@@ -1,0 +1,69 @@
+language: cpp
+
+os:
+    - linux
+
+compiler:
+    - gcc
+    - clang
+
+env:
+    global:
+        - secure: "ANVKlxG5kUtHRoiq94/XObDk6OmV7/LJKxv8mgQ0xY9vt7hx9bGHqu6XYOC8bZAM3p3AEOzPquSnNeNvxG2OQN+CsXCXtwhjcYtZ4x19+V4LAbv4Q90NScvnuq0IJ9WgoKNehYArihh8UlCimLnKnO0KHCBu0DEPaMT7rgn10Ag="
+    matrix:
+        - TRAVIS_BUILD_TYPE=Debug
+        - TRAVIS_BUILD_TYPE=Release
+
+cache: apt
+
+install:
+    # Store root directory
+    - export TRAV_ROOT=$(pwd)/..
+    # Store project root
+    - export PROJ_ROOT=$(pwd)
+
+    # Install icub
+    - sudo sh -c 'echo "deb http://www.icub.org/ubuntu precise contrib/science" > /etc/apt/sources.list.d/icub.list'
+    - sudo apt-get update
+    - sudo apt-get --force-yes install icub
+
+    # Install icub-contrib
+    - export ICUBcontrib_DIR=$TRAV_ROOT/iCubContrib
+    - cd $TRAV_ROOT
+#    - svn co https://svn.code.sf.net/p/robotcub/code/trunk/iCub/contrib/src/ICUBcontrib icub-contrib/src/ICUBcontrib
+    - git clone https://github.com/robotology/icub-contrib-common.git
+    - cd icub-contrib-common
+    - mkdir build
+    - cd build
+    - cmake .. -DCMAKE_BUILD_TYPE=${TRAVIS_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=$ICUBcontrib_DIR
+    - make
+    - sudo make install
+    - cd $TRAV_ROOT
+
+    # Install doxygen
+#    - sudo apt-get --force-yes install doxygen
+    -  wget http://mirrors.kernel.org/ubuntu/pool/main/d/doxygen/doxygen_1.8.4-1_amd64.deb
+    - sudo dpkg -i ./doxygen_1.8.4-1_amd64.deb
+    - sudo apt-get -f install 
+
+before_script:
+    - cd $PROJ_ROOT
+    - cmake --version
+    - mkdir build
+    - cd build
+    - cmake .. -DCMAKE_BUILD_TYPE=${TRAVIS_BUILD_TYPE}
+
+script:
+    # Build project
+    - make
+    - sudo make install
+
+after_success:
+    # Create doxygen documentation
+    - cd $PROJ_ROOT
+    - doxygen conf/Doxyfile > /dev/null
+
+    # Publish doxygen documentation
+    - cd $PROJ_ROOT
+    - chmod -R 744 .travis
+    - .travis/push-doxygen-to-gh-pages.sh
