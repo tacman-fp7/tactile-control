@@ -31,7 +31,7 @@ namespace iCub {
 
 				virtual void saveProgress();
 
-				virtual bool isOver();
+				virtual bool taskIsOver();
         };
     } //namespace plantIdentification
 } //namespace iCub

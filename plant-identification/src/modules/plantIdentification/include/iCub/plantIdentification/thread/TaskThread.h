@@ -3,6 +3,7 @@
 
 #include "iCub/plantIdentification/task/Task.h"
 #include "iCub/plantIdentification/data/TaskData.h"
+#include "iCub/plantIdentification/data/RPCCommandsData.h"
 #include "iCub/plantIdentification/data/LogData.h"
 #include "iCub/plantIdentification/util/ControllersUtil.h"
 #include "iCub/plantIdentification/util/PortsUtil.h"
@@ -57,9 +58,9 @@ namespace iCub {
 				void initializeGrasping();
 				void openHand();
 
-				void set(iCub::plantIdentification::SetParamName paramName,std::string paramValue);
-				void task(iCub::plantIdentification::TaskParamName paramName,double targetValue);
-				void view(iCub::plantIdentification::ViewParamName paramName);
+				void set(iCub::plantIdentification::RPCSetCmdArgName paramName,std::string paramValue);
+				void task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,std::string paramValue);
+				void view(iCub::plantIdentification::RPCViewCmdArgName paramName,iCub::plantIdentification::RPCCommandsData &rpcCmdData);
         };
     }
 }

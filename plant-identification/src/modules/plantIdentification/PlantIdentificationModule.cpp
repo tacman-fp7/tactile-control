@@ -11,7 +11,7 @@ using yarp::os::Value;
 /* *********************************************************************************************************************** */
 /* ******* Constructor                                                      ********************************************** */   
 PlantIdentificationModule::PlantIdentificationModule() 
-    : RFModule(), plantIdentification_IDLServer() {
+    : RFModule() {
         closing = false;
 
         dbgTag = "PlantIdentificationModule: ";
@@ -55,17 +55,11 @@ bool PlantIdentificationModule::configure(ResourceFinder &rf) {
     }
     taskThread->suspend();
 
+	rpcCmdUtil.init(&rpcCmdData);
+
     cout << dbgTag << "Started correctly. \n";
 
     return true;
-}
-/* *********************************************************************************************************************** */
-
-
-/* *********************************************************************************************************************** */
-/* ******* Attach RPC port                                                  ********************************************** */   
-bool PlantIdentificationModule::attach(yarp::os::RpcServer &source) {
-    return this->yarp().attachAsServer(source);
 }
 /* *********************************************************************************************************************** */
 
@@ -92,6 +86,36 @@ bool PlantIdentificationModule::interruptModule() {
 }
 /* *********************************************************************************************************************** */
 
+/* *********************************************************************************************************************** */
+/* ******* Manage commands coming from RPC Port                             ********************************************** */   
+bool PlantIdentificationModule::respond(const yarp::os::Bottle& command, yarp::os::Bottle& reply){
+
+	rpcCmdUtil.processCommand(command);
+
+	switch (rpcCmdUtil.mainCmd){
+
+	case SET:
+		set(rpcCmdUtil.setCmdArg,rpcCmdUtil.argValue);
+		break;
+	case TASK:
+		task(rpcCmdUtil.taskCmdArg,rpcCmdUtil.task,rpcCmdUtil.argValue);
+		break;
+	case VIEW:
+		view(rpcCmdUtil.viewCmdArg);
+		break;
+	case START:
+		start();
+		break;
+	case STOP:
+		stop();
+		break;
+	case QUIT:
+		quit();
+		break;
+	}
+
+	return true;
+}
 
 /* *********************************************************************************************************************** */
 /* ******* Close module                                                     ********************************************** */   
@@ -117,7 +141,7 @@ bool PlantIdentificationModule::close() {
 
 /* *********************************************************************************************************************** */
 /* ******* RPC Open hand                                                    ********************************************** */
-bool PlantIdentificationModule::open(void) {
+bool PlantIdentificationModule::stop(void) {
     
 	taskThread->suspend();
     
@@ -130,7 +154,7 @@ bool PlantIdentificationModule::open(void) {
 
 /* *********************************************************************************************************************** */
 /* ******* RPC Grasp object                                                 ********************************************** */
-bool PlantIdentificationModule::grasp(void) {
+bool PlantIdentificationModule::start(void) {
 
 	taskThread->initializeGrasping();
 
@@ -149,16 +173,16 @@ bool PlantIdentificationModule::quit(void) {
 /* *********************************************************************************************************************** */
 
 
-void PlantIdentificationModule::set(iCub::plantIdentification::SetParamName paramName,std::string paramValue){
+void PlantIdentificationModule::set(iCub::plantIdentification::RPCSetCmdArgName paramName,std::string paramValue){
 	taskThread->set(paramName,paramValue);
-	taskThread->view(SETTINGS);
+	view(SETTINGS);
 }
 
-void PlantIdentificationModule::task(iCub::plantIdentification::TaskParamName paramName,double targetValue = 0){
-	taskThread->task(paramName,targetValue);
-	taskThread->view(TASKS);
+void PlantIdentificationModule::task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,std::string paramValue){
+	taskThread->task(paramName,taskName,paramValue);
+	view(TASKS);
 }
 
-void PlantIdentificationModule::view(iCub::plantIdentification::ViewParamName paramName){
-	taskThread->view(paramName);
+void PlantIdentificationModule::view(iCub::plantIdentification::RPCViewCmdArgName paramName){
+	taskThread->view(paramName,rpcCmdData);
 }

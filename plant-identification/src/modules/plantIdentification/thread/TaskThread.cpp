@@ -140,7 +140,7 @@ void TaskThread::threadRelease() {
 /* *********************************************************************************************************************** */
 
 
-void TaskThread::set(iCub::plantIdentification::SetParamName paramName,std::string paramValue){
+void TaskThread::set(iCub::plantIdentification::RPCSetCmdArgName paramName,std::string paramValue){
 
 	switch (paramName){
 
@@ -187,35 +187,40 @@ void TaskThread::set(iCub::plantIdentification::SetParamName paramName,std::stri
 		break;
 
 	// ramp task data
-	case DB_SLOPE:
+	case RAMP_SLOPE:
 		taskData->rampData.slope = atof(paramValue.c_str());
 		break;
-	case DB_INTERCEPT:
+	case RAMP_INTERCEPT:
 		taskData->rampData.intercept = atof(paramValue.c_str());
 		break;
-	case DB_LIFESPAN:
+	case RAMP_LIFESPAN:
 		taskData->rampData.lifespan = atoi(paramValue.c_str());
 		break;
-	case DB_LIFESPAN_AFTER_STAB:
+	case RAMP_LIFESPAN_AFTER_STAB:
 		taskData->rampData.lifespanAfterStabilization = atoi(paramValue.c_str());
 		break;
 	}
 }
 
-void TaskThread::task(iCub::plantIdentification::TaskParamName paramName,double targetValue){
+void TaskThread::task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,string paramValue){
 
 	switch (paramName){
 
-	case STEP:
-		taskList.push_back(new StepTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->stepData,targetValue));
-		break;
+	case ADD:
 
-	case CONTROL:
-		taskList.push_back(new ControlTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->controlData,targetValue));
-		break;
+		switch (taskName){
+		case STEP:
+			taskList.push_back(new StepTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->stepData,atof(paramValue.c_str())));
+			break;
 
-	case RAMP:
-		taskList.push_back(new RampTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->rampData,targetValue));
+		case CONTROL:
+			taskList.push_back(new ControlTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->controlData,atof(paramValue.c_str())));
+			break;
+
+		case RAMP:
+			taskList.push_back(new RampTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->rampData,atof(paramValue.c_str())));
+			break;
+		}
 		break;
 
 	case EMPTY:
@@ -232,7 +237,7 @@ void TaskThread::task(iCub::plantIdentification::TaskParamName paramName,double 
 	}
 }
 
-void TaskThread::view(iCub::plantIdentification::ViewParamName paramName){
+void TaskThread::view(iCub::plantIdentification::RPCViewCmdArgName paramName,iCub::plantIdentification::RPCCommandsData &rpcCmdData){
 
 	switch (paramName){
 
@@ -240,28 +245,28 @@ void TaskThread::view(iCub::plantIdentification::ViewParamName paramName){
 		cout << "-------- SETTINGS --------" << "\n" <<
 		cout << "\n" <<
 		cout << "--- TASK COMMON DATA -----" << "\n" <<
-		cout << "FINGER_TO_MOVE (" << taskData->commonData.fingerToMove << ")" << "\n" <<
-		cout << "JOINT_TO_MOVE (" << taskData->commonData.jointToMove << ")" << "\n" <<
-		cout << "PWM_SIGN (" << taskData->commonData.pwmSign << ")" << "\n" <<
+		cout << rpcCmdData.getFullDescription(FINGER_TO_MOVE) << ": " << taskData->commonData.fingerToMove << "\n" <<
+		cout << rpcCmdData.getFullDescription(JOINT_TO_MOVE) << ": " << taskData->commonData.jointToMove << "\n" <<
+		cout << rpcCmdData.getFullDescription(PWM_SIGN) << ": " << taskData->commonData.pwmSign << "\n" <<
 		cout << "\n" <<
 		cout << "--- STEP TASK DATA -------" << "\n" <<
-		cout << "STEP_LIFESPAN (" << taskData->stepData.lifespan << ")" << "\n" <<
+		cout << rpcCmdData.getFullDescription(STEP_LIFESPAN) << ": " << taskData->stepData.lifespan << "\n" <<
 		cout << "\n" <<
 		cout << "--- CONTROL TASK DATA ----" << "\n" <<
-		cout << "CTRL_PID_KPF (" << taskData->controlData.pidKpf << ")" << "\n" <<
-		cout << "CTRL_PID_KIF (" << taskData->controlData.pidKif << ")" << "\n" <<
-		cout << "CTRL_PID_KDF (" << taskData->controlData.pidKdf << ")" << "\n" <<
-		cout << "CTRL_PID_KPB (" << taskData->controlData.pidKpb << ")" << "\n" <<
-		cout << "CTRL_PID_KIB (" << taskData->controlData.pidKib << ")" << "\n" <<
-		cout << "CTRL_PID_KDB (" << taskData->controlData.pidKdb << ")" << "\n" <<
-		cout << "CTRL_OP_MODE (" << taskData->controlData.controlMode << ")" << "\n" <<
-		cout << "CTRL_LIFESPAN (" << taskData->controlData.lifespan << ")" << "\n" <<
+		cout << rpcCmdData.getFullDescription(CTRL_PID_KPF) << ": " << taskData->controlData.pidKpf << "\n" <<
+		cout << rpcCmdData.getFullDescription(CTRL_PID_KIF) << ": " << taskData->controlData.pidKif << "\n" <<
+		cout << rpcCmdData.getFullDescription(CTRL_PID_KDF) << ": " << taskData->controlData.pidKdf << "\n" <<
+		cout << rpcCmdData.getFullDescription(CTRL_PID_KPB) << ": " << taskData->controlData.pidKpb << "\n" <<
+		cout << rpcCmdData.getFullDescription(CTRL_PID_KIB) << ": " << taskData->controlData.pidKib << "\n" <<
+		cout << rpcCmdData.getFullDescription(CTRL_PID_KDB) << ": " << taskData->controlData.pidKdb << "\n" <<
+		cout << rpcCmdData.getFullDescription(CTRL_OP_MODE) << ": " << taskData->controlData.controlMode << "\n" <<
+		cout << rpcCmdData.getFullDescription(CTRL_LIFESPAN) << ": " << taskData->controlData.lifespan << "\n" <<
 		cout << "\n" <<
 		cout << "--- RAMP TASK DATA ---" << "\n" <<
-		cout << "DB_SLOPE (" << taskData->rampData.slope << ")" << "\n" <<
-		cout << "DB_INTERCEPT (" << taskData->rampData.intercept << ")" << "\n" <<
-		cout << "DB_LIFESPAN (" << taskData->rampData.lifespan << ")" << "\n" <<
-		cout << "DB_LIFESPAN_AFTER_STAB (" << taskData->rampData.lifespanAfterStabilization << ")" << "\n";
+		cout << rpcCmdData.getFullDescription(RAMP_SLOPE) << ": " << taskData->rampData.slope << "\n" <<
+		cout << rpcCmdData.getFullDescription(RAMP_INTERCEPT) << ": " << taskData->rampData.intercept << "\n" <<
+		cout << rpcCmdData.getFullDescription(RAMP_LIFESPAN) << ": " << taskData->rampData.lifespan << "\n" <<
+		cout << rpcCmdData.getFullDescription(RAMP_LIFESPAN_AFTER_STAB) << ": " << taskData->rampData.lifespanAfterStabilization << "\n";
 		break;
 
 	case TASKS:

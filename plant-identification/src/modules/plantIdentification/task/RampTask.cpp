@@ -59,10 +59,8 @@ void RampTask::saveProgress(){
 	if (internalState == 1) callsNumberAfterStabilization++;
 }
 
-bool RampTask::isOver(){
+bool RampTask::taskIsOver(){
 
 	return callsNumber >= maxCallsNumber || callsNumberAfterStabilization >= maxCallsNumberAfterStabilization;
 }
-
-/* *********************************************************************************************************************** */
 

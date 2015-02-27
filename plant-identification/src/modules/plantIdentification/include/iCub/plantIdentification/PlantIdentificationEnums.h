@@ -4,7 +4,17 @@
 namespace iCub {
     namespace plantIdentification {
      
-		enum SetParamName {
+		enum RPCMainCmdName {
+
+			SET,
+			TASK,
+			VIEW,
+			START,
+			STOP,
+			QUIT
+		};
+
+		enum RPCSetCmdArgName {
 
 			FINGER_TO_MOVE,
 			JOINT_TO_MOVE,
@@ -21,23 +31,28 @@ namespace iCub {
 			CTRL_OP_MODE,
 			CTRL_LIFESPAN,
 
-			DB_SLOPE,
-			DB_INTERCEPT,
-			DB_LIFESPAN,
-			DB_LIFESPAN_AFTER_STAB
+			RAMP_SLOPE,
+			RAMP_INTERCEPT,
+			RAMP_LIFESPAN,
+			RAMP_LIFESPAN_AFTER_STAB
 		};
     
-		enum TaskParamName {
 
-			STEP,
-			CONTROL,
-			RAMP,
+		enum RPCTaskCmdArgName {
 
+			ADD,
 			EMPTY,
 			POP
 		};
 
-		enum ViewParamName {
+		enum TaskName {
+
+			STEP,
+			CONTROL,
+			RAMP,
+		};
+
+		enum RPCViewCmdArgName {
 
 			SETTINGS,
 			TASKS

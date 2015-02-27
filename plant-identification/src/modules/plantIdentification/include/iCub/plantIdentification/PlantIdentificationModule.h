@@ -1,18 +1,20 @@
 #ifndef __PLANTIDENTIFICATION_MODULE_H__
 #define __PLANTIDENTIFICATION_MODULE_H__
 
-#include "plantIdentification_IDLServer.h"
 #include "iCub/plantIdentification/thread/TaskThread.h"
+#include "iCub/plantIdentification/util/RPCCommandsUtil.h"
+#include "iCub/plantIdentification/data/RPCCommandsData.h"
 
 #include <string>
 
 #include <yarp/os/RFModule.h>
 #include <yarp/os/RpcServer.h>
+#include <yarp/os/Bottle.h>
 
 namespace iCub {
     namespace plantIdentification {
 
-        class PlantIdentificationModule : public yarp::os::RFModule, public plantIdentification_IDLServer {
+        class PlantIdentificationModule : public yarp::os::RFModule {
 
 			private:
 
@@ -24,6 +26,10 @@ namespace iCub {
                 
 				/* ****** RPC Ports                                     ****** */
 				yarp::os::RpcServer portPlantIdentificationRPC;
+
+				iCub::plantIdentification::RPCCommandsUtil rpcCmdUtil;
+				iCub::plantIdentification::RPCCommandsData rpcCmdData;
+
 
 				/* ****** Threads			                            ****** */
 				iCub::plantIdentification::TaskThread *taskThread;
@@ -39,17 +45,16 @@ namespace iCub {
 				virtual bool configure(yarp::os::ResourceFinder &rf);
 				virtual bool updateModule();
 				virtual bool interruptModule();
+				virtual bool respond(const yarp::os::Bottle& command, yarp::os::Bottle& reply);
 				virtual bool close();
-				virtual bool attach(yarp::os::RpcServer &source);
 
 				/* ****** RPC Methods                                  ****** */
-				virtual bool open(void);
-				virtual bool grasp(void);
-				virtual bool quit(void);
-				//TODO methods to add using thrift
-				virtual void set(iCub::plantIdentification::SetParamName paramName,std::string paramValue);
-				virtual void task(iCub::plantIdentification::TaskParamName paramName,double targetValue);
-				virtual void view(iCub::plantIdentification::ViewParamName paramName);
+				bool start(void);
+				bool stop(void);
+				bool quit(void);
+				void set(iCub::plantIdentification::RPCSetCmdArgName paramName,std::string paramValue);
+				void task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,std::string paramValue);
+				void view(iCub::plantIdentification::RPCViewCmdArgName paramName);
         };
     }
 }

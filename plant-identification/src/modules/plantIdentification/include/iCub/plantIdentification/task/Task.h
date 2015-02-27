@@ -20,7 +20,7 @@ namespace iCub {
 
 			protected:
 
-				iCub::plantIdentification::TaskParamName taskName;
+				iCub::plantIdentification::TaskName taskName;
 				iCub::plantIdentification::ControllersUtil *controllersUtil;
 				iCub::plantIdentification::PortsUtil *portsUtil;
 
@@ -29,7 +29,6 @@ namespace iCub {
 				int callsNumber;
 				int maxCallsNumber;
 				double pwmToUse;
-				bool taskIsOver;
 
                 /* ******* Debug attributes.                ******* */
                 std::string dbgTag;
@@ -38,7 +37,7 @@ namespace iCub {
                 
 				Task(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,int maxCallsNumber);
             
-				iCub::plantIdentification::TaskParamName getTaskName(){ return taskName; }
+				iCub::plantIdentification::TaskName getTaskName(){ return taskName; }
 
 				bool manage(bool keepActive);
 
@@ -58,7 +57,7 @@ namespace iCub {
 
 				virtual void saveProgress();
 
-				virtual bool isOver();
+				virtual bool taskIsOver();
 
 				virtual void release(){};
 

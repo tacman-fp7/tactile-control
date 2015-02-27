@@ -41,7 +41,7 @@ bool Task::manage(bool keepActive){
 
 	saveProgress();
 
-	if (isOver() && !keepActive){
+	if (taskIsOver() && !keepActive){
 		release();
 		return false;
 	}
@@ -101,7 +101,7 @@ void Task::saveProgress(){
 	callsNumber++;
 }
 
-bool Task::isOver(){
+bool Task::taskIsOver(){
 
 	return callsNumber >= maxCallsNumber;
 }
