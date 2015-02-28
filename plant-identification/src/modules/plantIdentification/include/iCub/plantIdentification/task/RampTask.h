@@ -1,6 +1,7 @@
 #ifndef __ICUB_PLANTIDENTIFICATION_RAMPTASK_H__
 #define __ICUB_PLANTIDENTIFICATION_RAMPTASK_H__
 
+#include "iCub/plantIdentification/PlantIdentificationEnums.h"
 #include "iCub/plantIdentification/task/Task.h"
 #include "iCub/plantIdentification/data/TaskData.h"
 #include "iCub/plantIdentification/util/ControllersUtil.h"
@@ -14,7 +15,7 @@ namespace iCub {
             private:
 
 				iCub::plantIdentification::RampTaskData *rampData;
-				int internalState;
+				iCub::plantIdentification::RampTaskState internalState;
 				double pressureTargetValue;
 				int callsNumberAfterStabilization;
 				int maxCallsNumberAfterStabilization;

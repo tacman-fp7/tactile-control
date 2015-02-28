@@ -1,5 +1,7 @@
 #include "iCub/plantIdentification/task/Task.h"
 
+#include <iCub/plantIdentification/PlantIdentificationEnums.h>
+
 #include <gsl/gsl_sort.h>
 #include <gsl/gsl_statistics.h>
 
@@ -39,6 +41,10 @@ bool Task::manage(bool keepActive){
 
 	portsUtil->sendLogData(logData);
 
+	if (callsNumber%commonData->screenLogStride == 0){
+		printScreenLog();
+	}
+
 	saveProgress();
 
 	if (taskIsOver() && !keepActive){
@@ -54,7 +60,17 @@ void Task::loadICubData(){
 
 	portsUtil->readFingerSkinCompData(commonData->fingerToMove,commonData->fingerTaxelsData);
 	
-	//TODO move this section in another utility class
+	processTactileData();
+	
+	controllersUtil->getEncoderAngle(PROXIMAL,&commonData->proximalJointAngle);
+	controllersUtil->getEncoderAngle(DISTAL,&commonData->distalJointAngle);
+
+	controllersUtil->getRealPwmValue(PROXIMAL,&commonData->realProximalPwm);
+	controllersUtil->getRealPwmValue(DISTAL,&commonData->realDistalPwm);
+}
+
+void Task::processTactileData(){
+
 	double partialOverallFingerPressure = 0.0;
 	for(size_t i = 0; i < commonData->fingerTaxelsData.size(); i++){
 		partialOverallFingerPressure += commonData->fingerTaxelsData[i];
@@ -62,16 +78,11 @@ void Task::loadICubData(){
 	commonData->overallFingerPressure = partialOverallFingerPressure;
 
 	commonData->previousOverallFingerPressures[commonData->previousPressuresIndex] = commonData->overallFingerPressure;
-	commonData->previousPressuresIndex++;
+	commonData->previousPressuresIndex = (commonData->previousPressuresIndex + 1)%commonData->previousOverallFingerPressures.size();
 
 	gsl_sort(&commonData->previousOverallFingerPressures[0],1,commonData->previousOverallFingerPressures.size());
 	commonData->overallFingerPressureMedian = gsl_stats_median_from_sorted_data(&commonData->previousOverallFingerPressures[0],1,commonData->previousOverallFingerPressures.size());
-	//TODO end section
 
-	controllersUtil->getProximalEncoderAngle(&commonData->proximalJointAngle);
-	controllersUtil->getDistalEncoderAngle(&commonData->distalJointAngle);
-	controllersUtil->getProximalRealPwmValue(&commonData->realProximalPwm);
-	controllersUtil->getDistalRealPwmValue(&commonData->realDistalPwm);
 }
 
 void Task::buildLogData(LogData &logData){
@@ -93,7 +104,11 @@ void Task::addCommonLogData(LogData &logData){
 	logData.realDistalPwm = commonData->realDistalPwm;
 
 	logData.pwm = pwmToUse;
+}
 
+void Task::printScreenLog(){
+
+	std::cout << dbgTag << "Sum: " << commonData->overallFingerPressureMedian << "\t   Pwm: " << pwmToUse <<"\n";
 }
 
 void Task::saveProgress(){

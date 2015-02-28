@@ -45,6 +45,8 @@ namespace iCub {
 
 				void addCommonLogData(iCub::plantIdentification::LogData &logData);
 
+				void processTactileData();
+
 			private:
 			
 				virtual void init(){};
@@ -54,6 +56,8 @@ namespace iCub {
 				virtual void calculatePwm() = 0;
 
 				virtual void buildLogData(iCub::plantIdentification::LogData &logData);
+
+				virtual void printScreenLog();
 
 				virtual void saveProgress();
 

@@ -58,6 +58,25 @@ namespace iCub {
 			TASKS
 		};
 
+		enum FingerJoint {
+
+			PROXIMAL,
+			DISTAL
+		};
+
+		enum RampTaskState {
+
+			DECREASING,
+			STEADY
+		};
+
+		enum ControlTaskOpMode {
+
+			GAINS_SET_POS_ERR = 0,
+			GAINS_SET_NEG_ERR = 1,
+			BOTH_GAINS_SETS = 2
+		};
+
 	}
 }
 

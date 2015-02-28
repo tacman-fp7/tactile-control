@@ -5,9 +5,11 @@
 #include <yarp/os/Time.h>
 #include <yarp/os/Value.h>
 
+using iCub::plantIdentification::ControllersUtil;
+using iCub::plantIdentification::FingerJoint;
+
 using std::string;
 using std::cout;
-using iCub::plantIdentification::ControllersUtil;
 using yarp::os::Property;
 
 
@@ -212,24 +214,33 @@ bool ControllersUtil::waitMoveDone(const double &i_timeout, const double &i_dela
 }
 /* *********************************************************************************************************************** */
 
-void ControllersUtil::getProximalEncoderAngle(double *encoderData){
+void ControllersUtil::getEncoderAngle(FingerJoint fingerJoint,double *encoderData){
 	
-	iEncs->getEncoder(jointToMove,encoderData);
-}
+	switch (fingerJoint){
 
-void ControllersUtil::getDistalEncoderAngle(double *encoderData){
+	case PROXIMAL:
+		iEncs->getEncoder(jointToMove,encoderData);
+		break;
+
+	case DISTAL:
+		iEncs->getEncoder(jointToMove + 1,encoderData);
+		break;
+	}
 	
-	iEncs->getEncoder(jointToMove + 1,encoderData);
 }
 
-void ControllersUtil::getProximalRealPwmValue(double *pwmValue){
+void ControllersUtil::getRealPwmValue(FingerJoint fingerJoint,double *pwmValue){
 
-	iOLC->getOutput(jointToMove,pwmValue);
-}
+	switch (fingerJoint){
 
-void ControllersUtil::getDistalRealPwmValue(double *pwmValue){
+	case PROXIMAL:
+		iOLC->getOutput(jointToMove,pwmValue);
+		break;
 
-	iOLC->getOutput(jointToMove + 1,pwmValue);
+	case DISTAL:
+		iOLC->getOutput(jointToMove + 1,pwmValue);
+		break;
+	}
 }
 
 void ControllersUtil::release(){

@@ -5,7 +5,10 @@
 #include "iCub/plantIdentification/data/TaskData.h"
 #include "iCub/plantIdentification/util/ControllersUtil.h"
 #include "iCub/plantIdentification/util/PortsUtil.h"
+
 #include <iCub/ctrl/pids.h>
+#include <yarp/os/Bottle.h>
+#include <yarp/os/Value.h>
 
 namespace iCub {
     namespace plantIdentification {
@@ -16,6 +19,10 @@ namespace iCub {
 
 				iCub::plantIdentification::ControlTaskData *controlData;
 				iCub::ctrl::parallelPID *pid;
+				// pid options bottle when error >= 0
+				yarp::os::Bottle pidOptionsPE;
+				// pid options bottle when error < 0
+				yarp::os::Bottle pidOptionsNE;
 				double pressureTargetValue;
 
             public:
@@ -29,6 +36,13 @@ namespace iCub {
 				virtual void calculatePwm();
 
 				virtual void release();
+
+		private :
+
+			void addOption(yarp::os::Bottle &bottle,char *paramName,yarp::os::Value paramValue);
+
+			void addOption(yarp::os::Bottle &bottle,char *paramName,yarp::os::Value paramValue1,yarp::os::Value paramValue2);
+
         };
     } //namespace plantIdentification
 } //namespace iCub

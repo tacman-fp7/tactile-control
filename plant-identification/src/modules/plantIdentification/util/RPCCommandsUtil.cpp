@@ -49,7 +49,6 @@ void RPCCommandsUtil::processCommand(const Bottle &rpcCmdBottle){
 
 }
 
-
 void RPCCommandsUtil::processTaskCommand(const Bottle &rpcCmdBottle){
 
 	taskCmdArg = rpcData->taskCmdArgRevMap[rpcCmdBottle.get(1).asString()];

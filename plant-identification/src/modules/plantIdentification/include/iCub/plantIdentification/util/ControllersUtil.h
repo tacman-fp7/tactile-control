@@ -1,6 +1,8 @@
 #ifndef __ICUB_PLANTIDENTIFICATION_CONTROLLERSUTIL_H__
 #define __ICUB_PLANTIDENTIFICATION_CONTROLLERSUTIL_H__
 
+#include <iCub/plantIdentification/PlantIdentificationEnums.h>
+
 #include <yarp/dev/PolyDriver.h>
 #include <yarp/dev/IEncoders.h>
 #include <yarp/dev/ControlBoardInterfaces.h>
@@ -51,13 +53,9 @@ namespace iCub {
 
 				void openHand();
 
-				void getProximalEncoderAngle(double *encoderData);
-				
-				void getDistalEncoderAngle(double *encoderData);
+				void getEncoderAngle(iCub::plantIdentification::FingerJoint fingerJoint,double *encoderData);
 
-				void getProximalRealPwmValue(double *pwmValue);
-
-				void getDistalRealPwmValue(double *pwmValue);
+				void getRealPwmValue(iCub::plantIdentification::FingerJoint fingerJoint,double *pwmValue);
 
 				void release();
 

@@ -180,7 +180,7 @@ void TaskThread::set(iCub::plantIdentification::RPCSetCmdArgName paramName,std::
 		taskData->controlData.pidKdb = atof(paramValue.c_str());
 		break;
 	case CTRL_OP_MODE:
-		taskData->controlData.controlMode = atoi(paramValue.c_str());
+		taskData->controlData.controlMode = static_cast<ControlTaskOpMode>(atoi(paramValue.c_str()));
 		break;
 	case CTRL_LIFESPAN:
 		taskData->controlData.lifespan = atoi(paramValue.c_str());

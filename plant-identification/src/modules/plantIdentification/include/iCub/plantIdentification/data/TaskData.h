@@ -1,6 +1,8 @@
 #ifndef __ICUB_PLANTIDENTIFICATION_TASKDATA_H__
 #define __ICUB_PLANTIDENTIFICATION_TASKDATA_H__
 
+#include "iCub/plantIdentification/PlantIdentificationEnums.h"
+
 #include <yarp/os/BufferedPort.h>
 #include <yarp/os/ResourceFinder.h>
 #include <yarp/sig/Vector.h>
@@ -26,6 +28,7 @@ namespace iCub {
 			int jointToMove;
 			int threadRate;
 			int pwmSign;
+			int screenLogStride;
 		};
 		typedef struct TaskCommonData TaskCommonData;
 
@@ -42,7 +45,14 @@ namespace iCub {
 			double pidKpb;
 			double pidKib;
 			double pidKdb;
-			int controlMode;
+			double pidN;
+			double pidMinSatLim;
+			double pidMaxSatLim;
+			double pidWp;
+			double pidWi;
+			double pidWd;
+			double pidWindUpCoeff;
+			iCub::plantIdentification::ControlTaskOpMode controlMode;
 			int lifespan;
 		};
 		typedef struct ControlTaskData ControlTaskData;

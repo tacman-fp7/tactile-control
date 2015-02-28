@@ -14,6 +14,8 @@ RampTask::RampTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCom
 	this->rampData = rampData;
 	this->pressureTargetValue = pressureTargetValue;
 
+	internalState = DECREASING;
+
 	callsNumberAfterStabilization = 0;
 	maxCallsNumberAfterStabilization = rampData->lifespanAfterStabilization*1000/commonData->threadRate;
 
@@ -25,19 +27,21 @@ void RampTask::calculatePwm(){
 
 	double pwmToUse;
 
-	//TODO use switch
-	if (internalState == 0){
+	switch (internalState){
+	
+	case DECREASING:
 
 		pwmToUse = rampData->intercept + rampData->slope*callsNumber*commonData->threadRate;
 
 		if (commonData->overallFingerPressure < pressureTargetValue){
-			internalState = 1;
+			internalState = STEADY;
 		}
+		break;
 
-	} else {
+	case STEADY:
 
 		pwmToUse = 0.0;
-
+		break;
 	}
 
 	this->pwmToUse = pwmToUse;
