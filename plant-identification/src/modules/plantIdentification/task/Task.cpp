@@ -24,7 +24,7 @@ Task::Task(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData 
 }
 
 bool Task::manage(bool keepActive){
-
+	
 	if (isFirstCall){
 		init();
 		isFirstCall = false;
@@ -55,10 +55,10 @@ bool Task::manage(bool keepActive){
 	return true;
 }
 
-void Task::loadICubData(){
+bool Task::loadICubData(){
 	using yarp::sig::Vector;
 
-	portsUtil->readFingerSkinCompData(commonData->fingerToMove,commonData->fingerTaxelsData);
+	if (!portsUtil->readFingerSkinCompData(commonData->fingerToMove,commonData->fingerTaxelsData)) return false;
 	
 	processTactileData();
 	
@@ -67,6 +67,8 @@ void Task::loadICubData(){
 
 	controllersUtil->getRealPwmValue(PROXIMAL,&commonData->realProximalPwm);
 	controllersUtil->getRealPwmValue(DISTAL,&commonData->realDistalPwm);
+
+	return true;
 }
 
 void Task::processTactileData(){
@@ -108,7 +110,7 @@ void Task::addCommonLogData(LogData &logData){
 
 void Task::printScreenLog(){
 
-	std::cout << dbgTag << "Sum: " << commonData->overallFingerPressureMedian << "\t   Pwm: " << pwmToUse <<"\n";
+	std::cout << dbgTag << "Sum: " << commonData->overallFingerPressure << "\t   Median: " << commonData->overallFingerPressureMedian << "\t   Pwm: " << pwmToUse <<"\n";
 }
 
 void Task::saveProgress(){

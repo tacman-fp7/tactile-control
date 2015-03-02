@@ -1,6 +1,6 @@
 #include "iCub/plantIdentification/task/StepTask.h"
 
-#include "iCub/plantIdentification/plantIdentificationEnums.h"
+#include "iCub/plantIdentification/PlantIdentificationEnums.h"
 
 using iCub::plantIdentification::StepTask;
 using iCub::plantIdentification::LogData;
@@ -16,6 +16,11 @@ StepTask::StepTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCom
 
 	taskName = STEP;
 	dbgTag = "StepTask: ";
+}
+
+void StepTask::init(){
+
+	std::cout << dbgTag << "TASK STARTED - Target: " << constantPwm << "\n";
 }
 
 void StepTask::calculatePwm(){

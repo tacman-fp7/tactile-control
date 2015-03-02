@@ -20,6 +20,8 @@ namespace iCub {
 
                 StepTask(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,iCub::plantIdentification::StepTaskData *stepData,double constantPwm);
 
+				virtual void init();
+
 				double getConstantPwm(){ return constantPwm; }
 
 				virtual void buildLogData(iCub::plantIdentification::LogData &logData);

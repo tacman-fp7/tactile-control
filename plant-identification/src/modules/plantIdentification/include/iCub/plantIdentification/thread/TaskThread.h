@@ -55,11 +55,11 @@ namespace iCub {
                 virtual void run(void);
                 virtual void threadRelease(void);
 
-				void initializeGrasping();
-				void openHand();
+				bool initializeGrasping();
+				bool openHand();
 
-				void set(iCub::plantIdentification::RPCSetCmdArgName paramName,std::string paramValue);
-				void task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,std::string paramValue);
+				void set(iCub::plantIdentification::RPCSetCmdArgName paramName,std::string paramValue,iCub::plantIdentification::RPCCommandsData &rpcCmdData);
+				void task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,std::string paramValue,iCub::plantIdentification::RPCCommandsData &rpcCmdData);
 				void view(iCub::plantIdentification::RPCViewCmdArgName paramName,iCub::plantIdentification::RPCCommandsData &rpcCmdData);
         };
     }

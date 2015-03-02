@@ -24,13 +24,15 @@ namespace iCub {
 
 			public:
 
-				PortsUtil(yarp::os::ResourceFinder &rf);
+				PortsUtil();
 
-				void sendLogData(iCub::plantIdentification::LogData &logData);
+				bool init(yarp::os::ResourceFinder &rf);
 
-				void readFingerSkinCompData(int finger,std::vector<double> &fingerTaxelsData);
+				bool sendLogData(iCub::plantIdentification::LogData &logData);
 
-				void release();
+				bool readFingerSkinCompData(int finger,std::vector<double> &fingerTaxelsData);
+
+				bool release();
         };
     } //namespace plantIdentification
 } //namespace iCub

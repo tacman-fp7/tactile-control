@@ -51,7 +51,7 @@ namespace iCub {
 			
 				virtual void init(){};
 
-				virtual void loadICubData();
+				virtual bool loadICubData();
 
 				virtual void calculatePwm() = 0;
 

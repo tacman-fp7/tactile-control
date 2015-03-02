@@ -18,6 +18,11 @@ using std::cout;
 using std::string;
 
 using iCub::plantIdentification::TaskThread;
+using iCub::plantIdentification::RPCSetCmdArgName;
+using iCub::plantIdentification::RPCTaskCmdArgName;
+using iCub::plantIdentification::TaskName;
+using iCub::plantIdentification::RPCViewCmdArgName;
+using iCub::plantIdentification::RPCCommandsData;
 
 using yarp::os::RateThread;
 using yarp::os::Value;
@@ -55,18 +60,21 @@ bool TaskThread::threadInit(void) {
 	currentTaskIndex = 0;
 
 	// initialize controllers
-	controllersUtil = new ControllersUtil(rf);
-	
+	controllersUtil = new ControllersUtil();
+	if (!controllersUtil->init(rf)) return false;;
+
 	// initialize ports
-	portsUtil = new PortsUtil(rf);
-	
+	portsUtil = new PortsUtil();
+	if (portsUtil->init(rf)) return false;
+
 	// initialize task data
 	taskData = new TaskData(rf,period);
 
-	// save current arm position, to be restored when the thread ends
-	controllersUtil->saveCurrentArmPosition();
 
-	controllersUtil->setArmInTaskPosition();
+	// save current arm position, to be restored when the thread ends
+	if (!controllersUtil->saveCurrentArmPosition()) return false;
+
+	if (!controllersUtil->setArmInTaskPosition()) return false;
  
 	// this prevent the run() method to be executed between the taskThread->start() and the taskThread->suspend() calls during the PlantIdentificationModule initialization
 	runEnabled = false;
@@ -78,12 +86,14 @@ bool TaskThread::threadInit(void) {
 /* *********************************************************************************************************************** */
 
 
-void TaskThread::initializeGrasping(){
+bool TaskThread::initializeGrasping(){
 
-	controllersUtil->init(taskData->commonData.jointToMove);
-	controllersUtil->saveCurrentControlMode();
-	controllersUtil->setTaskControlMode();
+	controllersUtil->setJoint(taskData->commonData.jointToMove);
+	if (!controllersUtil->saveCurrentControlMode()) return false;
+	if (!controllersUtil->setTaskControlMode()) return false;
 	runEnabled = true;
+
+	return true;
 }
 
 
@@ -104,19 +114,17 @@ void TaskThread::run(void) {
 			if (!taskIsActive){
 				currentTaskIndex++;
 			}
-
 		}
-
 	}
-
 }
 
-void TaskThread::openHand(){
+bool TaskThread::openHand(){
 
-	controllersUtil->restorePreviousControlMode();
-	controllersUtil->openHand();
+	if (!controllersUtil->restorePreviousControlMode()) return false;
+	if (!controllersUtil->openHand()) return false;
 	runEnabled = false;
 
+	return true;
 }
 
 /* *********************************************************************************************************************** */
@@ -140,7 +148,7 @@ void TaskThread::threadRelease() {
 /* *********************************************************************************************************************** */
 
 
-void TaskThread::set(iCub::plantIdentification::RPCSetCmdArgName paramName,std::string paramValue){
+void TaskThread::set(RPCSetCmdArgName paramName,string paramValue,RPCCommandsData &rpcCmdData){
 
 	switch (paramName){
 
@@ -200,9 +208,11 @@ void TaskThread::set(iCub::plantIdentification::RPCSetCmdArgName paramName,std::
 		taskData->rampData.lifespanAfterStabilization = atoi(paramValue.c_str());
 		break;
 	}
+
+	cout << dbgTag << "'" << rpcCmdData.setCmdArgMap[paramName] << "' SET TO " << paramValue << "\n";
 }
 
-void TaskThread::task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,string paramValue){
+void TaskThread::task(RPCTaskCmdArgName paramName,TaskName taskName,string paramValue,RPCCommandsData &rpcCmdData){
 
 	switch (paramName){
 
@@ -221,6 +231,7 @@ void TaskThread::task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCu
 			taskList.push_back(new RampTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->rampData,atof(paramValue.c_str())));
 			break;
 		}
+		cout << dbgTag << "ADDED '" << rpcCmdData.taskMap[taskName] << "' TASK" << "\n";
 		break;
 
 	case EMPTY:
@@ -228,16 +239,18 @@ void TaskThread::task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCu
 			delete(taskList[i]);
 		}
 		taskList.clear();
+		cout << dbgTag << "TASKS LIST CLEARED" << "\n";
 		break;
 
 	case POP:
 		delete(taskList[taskList.size() - 1]);
 		taskList.pop_back();
+		cout << dbgTag << "LAST TASK REMOVED" << "\n";
 		break;
 	}
 }
 
-void TaskThread::view(iCub::plantIdentification::RPCViewCmdArgName paramName,iCub::plantIdentification::RPCCommandsData &rpcCmdData){
+void TaskThread::view(RPCViewCmdArgName paramName,RPCCommandsData &rpcCmdData){
 
 	switch (paramName){
 

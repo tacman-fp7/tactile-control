@@ -1,6 +1,6 @@
 #include "iCub/plantIdentification/task/RampTask.h"
 
-#include "iCub/plantIdentification/plantIdentificationEnums.h"
+#include "iCub/plantIdentification/PlantIdentificationEnums.h"
 
 using iCub::plantIdentification::RampTask;
 using iCub::plantIdentification::LogData;
@@ -21,6 +21,11 @@ RampTask::RampTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCom
 
 	taskName = RAMP;
 	dbgTag = "RampTask: ";
+}
+
+void RampTask::init(){
+	
+	std::cout << dbgTag << "TASK STARTED - Target: " << pressureTargetValue << "\n";
 }
 
 void RampTask::calculatePwm(){

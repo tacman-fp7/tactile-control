@@ -1,6 +1,6 @@
 #include "iCub/plantIdentification/task/ControlTask.h"
 
-#include "iCub/plantIdentification/plantIdentificationEnums.h"
+#include "iCub/plantIdentification/PlantIdentificationEnums.h"
 
 #include <yarp/sig/Vector.h>
 #include <yarp/sig/Matrix.h>
@@ -98,6 +98,11 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	
 	taskName = CONTROL;
 	dbgTag = "ControlTask: ";
+}
+
+void ControlTask::init(){
+
+	std::cout << dbgTag << "TASK STARTED - Target: " << pressureTargetValue << "\n";
 }
 
 void ControlTask::calculatePwm(){

@@ -31,17 +31,19 @@ namespace iCub {
 
 				double getPressureTargetValue(){ return pressureTargetValue; }
 
+				virtual void init();
+
 				virtual void buildLogData(LogData &logData);
 
 				virtual void calculatePwm();
 
 				virtual void release();
 
-		private :
+			private :
 
-			void addOption(yarp::os::Bottle &bottle,char *paramName,yarp::os::Value paramValue);
+				void addOption(yarp::os::Bottle &bottle,char *paramName,yarp::os::Value paramValue);
 
-			void addOption(yarp::os::Bottle &bottle,char *paramName,yarp::os::Value paramValue1,yarp::os::Value paramValue2);
+				void addOption(yarp::os::Bottle &bottle,char *paramName,yarp::os::Value paramValue1,yarp::os::Value paramValue2);
 
         };
     } //namespace plantIdentification

@@ -10,7 +10,12 @@ using yarp::os::Value;
 using iCub::plantIdentification::PortsUtil;
 using iCub::plantIdentification::LogData;
 
-PortsUtil::PortsUtil(yarp::os::ResourceFinder &rf){
+PortsUtil::PortsUtil(){
+
+	dbgTag = "PortsUtil: ";
+}
+
+bool PortsUtil::init(yarp::os::ResourceFinder &rf){
 	using yarp::os::Network;
 
 	string whichHand = rf.check("whichHand", Value("right")).asString().c_str();
@@ -22,10 +27,10 @@ PortsUtil::PortsUtil(yarp::os::ResourceFinder &rf){
 	// connecting ports
 	Network::connect(("/icub/skin/" + whichHand + "_hand_comp"), ("/PlantIdentification/skin/" + whichHand + "_hand_comp:i"));
 
-	dbgTag = "PortsUtil: ";
+	return true;
 }
 
-void PortsUtil::sendLogData(LogData &logData){
+bool PortsUtil::sendLogData(LogData &logData){
 
 	using yarp::os::Bottle;
 
@@ -33,9 +38,11 @@ void PortsUtil::sendLogData(LogData &logData){
 	logBottle.clear();
 	logData.toBottle(logBottle);
 	portLogDataOut.write();
+
+	return true;
 }
 
-void PortsUtil::readFingerSkinCompData(int finger,std::vector<double> &fingerTaxelsData){
+bool PortsUtil::readFingerSkinCompData(int finger,std::vector<double> &fingerTaxelsData){
 
 	using yarp::sig::Vector;
 
@@ -46,15 +53,19 @@ void PortsUtil::readFingerSkinCompData(int finger,std::vector<double> &fingerTax
 			fingerTaxelsData[i] = (*iCubSkinData)[12*finger + i];
 		}
 	}
+
+	return true;
 }
 
-void PortsUtil::release(){
+bool PortsUtil::release(){
 
 	portLogDataOut.interrupt();
 	portSkinCompIn.interrupt();
 
 	portLogDataOut.close();
 	portSkinCompIn.close();
+
+	return true;
 }
 
 /* *********************************************************************************************************************** */

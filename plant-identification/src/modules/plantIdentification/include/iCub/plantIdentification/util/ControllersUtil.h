@@ -33,31 +33,33 @@ namespace iCub {
 
             public:
 
-				ControllersUtil(yarp::os::ResourceFinder &rf);
+				ControllersUtil();
 
-				void init(int jointToMove);
+				bool init(yarp::os::ResourceFinder &rf);
 
-				void sendPwm(double pwm);
+				void setJoint(int jointToMove){ this->jointToMove = jointToMove; }
 
-				void saveCurrentArmPosition();
+				bool sendPwm(double pwm);
 
-				void saveCurrentControlMode();
+				bool saveCurrentArmPosition();
 
-				void setTaskControlMode();
+				bool saveCurrentControlMode();
 
-				void setArmInTaskPosition();
+				bool setTaskControlMode();
 
-				void restorePreviousArmPosition();
+				bool setArmInTaskPosition();
 
-				void restorePreviousControlMode();
+				bool restorePreviousArmPosition();
 
-				void openHand();
+				bool restorePreviousControlMode();
 
-				void getEncoderAngle(iCub::plantIdentification::FingerJoint fingerJoint,double *encoderData);
+				bool openHand();
 
-				void getRealPwmValue(iCub::plantIdentification::FingerJoint fingerJoint,double *pwmValue);
+				bool getEncoderAngle(iCub::plantIdentification::FingerJoint fingerJoint,double *encoderData);
 
-				void release();
+				bool getRealPwmValue(iCub::plantIdentification::FingerJoint fingerJoint,double *pwmValue);
+
+				bool release();
 
 			private:
 

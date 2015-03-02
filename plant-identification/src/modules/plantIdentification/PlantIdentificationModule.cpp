@@ -156,7 +156,7 @@ bool PlantIdentificationModule::stop(void) {
 /* ******* RPC Grasp object                                                 ********************************************** */
 bool PlantIdentificationModule::start(void) {
 
-	taskThread->initializeGrasping();
+	if (!taskThread->initializeGrasping()) return false;
 
 	taskThread->resume();
 
@@ -174,12 +174,12 @@ bool PlantIdentificationModule::quit(void) {
 
 
 void PlantIdentificationModule::set(iCub::plantIdentification::RPCSetCmdArgName paramName,std::string paramValue){
-	taskThread->set(paramName,paramValue);
+	taskThread->set(paramName,paramValue,rpcCmdData);
 	view(SETTINGS);
 }
 
 void PlantIdentificationModule::task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,std::string paramValue){
-	taskThread->task(paramName,taskName,paramValue);
+	taskThread->task(paramName,taskName,paramValue,rpcCmdData);
 	view(TASKS);
 }
 

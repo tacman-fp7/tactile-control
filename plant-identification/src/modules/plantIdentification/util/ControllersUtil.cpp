@@ -13,11 +13,14 @@ using std::cout;
 using yarp::os::Property;
 
 
-ControllersUtil::ControllersUtil(yarp::os::ResourceFinder &rf){
-	using std::vector;
-	using yarp::os::Value;
+ControllersUtil::ControllersUtil(){
 
 	dbgTag = "ControllersUtil: ";
+}
+
+bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
+	using std::vector;
+	using yarp::os::Value;
 
 	string robotName = rf.check("robot", Value("icub"), "The robot name.").asString().c_str();
     string whichHand = rf.check("whichHand", Value("right"), "The hand to be used for the grasping.").asString().c_str();
@@ -33,28 +36,34 @@ ControllersUtil::ControllersUtil(yarp::os::ResourceFinder &rf){
     
     // Open driver
     if (!clientArm.open(options)) {
-//        return false;
+        cout << dbgTag << "could not open driver\n";
+		return false;
     }
     // Open interfaces
     clientArm.view(iEncs);
     if (!iEncs) {
-//        return false;
+		cout << dbgTag << "could not open encoders interface\n";
+        return false;
     }
 	clientArm.view(iOLC);
     if (!iOLC) {
-//        return false;
+		cout << dbgTag << "could not open open-loop interface\n";
+        return false;
     }
 	clientArm.view(iCtrl);
     if (!iCtrl) {
-//        return false;
+		cout << dbgTag << "could not open control mode interface\n";
+        return false;
     }
 	clientArm.view(iPos);
     if (!iPos) {
-//        return false;
+		cout << dbgTag << "could not open position interface\n";
+        return false;
     }
 	clientArm.view(iVel);
     if (!iVel) {
-//        return false;
+		cout << dbgTag << "could not open velocity interface\n";
+        return false;
     }
 
 	iPos->getAxes(&armJointsNum);
@@ -66,19 +75,20 @@ ControllersUtil::ControllersUtil(yarp::os::ResourceFinder &rf){
         refSpeeds[i] = 50;
     }
     iPos->setRefSpeeds(&refSpeeds[0]);
+
+	return true;
 }
 
-void ControllersUtil::init(int jointToMove){
+bool ControllersUtil::sendPwm(double pwm){
 
-	this->jointToMove = jointToMove;
+	if (!iOLC->setRefOutput(jointToMove,pwm)){
+		cout << dbgTag << "could not send pwm\n";
+		return false;
+	}
+	return true;
 }
 
-void ControllersUtil::sendPwm(double pwm){
-
-	iOLC->setRefOutput(jointToMove,pwm);
-}
-
-void ControllersUtil::saveCurrentArmPosition(){
+bool ControllersUtil::saveCurrentArmPosition(){
 	using yarp::os::Time;
 
     armStoredPosition.resize(armJointsNum);
@@ -88,9 +98,9 @@ void ControllersUtil::saveCurrentArmPosition(){
 
         encodersDataAcquired = iEncs->getEncoders(armStoredPosition.data());
 
-#ifndef NODEBUG
+//#ifndef NODEBUG
         cout << "DEBUG: " << dbgTag << "Encoder data is not available yet. \n";
-#endif
+//#endif
 
 		Time::delay(0.1);
     }
@@ -103,25 +113,31 @@ void ControllersUtil::saveCurrentArmPosition(){
     }
     cout << "\n";
 #endif
+
+	return true;
 }
 
-void ControllersUtil::saveCurrentControlMode(){
+bool ControllersUtil::saveCurrentControlMode(){
 
-	iCtrl->getControlMode(jointToMove,&jointStoredControlMode);
+	if (!iCtrl->getControlMode(jointToMove,&jointStoredControlMode)){
+		cout << dbgTag << "could not get current control mode\n";
+		return false;
+	}
+	return true;
 }
 
-void ControllersUtil::setTaskControlMode(){
+bool ControllersUtil::setTaskControlMode(){
 
-	setControlMode(VOCAB_CM_OPENLOOP,true);
+	return setControlMode(VOCAB_CM_OPENLOOP,true);
 }
 
 
 /* ******* Place arm in grasping position                                   ********************************************** */ 
-void ControllersUtil::setArmInTaskPosition() {
+bool ControllersUtil::setArmInTaskPosition() {
 
     cout << dbgTag << "Reaching for grasp ... \t";
     
-    iVel->stop();
+	iVel->stop();
 
     // Set the arm in the starting position
 	// Arm
@@ -148,10 +164,11 @@ void ControllersUtil::setArmInTaskPosition() {
     waitMoveDone(10, 1);
 	cout << "Done. \n";
 
+	return true;
 }
 /* *********************************************************************************************************************** */
 
-void ControllersUtil::restorePreviousArmPosition(){
+bool ControllersUtil::restorePreviousArmPosition(){
 	
 	// Stop interfaces
     if (iVel) {
@@ -162,12 +179,13 @@ void ControllersUtil::restorePreviousArmPosition(){
         // Restore initial robot position
         iPos->positionMove(armStoredPosition.data());
     }
+
+	return true;
 }
 
-void ControllersUtil::restorePreviousControlMode(){
+bool ControllersUtil::restorePreviousControlMode(){
 
-	setControlMode(jointStoredControlMode,true);
-
+	return setControlMode(jointStoredControlMode,true);
 }
 
 bool ControllersUtil::setControlMode(int controlMode,bool checkCurrent){
@@ -214,44 +232,61 @@ bool ControllersUtil::waitMoveDone(const double &i_timeout, const double &i_dela
 }
 /* *********************************************************************************************************************** */
 
-void ControllersUtil::getEncoderAngle(FingerJoint fingerJoint,double *encoderData){
+bool ControllersUtil::getEncoderAngle(FingerJoint fingerJoint,double *encoderData){
 	
-	switch (fingerJoint){
-
-	case PROXIMAL:
-		iEncs->getEncoder(jointToMove,encoderData);
-		break;
-
-	case DISTAL:
-		iEncs->getEncoder(jointToMove + 1,encoderData);
-		break;
-	}
-	
-}
-
-void ControllersUtil::getRealPwmValue(FingerJoint fingerJoint,double *pwmValue){
+	bool ok;
 
 	switch (fingerJoint){
 
 	case PROXIMAL:
-		iOLC->getOutput(jointToMove,pwmValue);
+		ok = iEncs->getEncoder(jointToMove,encoderData);
 		break;
 
 	case DISTAL:
-		iOLC->getOutput(jointToMove + 1,pwmValue);
+		ok = iEncs->getEncoder(jointToMove + 1,encoderData);
 		break;
 	}
+	
+	if (!ok){
+		cout << dbgTag << "could not get encoder value\n";
+	}
+	return ok;
 }
 
-void ControllersUtil::release(){
+bool ControllersUtil::getRealPwmValue(FingerJoint fingerJoint,double *pwmValue){
+
+	bool ok;
+
+	switch (fingerJoint){
+
+	case PROXIMAL:
+		ok = iOLC->getOutput(jointToMove,pwmValue);
+		break;
+
+	case DISTAL:
+		ok = iOLC->getOutput(jointToMove + 1,pwmValue);
+		break;
+	}
+
+	if (!ok){
+		cout << dbgTag << "could not get pwm value\n";
+	}
+	return ok;
+}
+
+bool ControllersUtil::release(){
 
     // Close driver
-    clientArm.close();
+    if (!clientArm.close()){
+		cout << dbgTag << "could not close driver\n";	
+		return false;
+	}
+	return true;
 }
 
 /* *********************************************************************************************************************** */
 /* ******* Open hand                                                        ********************************************** */
-void ControllersUtil::openHand() {
+bool ControllersUtil::openHand() {
     
 	cout << dbgTag << "Opening hand ... \t";
     
@@ -273,6 +308,8 @@ void ControllersUtil::openHand() {
     // Check motion done
     waitMoveDone(10, 1);
     cout << "Done. \n";
+
+	return true;
 }
 
 /* *********************************************************************************************************************** */

@@ -22,7 +22,9 @@ namespace iCub {
 
             public:
 
-                iCub::plantIdentification::RampTask(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,iCub::plantIdentification::RampTaskData *rampData,double pressureTargetValue);
+                RampTask(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,iCub::plantIdentification::RampTaskData *rampData,double pressureTargetValue);
+
+				virtual void init();
 
 				double getPressureTargetValue(){ return pressureTargetValue; }
 
