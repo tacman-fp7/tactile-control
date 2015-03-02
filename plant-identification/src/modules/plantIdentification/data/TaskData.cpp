@@ -15,6 +15,7 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,int threadRate) {
 	commonData.jointToMove = rf.check("jointToMove",13).asInt();
 	commonData.pwmSign = rf.check("pwmSign",1).asInt();
 	commonData.screenLogStride = rf.check("screenLogStride",10).asInt();
+    commonData.fingerTaxelsData.resize(12,0.0);
 	commonData.previousOverallFingerPressures.resize(rf.check("medianWidth",20).asInt(),0.0);
 	commonData.previousPressuresIndex = 0;
 

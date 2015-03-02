@@ -11,6 +11,7 @@
 
 #include <yarp/os/RateThread.h>
 #include <yarp/os/ResourceFinder.h>
+#include <yarp/os/Value.h>
 #include <yarp/sig/Vector.h>
 
 #include <fstream>
@@ -58,8 +59,8 @@ namespace iCub {
 				bool initializeGrasping();
 				bool openHand();
 
-				void set(iCub::plantIdentification::RPCSetCmdArgName paramName,std::string paramValue,iCub::plantIdentification::RPCCommandsData &rpcCmdData);
-				void task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,std::string paramValue,iCub::plantIdentification::RPCCommandsData &rpcCmdData);
+				void set(iCub::plantIdentification::RPCSetCmdArgName paramName,yarp::os::Value paramValue,iCub::plantIdentification::RPCCommandsData &rpcCmdData);
+				void task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,yarp::os::Value paramValue,iCub::plantIdentification::RPCCommandsData &rpcCmdData);
 				void view(iCub::plantIdentification::RPCViewCmdArgName paramName,iCub::plantIdentification::RPCCommandsData &rpcCmdData);
         };
     }

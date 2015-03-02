@@ -5,6 +5,7 @@
 #include "iCub/plantIdentification/data/RPCCommandsData.h"
 
 #include <yarp/os/Bottle.h>
+#include <yarp/os/Value.h>
 
 #include <map>
 
@@ -28,7 +29,7 @@ namespace iCub {
 				iCub::plantIdentification::RPCViewCmdArgName viewCmdArg;
 				iCub::plantIdentification::TaskName task;
 
-				std::string argValue;
+				yarp::os::Value argValue;
 
 
 				RPCCommandsUtil();

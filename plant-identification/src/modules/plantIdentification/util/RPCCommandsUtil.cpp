@@ -30,7 +30,7 @@ void RPCCommandsUtil::processCommand(const Bottle &rpcCmdBottle){
 
 	case SET:
 		setCmdArg = rpcData->setCmdArgRevMap[rpcCmdBottle.get(1).asString()];
-		argValue = rpcCmdBottle.get(2).asString();
+		argValue = rpcCmdBottle.get(2);
 		break;
 	case TASK:
 		processTaskCommand(rpcCmdBottle);
@@ -40,7 +40,7 @@ void RPCCommandsUtil::processCommand(const Bottle &rpcCmdBottle){
 		break;
 	case START: // do nothing
 		break;
-	case STOP:
+	case STOP: // do nothing
 		break;
 	case QUIT: // do nothing
 		break;
@@ -56,7 +56,7 @@ void RPCCommandsUtil::processTaskCommand(const Bottle &rpcCmdBottle){
 
 	case ADD:
 		task = rpcData->taskRevMap[rpcCmdBottle.get(2).asString()];
-		argValue = rpcCmdBottle.get(3).asString();
+		argValue = rpcCmdBottle.get(3);
 		break;
 	case EMPTY: // do nothing
 		break;

@@ -17,15 +17,29 @@ PortsUtil::PortsUtil(){
 
 bool PortsUtil::init(yarp::os::ResourceFinder &rf){
 	using yarp::os::Network;
+    using std::cout;
 
 	string whichHand = rf.check("whichHand", Value("right")).asString().c_str();
+    string moduleSkinCompPortName = "/PlantIdentification/skin/" + whichHand + "_hand_comp:i";
+    string icubSkinCompPortName = "/icub/skin/" + whichHand + "_hand_comp";
+    string logDataPortName = "/PlantIdentification/log:o";
 
-	// opening ports
-	portSkinCompIn.open("/PlantIdentification/skin/" + whichHand + "_hand_comp:i");
-	portLogDataOut.open("/PlantIdentification/log:o");
+    // opening ports
+	if (!portSkinCompIn.open(moduleSkinCompPortName)){
+        cout << dbgTag << "could not open " << moduleSkinCompPortName << " port \n";
+        return false;
+    }
+	if (!portLogDataOut.open(logDataPortName)){
+        cout << dbgTag << "could not open " << logDataPortName << " port \n";
+        return false;
+    }
 
 	// connecting ports
-	Network::connect(("/icub/skin/" + whichHand + "_hand_comp"), ("/PlantIdentification/skin/" + whichHand + "_hand_comp:i"));
+	if (!Network::connect(icubSkinCompPortName,moduleSkinCompPortName)){
+        cout << dbgTag << "could not connect ports: " << icubSkinCompPortName << " -> " <<  moduleSkinCompPortName << "\n";
+        return false;
+    }
+
 
 	return true;
 }
@@ -47,8 +61,9 @@ bool PortsUtil::readFingerSkinCompData(int finger,std::vector<double> &fingerTax
 	using yarp::sig::Vector;
 
 	Vector *iCubSkinData = portSkinCompIn.read(false);
-
+    
     if (iCubSkinData) {
+
 		for (size_t i = 0; i < fingerTaxelsData.size(); i++){
 			fingerTaxelsData[i] = (*iCubSkinData)[12*finger + i];
 		}

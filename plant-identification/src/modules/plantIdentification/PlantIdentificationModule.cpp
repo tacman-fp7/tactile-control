@@ -50,7 +50,7 @@ bool PlantIdentificationModule::configure(ResourceFinder &rf) {
     /* ******* Threads                                          ******* */
     taskThread = new TaskThread(20, rf);
     if (!taskThread->start()) {
-        cout << dbgTag << "Could not start the grasp thread. \n";
+        cout << dbgTag << "Could not start the task thread. \n";
         return false;
     }
     taskThread->suspend();
@@ -173,12 +173,12 @@ bool PlantIdentificationModule::quit(void) {
 /* *********************************************************************************************************************** */
 
 
-void PlantIdentificationModule::set(iCub::plantIdentification::RPCSetCmdArgName paramName,std::string paramValue){
+void PlantIdentificationModule::set(iCub::plantIdentification::RPCSetCmdArgName paramName,Value paramValue){
 	taskThread->set(paramName,paramValue,rpcCmdData);
 	view(SETTINGS);
 }
 
-void PlantIdentificationModule::task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,std::string paramValue){
+void PlantIdentificationModule::task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,Value paramValue){
 	taskThread->task(paramName,taskName,paramValue,rpcCmdData);
 	view(TASKS);
 }

@@ -135,7 +135,7 @@ bool ControllersUtil::setTaskControlMode(){
 /* ******* Place arm in grasping position                                   ********************************************** */ 
 bool ControllersUtil::setArmInTaskPosition() {
 
-    cout << dbgTag << "Reaching for grasp ... \t";
+    cout << dbgTag << "Reaching arm task position ... \t";
     
 	iVel->stop();
 

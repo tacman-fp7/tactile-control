@@ -1,5 +1,6 @@
 #include "iCub/plantIdentification/data/RPCCommandsData.h"
 
+#include <iostream>
 #include <sstream>
 
 using iCub::plantIdentification::RPCCommandsData;
@@ -25,13 +26,13 @@ RPCCommandsData::RPCCommandsData(){
 	add("joint",JOINT_TO_MOVE,"JOINT TO MOVE");
 	add("pwm_sign",PWM_SIGN,"PWM SIGN");
 	add("step_ls",STEP_LIFESPAN,"STEP TASK LIFESPAN");
-	add("kp_pe",CTRL_PID_KPF,"CONTROL PID Kp (error > 0)");
-	add("ki_pe",CTRL_PID_KIF,"CONTROL PID Ki (error > 0)");
-	add("kd_pe",CTRL_PID_KDF,"CONTROL PID Kd (error > 0)");
+	add("kp_pe",CTRL_PID_KPF,"CONTROL PID Kp (error >= 0)");
+	add("ki_pe",CTRL_PID_KIF,"CONTROL PID Ki (error >= 0)");
+	add("kd_pe",CTRL_PID_KDF,"CONTROL PID Kd (error >= 0)");
 	add("kp_ne",CTRL_PID_KPB,"CONTROL PID Kp (error < 0)");
 	add("ki_ne",CTRL_PID_KIB,"CONTROL PID Ki (error < 0)");
 	add("kd_ne",CTRL_PID_KDB,"CONTROL PID Kd (error < 0)");
-	add("ctrl_op_mode",CTRL_OP_MODE,"CONTROL OPERATION MODE [0/1]");
+	add("ctrl_op_mode",CTRL_OP_MODE,"CONTROL OPERATION MODE [0: err >= 0, 1: err < 0, 2: both]");
 	add("ctrl_ls",CTRL_LIFESPAN,"CONTROL TASK LIFESPAN");
 	add("slope",RAMP_SLOPE,"RAMP SLOPE");
 	add("intercept",RAMP_INTERCEPT,"RAMP INTERCEPT");
@@ -85,9 +86,6 @@ void RPCCommandsData::add(string rpcLabel,TaskName enumLabel,string description)
 
 std::string RPCCommandsData::getFullDescription(RPCSetCmdArgName setCmdArgName){
 
-	std::stringstream strstream;
-
-	strstream << setCmdArgDescMap[setCmdArgName] << " ('" << setCmdArgMap[setCmdArgName] << "')";
-	
-	return strstream.str();
+	return setCmdArgDescMap[setCmdArgName] + " ('" + setCmdArgMap[setCmdArgName] + "')";
 }
+

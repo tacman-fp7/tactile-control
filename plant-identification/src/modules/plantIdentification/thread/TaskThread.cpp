@@ -61,20 +61,30 @@ bool TaskThread::threadInit(void) {
 
 	// initialize controllers
 	controllersUtil = new ControllersUtil();
-	if (!controllersUtil->init(rf)) return false;;
+	if (!controllersUtil->init(rf)) {
+        cout << dbgTag << "failed to initialize controllers utility\n";
+        return false;
+    }
 
 	// initialize ports
 	portsUtil = new PortsUtil();
-	if (portsUtil->init(rf)) return false;
-
+	if (!portsUtil->init(rf)) {
+        cout << dbgTag << "failed to initialize ports utility\n";
+        return false;
+    }
 	// initialize task data
 	taskData = new TaskData(rf,period);
 
 
 	// save current arm position, to be restored when the thread ends
-	if (!controllersUtil->saveCurrentArmPosition()) return false;
-
-	if (!controllersUtil->setArmInTaskPosition()) return false;
+	if (!controllersUtil->saveCurrentArmPosition()) {
+        cout << dbgTag << "failed to store current arm position\n";
+        return false;
+    }
+	if (!controllersUtil->setArmInTaskPosition()) {
+        cout << dbgTag << "failed to set arm in task position\n";
+        return false;
+    }
  
 	// this prevent the run() method to be executed between the taskThread->start() and the taskThread->suspend() calls during the PlantIdentificationModule initialization
 	runEnabled = false;
@@ -103,7 +113,7 @@ void TaskThread::run(void) {
 
 	if (runEnabled){
 
-		while (currentTaskIndex < taskList.size()){
+		if (currentTaskIndex < taskList.size()){
 
 			// if it is the last task of the list, keep it active until further tasks are added
 			bool keepActive = (currentTaskIndex == taskList.size() - 1);
@@ -123,6 +133,7 @@ bool TaskThread::openHand(){
 	if (!controllersUtil->restorePreviousControlMode()) return false;
 	if (!controllersUtil->openHand()) return false;
 	runEnabled = false;
+    currentTaskIndex = 0;
 
 	return true;
 }
@@ -135,8 +146,7 @@ void TaskThread::threadRelease() {
     // closing ports
 	portsUtil->release();
 
-	controllersUtil->restorePreviousControlMode();
-	controllersUtil->restorePreviousArmPosition();
+    controllersUtil->restorePreviousArmPosition();
 	controllersUtil->release();
 
 	delete(portsUtil);
@@ -148,71 +158,73 @@ void TaskThread::threadRelease() {
 /* *********************************************************************************************************************** */
 
 
-void TaskThread::set(RPCSetCmdArgName paramName,string paramValue,RPCCommandsData &rpcCmdData){
+void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData &rpcCmdData){
 
 	switch (paramName){
 
 	// common data
 	case FINGER_TO_MOVE:
-		taskData->commonData.fingerToMove = atoi(paramValue.c_str());
+		taskData->commonData.fingerToMove = paramValue.asInt();
 		break;
 	case JOINT_TO_MOVE:
-		taskData->commonData.jointToMove = atoi(paramValue.c_str());
+		taskData->commonData.jointToMove = paramValue.asInt();
 		break;
 	case PWM_SIGN:
-		taskData->commonData.pwmSign = atoi(paramValue.c_str());
+		taskData->commonData.pwmSign = paramValue.asInt();
 		break;
 
 	// step task data
 	case STEP_LIFESPAN:
-		taskData->stepData.lifespan = atoi(paramValue.c_str());
+		taskData->stepData.lifespan = paramValue.asDouble();
 		break;
 
 	// control task data
 	case CTRL_PID_KPF:
-		taskData->controlData.pidKpf = atof(paramValue.c_str());
+		taskData->controlData.pidKpf = paramValue.asDouble();
 		break;
 	case CTRL_PID_KIF:
-		taskData->controlData.pidKif = atof(paramValue.c_str());
+		taskData->controlData.pidKif = paramValue.asDouble();
 		break;
 	case CTRL_PID_KDF:
-		taskData->controlData.pidKdf = atof(paramValue.c_str());
+		taskData->controlData.pidKdf = paramValue.asDouble();
 		break;
 	case CTRL_PID_KPB:
-		taskData->controlData.pidKpb = atof(paramValue.c_str());
+		taskData->controlData.pidKpb = paramValue.asDouble();
 		break;
 	case CTRL_PID_KIB:
-		taskData->controlData.pidKib = atof(paramValue.c_str());
+		taskData->controlData.pidKib = paramValue.asDouble();
 		break;
 	case CTRL_PID_KDB:
-		taskData->controlData.pidKdb = atof(paramValue.c_str());
+		taskData->controlData.pidKdb = paramValue.asDouble();
 		break;
 	case CTRL_OP_MODE:
-		taskData->controlData.controlMode = static_cast<ControlTaskOpMode>(atoi(paramValue.c_str()));
+		taskData->controlData.controlMode = static_cast<ControlTaskOpMode>(paramValue.asInt());
 		break;
 	case CTRL_LIFESPAN:
-		taskData->controlData.lifespan = atoi(paramValue.c_str());
+		taskData->controlData.lifespan = paramValue.asInt();
 		break;
 
 	// ramp task data
 	case RAMP_SLOPE:
-		taskData->rampData.slope = atof(paramValue.c_str());
+		taskData->rampData.slope = paramValue.asDouble();
 		break;
 	case RAMP_INTERCEPT:
-		taskData->rampData.intercept = atof(paramValue.c_str());
+		taskData->rampData.intercept = paramValue.asDouble();
 		break;
 	case RAMP_LIFESPAN:
-		taskData->rampData.lifespan = atoi(paramValue.c_str());
+		taskData->rampData.lifespan = paramValue.asInt();
 		break;
 	case RAMP_LIFESPAN_AFTER_STAB:
-		taskData->rampData.lifespanAfterStabilization = atoi(paramValue.c_str());
+		taskData->rampData.lifespanAfterStabilization = paramValue.asInt();
 		break;
 	}
 
-	cout << dbgTag << "'" << rpcCmdData.setCmdArgMap[paramName] << "' SET TO " << paramValue << "\n";
+	cout << "\n" <<
+            "\n" << 
+            "'" << rpcCmdData.setCmdArgMap[paramName] << "' SET TO " << (paramValue.isDouble() ? paramValue.asDouble() : paramValue.asInt()) << "\n";
 }
 
-void TaskThread::task(RPCTaskCmdArgName paramName,TaskName taskName,string paramValue,RPCCommandsData &rpcCmdData){
+void TaskThread::task(RPCTaskCmdArgName paramName,TaskName taskName,Value paramValue,RPCCommandsData &rpcCmdData){
 
 	switch (paramName){
 
@@ -220,18 +232,20 @@ void TaskThread::task(RPCTaskCmdArgName paramName,TaskName taskName,string param
 
 		switch (taskName){
 		case STEP:
-			taskList.push_back(new StepTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->stepData,atof(paramValue.c_str())));
+			taskList.push_back(new StepTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->stepData,paramValue.asDouble()));
 			break;
 
 		case CONTROL:
-			taskList.push_back(new ControlTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->controlData,atof(paramValue.c_str())));
+			taskList.push_back(new ControlTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->controlData,paramValue.asDouble()));
 			break;
 
 		case RAMP:
-			taskList.push_back(new RampTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->rampData,atof(paramValue.c_str())));
+			taskList.push_back(new RampTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->rampData,paramValue.asDouble()));
 			break;
 		}
-		cout << dbgTag << "ADDED '" << rpcCmdData.taskMap[taskName] << "' TASK" << "\n";
+		cout << "\n" <<
+            "\n" << 
+            "ADDED '" << rpcCmdData.taskMap[taskName] << "' TASK" << "\n";
 		break;
 
 	case EMPTY:
@@ -239,13 +253,17 @@ void TaskThread::task(RPCTaskCmdArgName paramName,TaskName taskName,string param
 			delete(taskList[i]);
 		}
 		taskList.clear();
-		cout << dbgTag << "TASKS LIST CLEARED" << "\n";
+		cout << "\n" <<
+            "\n" << 
+            "'" << "TASKS LIST CLEARED" << "\n";
 		break;
 
 	case POP:
 		delete(taskList[taskList.size() - 1]);
 		taskList.pop_back();
-		cout << dbgTag << "LAST TASK REMOVED" << "\n";
+		cout << "\n" <<
+            "\n" << 
+            "'" << "LAST TASK REMOVED" << "\n";
 		break;
 	}
 }
@@ -255,36 +273,40 @@ void TaskThread::view(RPCViewCmdArgName paramName,RPCCommandsData &rpcCmdData){
 	switch (paramName){
 
 	case SETTINGS:
-		cout << "-------- SETTINGS --------" << "\n" <<
 		cout << "\n" <<
-		cout << "--- TASK COMMON DATA -----" << "\n" <<
-		cout << rpcCmdData.getFullDescription(FINGER_TO_MOVE) << ": " << taskData->commonData.fingerToMove << "\n" <<
-		cout << rpcCmdData.getFullDescription(JOINT_TO_MOVE) << ": " << taskData->commonData.jointToMove << "\n" <<
-		cout << rpcCmdData.getFullDescription(PWM_SIGN) << ": " << taskData->commonData.pwmSign << "\n" <<
-		cout << "\n" <<
-		cout << "--- STEP TASK DATA -------" << "\n" <<
-		cout << rpcCmdData.getFullDescription(STEP_LIFESPAN) << ": " << taskData->stepData.lifespan << "\n" <<
-		cout << "\n" <<
-		cout << "--- CONTROL TASK DATA ----" << "\n" <<
-		cout << rpcCmdData.getFullDescription(CTRL_PID_KPF) << ": " << taskData->controlData.pidKpf << "\n" <<
-		cout << rpcCmdData.getFullDescription(CTRL_PID_KIF) << ": " << taskData->controlData.pidKif << "\n" <<
-		cout << rpcCmdData.getFullDescription(CTRL_PID_KDF) << ": " << taskData->controlData.pidKdf << "\n" <<
-		cout << rpcCmdData.getFullDescription(CTRL_PID_KPB) << ": " << taskData->controlData.pidKpb << "\n" <<
-		cout << rpcCmdData.getFullDescription(CTRL_PID_KIB) << ": " << taskData->controlData.pidKib << "\n" <<
-		cout << rpcCmdData.getFullDescription(CTRL_PID_KDB) << ": " << taskData->controlData.pidKdb << "\n" <<
-		cout << rpcCmdData.getFullDescription(CTRL_OP_MODE) << ": " << taskData->controlData.controlMode << "\n" <<
-		cout << rpcCmdData.getFullDescription(CTRL_LIFESPAN) << ": " << taskData->controlData.lifespan << "\n" <<
-		cout << "\n" <<
-		cout << "--- RAMP TASK DATA ---" << "\n" <<
-		cout << rpcCmdData.getFullDescription(RAMP_SLOPE) << ": " << taskData->rampData.slope << "\n" <<
-		cout << rpcCmdData.getFullDescription(RAMP_INTERCEPT) << ": " << taskData->rampData.intercept << "\n" <<
-		cout << rpcCmdData.getFullDescription(RAMP_LIFESPAN) << ": " << taskData->rampData.lifespan << "\n" <<
-		cout << rpcCmdData.getFullDescription(RAMP_LIFESPAN_AFTER_STAB) << ": " << taskData->rampData.lifespanAfterStabilization << "\n";
+		        "\n" <<
+                "-------- SETTINGS --------" << "\n" <<
+		        "\n" <<
+		        "--- TASK COMMON DATA -----" << "\n" <<
+		        rpcCmdData.getFullDescription(FINGER_TO_MOVE) << ": " << taskData->commonData.fingerToMove << "\n" <<
+		        rpcCmdData.getFullDescription(JOINT_TO_MOVE) << ": " << taskData->commonData.jointToMove << "\n" <<
+		        rpcCmdData.getFullDescription(PWM_SIGN) << ": " << taskData->commonData.pwmSign << "\n" <<
+		        "\n" <<
+		        "--- STEP TASK DATA -------" << "\n" <<
+		        rpcCmdData.getFullDescription(STEP_LIFESPAN) << ": " << taskData->stepData.lifespan << "\n" <<
+		        "\n" <<
+		        "--- CONTROL TASK DATA ----" << "\n" <<
+		        rpcCmdData.getFullDescription(CTRL_PID_KPF) << ": " << taskData->controlData.pidKpf << "\n" <<
+		        rpcCmdData.getFullDescription(CTRL_PID_KIF) << ": " << taskData->controlData.pidKif << "\n" <<
+		        rpcCmdData.getFullDescription(CTRL_PID_KDF) << ": " << taskData->controlData.pidKdf << "\n" <<
+		        rpcCmdData.getFullDescription(CTRL_PID_KPB) << ": " << taskData->controlData.pidKpb << "\n" <<
+		        rpcCmdData.getFullDescription(CTRL_PID_KIB) << ": " << taskData->controlData.pidKib << "\n" <<
+		        rpcCmdData.getFullDescription(CTRL_PID_KDB) << ": " << taskData->controlData.pidKdb << "\n" <<
+		        rpcCmdData.getFullDescription(CTRL_OP_MODE) << ": " << taskData->controlData.controlMode << "\n" <<
+		        rpcCmdData.getFullDescription(CTRL_LIFESPAN) << ": " << taskData->controlData.lifespan << "\n" <<
+		        "\n" <<
+		        "--- RAMP TASK DATA ---" << "\n" <<
+		        rpcCmdData.getFullDescription(RAMP_SLOPE) << ": " << taskData->rampData.slope << "\n" <<
+		        rpcCmdData.getFullDescription(RAMP_INTERCEPT) << ": " << taskData->rampData.intercept << "\n" <<
+		        rpcCmdData.getFullDescription(RAMP_LIFESPAN) << ": " << taskData->rampData.lifespan << "\n" <<
+		        rpcCmdData.getFullDescription(RAMP_LIFESPAN_AFTER_STAB) << ": " << taskData->rampData.lifespanAfterStabilization << "\n";
 		break;
 
 	case TASKS:
-		cout << "------- TASKS LIST -------" << "\n" <<
-		cout << "\n";
+		cout << "\n" <<
+            "\n" << 
+            "------- TASKS LIST -------" << "\n" <<
+		        "\n";
 
 		for (size_t i = 0; i < taskList.size(); i++){
 			

@@ -59,7 +59,7 @@ bool Task::loadICubData(){
 	using yarp::sig::Vector;
 
 	if (!portsUtil->readFingerSkinCompData(commonData->fingerToMove,commonData->fingerTaxelsData)) return false;
-	
+
 	processTactileData();
 	
 	controllersUtil->getEncoderAngle(PROXIMAL,&commonData->proximalJointAngle);
@@ -95,7 +95,7 @@ void Task::buildLogData(LogData &logData){
 void Task::addCommonLogData(LogData &logData){
 
 	for (size_t i = 0; i < commonData->fingerTaxelsData.size(); i++){
-		logData.fingerTaxelValues[i] = commonData->fingerTaxelsData.size();
+		logData.fingerTaxelValues[i] = commonData->fingerTaxelsData[i];
 	}
 	logData.overallFingerPressure = commonData->overallFingerPressure;
 	logData.overallFingerPressureMedian = commonData->overallFingerPressureMedian;

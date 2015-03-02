@@ -25,7 +25,9 @@ RampTask::RampTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCom
 
 void RampTask::init(){
 	
-	std::cout << dbgTag << "TASK STARTED - Target: " << pressureTargetValue << "\n";
+	std::cout << dbgTag << "\n" <<
+        "TASK STARTED - Target: " << pressureTargetValue << "\n" <<
+        "\n";
 }
 
 void RampTask::calculatePwm(){
@@ -38,7 +40,7 @@ void RampTask::calculatePwm(){
 
 		pwmToUse = rampData->intercept + rampData->slope*callsNumber*commonData->threadRate;
 
-		if (commonData->overallFingerPressure < pressureTargetValue){
+		if (commonData->overallFingerPressureMedian < pressureTargetValue){
 			internalState = STEADY;
 		}
 		break;

@@ -10,6 +10,7 @@
 #include <yarp/os/RFModule.h>
 #include <yarp/os/RpcServer.h>
 #include <yarp/os/Bottle.h>
+#include <yarp/os/Value.h>
 
 namespace iCub {
     namespace plantIdentification {
@@ -52,8 +53,8 @@ namespace iCub {
 				bool start(void);
 				bool stop(void);
 				bool quit(void);
-				void set(iCub::plantIdentification::RPCSetCmdArgName paramName,std::string paramValue);
-				void task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,std::string paramValue);
+				void set(iCub::plantIdentification::RPCSetCmdArgName paramName,yarp::os::Value paramValue);
+				void task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,yarp::os::Value paramValue);
 				void view(iCub::plantIdentification::RPCViewCmdArgName paramName);
         };
     }
