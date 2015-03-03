@@ -25,9 +25,7 @@ RampTask::RampTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCom
 
 void RampTask::init(){
 	
-	std::cout << dbgTag << "\n" <<
-        "TASK STARTED - Target: " << pressureTargetValue << "\n" <<
-        "\n";
+	std::cout << "\n\n" << dbgTag << "TASK STARTED - Target: " << pressureTargetValue << "\n\n";
 }
 
 void RampTask::calculatePwm(){

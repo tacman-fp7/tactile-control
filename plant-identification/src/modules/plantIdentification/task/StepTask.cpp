@@ -20,9 +20,7 @@ StepTask::StepTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCom
 
 void StepTask::init(){
 
-	std::cout << dbgTag << "\n" <<
-        "TASK STARTED - Target: " << constantPwm << "\n" <<
-        "\n";
+	std::cout << "\n\n" << dbgTag << "TASK STARTED - Target: " << constantPwm << "\n\n";
 }
 
 void StepTask::calculatePwm(){

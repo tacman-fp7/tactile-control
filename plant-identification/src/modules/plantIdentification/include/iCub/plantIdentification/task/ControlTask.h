@@ -45,6 +45,8 @@ namespace iCub {
 
 				void addOption(yarp::os::Bottle &bottle,char *paramName,yarp::os::Value paramValue1,yarp::os::Value paramValue2);
 
+				double calculateTt(iCub::plantIdentification::ControlTaskOpMode gainsSet);
+
         };
     } //namespace plantIdentification
 } //namespace iCub

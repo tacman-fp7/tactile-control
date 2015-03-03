@@ -30,30 +30,11 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	this->pressureTargetValue = pressureTargetValue;
 
     double threadRateSec = commonData->threadRate/1000.0;
-	double ttPeOption,ttNeOption,ti,td,minTt,maxTt;
+	double ttPeOption,ttNeOption;
 	
-    // calculating Tt when error >= 0
-    ti = controlData->pidKpf/controlData->pidKif;
-	td = controlData->pidKdf/controlData->pidKpf;
-	minTt = (0.1 + 0.9*controlData->pidWindUpCoeff)*ti;
-	maxTt = ti;
-	if (td < minTt){
-		ttPeOption = minTt;
-	} else if (td > maxTt){
-		ttPeOption = maxTt;
-	} else ttPeOption = td;
-    
-    // calculating Tt when error < 0
-	ti = controlData->pidKpf/controlData->pidKib;
-	td = controlData->pidKdf/controlData->pidKpb;
-	minTt = (0.1 + 0.9*controlData->pidWindUpCoeff)*ti;
-	maxTt = ti;
-	if (td < minTt){
-		ttNeOption = minTt;
-	} else if (td > maxTt){
-		ttNeOption = maxTt;
-	} else ttNeOption = td;
-
+	ttPeOption = calculateTt(GAINS_SET_POS_ERR);
+	ttNeOption = calculateTt(GAINS_SET_NEG_ERR);
+	
 	Vector kpPeOptionVect(1,controlData->pidKpf);
 	Vector kiPeOptionVect(1,controlData->pidKif);
 	Vector kdPeOptionVect(1,controlData->pidKdf);
@@ -110,11 +91,6 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 		pid->setOptions(pidOptionsPE);
 		break;
 	}
-	
-    Bottle bot;
-    pid->getOptions(bot);
-    std::cout << bot.toString() << "\n";
-
 
 	taskName = CONTROL;
 	dbgTag = "ControlTask: ";
@@ -122,9 +98,7 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 
 void ControlTask::init(){
 
-	std::cout << dbgTag << "\n" <<
-        "TASK STARTED - Target: " << pressureTargetValue << "\n" <<
-        "\n";
+	std::cout << "\n\n" << dbgTag << "TASK STARTED - Target: " << pressureTargetValue << "\n\n";
 }
 
 void ControlTask::calculatePwm(){
@@ -136,7 +110,6 @@ void ControlTask::calculatePwm(){
 			pid->setOptions(pidOptionsPE);
 		} else {
 			pid->setOptions(pidOptionsNE);
-    std::cout << "YEE";
 		}
 	}
 
@@ -193,3 +166,31 @@ void ControlTask::addOption(Bottle &bottle,char *paramName,Value paramValue1,Val
 	bottle.addList() = paramBottle;
 }
 
+double ControlTask::calculateTt(iCub::plantIdentification::ControlTaskOpMode gainsSet){
+
+	double tt,ti,td,minTt,maxTt;
+
+	switch (gainsSet){
+
+	case GAINS_SET_POS_ERR:
+		ti = controlData->pidKpf/controlData->pidKif;
+	    td = controlData->pidKdf/controlData->pidKpf;
+		break;
+
+	case GAINS_SET_NEG_ERR:
+		ti = controlData->pidKpf/controlData->pidKif;
+	    td = controlData->pidKdf/controlData->pidKpf;
+		break;
+	}
+
+	// TODO check the Tt rule
+	minTt = controlData->pidWindUpCoeff*ti;
+	maxTt = ti;
+	if (td < minTt){
+		tt = minTt;
+	} else if (td > maxTt){
+		tt = maxTt;
+	} else tt = td;
+
+	return tt;
+}
