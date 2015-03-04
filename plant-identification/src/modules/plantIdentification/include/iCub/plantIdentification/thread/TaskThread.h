@@ -52,9 +52,9 @@ namespace iCub {
                 TaskThread(const int aPeriod, const yarp::os::ResourceFinder &aRf);
                 virtual ~TaskThread();
 
-                virtual bool threadInit(void);
-                virtual void run(void);
-                virtual void threadRelease(void);
+                virtual bool threadInit();
+                virtual void run();
+                virtual void threadRelease();
 
 				bool initializeGrasping();
 				bool openHand();
@@ -62,6 +62,7 @@ namespace iCub {
 				void set(iCub::plantIdentification::RPCSetCmdArgName paramName,yarp::os::Value paramValue,iCub::plantIdentification::RPCCommandsData &rpcCmdData);
 				void task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,yarp::os::Value paramValue,iCub::plantIdentification::RPCCommandsData &rpcCmdData);
 				void view(iCub::plantIdentification::RPCViewCmdArgName paramName,iCub::plantIdentification::RPCCommandsData &rpcCmdData);
+				void help(iCub::plantIdentification::RPCCommandsData &rpcCmdData);
         };
     }
 }

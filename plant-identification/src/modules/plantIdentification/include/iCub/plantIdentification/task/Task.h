@@ -30,6 +30,8 @@ namespace iCub {
 				int maxCallsNumber;
 				double pwmToUse;
 
+				std::string taskId;
+
                 /* ******* Debug attributes.                ******* */
                 std::string dbgTag;
 
@@ -49,6 +51,8 @@ namespace iCub {
 
 			private:
 			
+				void createTaskId();
+
 				virtual void init(){};
 
 				virtual bool loadICubData();

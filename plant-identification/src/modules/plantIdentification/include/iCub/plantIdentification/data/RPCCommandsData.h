@@ -43,6 +43,8 @@ namespace iCub {
 
 				std::string getFullDescription(iCub::plantIdentification::RPCSetCmdArgName setCmdArgName);
 
+				std::string getFullDescription(iCub::plantIdentification::RPCMainCmdName mainCmdName);
+
 			private:
 
 				void add(std::string mapKey,iCub::plantIdentification::RPCMainCmdName mapValue,std::string description);

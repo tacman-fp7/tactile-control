@@ -28,6 +28,8 @@ void RPCCommandsUtil::processCommand(const Bottle &rpcCmdBottle){
 	
 	switch (mainCmd){
 
+	case HELP: // do nothing
+		break;
 	case SET:
 		setCmdArg = rpcData->setCmdArgRevMap[rpcCmdBottle.get(1).asString()];
 		argValue = rpcCmdBottle.get(2);

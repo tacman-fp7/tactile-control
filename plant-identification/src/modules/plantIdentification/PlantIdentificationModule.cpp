@@ -94,6 +94,9 @@ bool PlantIdentificationModule::respond(const yarp::os::Bottle& command, yarp::o
 
 	switch (rpcCmdUtil.mainCmd){
 
+	case HELP:
+		help();
+		break;
 	case SET:
 		set(rpcCmdUtil.setCmdArg,rpcCmdUtil.argValue);
 		break;
@@ -141,7 +144,7 @@ bool PlantIdentificationModule::close() {
 
 /* *********************************************************************************************************************** */
 /* ******* RPC Open hand                                                    ********************************************** */
-bool PlantIdentificationModule::stop(void) {
+bool PlantIdentificationModule::stop() {
     
 	taskThread->suspend();
     
@@ -154,7 +157,7 @@ bool PlantIdentificationModule::stop(void) {
 
 /* *********************************************************************************************************************** */
 /* ******* RPC Grasp object                                                 ********************************************** */
-bool PlantIdentificationModule::start(void) {
+bool PlantIdentificationModule::start() {
 
 	if (!taskThread->initializeGrasping()) return false;
 
@@ -167,7 +170,7 @@ bool PlantIdentificationModule::start(void) {
 
 /* *********************************************************************************************************************** */
 /* ******* RPC Quit module                                                  ********************************************** */
-bool PlantIdentificationModule::quit(void) {
+bool PlantIdentificationModule::quit() {
     return closing = true;
 }
 /* *********************************************************************************************************************** */
@@ -185,4 +188,8 @@ void PlantIdentificationModule::task(iCub::plantIdentification::RPCTaskCmdArgNam
 
 void PlantIdentificationModule::view(iCub::plantIdentification::RPCViewCmdArgName paramName){
 	taskThread->view(paramName,rpcCmdData);
+}
+
+void PlantIdentificationModule::help(){
+	taskThread->help(rpcCmdData);
 }

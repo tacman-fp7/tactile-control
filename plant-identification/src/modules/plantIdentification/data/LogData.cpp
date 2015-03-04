@@ -6,7 +6,8 @@ using yarp::os::Bottle;
 
 
 LogData::LogData() {
-     
+    
+	taskId = "";
 	taskType = 0;
 	taskOperationMode = 0;
 	targetValue = 0;
@@ -34,6 +35,7 @@ LogData::LogData() {
 void LogData::toBottle(Bottle &bottle){
 
 	bottle.clear();
+	bottle.addString(taskId);
 	bottle.addInt(taskType);
 	bottle.addInt(taskOperationMode);
 	bottle.addDouble(targetValue);

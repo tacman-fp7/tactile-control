@@ -5,6 +5,10 @@
 #include <gsl/gsl_sort.h>
 #include <gsl/gsl_statistics.h>
 
+#include <yarp/os/Time.h>
+
+#include <ctime>
+
 using iCub::plantIdentification::Task;
 using iCub::plantIdentification::LogData;
 using iCub::plantIdentification::ControllersUtil;
@@ -20,12 +24,23 @@ Task::Task(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData 
 	isFirstCall = true;
 	callsNumber = 0;
 	maxCallsNumber = taskLifespan*1000/commonData->threadRate;
-
 }
+
+void Task::createTaskId(){
+
+	time_t now = time(0);
+	tm *ltm = localtime(&now);
+	char myDate[15];
+	strftime(myDate,15,"%m%d%H%M%S",ltm);
+	
+	taskId = std::string(myDate);
+}
+
 
 bool Task::manage(bool keepActive){
 	
 	if (isFirstCall){
+		createTaskId();
 		init();
 		isFirstCall = false;
 	}
@@ -58,7 +73,9 @@ bool Task::manage(bool keepActive){
 bool Task::loadICubData(){
 	using yarp::sig::Vector;
 
-	if (!portsUtil->readFingerSkinCompData(commonData->fingerToMove,commonData->fingerTaxelsData)) return false;
+	if (!portsUtil->readFingerSkinCompData(commonData->fingerToMove,commonData->fingerTaxelsData)){
+		return false;
+	}
 
 	processTactileData();
 	
@@ -93,6 +110,8 @@ void Task::buildLogData(LogData &logData){
 }
 
 void Task::addCommonLogData(LogData &logData){
+
+	logData.taskId = taskId;
 
 	for (size_t i = 0; i < commonData->fingerTaxelsData.size(); i++){
 		logData.fingerTaxelValues[i] = commonData->fingerTaxelsData[i];

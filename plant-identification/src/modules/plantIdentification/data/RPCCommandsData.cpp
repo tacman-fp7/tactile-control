@@ -15,12 +15,13 @@ using std::pair;
 
 RPCCommandsData::RPCCommandsData(){
 
-	add("set",SET,"set");
-	add("task",TASK,"task");
-	add("view",VIEW,"view");
-	add("start",START,"start");
-	add("stop",STOP,"stop");
-	add("quit",QUIT,"quit");
+	add("help",HELP,"THIS HELP");
+	add("set",SET,"SET PARAMETERS (usage: 'set <paramName> <paramValue>')");
+	add("task",TASK,"MANAGE TASKS (usage: 'task [pop | empty | add <taskType> <targetValue>]')");
+	add("view",VIEW,"VIEW PARAMETERS/TASKS (usage: 'view [set | tasks]')");
+	add("start",START,"START TASKS");
+	add("stop",STOP,"STOP TASKS");
+	add("quit",QUIT,"QUIT MODULE");
 
 	add("finger",FINGER_TO_MOVE,"FINGER TO MOVE");
 	add("joint",JOINT_TO_MOVE,"JOINT TO MOVE");
@@ -87,5 +88,10 @@ void RPCCommandsData::add(string rpcLabel,TaskName enumLabel,string description)
 std::string RPCCommandsData::getFullDescription(RPCSetCmdArgName setCmdArgName){
 
 	return setCmdArgDescMap[setCmdArgName] + " ('" + setCmdArgMap[setCmdArgName] + "')";
+}
+
+std::string RPCCommandsData::getFullDescription(RPCMainCmdName mainCmdName){
+
+	return "'" + mainCmdDescMap[mainCmdName] + "' - " + mainCmdMap[mainCmdName];
 }
 

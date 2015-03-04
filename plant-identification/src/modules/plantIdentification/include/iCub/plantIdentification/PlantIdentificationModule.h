@@ -50,12 +50,13 @@ namespace iCub {
 				virtual bool close();
 
 				/* ****** RPC Methods                                  ****** */
-				bool start(void);
-				bool stop(void);
-				bool quit(void);
+				bool start();
+				bool stop();
+				bool quit();
 				void set(iCub::plantIdentification::RPCSetCmdArgName paramName,yarp::os::Value paramValue);
 				void task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,yarp::os::Value paramValue);
 				void view(iCub::plantIdentification::RPCViewCmdArgName paramName);
+				void help();
         };
     }
 }

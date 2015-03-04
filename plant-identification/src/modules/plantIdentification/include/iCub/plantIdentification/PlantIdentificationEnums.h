@@ -6,6 +6,7 @@ namespace iCub {
      
 		enum RPCMainCmdName {
 
+			HELP,
 			SET,
 			TASK,
 			VIEW,

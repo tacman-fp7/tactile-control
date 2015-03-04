@@ -48,7 +48,7 @@ TaskThread::~TaskThread() {}
 
 /* *********************************************************************************************************************** */
 /* ******* Initialise thread                                                ********************************************** */
-bool TaskThread::threadInit(void) {
+bool TaskThread::threadInit() {
     using yarp::os::Property;
     using yarp::os::Network;
     using yarp::os::Bottle;
@@ -109,7 +109,7 @@ bool TaskThread::initializeGrasping(){
 
 /* *********************************************************************************************************************** */
 /* ******* Run thread                                                       ********************************************** */
-void TaskThread::run(void) {
+void TaskThread::run() {
 
 	if (runEnabled){
 
@@ -244,8 +244,8 @@ void TaskThread::task(RPCTaskCmdArgName paramName,TaskName taskName,Value paramV
 			break;
 		}
 		cout << "\n" <<
-            "\n" << 
-            "ADDED '" << rpcCmdData.taskMap[taskName] << "' TASK" << "\n";
+				"\n" << 
+				"ADDED '" << rpcCmdData.taskMap[taskName] << "' TASK" << "\n";
 		break;
 
 	case EMPTY:
@@ -254,16 +254,16 @@ void TaskThread::task(RPCTaskCmdArgName paramName,TaskName taskName,Value paramV
 		}
 		taskList.clear();
 		cout << "\n" <<
-            "\n" << 
-            "'" << "TASKS LIST CLEARED" << "\n";
+				"\n" << 
+				"'" << "TASKS LIST CLEARED" << "\n";
 		break;
 
 	case POP:
 		delete(taskList[taskList.size() - 1]);
 		taskList.pop_back();
 		cout << "\n" <<
-            "\n" << 
-            "'" << "LAST TASK REMOVED" << "\n";
+				"\n" << 
+				"'" << "LAST TASK REMOVED" << "\n";
 		break;
 	}
 }
@@ -304,9 +304,9 @@ void TaskThread::view(RPCViewCmdArgName paramName,RPCCommandsData &rpcCmdData){
 
 	case TASKS:
 		cout << "\n" <<
-            "\n" << 
-            "------- TASKS LIST -------" << "\n" <<
-		        "\n";
+				"\n" << 
+				"------- TASKS LIST -------" << "\n" <<
+					"\n";
 
 		for (size_t i = 0; i < taskList.size(); i++){
 			
@@ -330,3 +330,20 @@ void TaskThread::view(RPCViewCmdArgName paramName,RPCCommandsData &rpcCmdData){
 	}
 
 }
+
+void TaskThread::help(RPCCommandsData &rpcCmdData){
+
+	cout << "\n" <<
+		    "\n" <<
+            "----------- HELP -----------" << "\n" <<
+		    "---- AVAILABLE COMMANDS ----" << "\n" <<
+		    "\n" <<
+		    rpcCmdData.getFullDescription(HELP) << "\n" <<
+		    rpcCmdData.getFullDescription(SET) << "\n" <<
+		    rpcCmdData.getFullDescription(TASK) << "\n" <<
+		    rpcCmdData.getFullDescription(VIEW) << "\n" <<
+		    rpcCmdData.getFullDescription(START) << "\n" <<
+		    rpcCmdData.getFullDescription(STOP) << "\n" <<
+		    rpcCmdData.getFullDescription(QUIT) << "\n";
+	
+}			

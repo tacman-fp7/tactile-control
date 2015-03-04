@@ -19,6 +19,7 @@ namespace iCub {
             public:
 
 				/* ******* Module attributes.               ******* */
+				std::string taskId;
 				int taskType;
 				int taskOperationMode;
 				double targetValue;
