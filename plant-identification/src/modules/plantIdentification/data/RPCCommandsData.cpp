@@ -33,7 +33,8 @@ RPCCommandsData::RPCCommandsData(){
 	add("kp_ne",CTRL_PID_KPB,"CONTROL PID Kp (error < 0)");
 	add("ki_ne",CTRL_PID_KIB,"CONTROL PID Ki (error < 0)");
 	add("kd_ne",CTRL_PID_KDB,"CONTROL PID Kd (error < 0)");
-	add("ctrl_op_mode",CTRL_OP_MODE,"CONTROL OPERATION MODE [0: err >= 0, 1: err < 0, 2: both]");
+	add("ctrl_op_mode",CTRL_OP_MODE,"CONTROL OPERATION MODE [0: err >= 0; 1: err < 0; 2: both]");
+	add("ctrl_pid_reset",CTRL_PID_RESET_ENABLED,"PID RESET ENABLED [0: false; 1: true]");
 	add("ctrl_ls",CTRL_LIFESPAN,"CONTROL TASK LIFESPAN");
 	add("slope",RAMP_SLOPE,"RAMP SLOPE");
 	add("intercept",RAMP_INTERCEPT,"RAMP INTERCEPT");
@@ -92,6 +93,6 @@ std::string RPCCommandsData::getFullDescription(RPCSetCmdArgName setCmdArgName){
 
 std::string RPCCommandsData::getFullDescription(RPCMainCmdName mainCmdName){
 
-	return "'" + mainCmdDescMap[mainCmdName] + "' - " + mainCmdMap[mainCmdName];
+	return "'" + mainCmdMap[mainCmdName] + "' - " + mainCmdDescMap[mainCmdName];
 }
 

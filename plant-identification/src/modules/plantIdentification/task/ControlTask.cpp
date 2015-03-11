@@ -74,26 +74,35 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	addOption(pidOptionsNE,"Tt",Value(ttNeOption));
 	pidOptionsNE.append(commonOptions);
 
+	// TODO to be removed
+	kpPe = controlData->pidKpf;
+	kpNe = controlData->pidKpb;
+	previousError = 0;
+
 	switch (controlData->controlMode){
 
 	case GAINS_SET_POS_ERR:
 		pid = new parallelPID(threadRateSec,kpPeOptionVect,kiPeOptionVect,kdPeOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttPeOptionVect,satLimMatrix);
 		pid->setOptions(pidOptionsPE);
+		currentKp = kpPe;
 		break;
 
 	case GAINS_SET_NEG_ERR:
 		pid = new parallelPID(threadRateSec,kpNeOptionVect,kiNeOptionVect,kdNeOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttNeOptionVect,satLimMatrix);
 		pid->setOptions(pidOptionsNE);
+		currentKp = kpNe;
 		break;
 
 	case BOTH_GAINS_SETS:
 		pid = new parallelPID(threadRateSec,kpPeOptionVect,kiPeOptionVect,kdPeOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttPeOptionVect,satLimMatrix);
 		pid->setOptions(pidOptionsPE);
+		currentKp = kpPe;
 		break;
 	}
 
 	taskName = CONTROL;
 	dbgTag = "ControlTask: ";
+
 }
 
 void ControlTask::init(){
@@ -104,12 +113,18 @@ void ControlTask::init(){
 void ControlTask::calculatePwm(){
 	using yarp::sig::Vector;
 
+	double error = pressureTargetValue - commonData->overallFingerPressureMedian;
+
+
+
 	if (controlData->controlMode == BOTH_GAINS_SETS){
 
-		if (pressureTargetValue - commonData->overallFingerPressureMedian >= 0){
+		if (error >= 0 && previousError < 0){
 			pid->setOptions(pidOptionsPE);
-		} else {
+			currentKp = kpPe;
+		} else if (error < 0 && previousError >= 0){
 			pid->setOptions(pidOptionsNE);
+			currentKp = kpNe;
 		}
 	}
 
@@ -117,7 +132,15 @@ void ControlTask::calculatePwm(){
 	Vector fb(1,commonData->overallFingerPressureMedian);
 	Vector result = pid->compute(ref,fb);
 	
+	// TODO to be removed
+	if (controlData->pidResetEnabled && error > 0 && result[0] < currentKp*error - 1.0){
+		pid->reset(result);
+		optionalLogString.append("[ PID RESET ] ");
+	}
+
 	pwmToUse = result[0];
+
+	previousError = error;
 }
 
 void ControlTask::buildLogData(LogData &logData){

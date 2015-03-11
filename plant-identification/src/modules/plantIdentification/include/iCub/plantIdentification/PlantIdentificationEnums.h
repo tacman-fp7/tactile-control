@@ -30,6 +30,7 @@ namespace iCub {
 			CTRL_PID_KIB,
 			CTRL_PID_KDB,
 			CTRL_OP_MODE,
+			CTRL_PID_RESET_ENABLED,
 			CTRL_LIFESPAN,
 
 			RAMP_SLOPE,

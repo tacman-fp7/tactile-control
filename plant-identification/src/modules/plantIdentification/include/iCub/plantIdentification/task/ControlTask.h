@@ -25,6 +25,12 @@ namespace iCub {
 				yarp::os::Bottle pidOptionsNE;
 				double pressureTargetValue;
 
+				// TODO to be removed
+				double currentKp;
+				double kpPe;
+				double kpNe;
+				double previousError;
+
             public:
 
                 ControlTask(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,iCub::plantIdentification::ControlTaskData *controlData,double pressureTargetValue);

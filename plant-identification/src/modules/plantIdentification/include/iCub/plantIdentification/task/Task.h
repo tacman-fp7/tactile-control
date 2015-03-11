@@ -32,6 +32,8 @@ namespace iCub {
 
 				std::string taskId;
 
+				std::string optionalLogString;
+
                 /* ******* Debug attributes.                ******* */
                 std::string dbgTag;
 

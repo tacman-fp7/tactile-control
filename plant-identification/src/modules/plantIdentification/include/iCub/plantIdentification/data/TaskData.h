@@ -53,6 +53,7 @@ namespace iCub {
 			double pidWd;
 			double pidWindUpCoeff;
 			iCub::plantIdentification::ControlTaskOpMode controlMode;
+			bool pidResetEnabled;
 			int lifespan;
 		};
 		typedef struct ControlTaskData ControlTaskData;

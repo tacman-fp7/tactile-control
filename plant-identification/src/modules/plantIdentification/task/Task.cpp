@@ -24,6 +24,7 @@ Task::Task(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData 
 	isFirstCall = true;
 	callsNumber = 0;
 	maxCallsNumber = taskLifespan*1000/commonData->threadRate;
+	optionalLogString = "";
 }
 
 void Task::createTaskId(){
@@ -129,7 +130,9 @@ void Task::addCommonLogData(LogData &logData){
 
 void Task::printScreenLog(){
 
-	std::cout << dbgTag << "Sum: " << commonData->overallFingerPressure << "\t   Median: " << commonData->overallFingerPressureMedian << "\t   Pwm: " << pwmToUse <<"\n";
+	std::cout << dbgTag << "Sum: " << commonData->overallFingerPressure << "\t   Median: " << commonData->overallFingerPressureMedian << "\t   Pwm: " << pwmToUse << " " << optionalLogString << "\n";
+
+	optionalLogString.clear();
 }
 
 void Task::saveProgress(){

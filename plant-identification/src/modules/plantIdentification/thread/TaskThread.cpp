@@ -197,6 +197,9 @@ void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData
 	case CTRL_PID_KDB:
 		taskData->controlData.pidKdb = paramValue.asDouble();
 		break;
+	case CTRL_PID_RESET_ENABLED:
+		taskData->controlData.pidResetEnabled = paramValue.asInt() != 0;
+		break;
 	case CTRL_OP_MODE:
 		taskData->controlData.controlMode = static_cast<ControlTaskOpMode>(paramValue.asInt());
 		break;
@@ -293,6 +296,7 @@ void TaskThread::view(RPCViewCmdArgName paramName,RPCCommandsData &rpcCmdData){
 		        rpcCmdData.getFullDescription(CTRL_PID_KIB) << ": " << taskData->controlData.pidKib << "\n" <<
 		        rpcCmdData.getFullDescription(CTRL_PID_KDB) << ": " << taskData->controlData.pidKdb << "\n" <<
 		        rpcCmdData.getFullDescription(CTRL_OP_MODE) << ": " << taskData->controlData.controlMode << "\n" <<
+				rpcCmdData.getFullDescription(CTRL_PID_RESET_ENABLED) << ": " << (taskData->controlData.pidResetEnabled ? "true" : "false") << "\n" <<
 		        rpcCmdData.getFullDescription(CTRL_LIFESPAN) << ": " << taskData->controlData.lifespan << "\n" <<
 		        "\n" <<
 		        "--- RAMP TASK DATA ---" << "\n" <<
