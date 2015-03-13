@@ -15,6 +15,8 @@ using yarp::os::Property;
 
 ControllersUtil::ControllersUtil(){
 
+    graspEnabled = true;
+
 	dbgTag = "ControllersUtil: ";
 }
 
@@ -140,26 +142,49 @@ bool ControllersUtil::setArmInTaskPosition() {
 	iVel->stop();
 
     // Set the arm in the starting position
-	// Arm
-	iPos->positionMove(0 ,-38);
-    iPos->positionMove(1 , 23);
-    iPos->positionMove(2 , 0);
-    iPos->positionMove(3 , 19);
-    
-    iPos->positionMove(4 ,-12);
-    iPos->positionMove(5 , 0);
-    iPos->positionMove(6 , 0);
-    iPos->positionMove(7 , 15);
-    
-	// Hand
-    iPos->positionMove(8 , 45);
-    iPos->positionMove(9 , 0);
-    iPos->positionMove(10, 0);
-    iPos->positionMove(11, 0);
-    iPos->positionMove(12, 10);
-    iPos->positionMove(13, 0);
-    iPos->positionMove(14, 10);
-    iPos->positionMove(15, 0);
+    if (graspEnabled){
+	    // Arm
+	    iPos->positionMove(0 ,-30);
+        iPos->positionMove(1 , 30);
+        iPos->positionMove(2 , 0);
+        iPos->positionMove(3 , 45);
+        
+        iPos->positionMove(4 , 0);
+        iPos->positionMove(5 , 1);
+        iPos->positionMove(6 , 1);
+        iPos->positionMove(7 , 14);
+        
+	    // Hand
+        iPos->positionMove(8 , 79);
+        iPos->positionMove(9 , 2);
+        iPos->positionMove(10, 29);
+        iPos->positionMove(11, 0);
+        iPos->positionMove(12, 0);
+        iPos->positionMove(13, 25);
+        iPos->positionMove(14, 48);
+        iPos->positionMove(15, 1);
+    } else {
+	    // Arm
+	    iPos->positionMove(0 ,-38);
+        iPos->positionMove(1 , 23);
+        iPos->positionMove(2 , 0);
+        iPos->positionMove(3 , 19);
+        
+        iPos->positionMove(4 ,-12);
+        iPos->positionMove(5 , 0);
+        iPos->positionMove(6 , 0);
+        iPos->positionMove(7 , 15);
+        
+	    // Hand
+        iPos->positionMove(8 , 45);
+        iPos->positionMove(9 , 0);
+        iPos->positionMove(10, 0);
+        iPos->positionMove(11, 0);
+        iPos->positionMove(12, 10);
+        iPos->positionMove(13, 0);
+        iPos->positionMove(14, 10);
+        iPos->positionMove(15, 0);
+    }
 
     // Check motion done
     waitMoveDone(10, 1);
@@ -294,14 +319,25 @@ bool ControllersUtil::openHand() {
     iVel->stop();
 
 	// Hand
-    iPos->positionMove(8 , 45);
-    iPos->positionMove(9 , 0);
-    iPos->positionMove(10, 0);
-    iPos->positionMove(11, 0);
-    iPos->positionMove(12, 10);
-    iPos->positionMove(13, 0);
-    iPos->positionMove(14, 10);
-    iPos->positionMove(15, 0);
+    if (graspEnabled){
+        iPos->positionMove(8 , 79);
+        iPos->positionMove(9 , 2);
+        iPos->positionMove(10, 29);
+        iPos->positionMove(11, 0);
+        iPos->positionMove(12, 0);
+        iPos->positionMove(13, 25);
+        iPos->positionMove(14, 48);
+        iPos->positionMove(15, 1);
+    } else {
+        iPos->positionMove(8 , 45);
+        iPos->positionMove(9 , 0);
+        iPos->positionMove(10, 0);
+        iPos->positionMove(11, 0);
+        iPos->positionMove(12, 10);
+        iPos->positionMove(13, 0);
+        iPos->positionMove(14, 10);
+        iPos->positionMove(15, 0);
+    }
 
     // Check motion done
     waitMoveDone(10, 1);

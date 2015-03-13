@@ -28,6 +28,8 @@ namespace iCub {
 				int jointStoredControlMode;
 				int jointToMove;
 
+                bool graspEnabled;
+
 				/* ****** Debug attributes                              ****** */
                 std::string dbgTag;
 

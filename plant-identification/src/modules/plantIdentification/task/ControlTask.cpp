@@ -113,7 +113,7 @@ void ControlTask::init(){
 void ControlTask::calculatePwm(){
 	using yarp::sig::Vector;
 
-	double error = pressureTargetValue - commonData->overallFingerPressureMedian;
+	double error = pressureTargetValue - commonData->overallFingerPressure;
 
 
 
@@ -129,7 +129,7 @@ void ControlTask::calculatePwm(){
 	}
 
 	Vector ref(1,pressureTargetValue);
-	Vector fb(1,commonData->overallFingerPressureMedian);
+	Vector fb(1,commonData->overallFingerPressure);
 	Vector result = pid->compute(ref,fb);
 	
 	// TODO to be removed
