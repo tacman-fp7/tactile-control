@@ -144,14 +144,14 @@ bool ControllersUtil::setArmInTaskPosition() {
     // Set the arm in the starting position
     if (graspEnabled){
 	    // Arm
-	    iPos->positionMove(0 ,-30);
-        iPos->positionMove(1 , 30);
-        iPos->positionMove(2 , 0);
-        iPos->positionMove(3 , 45);
+//	    iPos->positionMove(0 ,-30);
+//        iPos->positionMove(1 , 30);
+//        iPos->positionMove(2 , 0);
+//        iPos->positionMove(3 , 45);
         
-        iPos->positionMove(4 , 0);
-        iPos->positionMove(5 , 1);
-        iPos->positionMove(6 , 1);
+        iPos->positionMove(4 , -14);// 0
+        iPos->positionMove(5 , 3);// 1
+        iPos->positionMove(6 , -20);// 1
         iPos->positionMove(7 , 14);
         
 	    // Hand
@@ -161,14 +161,14 @@ bool ControllersUtil::setArmInTaskPosition() {
         iPos->positionMove(11, 0);
         iPos->positionMove(12, 0);
         iPos->positionMove(13, 25);
-        iPos->positionMove(14, 48);
+        iPos->positionMove(14, 15);
         iPos->positionMove(15, 1);
     } else {
 	    // Arm
-	    iPos->positionMove(0 ,-38);
-        iPos->positionMove(1 , 23);
-        iPos->positionMove(2 , 0);
-        iPos->positionMove(3 , 19);
+//	    iPos->positionMove(0 ,-38);
+//        iPos->positionMove(1 , 23);
+//        iPos->positionMove(2 , 0);
+//        iPos->positionMove(3 , 19);
         
         iPos->positionMove(4 ,-12);
         iPos->positionMove(5 , 0);
@@ -326,7 +326,7 @@ bool ControllersUtil::openHand() {
         iPos->positionMove(11, 0);
         iPos->positionMove(12, 0);
         iPos->positionMove(13, 25);
-        iPos->positionMove(14, 48);
+        iPos->positionMove(14, 25);
         iPos->positionMove(15, 1);
     } else {
         iPos->positionMove(8 , 45);
