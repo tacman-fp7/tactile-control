@@ -14,18 +14,16 @@ namespace iCub {
 
 		struct TaskCommonData {
 
-			std::vector<double> fingerTaxelsData;
-			std::vector<double> previousOverallFingerPressures;
-			int previousPressuresIndex;
-			double overallFingerPressure;
-			double overallFingerPressureMedian;
-			double realProximalPwm;
-			double realDistalPwm;
-			double proximalJointAngle;
-			double distalJointAngle;
+			std::vector<std::vector<double>> fingerTaxelsData;
+			std::vector<std::vector<double>> previousOverallFingerPressures;
+			std::vector<int> previousPressuresIndex;
+			std::vector<double> overallFingerPressure;
+			std::vector<double> overallFingerPressureMedian;
+//			double realProximalPwm;
+//			double realDistalPwm;
+//			double proximalJointAngle;
+//			double distalJointAngle;
 
-			int fingerToMove;
-			int jointToMove;
 			int threadRate;
 			int pwmSign;
 			int screenLogStride;
@@ -33,12 +31,17 @@ namespace iCub {
 		typedef struct TaskCommonData TaskCommonData;
 
 		struct StepTaskData {
+
+			std::vector<int> jointsList;
+			std::vector<int> fingersList;
 			int lifespan;
 		};
 		typedef struct StepTaskData StepTaskData;
 
 		struct ControlTaskData {
 
+			std::vector<int> jointsList;
+			std::vector<int> fingersList;
 			double pidKpf;
 			double pidKif;
 			double pidKdf;
@@ -60,6 +63,8 @@ namespace iCub {
 
 		struct RampTaskData {
 
+			std::vector<int> jointsList;
+			std::vector<int> fingersList;
             double slope;
 			double intercept;
 			int lifespan;
@@ -83,6 +88,10 @@ namespace iCub {
 				RampTaskData rampData;
 				
 				TaskData(yarp::os::ResourceFinder &rf,int threadRate);
+		
+			private:
+
+				int getFingerFromJoint(int joint);
 
         };
     } //namespace plantIdentification

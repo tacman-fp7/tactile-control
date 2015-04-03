@@ -15,8 +15,8 @@ namespace iCub {
             private:
 
 				iCub::plantIdentification::RampTaskData *rampData;
-				iCub::plantIdentification::RampTaskState internalState;
-				double pressureTargetValue;
+				std::vector<iCub::plantIdentification::RampTaskState> internalState;
+				std::vector<double> pressureTargetValue;
 				int callsNumberAfterStabilization;
 				int maxCallsNumberAfterStabilization;
 
@@ -26,7 +26,7 @@ namespace iCub {
 
 				virtual void init();
 
-				double getPressureTargetValue(){ return pressureTargetValue; }
+				std::string getPressureTargetValueDescription();
 
 				virtual void buildLogData(iCub::plantIdentification::LogData &logData);
 
@@ -35,6 +35,11 @@ namespace iCub {
 				virtual void saveProgress();
 
 				virtual bool taskIsOver();
+
+			private:
+
+				bool areAllJointsSteady();
+				
         };
     } //namespace plantIdentification
 } //namespace iCub

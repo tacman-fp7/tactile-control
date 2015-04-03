@@ -2,6 +2,8 @@
 
 #include "iCub/plantIdentification/PlantIdentificationEnums.h"
 
+#include <sstream>
+
 using iCub::plantIdentification::RampTask;
 using iCub::plantIdentification::LogData;
 using iCub::plantIdentification::ControllersUtil;
@@ -9,12 +11,12 @@ using iCub::plantIdentification::PortsUtil;
 using iCub::plantIdentification::TaskCommonData;
 using iCub::plantIdentification::RampTaskData;
 
-RampTask::RampTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,RampTaskData *rampData,double pressureTargetValue):Task(controllersUtil,portsUtil,commonData,rampData->lifespan) {
+RampTask::RampTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,RampTaskData *rampData,double pressureTargetValue):Task(controllersUtil,portsUtil,commonData,rampData->lifespan,rampData->jointsList,rampData->fingersList) {
 
 	this->rampData = rampData;
-	this->pressureTargetValue = pressureTargetValue;
+	this->pressureTargetValue.resize(fingersList.size(),pressureTargetValue);
 
-	internalState = DECREASING;
+	internalState.resize(fingersList.size(),DECREASING);
 
 	callsNumberAfterStabilization = 0;
 	maxCallsNumberAfterStabilization = rampData->lifespanAfterStabilization*1000/commonData->threadRate;
@@ -24,32 +26,42 @@ RampTask::RampTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCom
 }
 
 void RampTask::init(){
-	
-	std::cout << "\n\n" << dbgTag << "TASK STARTED - Target: " << pressureTargetValue << "\n\n";
+	using std::cout;
+
+	controllersUtil->setTaskControlModes(jointsList,VOCAB_CM_OPENLOOP);
+
+	cout << "\n\n" << dbgTag << "TASK STARTED - Target: ";
+	for(size_t i = 0; i < pressureTargetValue.size(); i++){
+		cout << pressureTargetValue[i] << " ";
+	}
+	cout << "\n\n";
 }
 
 void RampTask::calculatePwm(){
 
 	double pwmToUse;
-
-	switch (internalState){
 	
-	case DECREASING:
+	for(size_t i = 0; i < jointsList.size(); i++){
 
-		pwmToUse = rampData->intercept + rampData->slope*callsNumber*commonData->threadRate;
+		switch (internalState[i]){
+	
+		case DECREASING:
 
-		if (commonData->overallFingerPressureMedian < pressureTargetValue){
-			internalState = STEADY;
+			pwmToUse = rampData->intercept + rampData->slope*callsNumber*commonData->threadRate;
+
+			if (commonData->overallFingerPressureMedian[i] < pressureTargetValue[i]){
+				internalState[i] = STEADY;
+			}
+			break;
+
+		case STEADY:
+
+			pwmToUse = 0.0;
+			break;
 		}
-		break;
 
-	case STEADY:
-
-		pwmToUse = 0.0;
-		break;
+		this->pwmToUse[i] = pwmToUse;
 	}
-
-	this->pwmToUse = pwmToUse;
 }
 
 void RampTask::buildLogData(LogData &logData){
@@ -58,14 +70,16 @@ void RampTask::buildLogData(LogData &logData){
 
 	logData.taskType = RAMP;
 	logData.taskOperationMode = 0;
-	logData.targetValue = pressureTargetValue;
+	//TODO it should log all the array values
+	logData.targetValue = pressureTargetValue[0];
 
 }
 
 void RampTask::saveProgress(){
 
 	callsNumber++;
-	if (internalState == 1) callsNumberAfterStabilization++;
+
+	if (areAllJointsSteady()) callsNumberAfterStabilization++;
 }
 
 bool RampTask::taskIsOver(){
@@ -73,3 +87,25 @@ bool RampTask::taskIsOver(){
 	return callsNumber >= maxCallsNumber || callsNumberAfterStabilization >= maxCallsNumberAfterStabilization;
 }
 
+bool RampTask::areAllJointsSteady(){
+
+	bool allSteady = true;
+	
+	for(size_t i = 0; i < fingersList.size() && allSteady; i++){
+		allSteady = allSteady && (internalState[i] == STEADY);
+	}
+
+	return allSteady;
+}
+
+
+std::string RampTask::getPressureTargetValueDescription(){
+
+	std::stringstream description("");
+
+	for(size_t i = 0; i < pressureTargetValue.size(); i++){
+		description << pressureTargetValue[i] << " ";
+	}
+	
+	return description.str();
+}

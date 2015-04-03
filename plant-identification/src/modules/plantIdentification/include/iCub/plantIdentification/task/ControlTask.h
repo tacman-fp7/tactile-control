@@ -18,24 +18,24 @@ namespace iCub {
             private:
 
 				iCub::plantIdentification::ControlTaskData *controlData;
-				iCub::ctrl::parallelPID *pid;
+				std::vector<iCub::ctrl::parallelPID*> pid;
 				// pid options bottle when error >= 0
 				yarp::os::Bottle pidOptionsPE;
 				// pid options bottle when error < 0
 				yarp::os::Bottle pidOptionsNE;
-				double pressureTargetValue;
+				std::vector<double> pressureTargetValue;
 
 				// TODO to be removed
-				double currentKp;
-				double kpPe;
-				double kpNe;
-				double previousError;
+				std::vector<double> currentKp;
+				std::vector<double> kpPe;
+				std::vector<double> kpNe;
+				std::vector<double> previousError;
 
             public:
 
                 ControlTask(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,iCub::plantIdentification::ControlTaskData *controlData,double pressureTargetValue);
 
-				double getPressureTargetValue(){ return pressureTargetValue; }
+				std::string getPressureTargetValueDescription();
 
 				virtual void init();
 

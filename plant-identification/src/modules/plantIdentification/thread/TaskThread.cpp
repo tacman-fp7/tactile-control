@@ -75,7 +75,6 @@ bool TaskThread::threadInit() {
 	// initialize task data
 	taskData = new TaskData(rf,period);
 
-
 	// save current arm position, to be restored when the thread ends
 	if (!controllersUtil->saveCurrentArmPosition()) {
         cout << dbgTag << "failed to store current arm position\n";
@@ -98,9 +97,7 @@ bool TaskThread::threadInit() {
 
 bool TaskThread::initializeGrasping(){
 
-	controllersUtil->setJoint(taskData->commonData.jointToMove);
 	if (!controllersUtil->saveCurrentControlMode()) return false;
-	if (!controllersUtil->setTaskControlMode()) return false;
 	runEnabled = true;
 
 	return true;
@@ -163,12 +160,6 @@ void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData
 	switch (paramName){
 
 	// common data
-	case FINGER_TO_MOVE:
-		taskData->commonData.fingerToMove = paramValue.asInt();
-		break;
-	case JOINT_TO_MOVE:
-		taskData->commonData.jointToMove = paramValue.asInt();
-		break;
 	case PWM_SIGN:
 		taskData->commonData.pwmSign = paramValue.asInt();
 		break;
@@ -281,8 +272,6 @@ void TaskThread::view(RPCViewCmdArgName paramName,RPCCommandsData &rpcCmdData){
                 "-------- SETTINGS --------" << "\n" <<
 		        "\n" <<
 		        "--- TASK COMMON DATA -----" << "\n" <<
-		        rpcCmdData.getFullDescription(FINGER_TO_MOVE) << ": " << taskData->commonData.fingerToMove << "\n" <<
-		        rpcCmdData.getFullDescription(JOINT_TO_MOVE) << ": " << taskData->commonData.jointToMove << "\n" <<
 		        rpcCmdData.getFullDescription(PWM_SIGN) << ": " << taskData->commonData.pwmSign << "\n" <<
 		        "\n" <<
 		        "--- STEP TASK DATA -------" << "\n" <<
@@ -318,13 +307,13 @@ void TaskThread::view(RPCViewCmdArgName paramName,RPCCommandsData &rpcCmdData){
 			switch (taskList[i]->getTaskName()){
 
 			case STEP:
-				cout << "STEP\t" << ((StepTask*)taskList[i])->getConstantPwm() << "\n";
+				cout << "STEP\t" << ((StepTask*)taskList[i])->getConstantPwmDescription() << "\n";
 				break;
 			case CONTROL:
-				cout << "CONTROL\t" << ((ControlTask*)taskList[i])->getPressureTargetValue() << "\n";
+				cout << "CONTROL\t" << ((ControlTask*)taskList[i])->getPressureTargetValueDescription() << "\n";
 				break;
 			case RAMP:
-				cout << "RAMP\t" << ((RampTask*)taskList[i])->getPressureTargetValue() << "\n";
+				cout << "RAMP\t" << ((RampTask*)taskList[i])->getPressureTargetValueDescription() << "\n";
 				break;
 
 			}

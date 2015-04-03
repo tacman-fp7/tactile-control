@@ -26,9 +26,14 @@ namespace iCub {
 
 				iCub::plantIdentification::TaskCommonData *commonData;
 
+				std::vector<int> jointsList;
+				std::vector<int> fingersList;
+
+
+
 				int callsNumber;
 				int maxCallsNumber;
-				double pwmToUse;
+				std::vector<double> pwmToUse;
 
 				std::string taskId;
 
@@ -39,7 +44,7 @@ namespace iCub {
 
             public:
                 
-				Task(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,int maxCallsNumber);
+				Task(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,int maxCallsNumber,std::vector<int> &jointsList,std::vector<int> &fingersList);
             
 				iCub::plantIdentification::TaskName getTaskName(){ return taskName; }
 

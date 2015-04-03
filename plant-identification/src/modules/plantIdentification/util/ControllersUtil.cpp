@@ -24,6 +24,9 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
 	using std::vector;
 	using yarp::os::Value;
 
+	//TODO use constants
+	jointsStoredControlMode.resize(8,VOCAB_CM_POSITION);
+
 	string robotName = rf.check("robot", Value("icub"), "The robot name.").asString().c_str();
     string whichHand = rf.check("whichHand", Value("right"), "The hand to be used for the grasping.").asString().c_str();
 
@@ -81,9 +84,9 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
 	return true;
 }
 
-bool ControllersUtil::sendPwm(double pwm){
+bool ControllersUtil::sendPwm(int joint,double pwm){
 
-	if (!iOLC->setRefOutput(jointToMove,pwm)){
+	if (!iOLC->setRefOutput(joint,pwm)){
 		cout << dbgTag << "could not send pwm\n";
 		return false;
 	}
@@ -121,16 +124,25 @@ bool ControllersUtil::saveCurrentArmPosition(){
 
 bool ControllersUtil::saveCurrentControlMode(){
 
-	if (!iCtrl->getControlMode(jointToMove,&jointStoredControlMode)){
-		cout << dbgTag << "could not get current control mode\n";
-		return false;
+	// save control mode of joints 8 9 10 11 12 13 14 15
+	for(size_t i = 0; i < 8; i++){
+		if (!iCtrl->getControlMode(8 + i,&jointsStoredControlMode[i])){
+			cout << dbgTag << "could not get current control mode\n";
+			return false;
+		}
 	}
 	return true;
 }
 
-bool ControllersUtil::setTaskControlMode(){
+bool ControllersUtil::setTaskControlModes(std::vector<int> &jointsList,int controlMode){
 
-	return setControlMode(VOCAB_CM_OPENLOOP,true);
+	for(size_t i = 0; i < jointsList.size(); i++){
+		if (!setControlMode(jointsList[i],controlMode,true)){
+			cout << dbgTag << "could not set all control modes\n";
+			return false;
+		}
+	}
+	return true;
 }
 
 
@@ -211,21 +223,29 @@ bool ControllersUtil::restorePreviousArmPosition(){
 
 bool ControllersUtil::restorePreviousControlMode(){
 
-	return setControlMode(jointStoredControlMode,true);
+	// restore control modes from joints 8 9 10 11 12 13 14 15
+	for(size_t i = 0; i < 8; i++){
+		if (!setControlMode(8 + i,jointsStoredControlMode[i],true)){
+			cout << dbgTag << "could not set all control modes\n";
+			return false;
+		}
+	}
+
+	return true;
 }
 
-bool ControllersUtil::setControlMode(int controlMode,bool checkCurrent){
+bool ControllersUtil::setControlMode(int joint,int controlMode,bool checkCurrent){
 
 	if (checkCurrent){
 		int currentControlMode = -1;
-		if (iCtrl->getControlMode(jointToMove,&currentControlMode)){
+		if (iCtrl->getControlMode(joint,&currentControlMode)){
 
 			if (currentControlMode != controlMode){
-				if  (iCtrl->setControlMode(jointToMove,controlMode)){
-					cout << dbgTag << "CONTROL MODE SET TO " << controlMode << " ON JOINT " << jointToMove << "   PREV: " << currentControlMode << "  OPEN: " << VOCAB_CM_OPENLOOP << "\n";
+				if  (iCtrl->setControlMode(joint,controlMode)){
+					cout << dbgTag << "CONTROL MODE SET TO " << controlMode << " ON JOINT " << joint << "   PREV: " << currentControlMode << "  OPEN: " << VOCAB_CM_OPENLOOP << "\n";
 					return true;
 				} else {
-                    cout << dbgTag << "failed to SET control mode on joint " << jointToMove << "\n";                   
+                    cout << dbgTag << "failed to SET control mode on joint " << joint << "\n";                   
                     return false;
                 }	
 			} else {
@@ -233,10 +253,10 @@ bool ControllersUtil::setControlMode(int controlMode,bool checkCurrent){
                 return true;
             }
 		} else {
-            cout << dbgTag << "failed to GET control mode from joint " << jointToMove << " (controlMode appears to be " << currentControlMode << ")\n";           
+            cout << dbgTag << "failed to GET control mode from joint " << joint << " (controlMode appears to be " << currentControlMode << ")\n";           
             return false;
         }
-	} else return iCtrl->setControlMode(jointToMove,controlMode);
+	} else return iCtrl->setControlMode(joint,controlMode);
 	
     return true;
 }
@@ -258,47 +278,48 @@ bool ControllersUtil::waitMoveDone(const double &i_timeout, const double &i_dela
 }
 /* *********************************************************************************************************************** */
 
-bool ControllersUtil::getEncoderAngle(FingerJoint fingerJoint,double *encoderData){
-	
-	bool ok;
-
-	switch (fingerJoint){
-
-	case PROXIMAL:
-		ok = iEncs->getEncoder(jointToMove,encoderData);
-		break;
-
-	case DISTAL:
-		ok = iEncs->getEncoder(jointToMove + 1,encoderData);
-		break;
-	}
-	
-	if (!ok){
-		cout << dbgTag << "could not get encoder value\n";
-	}
-	return ok;
-}
-
-bool ControllersUtil::getRealPwmValue(FingerJoint fingerJoint,double *pwmValue){
-
-	bool ok;
-
-	switch (fingerJoint){
-
-	case PROXIMAL:
-		ok = iOLC->getOutput(jointToMove,pwmValue);
-		break;
-
-	case DISTAL:
-		ok = iOLC->getOutput(jointToMove + 1,pwmValue);
-		break;
-	}
-
-	if (!ok){
-		cout << dbgTag << "could not get pwm value\n";
-	}
-	return ok;
-}
+//TODO restore getEncoderAngle and getRealPwmValue
+//bool ControllersUtil::getEncoderAngle(FingerJoint fingerJoint,double *encoderData){
+//	
+//	bool ok;
+//
+//	switch (fingerJoint){
+//
+//	case PROXIMAL:
+//		ok = iEncs->getEncoder(jointToMove,encoderData);
+//		break;
+//
+//	case DISTAL:
+//		ok = iEncs->getEncoder(jointToMove + 1,encoderData);
+//		break;
+//	}
+//	
+//	if (!ok){
+//		cout << dbgTag << "could not get encoder value\n";
+//	}
+//	return ok;
+//}
+//
+//bool ControllersUtil::getRealPwmValue(FingerJoint fingerJoint,double *pwmValue){
+//
+//	bool ok;
+//
+//	switch (fingerJoint){
+//
+//	case PROXIMAL:
+//		ok = iOLC->getOutput(jointToMove,pwmValue);
+//		break;
+//
+//	case DISTAL:
+//		ok = iOLC->getOutput(jointToMove + 1,pwmValue);
+//		break;
+//	}
+//
+//	if (!ok){
+//		cout << dbgTag << "could not get pwm value\n";
+//	}
+//	return ok;
+//}
 
 bool ControllersUtil::release(){
 

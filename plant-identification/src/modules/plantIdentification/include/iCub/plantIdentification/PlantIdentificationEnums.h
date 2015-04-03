@@ -17,12 +17,12 @@ namespace iCub {
 
 		enum RPCSetCmdArgName {
 
-			FINGER_TO_MOVE,
-			JOINT_TO_MOVE,
 			PWM_SIGN,
 
+			STEP_JOINTS_LIST,
 			STEP_LIFESPAN,
 			
+			CTRL_JOINTS_LIST,
 			CTRL_PID_KPF,
 			CTRL_PID_KIF,
 			CTRL_PID_KDF,
@@ -33,6 +33,7 @@ namespace iCub {
 			CTRL_PID_RESET_ENABLED,
 			CTRL_LIFESPAN,
 
+			RAMP_JOINTS_LIST,
 			RAMP_SLOPE,
 			RAMP_INTERCEPT,
 			RAMP_LIFESPAN,

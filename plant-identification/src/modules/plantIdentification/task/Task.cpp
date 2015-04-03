@@ -15,11 +15,20 @@ using iCub::plantIdentification::ControllersUtil;
 using iCub::plantIdentification::PortsUtil;
 using iCub::plantIdentification::TaskCommonData;
 
-Task::Task(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,int taskLifespan){
+Task::Task(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,int taskLifespan,std::vector<int> &jointsList,std::vector<int> &fingersList){
 	
 	this->controllersUtil = controllersUtil;
 	this->portsUtil = portsUtil;
 	this->commonData = commonData;
+	this->jointsList.resize(jointsList.size());
+	for(size_t i = 0; i < jointsList.size(); i++){
+		this->jointsList[i] = jointsList[i];
+	}
+	this->fingersList.resize(fingersList.size());
+	for(size_t i = 0; i < fingersList.size(); i++){
+		this->fingersList[i] = fingersList[i];
+	}
+	pwmToUse.resize(jointsList.size(),0.0);
 
 	isFirstCall = true;
 	callsNumber = 0;
@@ -50,8 +59,10 @@ bool Task::manage(bool keepActive){
 
 	calculatePwm();
 
-	controllersUtil->sendPwm(commonData->pwmSign*pwmToUse);
-	
+	for(size_t i = 0; i < pwmToUse.size(); i++){
+		controllersUtil->sendPwm(jointsList[i],commonData->pwmSign*pwmToUse[i]);
+	}
+
 	LogData logData;
 	buildLogData(logData);
 
@@ -74,34 +85,42 @@ bool Task::manage(bool keepActive){
 bool Task::loadICubData(){
 	using yarp::sig::Vector;
 
-	if (!portsUtil->readFingerSkinCompData(commonData->fingerToMove,commonData->fingerTaxelsData)){
+	if (!portsUtil->readFingerSkinCompData(commonData->fingerTaxelsData)){
 		return false;
 	}
 
 	processTactileData();
 	
-	controllersUtil->getEncoderAngle(PROXIMAL,&commonData->proximalJointAngle);
-	controllersUtil->getEncoderAngle(DISTAL,&commonData->distalJointAngle);
+	//TODO define what encoders should be logged
+//	controllersUtil->getEncoderAngle(PROXIMAL,&commonData->proximalJointAngle);
+//	controllersUtil->getEncoderAngle(DISTAL,&commonData->distalJointAngle);
 
-	controllersUtil->getRealPwmValue(PROXIMAL,&commonData->realProximalPwm);
-	controllersUtil->getRealPwmValue(DISTAL,&commonData->realDistalPwm);
+//	controllersUtil->getRealPwmValue(PROXIMAL,&commonData->realProximalPwm);
+//	controllersUtil->getRealPwmValue(DISTAL,&commonData->realDistalPwm);
 
 	return true;
 }
 
 void Task::processTactileData(){
 
-	double partialOverallFingerPressure = 0.0;
+	double partialOverallFingerPressure;
+
 	for(size_t i = 0; i < commonData->fingerTaxelsData.size(); i++){
-		partialOverallFingerPressure += commonData->fingerTaxelsData[i];
+		partialOverallFingerPressure = 0.0;
+		for(size_t j = 0; j < commonData->fingerTaxelsData[i].size(); j++){
+			partialOverallFingerPressure += commonData->fingerTaxelsData[i][j];
+		}
+		commonData->overallFingerPressure[i] = partialOverallFingerPressure;
+
+		commonData->previousOverallFingerPressures[i][commonData->previousPressuresIndex[i]] = commonData->overallFingerPressure[i];
+		commonData->previousPressuresIndex[i] = (commonData->previousPressuresIndex[i] + 1)%commonData->previousOverallFingerPressures[i].size();
+
+		std::vector<double> previousOverallFingerPressuresCopy(commonData->previousOverallFingerPressures[i]);
+
+		gsl_sort(&previousOverallFingerPressuresCopy[0],1,previousOverallFingerPressuresCopy.size());
+		commonData->overallFingerPressureMedian[i] = gsl_stats_median_from_sorted_data(&previousOverallFingerPressuresCopy[0],1,previousOverallFingerPressuresCopy.size());
+
 	}
-	commonData->overallFingerPressure = partialOverallFingerPressure;
-
-	commonData->previousOverallFingerPressures[commonData->previousPressuresIndex] = commonData->overallFingerPressure;
-	commonData->previousPressuresIndex = (commonData->previousPressuresIndex + 1)%commonData->previousOverallFingerPressures.size();
-
-	gsl_sort(&commonData->previousOverallFingerPressures[0],1,commonData->previousOverallFingerPressures.size());
-	commonData->overallFingerPressureMedian = gsl_stats_median_from_sorted_data(&commonData->previousOverallFingerPressures[0],1,commonData->previousOverallFingerPressures.size());
 
 }
 
@@ -113,24 +132,36 @@ void Task::buildLogData(LogData &logData){
 void Task::addCommonLogData(LogData &logData){
 
 	logData.taskId = taskId;
-
+	//TODO only the first element is logged!
 	for (size_t i = 0; i < commonData->fingerTaxelsData.size(); i++){
-		logData.fingerTaxelValues[i] = commonData->fingerTaxelsData[i];
+		logData.fingerTaxelValues[i] = commonData->fingerTaxelsData[0][i];
 	}
-	logData.overallFingerPressure = commonData->overallFingerPressure;
-	logData.overallFingerPressureMedian = commonData->overallFingerPressureMedian;
+	logData.overallFingerPressure = commonData->overallFingerPressure[0];
+	logData.overallFingerPressureMedian = commonData->overallFingerPressureMedian[0];
 
-	logData.proximalJointAngle = commonData->proximalJointAngle;
-	logData.distalJointAngle = commonData->distalJointAngle;
-	logData.realProximalPwm = commonData->realProximalPwm;
-	logData.realDistalPwm = commonData->realDistalPwm;
+//	logData.proximalJointAngle = commonData->proximalJointAngle;
+//	logData.distalJointAngle = commonData->distalJointAngle;
+//	logData.realProximalPwm = commonData->realProximalPwm;
+//	logData.realDistalPwm = commonData->realDistalPwm;
 
-	logData.pwm = pwmToUse;
+	logData.pwm = pwmToUse[0];
 }
 
 void Task::printScreenLog(){
+	using std::cout;
+	
+	cout << dbgTag << "Sum: ";
+	
+	for(size_t i = 0; i < fingersList.size(); i++){
+		cout << commonData->overallFingerPressure[i] << "(" << fingersList[i] << ") ";
+	}
+	cout << "\t   Pwm: ";
 
-	std::cout << dbgTag << "Sum: " << commonData->overallFingerPressure << "\t   Median: " << commonData->overallFingerPressureMedian << "\t   Pwm: " << pwmToUse << " " << optionalLogString << "\n";
+	for(size_t i = 0; i < jointsList.size(); i++){
+		cout << pwmToUse[i] << "(" << jointsList[i] << ") ";
+	}
+	
+	cout << optionalLogString << "\n";
 
 	optionalLogString.clear();
 }

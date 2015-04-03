@@ -56,16 +56,18 @@ bool PortsUtil::sendLogData(LogData &logData){
 	return true;
 }
 
-bool PortsUtil::readFingerSkinCompData(int finger,std::vector<double> &fingerTaxelsData){
+bool PortsUtil::readFingerSkinCompData(std::vector<std::vector<double>> &fingerTaxelsData){
 
 	using yarp::sig::Vector;
 
 	Vector *iCubSkinData = portSkinCompIn.read(false);
     
+	//TODO generalize fingers number
     if (iCubSkinData) {
-
-		for (size_t i = 0; i < fingerTaxelsData.size(); i++){
-			fingerTaxelsData[i] = (*iCubSkinData)[12*finger + i];
+		for(size_t i = 0; i < 5; i++){
+			for (size_t j = 0; j < fingerTaxelsData[i].size(); j++){
+				fingerTaxelsData[i][j] = (*iCubSkinData)[12*i + j];
+			}
 		}
 	}
 

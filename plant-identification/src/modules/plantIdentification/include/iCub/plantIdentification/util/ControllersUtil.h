@@ -9,6 +9,8 @@
 #include <yarp/os/ResourceFinder.h>
 #include <yarp/sig/Vector.h>
 
+#include <vector>
+
 namespace iCub {
     namespace plantIdentification {
 
@@ -25,8 +27,8 @@ namespace iCub {
 
 				yarp::sig::Vector armStoredPosition;
 				int armJointsNum;
-				int jointStoredControlMode;
-				int jointToMove;
+				std::vector<int> jointsStoredControlMode;
+				std::vector<int> handJointsToMove;
 
                 bool graspEnabled;
 
@@ -39,15 +41,13 @@ namespace iCub {
 
 				bool init(yarp::os::ResourceFinder &rf);
 
-				void setJoint(int jointToMove){ this->jointToMove = jointToMove; }
-
-				bool sendPwm(double pwm);
+				bool sendPwm(int joint,double pwm);
 
 				bool saveCurrentArmPosition();
 
 				bool saveCurrentControlMode();
 
-				bool setTaskControlMode();
+				bool setTaskControlModes(std::vector<int> &jointsList,int controlMode);
 
 				bool setArmInTaskPosition();
 
@@ -57,9 +57,9 @@ namespace iCub {
 
 				bool openHand();
 
-				bool getEncoderAngle(iCub::plantIdentification::FingerJoint fingerJoint,double *encoderData);
+//				bool getEncoderAngle(iCub::plantIdentification::FingerJoint fingerJoint,double *encoderData);
 
-				bool getRealPwmValue(iCub::plantIdentification::FingerJoint fingerJoint,double *pwmValue);
+//				bool getRealPwmValue(iCub::plantIdentification::FingerJoint fingerJoint,double *pwmValue);
 
 				bool release();
 
@@ -67,7 +67,7 @@ namespace iCub {
 
 				bool waitMoveDone(const double &i_timeout, const double &i_delay);
 
-				bool setControlMode(int controlMode,bool checkCurrent);
+				bool setControlMode(int joint,int controlMode,bool checkCurrent);
 };
     } //namespace plantIdentification
 } //namespace iCub

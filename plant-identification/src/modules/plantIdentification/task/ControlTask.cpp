@@ -21,13 +21,14 @@ using yarp::os::Value;
 
 using std::string;
 
-ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,ControlTaskData *controlData,double pressureTargetValue):Task(controllersUtil,portsUtil,commonData,controlData->lifespan) {
+ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,ControlTaskData *controlData,double pressureTargetValue):Task(controllersUtil,portsUtil,commonData,controlData->lifespan,controlData->jointsList,controlData->fingersList) {
 	using yarp::sig::Vector;
 	using yarp::sig::Matrix;
-	using std::stringstream;
 
     this->controlData = controlData;
-	this->pressureTargetValue = pressureTargetValue;
+
+	this->pressureTargetValue.resize(fingersList.size(),pressureTargetValue);
+	this->pid.resize(jointsList.size());
 
     double threadRateSec = commonData->threadRate/1000.0;
 	double ttPeOption,ttNeOption;
@@ -74,73 +75,89 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	addOption(pidOptionsNE,"Tt",Value(ttNeOption));
 	pidOptionsNE.append(commonOptions);
 
-	// TODO to be removed
-	kpPe = controlData->pidKpf;
-	kpNe = controlData->pidKpb;
-	previousError = 0;
 
-	switch (controlData->controlMode){
+	for(size_t i = 0; i < jointsList.size(); i++){
 
-	case GAINS_SET_POS_ERR:
-		pid = new parallelPID(threadRateSec,kpPeOptionVect,kiPeOptionVect,kdPeOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttPeOptionVect,satLimMatrix);
-		pid->setOptions(pidOptionsPE);
-		currentKp = kpPe;
-		break;
+		// TODO to be removed
+		kpPe[i] = controlData->pidKpf;
+		kpNe[i] = controlData->pidKpb;
+		previousError[i] = 0;
 
-	case GAINS_SET_NEG_ERR:
-		pid = new parallelPID(threadRateSec,kpNeOptionVect,kiNeOptionVect,kdNeOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttNeOptionVect,satLimMatrix);
-		pid->setOptions(pidOptionsNE);
-		currentKp = kpNe;
-		break;
+		switch (controlData->controlMode){
 
-	case BOTH_GAINS_SETS:
-		pid = new parallelPID(threadRateSec,kpPeOptionVect,kiPeOptionVect,kdPeOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttPeOptionVect,satLimMatrix);
-		pid->setOptions(pidOptionsPE);
-		currentKp = kpPe;
-		break;
+			case GAINS_SET_POS_ERR:
+				pid[i] = new parallelPID(threadRateSec,kpPeOptionVect,kiPeOptionVect,kdPeOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttPeOptionVect,satLimMatrix);
+				pid[i]->setOptions(pidOptionsPE);
+				currentKp[i] = kpPe[i];
+				break;
+
+			case GAINS_SET_NEG_ERR:
+				pid[i] = new parallelPID(threadRateSec,kpNeOptionVect,kiNeOptionVect,kdNeOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttNeOptionVect,satLimMatrix);
+				pid[i]->setOptions(pidOptionsNE);
+				currentKp[i] = kpNe[i];
+				break;
+
+			case BOTH_GAINS_SETS:
+				pid[i] = new parallelPID(threadRateSec,kpPeOptionVect,kiPeOptionVect,kdPeOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttPeOptionVect,satLimMatrix);
+				pid[i]->setOptions(pidOptionsPE);
+				currentKp[i] = kpPe[i];
+				break;
+		}
+
 	}
-
 	taskName = CONTROL;
 	dbgTag = "ControlTask: ";
 
 }
 
 void ControlTask::init(){
+	using std::cout;
 
-	std::cout << "\n\n" << dbgTag << "TASK STARTED - Target: " << pressureTargetValue << "\n\n";
+	controllersUtil->setTaskControlModes(jointsList,VOCAB_CM_OPENLOOP);
+
+	cout << "\n\n" << dbgTag << "TASK STARTED - Target: ";
+	for(size_t i = 0; i < pressureTargetValue.size(); i++){
+		cout << pressureTargetValue[i] << " ";
+	}
+	cout << "\n\n";
 }
 
 void ControlTask::calculatePwm(){
 	using yarp::sig::Vector;
 
-	double error = pressureTargetValue - commonData->overallFingerPressure;
+
+	for(size_t i = 0; i < jointsList.size(); i++){
+
+		double error = pressureTargetValue[i] - commonData->overallFingerPressure[i];
 
 
 
-	if (controlData->controlMode == BOTH_GAINS_SETS){
+		if (controlData->controlMode == BOTH_GAINS_SETS){
 
-		if (error >= 0 && previousError < 0){
-			pid->setOptions(pidOptionsPE);
-			currentKp = kpPe;
-		} else if (error < 0 && previousError >= 0){
-			pid->setOptions(pidOptionsNE);
-			currentKp = kpNe;
+			if (error >= 0 && previousError[i] < 0){
+				pid[i]->setOptions(pidOptionsPE);
+				currentKp[i] = kpPe[i];
+			} else if (error < 0 && previousError[i] >= 0){
+				pid[i]->setOptions(pidOptionsNE);
+				currentKp[i] = kpNe[i];
+			}
 		}
-	}
 
-	Vector ref(1,pressureTargetValue);
-	Vector fb(1,commonData->overallFingerPressure);
-	Vector result = pid->compute(ref,fb);
+		Vector ref(1,pressureTargetValue[i]);
+		Vector fb(1,commonData->overallFingerPressure[i]);
+		Vector result = pid[i]->compute(ref,fb);
 	
-	// TODO to be removed
-	if (controlData->pidResetEnabled && error > 0 && result[0] < currentKp*error - 1.0){
-		pid->reset(result);
-		optionalLogString.append("[ PID RESET ] ");
+		// TODO to be removed
+		if (controlData->pidResetEnabled && error > 0 && result[0] < currentKp[i]*error - 1.0){
+			pid[i]->reset(result);
+			optionalLogString.append("[ PID RESET ] ");
+		}
+
+		pwmToUse[i] = result[0];
+
+		previousError[i] = error;
+
 	}
-
-	pwmToUse = result[0];
-
-	previousError = error;
 }
 
 void ControlTask::buildLogData(LogData &logData){
@@ -149,7 +166,8 @@ void ControlTask::buildLogData(LogData &logData){
 
 	logData.taskType = CONTROL;
 	logData.taskOperationMode = controlData->controlMode;
-	logData.targetValue = pressureTargetValue;
+	//TODO only the first element is logged!
+	logData.targetValue = pressureTargetValue[0];
 	
 	logData.pidKpf = controlData->pidKpf;
 	logData.pidKif = controlData->pidKif;
@@ -161,7 +179,10 @@ void ControlTask::buildLogData(LogData &logData){
 
 void ControlTask::release(){
 
-	delete(pid);
+	for(size_t i = 0; i < jointsList.size(); i++){
+		delete(pid[i]);
+	}
+	
 }
 
 void ControlTask::addOption(Bottle &bottle,char *paramName,Value paramValue){
@@ -216,4 +237,15 @@ double ControlTask::calculateTt(iCub::plantIdentification::ControlTaskOpMode gai
 	} else tt = td;
 
 	return tt;
+}
+
+std::string ControlTask::getPressureTargetValueDescription(){
+
+	std::stringstream description("");
+
+	for(size_t i = 0; i < pressureTargetValue.size(); i++){
+		description << pressureTargetValue[i] << " ";
+	}
+	
+	return description.str();
 }

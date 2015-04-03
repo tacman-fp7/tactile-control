@@ -23,8 +23,6 @@ RPCCommandsData::RPCCommandsData(){
 	add("stop",STOP,"STOP TASKS");
 	add("quit",QUIT,"QUIT MODULE");
 
-	add("finger",FINGER_TO_MOVE,"FINGER TO MOVE");
-	add("joint",JOINT_TO_MOVE,"JOINT TO MOVE");
 	add("pwm_sign",PWM_SIGN,"PWM SIGN");
 	add("step_ls",STEP_LIFESPAN,"STEP TASK LIFESPAN");
 	add("kp_pe",CTRL_PID_KPF,"CONTROL PID Kp (error >= 0)");

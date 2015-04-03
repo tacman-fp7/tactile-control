@@ -14,7 +14,7 @@ namespace iCub {
             private:
                 
 				iCub::plantIdentification::StepTaskData *stepData;
-				double constantPwm;
+				std::vector<double> constantPwm;
 
             public:
 
@@ -22,7 +22,7 @@ namespace iCub {
 
 				virtual void init();
 
-				double getConstantPwm(){ return constantPwm; }
+				std::string getConstantPwmDescription();
 
 				virtual void buildLogData(iCub::plantIdentification::LogData &logData);
 
