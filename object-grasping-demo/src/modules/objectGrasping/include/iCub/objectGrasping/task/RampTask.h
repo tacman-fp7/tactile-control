@@ -22,7 +22,7 @@ namespace iCub {
 
             public:
 
-                RampTask(iCub::objectGrasping::ControllersUtil *controllersUtil,iCub::objectGrasping::PortsUtil *portsUtil,iCub::objectGrasping::TaskCommonData *commonData,iCub::objectGrasping::RampTaskData *rampData,double pressureTargetValue);
+                RampTask(iCub::objectGrasping::ControllersUtil *controllersUtil,iCub::objectGrasping::PortsUtil *portsUtil,iCub::objectGrasping::TaskCommonData *commonData,iCub::objectGrasping::RampTaskData *rampData,std::vector<double> &pressureTargetValue);
 
 				virtual void init();
 

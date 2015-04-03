@@ -21,13 +21,16 @@ using yarp::os::Value;
 
 using std::string;
 
-ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,ControlTaskData *controlData,double pressureTargetValue):Task(controllersUtil,portsUtil,commonData,controlData->lifespan,controlData->jointsList,controlData->fingersList) {
+ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,ControlTaskData *controlData,std::vector<double> &pressureTargetValue):Task(controllersUtil,portsUtil,commonData,controlData->lifespan,controlData->jointsList,controlData->fingersList) {
 	using yarp::sig::Vector;
 	using yarp::sig::Matrix;
 
     this->controlData = controlData;
 
-	this->pressureTargetValue.resize(fingersList.size(),pressureTargetValue);
+	this->pressureTargetValue.resize(fingersList.size());
+	for(size_t i = 0; i < this->pressureTargetValue.size(); i++){
+		this->pressureTargetValue[i] = pressureTargetValue[i < pressureTargetValue.size() ? i : pressureTargetValue.size() - 1];
+	}
 	this->pid.resize(jointsList.size());
 
     double threadRateSec = commonData->threadRate/1000.0;

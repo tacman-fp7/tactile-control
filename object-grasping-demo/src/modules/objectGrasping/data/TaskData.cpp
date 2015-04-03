@@ -12,7 +12,6 @@ using iCub::objectGrasping::TaskData;
 TaskData::TaskData(yarp::os::ResourceFinder &rf,int threadRate) {
 	using iCub::objectGrasping::ControlTaskOpMode;
 	using yarp::os::Bottle;
-	std::vector<std::vector<double>> a;
 
 	commonData.threadRate = threadRate;
 

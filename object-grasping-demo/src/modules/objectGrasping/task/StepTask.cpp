@@ -11,11 +11,13 @@ using iCub::objectGrasping::PortsUtil;
 using iCub::objectGrasping::TaskCommonData;
 using iCub::objectGrasping::StepTaskData;
 
-StepTask::StepTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,StepTaskData *stepData,double constantPwm):Task(controllersUtil,portsUtil,commonData,stepData->lifespan,stepData->jointsList,stepData->fingersList) {
+StepTask::StepTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,StepTaskData *stepData,std::vector<double> &constantPwm):Task(controllersUtil,portsUtil,commonData,stepData->lifespan,stepData->jointsList,stepData->fingersList) {
 
 	this->stepData = stepData;
-	this->constantPwm.resize(jointsList.size(),constantPwm);
-
+	this->constantPwm.resize(jointsList.size());
+	for(size_t i = 0; i < this->constantPwm.size(); i++){
+		this->constantPwm[i] = constantPwm[i < constantPwm.size() ? i : constantPwm.size() - 1];
+	}
 	taskName = STEP;
 	dbgTag = "StepTask: ";
 }

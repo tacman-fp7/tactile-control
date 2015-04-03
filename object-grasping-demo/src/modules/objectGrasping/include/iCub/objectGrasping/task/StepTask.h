@@ -18,7 +18,7 @@ namespace iCub {
 
             public:
 
-                StepTask(iCub::objectGrasping::ControllersUtil *controllersUtil,iCub::objectGrasping::PortsUtil *portsUtil,iCub::objectGrasping::TaskCommonData *commonData,iCub::objectGrasping::StepTaskData *stepData,double constantPwm);
+                StepTask(iCub::objectGrasping::ControllersUtil *controllersUtil,iCub::objectGrasping::PortsUtil *portsUtil,iCub::objectGrasping::TaskCommonData *commonData,iCub::objectGrasping::StepTaskData *stepData,std::vector<double> &constantPwm);
 
 				virtual void init();
 

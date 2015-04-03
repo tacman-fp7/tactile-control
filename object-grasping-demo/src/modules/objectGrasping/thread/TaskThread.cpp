@@ -13,6 +13,7 @@
 #include <ctime>
 #include <cmath>
 
+
 using std::cerr;
 using std::cout;
 using std::string;
@@ -192,26 +193,39 @@ void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData
 
 void TaskThread::task(RPCTaskCmdArgName paramName,TaskName taskName,Value paramValue,RPCCommandsData &rpcCmdData){
 
+
 	switch (paramName){
 
 	case ADD:
+		{
+			string targetsString = paramValue.asString();
+			char *targetsChar = new char[targetsString.length() + 1];
+			strcpy(targetsChar,targetsString.c_str());
+			std::vector<double> targetsList;
+			char *target;
+			
+			target = strtok(targetsChar,"_");
+			while(target != NULL){
+				targetsList.push_back(atof(target));
+			}
 
-		switch (taskName){
-		case STEP:
-			taskList.push_back(new StepTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->stepData,paramValue.asDouble()));
-			break;
+			switch (taskName){
+			case STEP:
+				taskList.push_back(new StepTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->stepData,targetsList));
+				break;
 
-		case CONTROL:
-			taskList.push_back(new ControlTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->controlData,paramValue.asDouble()));
-			break;
+			case CONTROL:
+				taskList.push_back(new ControlTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->controlData,targetsList));
+				break;
 
-		case RAMP:
-			taskList.push_back(new RampTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->rampData,paramValue.asDouble()));
-			break;
+			case RAMP:
+				taskList.push_back(new RampTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->rampData,targetsList));
+				break;
+			}
+			cout << "\n" <<
+					"\n" << 
+					"ADDED '" << rpcCmdData.taskMap[taskName] << "' TASK" << "\n";
 		}
-		cout << "\n" <<
-				"\n" << 
-				"ADDED '" << rpcCmdData.taskMap[taskName] << "' TASK" << "\n";
 		break;
 
 	case EMPTY:

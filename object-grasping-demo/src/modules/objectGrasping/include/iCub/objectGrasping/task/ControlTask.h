@@ -33,7 +33,7 @@ namespace iCub {
 
             public:
 
-                ControlTask(iCub::objectGrasping::ControllersUtil *controllersUtil,iCub::objectGrasping::PortsUtil *portsUtil,iCub::objectGrasping::TaskCommonData *commonData,iCub::objectGrasping::ControlTaskData *controlData,double pressureTargetValue);
+                ControlTask(iCub::objectGrasping::ControllersUtil *controllersUtil,iCub::objectGrasping::PortsUtil *portsUtil,iCub::objectGrasping::TaskCommonData *commonData,iCub::objectGrasping::ControlTaskData *controlData,std::vector<double> &pressureTargetValue);
 
 				std::string getPressureTargetValueDescription();
 

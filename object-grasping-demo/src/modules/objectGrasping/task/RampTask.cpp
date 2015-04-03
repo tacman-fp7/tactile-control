@@ -11,10 +11,13 @@ using iCub::objectGrasping::PortsUtil;
 using iCub::objectGrasping::TaskCommonData;
 using iCub::objectGrasping::RampTaskData;
 
-RampTask::RampTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,RampTaskData *rampData,double pressureTargetValue):Task(controllersUtil,portsUtil,commonData,rampData->lifespan,rampData->jointsList,rampData->fingersList) {
+RampTask::RampTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,RampTaskData *rampData,std::vector<double> &pressureTargetValue):Task(controllersUtil,portsUtil,commonData,rampData->lifespan,rampData->jointsList,rampData->fingersList) {
 
 	this->rampData = rampData;
-	this->pressureTargetValue.resize(fingersList.size(),pressureTargetValue);
+	this->pressureTargetValue.resize(fingersList.size());
+	for(size_t i = 0; i < this->pressureTargetValue.size(); i++){
+		this->pressureTargetValue[i] = pressureTargetValue[i < pressureTargetValue.size() ? i : pressureTargetValue.size() - 1];
+	}
 
 	internalState.resize(fingersList.size(),DECREASING);
 
