@@ -80,7 +80,7 @@ bool ObjectGraspingModule::configure(ResourceFinder &rf) {
     }
     taskThread->suspend();
 
-	taskState = WAIT_FOR_DEMO;
+	taskState = WAIT_TO_START;
 
     cout << dbgTag << "Started correctly. \n";
 
