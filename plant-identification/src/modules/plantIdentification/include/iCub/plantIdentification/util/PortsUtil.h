@@ -30,7 +30,7 @@ namespace iCub {
 
 				bool sendLogData(iCub::plantIdentification::LogData &logData);
 
-				bool readFingerSkinCompData(std::vector<std::vector<double>> &fingerTaxelsData);
+				bool readFingerSkinCompData(std::vector<std::vector<double> > &fingerTaxelsData);
 
 				bool release();
         };

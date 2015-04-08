@@ -28,7 +28,11 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
     this->controlData = controlData;
 
 	this->pressureTargetValue.resize(fingersList.size(),pressureTargetValue);
-	this->pid.resize(jointsList.size());
+	pid.resize(jointsList.size());
+    currentKp.resize(jointsList.size());
+    kpPe.resize(jointsList.size());
+	kpNe.resize(jointsList.size());
+	previousError.resize(jointsList.size());
 
     double threadRateSec = commonData->threadRate/1000.0;
 	double ttPeOption,ttNeOption;
@@ -75,14 +79,16 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	addOption(pidOptionsNE,"Tt",Value(ttNeOption));
 	pidOptionsNE.append(commonOptions);
 
-
+std::cout << "7\n";
+std::cout.flush();
 	for(size_t i = 0; i < jointsList.size(); i++){
 
 		// TODO to be removed
 		kpPe[i] = controlData->pidKpf;
 		kpNe[i] = controlData->pidKpb;
 		previousError[i] = 0;
-
+std::cout << "7\n";
+std::cout.flush();
 		switch (controlData->controlMode){
 
 			case GAINS_SET_POS_ERR:
@@ -128,7 +134,7 @@ void ControlTask::calculatePwm(){
 
 	for(size_t i = 0; i < jointsList.size(); i++){
 
-		double error = pressureTargetValue[i] - commonData->overallFingerPressure[i];
+		double error = pressureTargetValue[i] - commonData->overallFingerPressure[fingersList[i]];
 
 
 
@@ -144,7 +150,7 @@ void ControlTask::calculatePwm(){
 		}
 
 		Vector ref(1,pressureTargetValue[i]);
-		Vector fb(1,commonData->overallFingerPressure[i]);
+		Vector fb(1,commonData->overallFingerPressure[fingersList[i]]);
 		Vector result = pid[i]->compute(ref,fb);
 	
 		// TODO to be removed

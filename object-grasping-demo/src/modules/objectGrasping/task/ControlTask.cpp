@@ -31,8 +31,11 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	for(size_t i = 0; i < this->pressureTargetValue.size(); i++){
 		this->pressureTargetValue[i] = pressureTargetValue[i < pressureTargetValue.size() ? i : pressureTargetValue.size() - 1];
 	}
-	this->pid.resize(jointsList.size());
-
+	pid.resize(jointsList.size());
+    currentKp.resize(jointsList.size());
+    kpPe.resize(jointsList.size());
+	kpNe.resize(jointsList.size());
+	previousError.resize(jointsList.size());
     double threadRateSec = commonData->threadRate/1000.0;
 	double ttPeOption,ttNeOption;
 	
@@ -131,7 +134,7 @@ void ControlTask::calculatePwm(){
 
 	for(size_t i = 0; i < jointsList.size(); i++){
 
-		double error = pressureTargetValue[i] - commonData->overallFingerPressure[i];
+		double error = pressureTargetValue[i] - commonData->overallFingerPressure[fingersList[i]];
 
 
 
@@ -147,7 +150,7 @@ void ControlTask::calculatePwm(){
 		}
 
 		Vector ref(1,pressureTargetValue[i]);
-		Vector fb(1,commonData->overallFingerPressure[i]);
+		Vector fb(1,commonData->overallFingerPressure[fingersList[i]]);
 		Vector result = pid[i]->compute(ref,fb);
 	
 		// TODO to be removed

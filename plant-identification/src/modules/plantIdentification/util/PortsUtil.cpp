@@ -56,7 +56,7 @@ bool PortsUtil::sendLogData(LogData &logData){
 	return true;
 }
 
-bool PortsUtil::readFingerSkinCompData(std::vector<std::vector<double>> &fingerTaxelsData){
+bool PortsUtil::readFingerSkinCompData(std::vector<std::vector<double> > &fingerTaxelsData){
 
 	using yarp::sig::Vector;
 

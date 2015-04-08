@@ -14,8 +14,8 @@ namespace iCub {
 
 		struct TaskCommonData {
 
-			std::vector<std::vector<double>> fingerTaxelsData;
-			std::vector<std::vector<double>> previousOverallFingerPressures;
+			std::vector<std::vector<double> > fingerTaxelsData;
+			std::vector<std::vector<double> > previousOverallFingerPressures;
 			std::vector<int> previousPressuresIndex;
 			std::vector<double> overallFingerPressure;
 			std::vector<double> overallFingerPressureMedian;

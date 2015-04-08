@@ -10,8 +10,10 @@ using iCub::objectGrasping::TaskData;
 
 
 TaskData::TaskData(yarp::os::ResourceFinder &rf,int threadRate) {
-	using iCub::objectGrasping::ControlTaskOpMode;
+	using iCub::plantIdentification::ControlTaskOpMode;
 	using yarp::os::Bottle;
+
+	dbgTag = "TaskData: ";
 
 	commonData.threadRate = threadRate;
 
@@ -32,11 +34,12 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,int threadRate) {
 	commonData.overallFingerPressureMedian.resize(5,0.0);
 
 	//TODO change the default value
-	Bottle* stepTaskJoints = rf.check("stepTaskJoints",Value(11)).asList();
-	controlData.jointsList.resize(stepTaskJoints->size(),0);
+	Bottle* stepTaskJoints = rf.find("stepTaskJoints").asList();
+	stepData.jointsList.resize(stepTaskJoints->size(),0);
+	stepData.fingersList.resize(stepTaskJoints->size(),0);
 	for(int i = 0; i < stepTaskJoints->size(); i++){
-		controlData.jointsList[i] = stepTaskJoints->get(i).asInt();
-		controlData.fingersList[i] = getFingerFromJoint(controlData.jointsList[i]);
+		stepData.jointsList[i] = stepTaskJoints->get(i).asInt();
+		stepData.fingersList[i] = getFingerFromJoint(stepData.jointsList[i]);
 	}	stepData.lifespan = rf.check("stepTaskLifespan",Value(10)).asInt();
 
 	controlData.pidKpf = rf.check("pidKpPe",Value(1.0)).asDouble();
@@ -47,8 +50,9 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,int threadRate) {
 	controlData.pidKdb = rf.check("pidKdNe",Value(0.0)).asDouble();
 
 	//TODO change the default value
-	Bottle* controltTaskJoints = rf.check("controlTaskJoints",Value(11)).asList();
+	Bottle* controltTaskJoints = rf.find("controlTaskJoints").asList();
 	controlData.jointsList.resize(controltTaskJoints->size(),0);
+	controlData.fingersList.resize(controltTaskJoints->size(),0);
 	for(int i = 0; i < controltTaskJoints->size(); i++){
 		controlData.jointsList[i] = controltTaskJoints->get(i).asInt();
 		controlData.fingersList[i] = getFingerFromJoint(controlData.jointsList[i]);
@@ -66,18 +70,18 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,int threadRate) {
 	controlData.lifespan = rf.check("controlTaskLifespan",Value(10)).asInt();
 
 	//TODO change the default value
-	Bottle* rampTaskJoints = rf.check("rampTaskJoints",Value(11)).asList();
-	controlData.jointsList.resize(rampTaskJoints->size(),0);
+	Bottle* rampTaskJoints = rf.find("rampTaskJoints").asList();
+	rampData.jointsList.resize(rampTaskJoints->size(),0);
+	rampData.fingersList.resize(rampTaskJoints->size(),0);
 	for(int i = 0; i < rampTaskJoints->size(); i++){
-		controlData.jointsList[i] = rampTaskJoints->get(i).asInt();
-		controlData.fingersList[i] = getFingerFromJoint(controlData.jointsList[i]);
+		rampData.jointsList[i] = rampTaskJoints->get(i).asInt();
+		rampData.fingersList[i] = getFingerFromJoint(rampData.jointsList[i]);
 	}
 	rampData.slope = rf.check("slope",Value(-0.0025)).asDouble();
 	rampData.intercept = rf.check("intercept",Value(-90.0)).asDouble();
 	rampData.lifespan = rf.check("rampTaskLifespan",Value(10)).asInt();
 	rampData.lifespanAfterStabilization = rf.check("rampTaskLifespanAfterStabilization",Value(5)).asInt();
 
-	dbgTag = "TaskData: ";
 }
 
 int TaskData::getFingerFromJoint(int joint){

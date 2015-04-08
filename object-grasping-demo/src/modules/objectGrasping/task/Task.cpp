@@ -153,7 +153,7 @@ void Task::printScreenLog(){
 	cout << dbgTag << "Sum: ";
 	
 	for(size_t i = 0; i < fingersList.size(); i++){
-		cout << commonData->overallFingerPressure[i] << "(" << fingersList[i] << ") ";
+		cout << commonData->overallFingerPressure[fingersList[i]] << "(" << fingersList[i] << ") ";
 	}
 	cout << "\t   Pwm: ";
 
