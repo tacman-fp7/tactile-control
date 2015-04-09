@@ -15,6 +15,7 @@ using std::pair;
 
 RPCCommandsData::RPCCommandsData(){
 
+	add("demo",DEMO,"START THE DEMO");
 	add("help",HELP,"THIS HELP");
 	add("set",SET,"SET PARAMETERS (usage: 'set <paramName> <paramValue>')");
 	add("task",TASK,"MANAGE TASKS (usage: 'task [pop | empty | add <taskType> <targetValue>]')");

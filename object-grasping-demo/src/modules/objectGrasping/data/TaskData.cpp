@@ -10,7 +10,7 @@ using iCub::objectGrasping::TaskData;
 
 
 TaskData::TaskData(yarp::os::ResourceFinder &rf,int threadRate) {
-	using iCub::plantIdentification::ControlTaskOpMode;
+	using iCub::objectGrasping::ControlTaskOpMode;
 	using yarp::os::Bottle;
 
 	dbgTag = "TaskData: ";

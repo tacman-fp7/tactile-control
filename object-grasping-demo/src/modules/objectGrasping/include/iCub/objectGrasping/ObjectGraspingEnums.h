@@ -6,6 +6,7 @@ namespace iCub {
      
 		enum RPCMainCmdName {
 
+            DEMO,
 			HELP,
 			SET,
 			TASK,
@@ -82,6 +83,9 @@ namespace iCub {
 
 		enum TaskState  {
 
+			TEST1,
+			TEST2,
+			SET_ARM_IN_START_POSITION,
 			WAIT_TO_START,
 			SET_ARM_IN_GRASP_POSITION,
 			BEGIN_GRASP_THREAD,

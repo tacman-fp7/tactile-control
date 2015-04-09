@@ -28,6 +28,8 @@ void RPCCommandsUtil::processCommand(const Bottle &rpcCmdBottle){
 	
 	switch (mainCmd){
 
+    case DEMO: // do nothing
+        break;
 	case HELP: // do nothing
 		break;
 	case SET:

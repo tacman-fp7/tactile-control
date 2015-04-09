@@ -109,7 +109,7 @@ void TaskThread::run() {
 bool TaskThread::openHand(){
 
 	if (!controllersUtil->restorePreviousControlMode()) return false;
-	if (!controllersUtil->openHand()) return false;
+//	if (!controllersUtil->openHand()) return false;
 	runEnabled = false;
     currentTaskIndex = 0;
 
@@ -198,16 +198,19 @@ void TaskThread::task(RPCTaskCmdArgName paramName,TaskName taskName,Value paramV
 
 	case ADD:
 		{
-			string targetsString = paramValue.asString();
-			char *targetsChar = new char[targetsString.length() + 1];
-			strcpy(targetsChar,targetsString.c_str());
-			std::vector<double> targetsList;
-			char *target;
+//			string targetsString = paramValue.asString();
+//			char *targetsChar = new char[targetsString.length() + 1];
+//			strcpy(targetsChar,targetsString.c_str());
+//			std::vector<double> targetsList;
+//			char *target;
 			
-			target = strtok(targetsChar,"_");
-			while(target != NULL){
-				targetsList.push_back(atof(target));
-			}
+//			target = strtok(targetsChar,"_");
+//			while(target != NULL){
+//				targetsList.push_back(atof(target));
+//			}
+
+            std::vector<double> targetsList;
+            targetsList.push_back(paramValue.asDouble());
 
 			switch (taskName){
 			case STEP:

@@ -25,7 +25,7 @@ namespace iCub {
 				std::string robotName;
 				bool closing;
 				TaskState taskState;
-
+                int tempVar;
                 
 				/* ****** RPC Ports                                     ****** */
 				yarp::os::RpcServer portObjectGraspingRPC;

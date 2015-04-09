@@ -80,7 +80,8 @@ bool ObjectGraspingModule::configure(ResourceFinder &rf) {
     }
     taskThread->suspend();
 
-	taskState = WAIT_TO_START;
+	taskState = SET_ARM_IN_START_POSITION;
+    tempVar = 0;
 
     cout << dbgTag << "Started correctly. \n";
 
@@ -94,6 +95,15 @@ bool ObjectGraspingModule::configure(ResourceFinder &rf) {
 bool ObjectGraspingModule::updateModule() {
 
 	switch(taskState){
+
+	case SET_ARM_IN_START_POSITION:
+		if (controllersUtil->setArmInStartPosition()) {
+			taskState = WAIT_TO_START;
+		} else{
+	        cout << dbgTag << "failed to set the arm in start position\n";
+	        return false;
+		}
+		break;
 
 	case WAIT_TO_START:
 		// do nothing
@@ -119,10 +129,11 @@ bool ObjectGraspingModule::updateModule() {
 	
 	case WAIT_FOR_GRASP_THREAD:
 		yarp::os::Time::delay(5);
+        taskState = RAISE_ARM;
 		break;
 
 	case RAISE_ARM:
-		if (controllersUtil->setArmInGraspPosition()) {
+		if (controllersUtil->raiseArm()) {
 			taskState = WAIT_FOR_CLOSURE;
 		} else{
 	        cout << dbgTag << "failed to raise the arm\n";
@@ -165,6 +176,9 @@ bool ObjectGraspingModule::respond(const yarp::os::Bottle& command, yarp::os::Bo
 
 	switch (rpcCmdUtil.mainCmd){
 
+	case DEMO:
+		demo();
+		break;
 	case HELP:
 		help();
 		break;
@@ -249,7 +263,7 @@ bool ObjectGraspingModule::start() {
 /* ******* RPC Grasp object                                                 ********************************************** */
 bool ObjectGraspingModule::demo() {
 
-	taskState = SET_ARM_IN_GRASP_POSITION;
+    taskState = SET_ARM_IN_GRASP_POSITION;
 
     return true;
 }
@@ -258,7 +272,15 @@ bool ObjectGraspingModule::demo() {
 /* *********************************************************************************************************************** */
 /* ******* RPC Quit module                                                  ********************************************** */
 bool ObjectGraspingModule::quit() {
-    return closing = true;
+
+	if (taskThread->isRunning()){
+		taskThread->suspend();
+        taskThread->openHand();
+	}
+
+    taskState = SET_ARM_IN_START_POSITION;
+
+//    return closing = true;
 }
 /* *********************************************************************************************************************** */
 

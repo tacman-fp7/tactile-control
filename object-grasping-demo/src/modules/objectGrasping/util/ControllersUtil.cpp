@@ -145,22 +145,22 @@ bool ControllersUtil::setTaskControlModes(std::vector<int> &jointsList,int contr
 
 
 /* ******* Place arm in grasping position                                   ********************************************** */ 
-bool ControllersUtil::setArmInGraspPosition() {
+bool ControllersUtil::setArmInStartPosition() {
 
     cout << dbgTag << "Reaching arm grasp position ... \t";
     
 	iVel->stop();
 
 	// Arm
-	iPos->positionMove(0 ,-30);
-    iPos->positionMove(1 , 30);
-    iPos->positionMove(2 , 0);
-    iPos->positionMove(3 , 45);
+	iPos->positionMove(0 ,-3);
+    iPos->positionMove(1 , 41);
+    iPos->positionMove(2 , 16);
+    iPos->positionMove(3 , 76);
         
-    iPos->positionMove(4 , -14);
-    iPos->positionMove(5 , 3);
-    iPos->positionMove(6 , -20);
-    iPos->positionMove(7 , 14);
+    iPos->positionMove(4 , -20);
+    iPos->positionMove(5 , -8);
+    iPos->positionMove(6 , -0);
+    iPos->positionMove(7 , 33);
         
 	// Hand
     iPos->positionMove(8 , 79);
@@ -168,7 +168,43 @@ bool ControllersUtil::setArmInGraspPosition() {
     iPos->positionMove(10, 29);
     iPos->positionMove(11, 0);
     iPos->positionMove(12, 0);
-    iPos->positionMove(13, 25);
+    iPos->positionMove(13, 0);
+    iPos->positionMove(14, 15);
+    iPos->positionMove(15, 1);
+
+    // Check motion done
+    waitMoveDone(10, 1);
+	cout << "Done. \n";
+
+	return true;
+}
+/* *********************************************************************************************************************** */
+
+/* ******* Place arm in grasping position                                   ********************************************** */ 
+bool ControllersUtil::setArmInGraspPosition() {
+
+    cout << dbgTag << "Reaching arm grasp position ... \t";
+    
+	iVel->stop();
+
+	// Arm
+	iPos->positionMove(0 ,-39);
+    iPos->positionMove(1 , 25);
+    iPos->positionMove(2 , 0);
+    iPos->positionMove(3 , 48);
+        
+    iPos->positionMove(4 , -6);
+    iPos->positionMove(5 , -5);
+    iPos->positionMove(6 , 0);
+    iPos->positionMove(7 , 33);
+        
+	// Hand
+    iPos->positionMove(8 , 79);
+    iPos->positionMove(9 , 2);
+    iPos->positionMove(10, 29);
+    iPos->positionMove(11, 0);
+    iPos->positionMove(12, 0);
+    iPos->positionMove(13, 0);
     iPos->positionMove(14, 15);
     iPos->positionMove(15, 1);
 
@@ -189,15 +225,15 @@ bool ControllersUtil::raiseArm() {
 //	iVel->stop();
 
 	// Arm
-	iPos->positionMove(0 ,-30);
-    iPos->positionMove(1 , 30);
-    iPos->positionMove(2 , 0);
-    iPos->positionMove(3 , 45);
+	iPos->positionMove(0 ,-40);
+    iPos->positionMove(1 , 41);
+    iPos->positionMove(2 , 16);
+    iPos->positionMove(3 , 76);
         
-    iPos->positionMove(4 , -14);
-    iPos->positionMove(5 , 3);
-    iPos->positionMove(6 , -20);
-    iPos->positionMove(7 , 14);
+    iPos->positionMove(4 , -20);
+    iPos->positionMove(5 , -8);
+    iPos->positionMove(6 , -0);
+    iPos->positionMove(7 , 33);
         
 	// Hand
     //iPos->positionMove(8 , 79);

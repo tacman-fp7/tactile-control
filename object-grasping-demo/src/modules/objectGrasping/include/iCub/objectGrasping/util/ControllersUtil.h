@@ -47,6 +47,8 @@ namespace iCub {
 
 				bool setTaskControlModes(std::vector<int> &jointsList,int controlMode);
 
+				bool setArmInStartPosition();
+
 				bool setArmInGraspPosition();
 
 				bool raiseArm();
