@@ -110,7 +110,15 @@ bool ObjectGraspingModule::updateModule() {
 		break;
 
 	case SET_ARM_IN_GRASP_POSITION:
+
+//        controllersUtil->testCartesianController();
+//        taskState = WAIT_TO_START;
+        
+
+
 		if (controllersUtil->setArmInGraspPosition()) {
+//			taskState = WAIT_TO_START;
+
 			taskState = BEGIN_GRASP_THREAD;
 		} else{
 	        cout << dbgTag << "failed to set the arm in grasp position\n";
@@ -119,7 +127,9 @@ bool ObjectGraspingModule::updateModule() {
 		break;
 
 	case BEGIN_GRASP_THREAD:
+        controllersUtil->moveFingers();
 		if (start()){
+            task(ADD,CONTROL,Value(40));
 			taskState = WAIT_FOR_GRASP_THREAD;
 		} else {
 			cout << dbgTag << "failed to start the grasp thread\n";
@@ -128,15 +138,45 @@ bool ObjectGraspingModule::updateModule() {
 		break;
 	
 	case WAIT_FOR_GRASP_THREAD:
-		yarp::os::Time::delay(5);
+		yarp::os::Time::delay(4);
         taskState = RAISE_ARM;
 		break;
 
 	case RAISE_ARM:
 		if (controllersUtil->raiseArm()) {
-			taskState = WAIT_FOR_CLOSURE;
+			taskState = SET_ARM_BACK_IN_GRASP_POSITION;
 		} else{
 	        cout << dbgTag << "failed to raise the arm\n";
+	        return false;
+		}
+		break;
+
+	case WAIT_WITH_ARM_RAISED:
+		// do nothing
+		break;
+
+	case SET_ARM_BACK_IN_GRASP_POSITION:
+		if (controllersUtil->setArmInGraspPosition()) {
+			taskState = OPEN_HAND;
+		} else{
+	        cout << dbgTag << "failed to set the arm in grasp position\n";
+	        return false;
+		}
+		break;
+
+	case OPEN_HAND:
+        if (taskThread->isRunning()){
+		    stop();
+            task(EMPTY,NONE,Value());
+	    }
+        taskState = SET_ARM_BACK_IN_START_POSITION;
+	break;
+
+	case SET_ARM_BACK_IN_START_POSITION:
+		if (controllersUtil->setArmInStartPosition()) {
+			taskState = WAIT_FOR_CLOSURE;
+		} else{
+	        cout << dbgTag << "failed to set the arm in start position\n";
 	        return false;
 		}
 		break;
@@ -217,6 +257,8 @@ bool ObjectGraspingModule::close() {
     // Stop thread
     taskThread->stop();
 
+    controllersUtil->restorePreviousArmPosition();
+
 	portsUtil->release();
 
 	controllersUtil->release();
@@ -263,8 +305,8 @@ bool ObjectGraspingModule::start() {
 /* ******* RPC Grasp object                                                 ********************************************** */
 bool ObjectGraspingModule::demo() {
 
-    taskState = SET_ARM_IN_GRASP_POSITION;
-
+    taskState = SET_ARM_IN_GRASP_POSITION; 
+    
     return true;
 }
 /* *********************************************************************************************************************** */
@@ -273,14 +315,7 @@ bool ObjectGraspingModule::demo() {
 /* ******* RPC Quit module                                                  ********************************************** */
 bool ObjectGraspingModule::quit() {
 
-	if (taskThread->isRunning()){
-		taskThread->suspend();
-        taskThread->openHand();
-	}
-
-    taskState = SET_ARM_IN_START_POSITION;
-
-//    return closing = true;
+    return closing = true;
 }
 /* *********************************************************************************************************************** */
 

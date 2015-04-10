@@ -109,7 +109,7 @@ void TaskThread::run() {
 bool TaskThread::openHand(){
 
 	if (!controllersUtil->restorePreviousControlMode()) return false;
-//	if (!controllersUtil->openHand()) return false;
+	if (!controllersUtil->openHand()) return false;
 	runEnabled = false;
     currentTaskIndex = 0;
 

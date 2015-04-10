@@ -4,6 +4,7 @@
 #include <ctime>
 #include <yarp/os/Time.h>
 #include <yarp/os/Value.h>
+#include <yarp/sig/Vector.h>
 
 using iCub::objectGrasping::ControllersUtil;
 using iCub::objectGrasping::FingerJoint;
@@ -79,6 +80,19 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
     }
     iPos->setRefSpeeds(&refSpeeds[0]);
 
+    
+    Property cartContrOptions;
+    cartContrOptions.put("device","cartesiancontrollerclient");
+    cartContrOptions.put("remote","/icub/cartesianController/right_arm");
+    cartContrOptions.put("local","/client/right_arm");
+     
+    clientArmCartContr.open(cartContrOptions);
+    
+    if (clientArmCartContr.isValid()) {
+       clientArmCartContr.view(iCart);
+    }
+
+
 	return true;
 }
 
@@ -152,28 +166,59 @@ bool ControllersUtil::setArmInStartPosition() {
 	iVel->stop();
 
 	// Arm
-	iPos->positionMove(0 ,-3);
-    iPos->positionMove(1 , 41);
-    iPos->positionMove(2 , 16);
-    iPos->positionMove(3 , 76);
+	iPos->positionMove(0 ,-29);
+    iPos->positionMove(1 , 54);
+    iPos->positionMove(2 , -22);
+    iPos->positionMove(3 , 45);
         
-    iPos->positionMove(4 , -20);
-    iPos->positionMove(5 , -8);
-    iPos->positionMove(6 , -0);
-    iPos->positionMove(7 , 33);
+    iPos->positionMove(4 , -3);
+    iPos->positionMove(5 , 17);
+    iPos->positionMove(6 , 7);
+    iPos->positionMove(7 , 15);
         
 	// Hand
     iPos->positionMove(8 , 79);
-    iPos->positionMove(9 , 2);
-    iPos->positionMove(10, 29);
+    iPos->positionMove(9 , 0);
+    iPos->positionMove(10, 0);// 29
     iPos->positionMove(11, 0);
     iPos->positionMove(12, 0);
     iPos->positionMove(13, 0);
-    iPos->positionMove(14, 15);
-    iPos->positionMove(15, 1);
+    iPos->positionMove(14, 0);//15
+    iPos->positionMove(15, 0);
 
     // Check motion done
     waitMoveDone(10, 1);
+	cout << "Done. \n";
+
+	return true;
+}
+/* *********************************************************************************************************************** */
+
+
+/* ******* Place arm in grasping position                                   ********************************************** */ 
+bool ControllersUtil::testCartesianController() {
+    using yarp::sig::Vector;
+
+    cout << dbgTag << "Testing cartesian controller ... \t\n";
+    
+//	iVel->stop();
+
+    Vector x0,o0;
+    if (!iCart->getPose(x0,o0)) cout << "could not read pose!\n";
+    else { cout << "pose read! n is " << x0.size() << "\n";}
+    
+    for (size_t i = 0; i < x0.size(); i++){
+        std::cout << x0[i] << "\n";
+    }    
+
+    for (size_t i = 0; i < o0.size(); i++){
+        std::cout << o0[i] << "\n";
+    }    
+
+    std::cout << "\n";
+
+    // Check motion done
+//    waitMoveDone(10, 1);
 	cout << "Done. \n";
 
 	return true;
@@ -188,34 +233,33 @@ bool ControllersUtil::setArmInGraspPosition() {
 	iVel->stop();
 
 	// Arm
-	iPos->positionMove(0 ,-39);
-    iPos->positionMove(1 , 25);
-    iPos->positionMove(2 , 0);
-    iPos->positionMove(3 , 48);
+	iPos->positionMove(0 ,-36);
+    iPos->positionMove(1 , 30);
+    iPos->positionMove(2 , -5);
+    iPos->positionMove(3 , 45);
         
-    iPos->positionMove(4 , -6);
-    iPos->positionMove(5 , -5);
-    iPos->positionMove(6 , 0);
-    iPos->positionMove(7 , 33);
+    iPos->positionMove(4 , -1);
+    iPos->positionMove(5 , 18);
+    iPos->positionMove(6 , 7);
+    iPos->positionMove(7 , 15);
         
 	// Hand
-    iPos->positionMove(8 , 79);
-    iPos->positionMove(9 , 2);
-    iPos->positionMove(10, 29);
-    iPos->positionMove(11, 0);
-    iPos->positionMove(12, 0);
-    iPos->positionMove(13, 0);
-    iPos->positionMove(14, 15);
-    iPos->positionMove(15, 1);
+//    iPos->positionMove(8 , 79);
+//    iPos->positionMove(9 , 0);
+//    iPos->positionMove(10, 0);// 29
+//    iPos->positionMove(11, 0);
+//    iPos->positionMove(12, 0);
+//    iPos->positionMove(13, 0);
+//    iPos->positionMove(14, 0);//15
+//    iPos->positionMove(15, 0);
 
     // Check motion done
-    waitMoveDone(10, 1);
+    waitMoveDone(10, 1,true);
 	cout << "Done. \n";
 
 	return true;
 }
 /* *********************************************************************************************************************** */
-
 
 /* ******* Place arm in grasping position                                   ********************************************** */ 
 bool ControllersUtil::raiseArm() {
@@ -225,15 +269,15 @@ bool ControllersUtil::raiseArm() {
 //	iVel->stop();
 
 	// Arm
-	iPos->positionMove(0 ,-40);
-    iPos->positionMove(1 , 41);
-    iPos->positionMove(2 , 16);
-    iPos->positionMove(3 , 76);
+	iPos->positionMove(0 ,-36);
+    iPos->positionMove(1 , 30);
+    iPos->positionMove(2 , -5);
+    iPos->positionMove(3 , 90);
         
     iPos->positionMove(4 , -20);
-    iPos->positionMove(5 , -8);
-    iPos->positionMove(6 , -0);
-    iPos->positionMove(7 , 33);
+    iPos->positionMove(5 , 18);
+    iPos->positionMove(6 , 7);
+    iPos->positionMove(7 , 15);
         
 	// Hand
     //iPos->positionMove(8 , 79);
@@ -246,7 +290,7 @@ bool ControllersUtil::raiseArm() {
     //iPos->positionMove(15, 1);
 
     // Check motion done
-//    waitMoveDone(10, 1);
+    waitMoveDone(10, 1,true);
 	cout << "Done. \n";
 
 	return true;
@@ -325,6 +369,37 @@ bool ControllersUtil::waitMoveDone(const double &i_timeout, const double &i_dela
 }
 /* *********************************************************************************************************************** */
 
+/* ******* Wait for motion to be completed.                                 ********************************************** */
+bool ControllersUtil::waitMoveDone(const double &i_timeout, const double &i_delay, bool excludeHand) {
+    using yarp::os::Time;
+    
+    bool ok = false;
+    
+    double start = Time::now();
+
+    if (excludeHand){
+
+        for (size_t i = 0; i <= 7; i++){
+            ok = false;            
+            while (!ok && (Time::now() - start <= i_timeout)) {
+                iPos->checkMotionDone(i,&ok);
+                if (!ok) Time::delay(i_delay);
+            }
+        }
+
+    } else {
+
+        while (!ok && (Time::now() - start <= i_timeout)) {
+            iPos->checkMotionDone(&ok);
+            Time::delay(i_delay);
+        }
+
+    }
+
+    return ok;
+}
+/* *********************************************************************************************************************** */
+
 
 bool ControllersUtil::release(){
 
@@ -346,14 +421,15 @@ bool ControllersUtil::openHand() {
     
     iVel->stop();
 
+	// Hand
     iPos->positionMove(8 , 79);
-    iPos->positionMove(9 , 2);
-    iPos->positionMove(10, 29);
+    iPos->positionMove(9 , 0);
+    iPos->positionMove(10, 0);// 29
     iPos->positionMove(11, 0);
     iPos->positionMove(12, 0);
-    iPos->positionMove(13, 25);
-    iPos->positionMove(14, 25);
-    iPos->positionMove(15, 1);
+    iPos->positionMove(13, 0);
+    iPos->positionMove(14, 0);//15
+    iPos->positionMove(15, 0);
 
     // Check motion done
     waitMoveDone(10, 1);
@@ -363,4 +439,13 @@ bool ControllersUtil::openHand() {
 }
 
 /* *********************************************************************************************************************** */
+
+bool ControllersUtil::moveFingers() {
+    
+    iPos->positionMove(10, 29);
+    iPos->positionMove(12, 15);
+    iPos->positionMove(14, 15);
+
+	return true;
+}
 

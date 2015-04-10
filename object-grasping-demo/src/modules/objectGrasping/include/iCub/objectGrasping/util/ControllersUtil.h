@@ -5,6 +5,7 @@
 
 #include <yarp/dev/PolyDriver.h>
 #include <yarp/dev/IEncoders.h>
+#include <yarp/dev/CartesianControl.h>
 #include <yarp/dev/ControlBoardInterfaces.h>
 #include <yarp/os/ResourceFinder.h>
 #include <yarp/sig/Vector.h>
@@ -19,11 +20,15 @@ namespace iCub {
             private:
 
                 yarp::dev::PolyDriver clientArm;
+                yarp::dev::PolyDriver clientArmCartContr;
+                
                 yarp::dev::IEncoders *iEncs;
 				yarp::dev::IOpenLoopControl *iOLC;
 				yarp::dev::IControlMode2 *iCtrl;
 				yarp::dev::IPositionControl *iPos;
 				yarp::dev::IVelocityControl *iVel;
+
+                yarp::dev::ICartesianControl *iCart;
 
 				yarp::sig::Vector armStoredPosition;
 				int armJointsNum;
@@ -47,6 +52,8 @@ namespace iCub {
 
 				bool setTaskControlModes(std::vector<int> &jointsList,int controlMode);
 
+				bool testCartesianController();
+
 				bool setArmInStartPosition();
 
 				bool setArmInGraspPosition();
@@ -61,9 +68,13 @@ namespace iCub {
 
 				bool openHand();
 
+				bool moveFingers();
+
 			private:
 
 				bool waitMoveDone(const double &i_timeout, const double &i_delay);
+
+				bool waitMoveDone(const double &i_timeout, const double &i_delay,bool excludeHand);
 
 				bool setControlMode(int joint,int controlMode,bool checkCurrent);
 };

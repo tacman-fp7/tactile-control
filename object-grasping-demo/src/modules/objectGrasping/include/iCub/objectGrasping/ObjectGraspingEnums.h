@@ -54,6 +54,7 @@ namespace iCub {
 			STEP,
 			CONTROL,
 			RAMP,
+            NONE
 		};
 
 		enum RPCViewCmdArgName {
@@ -83,14 +84,16 @@ namespace iCub {
 
 		enum TaskState  {
 
-			TEST1,
-			TEST2,
 			SET_ARM_IN_START_POSITION,
 			WAIT_TO_START,
 			SET_ARM_IN_GRASP_POSITION,
 			BEGIN_GRASP_THREAD,
 			WAIT_FOR_GRASP_THREAD,
 			RAISE_ARM,
+            WAIT_WITH_ARM_RAISED,
+            SET_ARM_BACK_IN_GRASP_POSITION,
+            OPEN_HAND,
+            SET_ARM_BACK_IN_START_POSITION,
 			WAIT_FOR_CLOSURE
 		};
 	}
