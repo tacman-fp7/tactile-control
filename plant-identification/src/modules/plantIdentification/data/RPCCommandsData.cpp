@@ -21,6 +21,8 @@ RPCCommandsData::RPCCommandsData(){
 	add("view",VIEW,"VIEW PARAMETERS/TASKS (usage: 'view [set | tasks]')");
 	add("start",START,"START TASKS");
 	add("stop",STOP,"STOP TASKS");
+	add("open",OPEN,"STOP TASKS AND OPEN HAND");
+	add("arm",ARM,"set ARM IN TASK POSITION");
 	add("quit",QUIT,"QUIT MODULE");
 
 	add("pwm_sign",PWM_SIGN,"PWM SIGN");

@@ -76,14 +76,14 @@ bool TaskThread::threadInit() {
 	taskData = new TaskData(rf,period);
 
 	// save current arm position, to be restored when the thread ends
-	if (!controllersUtil->saveCurrentArmPosition()) {
-        cout << dbgTag << "failed to store current arm position\n";
-        return false;
-    }
-	if (!controllersUtil->setArmInTaskPosition()) {
-        cout << dbgTag << "failed to set arm in task position\n";
-        return false;
-    }
+//	if (!controllersUtil->saveCurrentArmPosition()) {
+//        cout << dbgTag << "failed to store current arm position\n";
+//        return false;
+//    }
+//	if (!controllersUtil->setArmInTaskPosition()) {
+//        cout << dbgTag << "failed to set arm in task position\n";
+//        return false;
+//    }
  
 	// this prevent the run() method to be executed between the taskThread->start() and the taskThread->suspend() calls during the PlantIdentificationModule initialization
 	runEnabled = false;
@@ -125,10 +125,12 @@ void TaskThread::run() {
 	}
 }
 
-bool TaskThread::openHand(){
+bool TaskThread::afterRun(bool openHand){
 
 	if (!controllersUtil->restorePreviousControlMode()) return false;
-	if (!controllersUtil->openHand()) return false;
+	if (openHand) {
+		if (!controllersUtil->openHand()) return false;
+	}
 	runEnabled = false;
     currentTaskIndex = 0;
 
@@ -143,7 +145,7 @@ void TaskThread::threadRelease() {
     // closing ports
 	portsUtil->release();
 
-    controllersUtil->restorePreviousArmPosition();
+//    controllersUtil->restorePreviousArmPosition();
 	controllersUtil->release();
 
 	delete(portsUtil);
@@ -154,6 +156,16 @@ void TaskThread::threadRelease() {
 }
 /* *********************************************************************************************************************** */
 
+bool TaskThread::setArmInTaskPosition(){
+
+	if (!controllersUtil->setArmInTaskPosition()) {
+        cout << dbgTag << "failed to set arm in task position\n";
+        return false;
+    }
+
+    return true;
+
+}
 
 void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData &rpcCmdData){
 
@@ -337,6 +349,8 @@ void TaskThread::help(RPCCommandsData &rpcCmdData){
 		    rpcCmdData.getFullDescription(VIEW) << "\n" <<
 		    rpcCmdData.getFullDescription(START) << "\n" <<
 		    rpcCmdData.getFullDescription(STOP) << "\n" <<
+		    rpcCmdData.getFullDescription(OPEN) << "\n" <<
+		    rpcCmdData.getFullDescription(ARM) << "\n" <<
 		    rpcCmdData.getFullDescription(QUIT) << "\n";
 	
 }			

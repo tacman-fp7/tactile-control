@@ -12,6 +12,8 @@ namespace iCub {
 			VIEW,
 			START,
 			STOP,
+			OPEN,
+			ARM,
 			QUIT
 		};
 

@@ -57,7 +57,9 @@ namespace iCub {
                 virtual void threadRelease();
 
 				bool initializeGrasping();
-				bool openHand();
+				bool afterRun(bool openHand);
+
+				bool setArmInTaskPosition();
 
 				void set(iCub::plantIdentification::RPCSetCmdArgName paramName,yarp::os::Value paramValue,iCub::plantIdentification::RPCCommandsData &rpcCmdData);
 				void task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,yarp::os::Value paramValue,iCub::plantIdentification::RPCCommandsData &rpcCmdData);

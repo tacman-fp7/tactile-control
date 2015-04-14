@@ -52,6 +52,8 @@ namespace iCub {
 				/* ****** RPC Methods                                  ****** */
 				bool start();
 				bool stop();
+				bool open();
+				bool arm();
 				bool quit();
 				void set(iCub::plantIdentification::RPCSetCmdArgName paramName,yarp::os::Value paramValue);
 				void task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,yarp::os::Value paramValue);

@@ -44,7 +44,7 @@ bool PlantIdentificationModule::configure(ResourceFinder &rf) {
     period = rf.check("period", 1.0).asDouble();
 
     /* ******* Open ports                                       ******* */
-    portPlantIdentificationRPC.open("/plantIdentification/cmd:io");
+    portPlantIdentificationRPC.open("/plantIdentification/cmd:i");
     attach(portPlantIdentificationRPC);
 
     /* ******* Threads                                          ******* */
@@ -112,6 +112,12 @@ bool PlantIdentificationModule::respond(const yarp::os::Bottle& command, yarp::o
 	case STOP:
 		stop();
 		break;
+	case OPEN:
+		open();
+		break;
+	case ARM:
+		arm();
+		break;
 	case QUIT:
 		quit();
 		break;
@@ -143,12 +149,24 @@ bool PlantIdentificationModule::close() {
 
 
 /* *********************************************************************************************************************** */
-/* ******* RPC Open hand                                                    ********************************************** */
+/* ******* RPC Stop task execution without opening the hand                 ********************************************** */
 bool PlantIdentificationModule::stop() {
     
 	taskThread->suspend();
+
+	taskThread->afterRun(false);
+
+	return true;
+}
+/* *********************************************************************************************************************** */
+
+/* *********************************************************************************************************************** */
+/* ******* RPC Stop task execution and open the hand                        ********************************************** */
+bool PlantIdentificationModule::open() {
     
-	taskThread->openHand();
+	taskThread->suspend();
+
+	taskThread->afterRun(true);
 
 	return true;
 }
@@ -164,6 +182,14 @@ bool PlantIdentificationModule::start() {
 	taskThread->resume();
 
     return true;
+}
+/* *********************************************************************************************************************** */
+
+/* *********************************************************************************************************************** */
+/* ******* RPC Set arm in task position                                     ********************************************** */
+bool PlantIdentificationModule::arm() {
+
+	return taskThread->setArmInTaskPosition();
 }
 /* *********************************************************************************************************************** */
 
