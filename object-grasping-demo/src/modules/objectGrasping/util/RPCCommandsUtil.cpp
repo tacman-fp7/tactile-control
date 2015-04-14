@@ -1,5 +1,7 @@
 #include "iCub/objectGrasping/util/RPCCommandsUtil.h"
 
+#include <string.h>
+
 #include <vector>
 
 using iCub::objectGrasping::RPCCommandsUtil;
@@ -94,3 +96,13 @@ void RPCCommandsUtil::createBottleMessage(string command,Bottle &message){
 
 	}
 }
+
+void RPCCommandsUtil::createBottleMessage(string command,double value,Bottle &message){
+
+    createBottleMessage(command,message);
+
+    message.add(yarp::os::Value(value));
+	
+}
+
+

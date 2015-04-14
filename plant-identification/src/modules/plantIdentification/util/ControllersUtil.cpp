@@ -36,7 +36,7 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
     options.put("robot", robotName.c_str()); 
     options.put("device", "remote_controlboard");
     options.put("part", arm.c_str());
-    options.put("local", ("/PlantIdentification/" + arm).c_str());
+    options.put("local", ("/plantIdentification/" + arm).c_str());
     options.put("remote", ("/" + robotName + "/" + arm).c_str());
     
     // Open driver

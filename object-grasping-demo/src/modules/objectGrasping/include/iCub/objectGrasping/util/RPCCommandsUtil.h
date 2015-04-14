@@ -41,6 +41,8 @@ namespace iCub {
 
 				void createBottleMessage(std::string command,yarp::os::Bottle &message);
 
+				void createBottleMessage(std::string command,double value,yarp::os::Bottle &message);
+
 			private:
 
 				void processTaskCommand(const yarp::os::Bottle &rpcCmdBottle);

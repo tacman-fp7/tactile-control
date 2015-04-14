@@ -20,9 +20,9 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
     using std::cout;
 
 	string whichHand = rf.check("whichHand", Value("right")).asString().c_str();
-    string moduleSkinCompPortName = "/PlantIdentification/skin/" + whichHand + "_hand_comp:i";
+    string moduleSkinCompPortName = "/plantIdentification/skin/" + whichHand + "_hand_comp:i";
     string icubSkinCompPortName = "/icub/skin/" + whichHand + "_hand_comp";
-    string logDataPortName = "/PlantIdentification/log:o";
+    string logDataPortName = "/plantIdentification/log:o";
 
     // opening ports
 	if (!portSkinCompIn.open(moduleSkinCompPortName)){

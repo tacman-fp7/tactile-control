@@ -60,6 +60,7 @@ namespace iCub {
 				virtual bool close();
 
 				void sendCommand(std::string command);
+				void sendCommand(std::string command,double value);
 
 				/* ****** RPC Methods                                  ****** */
 				bool start();

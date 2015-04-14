@@ -118,20 +118,16 @@ bool ObjectGraspingModule::updateModule() {
         
 		controllersUtil->moveFingers();
 		
+        sendCommand("set kp_pe",configData->pidKp);
+		
+        sendCommand("set ki_pe",configData->pidKi);
+
+		sendCommand("task empty");
+		
+        sendCommand("task add ctrl",configData->targetPressure);
+
 		sendCommand("start");
 		
-		cmd.clear();
-		cmd << "task add ctrl " << configData->targetPressure;
-		sendCommand(cmd.str());
-		
-		cmd.clear();
-		cmd << "set kp_pe " << configData->pidKp;
-		sendCommand(cmd.str());
-		
-		cmd.clear();
-		cmd << "set ki_pe " << configData->pidKi;
-		sendCommand(cmd.str());
-
 		taskState = WAIT_FOR_GRASP_THREAD;
 		break;
 	
@@ -164,6 +160,7 @@ bool ObjectGraspingModule::updateModule() {
 
 	case OPEN_HAND:
 		sendCommand("stop");
+        yarp::os::Time::delay(1);
 		sendCommand("task empty");
         taskState = SET_ARM_BACK_IN_START_POSITION;
 	break;
@@ -325,6 +322,16 @@ void ObjectGraspingModule::sendCommand(std::string command){
 	yarp::os::Bottle message;
 
 	rpcCmdUtil.createBottleMessage(command,message);
+
+	portOutgoingCommandsRPC.write(message);
+
+}
+
+void ObjectGraspingModule::sendCommand(std::string command,double value){
+	
+	yarp::os::Bottle message;
+
+	rpcCmdUtil.createBottleMessage(command,value,message);
 
 	portOutgoingCommandsRPC.write(message);
 

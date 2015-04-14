@@ -33,6 +33,7 @@ void RPCCommandsUtil::processCommand(const Bottle &rpcCmdBottle){
 	case SET:
 		setCmdArg = rpcData->setCmdArgRevMap[rpcCmdBottle.get(1).asString()];
 		argValue = rpcCmdBottle.get(2);
+        std::cout << "ASSTRING" << argValue.asString() << "\n" << "ADOUBLE " << argValue.asDouble() << "\n";
 		break;
 	case TASK:
 		processTaskCommand(rpcCmdBottle);
