@@ -1,5 +1,7 @@
 #include "iCub/objectGrasping/util/RPCCommandsUtil.h"
 
+#include <vector>
+
 using iCub::objectGrasping::RPCCommandsUtil;
 using iCub::objectGrasping::RPCCommandsData;
 using iCub::objectGrasping::RPCMainCmdName;
@@ -66,5 +68,29 @@ void RPCCommandsUtil::processTaskCommand(const Bottle &rpcCmdBottle){
 		break;
 	case POP: // do nothing
 		break;
+	}
+}
+
+void RPCCommandsUtil::createBottleMessage(string command,Bottle &message){
+
+	message.clear();
+
+	if (!command.empty()){
+
+		char *commandChar = new char[command.length() + 1];
+		strcpy(commandChar,command.c_str());
+		std::vector<string> wordList;
+		char *target;
+			
+		target = strtok(commandChar," ");
+		while(target != NULL){
+			wordList.push_back(target);
+			target = strtok(NULL," ");
+		}
+
+		for(size_t i = 0; i < wordList.size(); i++){
+			message.add(yarp::os::Value(wordList[i]));
+		}
+
 	}
 }

@@ -2,6 +2,8 @@
 
 #include <yarp/os/Time.h>
 
+#include <sstream>
+
 using iCub::objectGrasping::ObjectGraspingModule;
 
 using std::cout;
@@ -46,23 +48,18 @@ bool ObjectGraspingModule::configure(ResourceFinder &rf) {
     period = rf.check("period", 1.0).asDouble();
 
     /* ******* Open ports                                       ******* */
-    portObjectGraspingRPC.open("/objectGrasping/cmd:io");
-    attach(portObjectGraspingRPC);
+    portIncomingCommandsRPC.open("/objectGrasping/incomingCmd:i");
+    portOutgoingCommandsRPC.open("/objectGrasping/graspTaskCmd:o");
+    attach(portIncomingCommandsRPC);
 
 	rpcCmdUtil.init(&rpcCmdData);
 
+	configData = new ConfigData(rf);
 
 	// initialize controllers
 	controllersUtil = new ControllersUtil();
 	if (!controllersUtil->init(rf)) {
         cout << dbgTag << "failed to initialize controllers utility\n";
-        return false;
-    }
-
-	// initialize ports
-	portsUtil = new PortsUtil();
-	if (!portsUtil->init(rf)) {
-        cout << dbgTag << "failed to initialize ports utility\n";
         return false;
     }
 
@@ -72,16 +69,7 @@ bool ObjectGraspingModule::configure(ResourceFinder &rf) {
         return false;
     }
 
-	/* ******* Threads                                          ******* */
-    taskThread = new TaskThread(controllersUtil,portsUtil,20, rf);
-    if (!taskThread->start()) {
-        cout << dbgTag << "Could not start the task thread. \n";
-        return false;
-    }
-    taskThread->suspend();
-
 	taskState = SET_ARM_IN_START_POSITION;
-    tempVar = 0;
 
     cout << dbgTag << "Started correctly. \n";
 
@@ -93,6 +81,8 @@ bool ObjectGraspingModule::configure(ResourceFinder &rf) {
 /* *********************************************************************************************************************** */
 /* ******* Update    module                                                 ********************************************** */   
 bool ObjectGraspingModule::updateModule() {
+
+	std::stringstream cmd;
 
 	switch(taskState){
 
@@ -113,8 +103,6 @@ bool ObjectGraspingModule::updateModule() {
 
 //        controllersUtil->testCartesianController();
 //        taskState = WAIT_TO_START;
-        
-
 
 		if (controllersUtil->setArmInGraspPosition()) {
 //			taskState = WAIT_TO_START;
@@ -127,14 +115,24 @@ bool ObjectGraspingModule::updateModule() {
 		break;
 
 	case BEGIN_GRASP_THREAD:
-        controllersUtil->moveFingers();
-		if (start()){
-            task(ADD,CONTROL,Value(40));
-			taskState = WAIT_FOR_GRASP_THREAD;
-		} else {
-			cout << dbgTag << "failed to start the grasp thread\n";
-	        return false;
-		}
+        
+		controllersUtil->moveFingers();
+		
+		sendCommand("start");
+		
+		cmd.clear();
+		cmd << "task add ctrl " << configData->targetPressure;
+		sendCommand(cmd.str());
+		
+		cmd.clear();
+		cmd << "set kp_pe " << configData->pidKp;
+		sendCommand(cmd.str());
+		
+		cmd.clear();
+		cmd << "set ki_pe " << configData->pidKi;
+		sendCommand(cmd.str());
+
+		taskState = WAIT_FOR_GRASP_THREAD;
 		break;
 	
 	case WAIT_FOR_GRASP_THREAD:
@@ -165,10 +163,8 @@ bool ObjectGraspingModule::updateModule() {
 		break;
 
 	case OPEN_HAND:
-        if (taskThread->isRunning()){
-		    stop();
-            task(EMPTY,NONE,Value());
-	    }
+		sendCommand("stop");
+		sendCommand("task empty");
         taskState = SET_ARM_BACK_IN_START_POSITION;
 	break;
 
@@ -200,7 +196,8 @@ bool ObjectGraspingModule::interruptModule() {
     cout << dbgTag << "Interrupting. \n";
     
     // Interrupt port
-    portObjectGraspingRPC.interrupt();
+    portIncomingCommandsRPC.interrupt();
+    portOutgoingCommandsRPC.interrupt();
 
     cout << dbgTag << "Interrupted correctly. \n";
 
@@ -249,25 +246,16 @@ bool ObjectGraspingModule::respond(const yarp::os::Bottle& command, yarp::os::Bo
 /* ******* Close module                                                     ********************************************** */   
 bool ObjectGraspingModule::close() {
     cout << dbgTag << "Closing. \n";
-    
-	if (taskThread->isRunning()){
-		taskThread->suspend();
-	}
-
-    // Stop thread
-    taskThread->stop();
 
     controllersUtil->restorePreviousArmPosition();
 
-	portsUtil->release();
-
 	controllersUtil->release();
 
-	delete(portsUtil);
 	delete(controllersUtil);
 
     // Close port
-    portObjectGraspingRPC.close();
+    portIncomingCommandsRPC.close();
+    portOutgoingCommandsRPC.close();
 
     cout << dbgTag << "Closed. \n";
     
@@ -280,10 +268,6 @@ bool ObjectGraspingModule::close() {
 /* ******* RPC Open hand                                                    ********************************************** */
 bool ObjectGraspingModule::stop() {
     
-	taskThread->suspend();
-    
-	taskThread->openHand();
-
 	return true;
 }
 /* *********************************************************************************************************************** */
@@ -292,10 +276,6 @@ bool ObjectGraspingModule::stop() {
 /* *********************************************************************************************************************** */
 /* ******* RPC Grasp object                                                 ********************************************** */
 bool ObjectGraspingModule::start() {
-
-	if (!taskThread->initializeGrasping()) return false;
-
-	taskThread->resume();
 
     return true;
 }
@@ -321,19 +301,31 @@ bool ObjectGraspingModule::quit() {
 
 
 void ObjectGraspingModule::set(iCub::objectGrasping::RPCSetCmdArgName paramName,Value paramValue){
-	taskThread->set(paramName,paramValue,rpcCmdData);
-	view(SETTINGS);
+//	taskThread->set(paramName,paramValue,rpcCmdData);
+//	view(SETTINGS);
 }
 
 void ObjectGraspingModule::task(iCub::objectGrasping::RPCTaskCmdArgName paramName,iCub::objectGrasping::TaskName taskName,Value paramValue){
-	taskThread->task(paramName,taskName,paramValue,rpcCmdData);
-	view(TASKS);
+//	taskThread->task(paramName,taskName,paramValue,rpcCmdData);
+//	view(TASKS);
 }
 
 void ObjectGraspingModule::view(iCub::objectGrasping::RPCViewCmdArgName paramName){
-	taskThread->view(paramName,rpcCmdData);
+//	taskThread->view(paramName,rpcCmdData);
 }
 
 void ObjectGraspingModule::help(){
-	taskThread->help(rpcCmdData);
+//	taskThread->help(rpcCmdData);
+}
+
+
+
+void ObjectGraspingModule::sendCommand(std::string command){
+	
+	yarp::os::Bottle message;
+
+	rpcCmdUtil.createBottleMessage(command,message);
+
+	portOutgoingCommandsRPC.write(message);
+
 }

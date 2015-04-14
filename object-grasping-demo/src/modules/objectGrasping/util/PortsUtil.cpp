@@ -8,7 +8,6 @@ using std::string;
 using yarp::os::Value;
 
 using iCub::objectGrasping::PortsUtil;
-using iCub::objectGrasping::LogData;
 
 PortsUtil::PortsUtil(){
 
@@ -20,9 +19,9 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
     using std::cout;
 
 	string whichHand = rf.check("whichHand", Value("right")).asString().c_str();
-    string moduleSkinCompPortName = "/objectGrasping/skin/" + whichHand + "_hand_comp:i";
+    string moduleSkinCompPortName = "/ObjectGrasping/skin/" + whichHand + "_hand_comp:i";
     string icubSkinCompPortName = "/icub/skin/" + whichHand + "_hand_comp";
-    string logDataPortName = "/objectGrasping/log:o";
+    string logDataPortName = "/ObjectGrasping/log:o";
 
     // opening ports
 	if (!portSkinCompIn.open(moduleSkinCompPortName)){
@@ -40,35 +39,6 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
         return false;
     }
 
-	return true;
-}
-
-bool PortsUtil::sendLogData(LogData &logData){
-
-	using yarp::os::Bottle;
-
-	Bottle& logBottle = portLogDataOut.prepare();
-	logBottle.clear();
-	logData.toBottle(logBottle);
-	portLogDataOut.write();
-
-	return true;
-}
-
-bool PortsUtil::readFingerSkinCompData(std::vector<std::vector<double> > &fingerTaxelsData){
-
-	using yarp::sig::Vector;
-
-	Vector *iCubSkinData = portSkinCompIn.read(false);
-    
-	//TODO generalize fingers number
-    if (iCubSkinData) {
-		for(size_t i = 0; i < 5; i++){
-			for (size_t j = 0; j < fingerTaxelsData[i].size(); j++){
-				fingerTaxelsData[i][j] = (*iCubSkinData)[12*i + j];
-			}
-		}
-	}
 
 	return true;
 }

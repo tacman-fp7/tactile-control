@@ -1,5 +1,8 @@
 #include "iCub/objectGrasping/ObjectGraspingModule.h" 
 
+#include <yarp/os/Network.h>
+#include <yarp/dev/Drivers.h>
+
 using yarp::os::Network;
 using yarp::os::ResourceFinder;
 

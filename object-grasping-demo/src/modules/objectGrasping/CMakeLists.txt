@@ -12,20 +12,12 @@ set(INC_HEADERS
     include/iCub/objectGrasping/ObjectGraspingModule.h
     include/iCub/objectGrasping/ObjectGraspingEnums.h
 
-    include/iCub/objectGrasping/thread/TaskThread.h
-
-    include/iCub/objectGrasping/task/Task.h
-    include/iCub/objectGrasping/task/StepTask.h
-    include/iCub/objectGrasping/task/ControlTask.h
-    include/iCub/objectGrasping/task/RampTask.h
-
-    include/iCub/objectGrasping/data/LogData.h
-    include/iCub/objectGrasping/data/TaskData.h
+    include/iCub/objectGrasping/data/ConfigData.h
     include/iCub/objectGrasping/data/RPCCommandsData.h
 
     include/iCub/objectGrasping/util/ControllersUtil.h
-    include/iCub/objectGrasping/util/PortsUtil.h
     include/iCub/objectGrasping/util/RPCCommandsUtil.h
+    include/iCub/objectGrasping/util/PortsUtil.h
 
 )
 
@@ -35,20 +27,12 @@ set(INC_SOURCES
 
     ObjectGraspingModule.cpp
 
-    thread/TaskThread.cpp
-
-    task/Task.cpp
-    task/StepTask.cpp
-    task/ControlTask.cpp
-    task/RampTask.cpp
-
-    data/LogData.cpp
-    data/TaskData.cpp
+    data/ConfigData.cpp
     data/RPCCommandsData.cpp
 
     util/ControllersUtil.cpp
-    util/PortsUtil.cpp
     util/RPCCommandsUtil.cpp
+    util/PortsUtil.cpp
 )
 
 source_group("Source Files" FILES ${INC_SOURCES})

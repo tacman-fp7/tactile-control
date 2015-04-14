@@ -23,7 +23,6 @@ namespace iCub {
                 yarp::dev::PolyDriver clientArmCartContr;
                 
                 yarp::dev::IEncoders *iEncs;
-				yarp::dev::IOpenLoopControl *iOLC;
 				yarp::dev::IControlMode2 *iCtrl;
 				yarp::dev::IPositionControl *iPos;
 				yarp::dev::IVelocityControl *iVel;
@@ -44,13 +43,9 @@ namespace iCub {
 
 				bool init(yarp::os::ResourceFinder &rf);
 
-				bool sendPwm(int joint,double pwm);
-
 				bool saveCurrentArmPosition();
 
 				bool saveCurrentControlMode();
-
-				bool setTaskControlModes(std::vector<int> &jointsList,int controlMode);
 
 				bool testCartesianController();
 

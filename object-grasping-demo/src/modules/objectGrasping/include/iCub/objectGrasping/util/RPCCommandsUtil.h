@@ -8,6 +8,7 @@
 #include <yarp/os/Value.h>
 
 #include <map>
+#include <string>
 
 namespace iCub {
     namespace objectGrasping {
@@ -37,6 +38,8 @@ namespace iCub {
 				void init(iCub::objectGrasping::RPCCommandsData *rpcData);
 
 				void processCommand(const yarp::os::Bottle &rpcCmdBottle);
+
+				void createBottleMessage(std::string command,yarp::os::Bottle &message);
 
 			private:
 

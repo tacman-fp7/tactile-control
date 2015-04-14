@@ -35,7 +35,7 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
     options.put("robot", robotName.c_str()); 
     options.put("device", "remote_controlboard");
     options.put("part", arm.c_str());
-    options.put("local", ("/ObjectGrasping/" + arm).c_str());
+    options.put("local", ("/objectGrasping/" + arm).c_str());
     options.put("remote", ("/" + robotName + "/" + arm).c_str());
     
     // Open driver
@@ -47,11 +47,6 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
     clientArm.view(iEncs);
     if (!iEncs) {
 		cout << dbgTag << "could not open encoders interface\n";
-        return false;
-    }
-	clientArm.view(iOLC);
-    if (!iOLC) {
-		cout << dbgTag << "could not open open-loop interface\n";
         return false;
     }
 	clientArm.view(iCtrl);
@@ -84,7 +79,7 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
     Property cartContrOptions;
     cartContrOptions.put("device","cartesiancontrollerclient");
     cartContrOptions.put("remote","/icub/cartesianController/right_arm");
-    cartContrOptions.put("local","/client/right_arm");
+    cartContrOptions.put("local","/objectGrasping/client/right_arm");
      
     clientArmCartContr.open(cartContrOptions);
     
@@ -96,14 +91,6 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
 	return true;
 }
 
-bool ControllersUtil::sendPwm(int joint,double pwm){
-
-	if (!iOLC->setRefOutput(joint,pwm)){
-		cout << dbgTag << "could not send pwm\n";
-		return false;
-	}
-	return true;
-}
 
 bool ControllersUtil::saveCurrentArmPosition(){
 	using yarp::os::Time;
@@ -140,17 +127,6 @@ bool ControllersUtil::saveCurrentControlMode(){
 	for(size_t i = 0; i < 8; i++){
 		if (!iCtrl->getControlMode(8 + i,&jointsStoredControlMode[i])){
 			cout << dbgTag << "could not get current control mode\n";
-			return false;
-		}
-	}
-	return true;
-}
-
-bool ControllersUtil::setTaskControlModes(std::vector<int> &jointsList,int controlMode){
-
-	for(size_t i = 0; i < jointsList.size(); i++){
-		if (!setControlMode(jointsList[i],controlMode,true)){
-			cout << dbgTag << "could not set all control modes\n";
 			return false;
 		}
 	}

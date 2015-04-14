@@ -1,14 +1,17 @@
 #ifndef __OBJECTGRASPING_MODULE_H__
 #define __OBJECTGRASPING_MODULE_H__
 
-#include "iCub/objectGrasping/thread/TaskThread.h"
+#include "iCub/objectGrasping/util/ControllersUtil.h"
 #include "iCub/objectGrasping/util/RPCCommandsUtil.h"
+#include "iCub/objectGrasping/util/PortsUtil.h"
 #include "iCub/objectGrasping/data/RPCCommandsData.h"
+#include "iCub/objectGrasping/data/ConfigData.h"
 
 #include <string>
 
 #include <yarp/os/RFModule.h>
 #include <yarp/os/RpcServer.h>
+#include <yarp/os/RpcClient.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/Value.h>
 
@@ -25,10 +28,10 @@ namespace iCub {
 				std::string robotName;
 				bool closing;
 				TaskState taskState;
-                int tempVar;
                 
 				/* ****** RPC Ports                                     ****** */
-				yarp::os::RpcServer portObjectGraspingRPC;
+				yarp::os::RpcServer portIncomingCommandsRPC;
+				yarp::os::RpcClient portOutgoingCommandsRPC;
 
 				iCub::objectGrasping::RPCCommandsUtil rpcCmdUtil;
 				iCub::objectGrasping::RPCCommandsData rpcCmdData;
@@ -36,12 +39,12 @@ namespace iCub {
 				/* ******* Controllers utility                          ******* */
                 iCub::objectGrasping::ControllersUtil *controllersUtil;
 
-				/* ****** Ports utility                                 ****** */
-				iCub::objectGrasping::PortsUtil *portsUtil;
+				/* ******* Ports utility                          ******* */
+//                iCub::objectGrasping::PortsUtil *portsUtil;
 
-				/* ****** Threads			                            ****** */
-				iCub::objectGrasping::TaskThread *taskThread;
-         
+				/* ******* Config Data                            ******* */
+				ConfigData *configData;
+
 				/* ****** Debug attributes                              ****** */
 				std::string dbgTag;
            
@@ -56,7 +59,7 @@ namespace iCub {
 				virtual bool respond(const yarp::os::Bottle& command, yarp::os::Bottle& reply);
 				virtual bool close();
 
-				void putArmInGraspPosition();
+				void sendCommand(std::string command);
 
 				/* ****** RPC Methods                                  ****** */
 				bool start();
