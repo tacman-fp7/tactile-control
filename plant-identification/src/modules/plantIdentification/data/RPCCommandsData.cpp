@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <sstream>
+#include <string.h>
+#include <stdlib.h>
 
 using iCub::plantIdentification::RPCCommandsData;
 using iCub::plantIdentification::RPCMainCmdName;

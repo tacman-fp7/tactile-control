@@ -24,40 +24,48 @@ using std::string;
 ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,ControlTaskData *controlData,double pressureTargetValue):Task(controllersUtil,portsUtil,commonData,controlData->lifespan,controlData->jointsList,controlData->fingersList) {
 	using yarp::sig::Vector;
 	using yarp::sig::Matrix;
-
+std::cout << "1\n";
     this->controlData = controlData;
 
 	this->pressureTargetValue.resize(fingersList.size(),pressureTargetValue);
 	pid.resize(jointsList.size());
 	pidOptionsPE.resize(jointsList.size());
 	pidOptionsNE.resize(jointsList.size());
+std::cout << "2\n";
 	
 	currentKp.resize(jointsList.size());
     kpPe.resize(jointsList.size());
 	kpNe.resize(jointsList.size());
 	previousError.resize(jointsList.size());
+std::cout << "3\n";
 
     double threadRateSec = commonData->threadRate/1000.0;
 	std::vector<double> ttPeOption,ttNeOption;
-	
+std::cout << "4\n";
+	ttPeOption.resize(jointsList.size());
+	ttNeOption.resize(jointsList.size());
 	for(size_t i = 0; i < jointsList.size(); i++){
 		ttPeOption[i] = calculateTt(GAINS_SET_POS_ERR,i);
 		ttNeOption[i] = calculateTt(GAINS_SET_NEG_ERR,i);
 	}
+std::cout << "5\n";
 	
 	std::vector<Vector> kpPeOptionVect;
 	kpPeOptionVect.resize(jointsList.size());
 	for(size_t i = 0; i < kpPeOptionVect.size(); i++){
 		kpPeOptionVect[i].resize(1,controlData->pidKpf[i]);
 	}
+std::cout << "6\n";
 	std::vector<Vector> kiPeOptionVect;
 	kiPeOptionVect.resize(jointsList.size());
 	for(size_t i = 0; i < kiPeOptionVect.size(); i++){
 		kiPeOptionVect[i].resize(1,controlData->pidKif[i]);
 	}
+std::cout << "7\n";
 	Vector kdPeOptionVect(1,0.0);
 	std::vector<Vector> ttPeOptionVect;
 	ttPeOptionVect.resize(jointsList.size());
+std::cout << "8\n";
 	for(size_t i = 0; i < ttPeOptionVect.size(); i++){
 		ttPeOptionVect[i].resize(1,ttPeOption[i]);
 	}
@@ -65,6 +73,7 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	
 	std::vector<Vector> kpNeOptionVect;
 	kpNeOptionVect.resize(jointsList.size());
+std::cout << "9\n";
 	for(size_t i = 0; i < kpNeOptionVect.size(); i++){
 		kpNeOptionVect[i].resize(1,controlData->pidKpb[i]);
 	}
@@ -73,6 +82,7 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	for(size_t i = 0; i < kiNeOptionVect.size(); i++){
 		kiNeOptionVect[i].resize(1,controlData->pidKib[i]);
 	}
+std::cout << "10\n";
 	Vector kdNeOptionVect(1,0.0);
 	std::vector<Vector> ttNeOptionVect;
 	ttNeOptionVect.resize(jointsList.size());
@@ -80,10 +90,12 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 		ttNeOptionVect[i].resize(1,ttNeOption[i]);
 	}
 
+std::cout << "11\n";
 	Vector wpOptionVect(1,controlData->pidWp);
 	Vector wiOptionVect(1,controlData->pidWi);
 	Vector wdOptionVect(1,controlData->pidWd);
 	Vector nOptionVect(1,controlData->pidN);
+std::cout << "12\n";
 	
 	Matrix satLimMatrix(1,2);
 	satLimMatrix[0][0] = controlData->pidMinSatLim;
@@ -96,6 +108,7 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	addOption(commonOptions,"Wd",Value(controlData->pidWd));
 	addOption(commonOptions,"N",Value(controlData->pidN));
 	addOption(commonOptions,"satLim",Value(controlData->pidMinSatLim),Value(controlData->pidMaxSatLim));
+std::cout << "13\n";
 
 	for(size_t i = 0; i < jointsList.size(); i++){
 		addOption(pidOptionsPE[i],"Kp",Value(controlData->pidKpf[i]));
@@ -103,6 +116,7 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 		addOption(pidOptionsPE[i],"Kd",Value(0.0));
 		addOption(pidOptionsPE[i],"Tt",Value(ttPeOption[i]));
 		pidOptionsPE[i].append(commonOptions);
+std::cout << "14\n";
 
 		addOption(pidOptionsNE[i],"Kp",Value(controlData->pidKpb[i]));
 		addOption(pidOptionsNE[i],"Ki",Value(controlData->pidKib[i]));
@@ -110,6 +124,7 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 		addOption(pidOptionsNE[i],"Tt",Value(ttNeOption[i]));
 		pidOptionsNE[i].append(commonOptions);
 	}
+std::cout << "15\n";
 
 	for(size_t i = 0; i < jointsList.size(); i++){
 
@@ -117,6 +132,7 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 		kpPe[i] = controlData->pidKpf[i];
 		kpNe[i] = controlData->pidKpb[i];
 		previousError[i] = 0;
+std::cout << "16\n";
 
 		switch (controlData->controlMode){
 
@@ -124,18 +140,21 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 				pid[i] = new parallelPID(threadRateSec,kpPeOptionVect[i],kiPeOptionVect[i],kdPeOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttPeOptionVect[i],satLimMatrix);
 				pid[i]->setOptions(pidOptionsPE[i]);
 				currentKp[i] = kpPe[i];
+std::cout << "17\n";
 				break;
 
 			case GAINS_SET_NEG_ERR:
 				pid[i] = new parallelPID(threadRateSec,kpNeOptionVect[i],kiNeOptionVect[i],kdNeOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttNeOptionVect[i],satLimMatrix);
 				pid[i]->setOptions(pidOptionsNE[i]);
 				currentKp[i] = kpNe[i];
+std::cout << "18\n";
 				break;
 
 			case BOTH_GAINS_SETS:
 				pid[i] = new parallelPID(threadRateSec,kpPeOptionVect[i],kiPeOptionVect[i],kdPeOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttPeOptionVect[i],satLimMatrix);
 				pid[i]->setOptions(pidOptionsPE[i]);
 				currentKp[i] = kpPe[i];
+std::cout << "19\n";
 				break;
 		}
 	}

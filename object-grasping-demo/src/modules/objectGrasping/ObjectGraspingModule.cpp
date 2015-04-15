@@ -118,9 +118,9 @@ bool ObjectGraspingModule::updateModule() {
         
 		controllersUtil->moveFingers();
 		
-        sendCommand("set kp_pe",configData->pidKp);
+//        sendCommand("set kp_pe",configData->pidKp);
 		
-        sendCommand("set ki_pe",configData->pidKi);
+//        sendCommand("set ki_pe",configData->pidKi);
 
 		sendCommand("task empty");
 		
