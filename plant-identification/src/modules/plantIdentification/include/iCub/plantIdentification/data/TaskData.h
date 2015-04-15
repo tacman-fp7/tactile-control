@@ -8,6 +8,7 @@
 #include <yarp/sig/Vector.h>
 
 #include <vector>
+#include <string>
 
 namespace iCub {
     namespace plantIdentification {
@@ -42,12 +43,10 @@ namespace iCub {
 
 			std::vector<int> jointsList;
 			std::vector<int> fingersList;
-			double pidKpf;
-			double pidKif;
-			double pidKdf;
-			double pidKpb;
-			double pidKib;
-			double pidKdb;
+			std::vector<double> pidKpf;
+			std::vector<double> pidKif;
+			std::vector<double> pidKpb;
+			std::vector<double> pidKib;
 			double pidN;
 			double pidMinSatLim;
 			double pidMaxSatLim;
@@ -88,6 +87,8 @@ namespace iCub {
 				RampTaskData rampData;
 				
 				TaskData(yarp::os::ResourceFinder &rf,int threadRate);
+
+				std::string getValueDescription(iCub::plantIdentification::RPCSetCmdArgName cmdName);
 		
 			private:
 

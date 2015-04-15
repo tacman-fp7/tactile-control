@@ -20,9 +20,9 @@ namespace iCub {
 				iCub::plantIdentification::ControlTaskData *controlData;
 				std::vector<iCub::ctrl::parallelPID*> pid;
 				// pid options bottle when error >= 0
-				yarp::os::Bottle pidOptionsPE;
+				std::vector<yarp::os::Bottle> pidOptionsPE;
 				// pid options bottle when error < 0
-				yarp::os::Bottle pidOptionsNE;
+				std::vector<yarp::os::Bottle> pidOptionsNE;
 				std::vector<double> pressureTargetValue;
 
 				// TODO to be removed
@@ -51,7 +51,7 @@ namespace iCub {
 
 				void addOption(yarp::os::Bottle &bottle,char *paramName,yarp::os::Value paramValue1,yarp::os::Value paramValue2);
 
-				double calculateTt(iCub::plantIdentification::ControlTaskOpMode gainsSet);
+				double calculateTt(iCub::plantIdentification::ControlTaskOpMode gainsSet,int index);
 
         };
     } //namespace plantIdentification

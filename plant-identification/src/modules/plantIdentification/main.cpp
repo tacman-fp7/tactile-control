@@ -1,5 +1,6 @@
 #include "iCub/plantIdentification/PlantIdentificationModule.h" 
-
+#include <sstream>
+#include <string>
 using yarp::os::Network;
 using yarp::os::ResourceFinder;
 
@@ -28,6 +29,7 @@ int main(int argc, char * argv[])
 
     /* starting module */
     plantIdentification.runModule(rf);
+
 
     return 0;
 }

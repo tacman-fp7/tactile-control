@@ -29,10 +29,8 @@ RPCCommandsData::RPCCommandsData(){
 	add("step_ls",STEP_LIFESPAN,"STEP TASK LIFESPAN");
 	add("kp_pe",CTRL_PID_KPF,"CONTROL PID Kp (error >= 0)");
 	add("ki_pe",CTRL_PID_KIF,"CONTROL PID Ki (error >= 0)");
-	add("kd_pe",CTRL_PID_KDF,"CONTROL PID Kd (error >= 0)");
 	add("kp_ne",CTRL_PID_KPB,"CONTROL PID Kp (error < 0)");
 	add("ki_ne",CTRL_PID_KIB,"CONTROL PID Ki (error < 0)");
-	add("kd_ne",CTRL_PID_KDB,"CONTROL PID Kd (error < 0)");
 	add("ctrl_op_mode",CTRL_OP_MODE,"CONTROL OPERATION MODE [0: err >= 0; 1: err < 0; 2: both]");
 	add("ctrl_pid_reset",CTRL_PID_RESET_ENABLED,"PID RESET ENABLED [0: false; 1: true]");
 	add("ctrl_ls",CTRL_LIFESPAN,"CONTROL TASK LIFESPAN");
@@ -95,4 +93,31 @@ std::string RPCCommandsData::getFullDescription(RPCMainCmdName mainCmdName){
 
 	return "'" + mainCmdMap[mainCmdName] + "' - " + mainCmdDescMap[mainCmdName];
 }
+
+void RPCCommandsData::setValues(std::string values,std::vector<double> &valueList){
+
+	valueList.resize(0);
+	
+	char *valuesChar = new char[values.length() + 1];
+	strcpy(valuesChar,values.c_str());
+	char *target;
+			
+	target = strtok(valuesChar,"_");
+	while(target != NULL){
+		valueList.push_back(atof(target));
+		target = strtok(NULL,"_");
+	}
+}
+
+std::string RPCCommandsData::printValue(yarp::os::Value &value){
+
+	std::stringstream valueString("");
+
+	if (value.isDouble()) valueString << value.asDouble();
+	else if (value.isInt()) valueString << value.asInt();
+	else valueString << value.asString();
+
+	return valueString.str();
+}
+
 

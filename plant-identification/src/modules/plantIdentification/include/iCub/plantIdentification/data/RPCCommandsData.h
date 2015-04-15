@@ -3,8 +3,11 @@
 
 #include "iCub/plantIdentification/PlantIdentificationEnums.h"
 
+#include <yarp/os/Value.h>
+
 #include <map>
 #include <string>
+#include <vector>
 
 namespace iCub {
     namespace plantIdentification {
@@ -44,6 +47,10 @@ namespace iCub {
 				std::string getFullDescription(iCub::plantIdentification::RPCSetCmdArgName setCmdArgName);
 
 				std::string getFullDescription(iCub::plantIdentification::RPCMainCmdName mainCmdName);
+
+				void setValues(std::string values,std::vector<double> &valueList);
+
+				std::string printValue(yarp::os::Value &value);
 
 			private:
 

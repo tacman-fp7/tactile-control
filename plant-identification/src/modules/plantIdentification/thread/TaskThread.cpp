@@ -183,22 +183,16 @@ void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData
 
 	// control task data
 	case CTRL_PID_KPF:
-		taskData->controlData.pidKpf = paramValue.asDouble();
+		rpcCmdData.setValues(paramValue.asString(),taskData->controlData.pidKpf);
 		break;
 	case CTRL_PID_KIF:
-		taskData->controlData.pidKif = paramValue.asDouble();
-		break;
-	case CTRL_PID_KDF:
-		taskData->controlData.pidKdf = paramValue.asDouble();
+		rpcCmdData.setValues(paramValue.asString(),taskData->controlData.pidKif);
 		break;
 	case CTRL_PID_KPB:
-		taskData->controlData.pidKpb = paramValue.asDouble();
+		rpcCmdData.setValues(paramValue.asString(),taskData->controlData.pidKpb);
 		break;
 	case CTRL_PID_KIB:
-		taskData->controlData.pidKib = paramValue.asDouble();
-		break;
-	case CTRL_PID_KDB:
-		taskData->controlData.pidKdb = paramValue.asDouble();
+		rpcCmdData.setValues(paramValue.asString(),taskData->controlData.pidKib);
 		break;
 	case CTRL_PID_RESET_ENABLED:
 		taskData->controlData.pidResetEnabled = paramValue.asInt() != 0;
@@ -227,7 +221,7 @@ void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData
 
 	cout << "\n" <<
             "\n" << 
-            "'" << rpcCmdData.setCmdArgMap[paramName] << "' SET TO " << (paramValue.isDouble() ? paramValue.asDouble() : paramValue.asInt()) << "\n";
+			"'" << rpcCmdData.setCmdArgMap[paramName] << "' SET TO " << rpcCmdData.printValue(paramValue) << "\n";
 }
 
 void TaskThread::task(RPCTaskCmdArgName paramName,TaskName taskName,Value paramValue,RPCCommandsData &rpcCmdData){
@@ -261,7 +255,7 @@ void TaskThread::task(RPCTaskCmdArgName paramName,TaskName taskName,Value paramV
 		taskList.clear();
 		cout << "\n" <<
 				"\n" << 
-				"'" << "TASKS LIST CLEARED" << "\n";
+				"'" << "TASK LIST CLEARED" << "\n";
 		break;
 
 	case POP:
@@ -290,12 +284,10 @@ void TaskThread::view(RPCViewCmdArgName paramName,RPCCommandsData &rpcCmdData){
 		        rpcCmdData.getFullDescription(STEP_LIFESPAN) << ": " << taskData->stepData.lifespan << "\n" <<
 		        "\n" <<
 		        "--- CONTROL TASK DATA ----" << "\n" <<
-		        rpcCmdData.getFullDescription(CTRL_PID_KPF) << ": " << taskData->controlData.pidKpf << "\n" <<
-		        rpcCmdData.getFullDescription(CTRL_PID_KIF) << ": " << taskData->controlData.pidKif << "\n" <<
-		        rpcCmdData.getFullDescription(CTRL_PID_KDF) << ": " << taskData->controlData.pidKdf << "\n" <<
-		        rpcCmdData.getFullDescription(CTRL_PID_KPB) << ": " << taskData->controlData.pidKpb << "\n" <<
-		        rpcCmdData.getFullDescription(CTRL_PID_KIB) << ": " << taskData->controlData.pidKib << "\n" <<
-		        rpcCmdData.getFullDescription(CTRL_PID_KDB) << ": " << taskData->controlData.pidKdb << "\n" <<
+				rpcCmdData.getFullDescription(CTRL_PID_KPF) << ": " << taskData->getValueDescription(CTRL_PID_KPF) << "\n" <<
+		        rpcCmdData.getFullDescription(CTRL_PID_KIF) << ": " << taskData->getValueDescription(CTRL_PID_KIF) << "\n" <<
+		        rpcCmdData.getFullDescription(CTRL_PID_KPB) << ": " << taskData->getValueDescription(CTRL_PID_KPB) << "\n" <<
+		        rpcCmdData.getFullDescription(CTRL_PID_KIB) << ": " << taskData->getValueDescription(CTRL_PID_KIB) << "\n" <<
 		        rpcCmdData.getFullDescription(CTRL_OP_MODE) << ": " << taskData->controlData.controlMode << "\n" <<
 				rpcCmdData.getFullDescription(CTRL_PID_RESET_ENABLED) << ": " << (taskData->controlData.pidResetEnabled ? "true" : "false") << "\n" <<
 		        rpcCmdData.getFullDescription(CTRL_LIFESPAN) << ": " << taskData->controlData.lifespan << "\n" <<
@@ -310,7 +302,7 @@ void TaskThread::view(RPCViewCmdArgName paramName,RPCCommandsData &rpcCmdData){
 	case TASKS:
 		cout << "\n" <<
 				"\n" << 
-				"------- TASKS LIST -------" << "\n" <<
+				"------- TASK LIST -------" << "\n" <<
 					"\n";
 
 		for (size_t i = 0; i < taskList.size(); i++){
