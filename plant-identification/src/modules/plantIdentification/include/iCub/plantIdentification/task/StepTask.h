@@ -26,7 +26,7 @@ namespace iCub {
 
 				virtual void buildLogData(iCub::plantIdentification::LogData &logData);
 
-				virtual void calculatePwm();
+				virtual void calculateControlInput();
         };
     } //namespace plantIdentification
 } //namespace iCub

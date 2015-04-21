@@ -133,14 +133,12 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 				pid[i] = new parallelPID(threadRateSec,kpNeOptionVect[i],kiNeOptionVect[i],kdNeOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttNeOptionVect[i],satLimMatrix);
 				pid[i]->setOptions(pidOptionsNE[i]);
 				currentKp[i] = kpNe[i];
-std::cout << "18\n";
 				break;
 
 			case BOTH_GAINS_SETS:
 				pid[i] = new parallelPID(threadRateSec,kpPeOptionVect[i],kiPeOptionVect[i],kdPeOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttPeOptionVect[i],satLimMatrix);
 				pid[i]->setOptions(pidOptionsPE[i]);
 				currentKp[i] = kpPe[i];
-std::cout << "19\n";
 				break;
 		}
 	}
@@ -167,7 +165,7 @@ void ControlTask::init(){
 	cout << "\n\n";
 }
 
-void ControlTask::calculatePwm(){
+void ControlTask::calculateControlInput(){
 	using yarp::sig::Vector;
 
 
@@ -198,7 +196,7 @@ void ControlTask::calculatePwm(){
 			optionalLogString.append("[ PID RESET ] ");
 		}
 
-		// if a finger gets in touch with the object reset its PID
+		// if a finger gets in touch with the object then reset its PID
 		if (resetErrOnContact && !fingerIsInContact[fingersList[i]] && commonData->overallFingerPressure[fingersList[i]] > commonData->objDetectPressureThresholds[fingersList[i]]){
 			pid[i]->reset(result);
 			fingerIsInContact[fingersList[i]] = true;
@@ -207,7 +205,7 @@ void ControlTask::calculatePwm(){
 			optionalLogString.append(output.str());
 		}
 
-		pwmToUse[i] = result[0];
+		inputCommandValue[i] = result[0];
 
 		previousError[i] = error;
 

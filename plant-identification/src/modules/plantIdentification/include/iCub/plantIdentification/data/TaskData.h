@@ -72,6 +72,17 @@ namespace iCub {
 		};
 		typedef struct RampTaskData RampTaskData;
 
+		struct ApproachTaskData {
+
+			std::vector<int> jointsList;
+			std::vector<int> fingersList;
+			std::vector<double> velocitiesList;
+			std::vector<double> jointsPwmLimitsList;
+			bool jointsPwmLimitsEnabled;
+			int lifespan;
+		};
+		typedef struct ApproachTaskData ApproachTaskData;
+
         class TaskData {
 
             private:
@@ -86,13 +97,12 @@ namespace iCub {
 				StepTaskData stepData;
 				ControlTaskData controlData;
 				RampTaskData rampData;
+				ApproachTaskData approachData;
 				
 				TaskData(yarp::os::ResourceFinder &rf,int threadRate);
 
 				std::string getValueDescription(iCub::plantIdentification::RPCSetCmdArgName cmdName);
 		
-			private:
-
 				int getFingerFromJoint(int joint);
 
         };

@@ -1,6 +1,7 @@
 #include "iCub/plantIdentification/thread/TaskThread.h"
 #include "iCub/plantIdentification/task/StepTask.h"
 #include "iCub/plantIdentification/task/ControlTask.h"
+#include "iCub/plantIdentification/task/ApproachTask.h"
 #include "iCub/plantIdentification/task/RampTask.h"
 
 #include <yarp/os/Property.h>
@@ -220,6 +221,22 @@ void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData
 	case RAMP_LIFESPAN_AFTER_STAB:
 		taskData->rampData.lifespanAfterStabilization = paramValue.asInt();
 		break;
+
+	// approach task data
+	case APPR_JOINTS_VELOCITIES:
+		rpcCmdData.setValues(paramValue.asString(),taskData->approachData.velocitiesList);
+		break;
+	case APPR_JOINTS_PWM_LIMITS:
+		rpcCmdData.setValues(paramValue.asString(),taskData->approachData.jointsPwmLimitsList);
+		break;
+	case APPR_JOINTS_PWM_LIMITS_ENABLED:
+		taskData->approachData.jointsPwmLimitsEnabled = paramValue.asInt() != 0;
+		break;
+	case APPR_LIFESPAN:
+		taskData->approachData.lifespan = paramValue.asInt();
+		break;
+
+
 	}
 
 	cout << "\n" <<
@@ -244,6 +261,10 @@ void TaskThread::task(RPCTaskCmdArgName paramName,TaskName taskName,Value paramV
 
 		case APPROACH_AND_CONTROL:
 			taskList.push_back(new ControlTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->controlData,paramValue.asDouble(),true));
+			break;
+
+		case APPROACH:
+			taskList.push_back(new ApproachTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->approachData));
 			break;
 
 		case RAMP:
@@ -297,14 +318,22 @@ void TaskThread::view(RPCViewCmdArgName paramName,RPCCommandsData &rpcCmdData){
 		        rpcCmdData.getFullDescription(CTRL_PID_KPB) << ": " << taskData->getValueDescription(CTRL_PID_KPB) << "\n" <<
 		        rpcCmdData.getFullDescription(CTRL_PID_KIB) << ": " << taskData->getValueDescription(CTRL_PID_KIB) << "\n" <<
 		        rpcCmdData.getFullDescription(CTRL_OP_MODE) << ": " << taskData->controlData.controlMode << "\n" <<
-				rpcCmdData.getFullDescription(CTRL_PID_RESET_ENABLED) << ": " << (taskData->controlData.pidResetEnabled ? "true" : "false") << "\n" <<
+				rpcCmdData.getFullDescription(CTRL_PID_RESET_ENABLED) << ": " << taskData->controlData.pidResetEnabled << "\n" <<
 		        rpcCmdData.getFullDescription(CTRL_LIFESPAN) << ": " << taskData->controlData.lifespan << "\n" <<
 		        "\n" <<
 		        "--- RAMP TASK DATA ---" << "\n" <<
 		        rpcCmdData.getFullDescription(RAMP_SLOPE) << ": " << taskData->rampData.slope << "\n" <<
 		        rpcCmdData.getFullDescription(RAMP_INTERCEPT) << ": " << taskData->rampData.intercept << "\n" <<
 		        rpcCmdData.getFullDescription(RAMP_LIFESPAN) << ": " << taskData->rampData.lifespan << "\n" <<
-		        rpcCmdData.getFullDescription(RAMP_LIFESPAN_AFTER_STAB) << ": " << taskData->rampData.lifespanAfterStabilization << "\n";
+		        rpcCmdData.getFullDescription(RAMP_LIFESPAN_AFTER_STAB) << ": " << taskData->rampData.lifespanAfterStabilization << "\n" <<
+		        "\n" <<
+		        "--- APPROACH TASK DATA ---" << "\n" <<
+		        rpcCmdData.getFullDescription(APPR_JOINTS_VELOCITIES) << ": " << taskData->getValueDescription(APPR_JOINTS_VELOCITIES) << "\n" <<
+		        rpcCmdData.getFullDescription(APPR_JOINTS_PWM_LIMITS) << ": " << taskData->getValueDescription(APPR_JOINTS_PWM_LIMITS) << "\n" <<
+				rpcCmdData.getFullDescription(APPR_JOINTS_PWM_LIMITS_ENABLED) << ": " << taskData->approachData.jointsPwmLimitsEnabled << "\n" <<
+		        rpcCmdData.getFullDescription(APPR_LIFESPAN) << ": " << taskData->approachData.lifespan << "\n" <<
+			
+				"";
 		break;
 
 	case TASKS:
@@ -326,6 +355,9 @@ void TaskThread::view(RPCViewCmdArgName paramName,RPCCommandsData &rpcCmdData){
 				break;
 			case APPROACH_AND_CONTROL:
 				cout << "APPROACH & CONTROL\t" << ((ControlTask*)taskList[i])->getPressureTargetValueDescription() << "\n";
+				break;
+			case APPROACH:
+				cout << "APPROACH\t" << "\n";
 				break;
 			case RAMP:
 				cout << "RAMP\t" << ((RampTask*)taskList[i])->getPressureTargetValueDescription() << "\n";

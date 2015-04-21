@@ -33,7 +33,7 @@ namespace iCub {
 
 				int callsNumber;
 				int maxCallsNumber;
-				std::vector<double> pwmToUse;
+				std::vector<double> inputCommandValue;
 
 				std::string taskId;
 
@@ -64,7 +64,9 @@ namespace iCub {
 
 				virtual bool loadICubData();
 
-				virtual void calculatePwm() = 0;
+				virtual void calculateControlInput() = 0;
+
+				virtual void sendCommands();
 
 				virtual void buildLogData(iCub::plantIdentification::LogData &logData);
 

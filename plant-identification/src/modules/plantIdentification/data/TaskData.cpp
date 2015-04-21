@@ -70,7 +70,6 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,int threadRate) {
 		controlData.pidKib[i] = controlTaskPidKiNe->get(i).asDouble();
 	}
 
-	//TODO change the default value
 	Bottle* controltTaskJoints = rf.find("controlTaskJoints").asList();
 	controlData.jointsList.resize(controltTaskJoints->size(),0);
 	controlData.fingersList.resize(controltTaskJoints->size(),0);
@@ -89,7 +88,6 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,int threadRate) {
 	controlData.pidResetEnabled = rf.check("pidResetEnabled",Value(0)).asInt() != 0;
 	controlData.lifespan = rf.check("controlTaskLifespan",Value(10)).asInt();
 
-	//TODO change the default value
 	Bottle* rampTaskJoints = rf.find("rampTaskJoints").asList();
 	rampData.jointsList.resize(rampTaskJoints->size(),0);
 	rampData.fingersList.resize(rampTaskJoints->size(),0);
@@ -101,6 +99,26 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,int threadRate) {
 	rampData.intercept = rf.check("intercept",Value(-90.0)).asDouble();
 	rampData.lifespan = rf.check("rampTaskLifespan",Value(10)).asInt();
 	rampData.lifespanAfterStabilization = rf.check("rampTaskLifespanAfterStabilization",Value(5)).asInt();
+
+	Bottle* approachTaskJoints = rf.find("approach.taskJoints").asList();
+	approachData.jointsList.resize(approachTaskJoints->size());
+	approachData.fingersList.resize(approachTaskJoints->size(),0);
+	for(int i = 0; i < approachTaskJoints->size(); i++){
+		approachData.jointsList[i] = approachTaskJoints->get(i).asInt();
+		approachData.fingersList[i] = getFingerFromJoint(approachData.jointsList[i]);
+	}
+	Bottle* approachJointsVelocities = rf.find("approach.jointsVelocities").asList();
+	approachData.velocitiesList.resize(approachJointsVelocities->size());
+	for(int i = 0; i < approachJointsVelocities->size(); i++){
+		approachData.velocitiesList[i] = approachJointsVelocities->get(i).asDouble();
+	}
+	Bottle* approachJointsPwmLimits = rf.find("approach.jointsPwmLimits").asList();
+	approachData.jointsPwmLimitsList.resize(approachJointsVelocities->size());
+	for(int i = 0; i < approachJointsPwmLimits->size(); i++){
+		approachData.jointsPwmLimitsList[i] = approachJointsPwmLimits->get(i).asDouble();
+	}
+	approachData.jointsPwmLimitsEnabled = rf.check("approach.jointsPwmLimitsEnabled",Value(0)).asInt() != 0;
+	approachData.lifespan = rf.check("approach.lifespan",Value(5)).asInt();
 
 }
 
@@ -148,6 +166,18 @@ std::string TaskData::getValueDescription(iCub::plantIdentification::RPCSetCmdAr
 	case OBJ_DETECT_PRESS_THRESHOLDS:
 		for(size_t i = 0; i < commonData.objDetectPressureThresholds.size(); i++){
 			description << commonData.objDetectPressureThresholds[i] << " ";
+		}
+		break;
+	
+	case APPR_JOINTS_VELOCITIES:
+		for(size_t i = 0; i < approachData.velocitiesList.size(); i++){
+			description << approachData.velocitiesList[i] << " ";
+		}
+		break;
+	
+	case APPR_JOINTS_PWM_LIMITS:
+		for(size_t i = 0; i < approachData.jointsPwmLimitsList.size(); i++){
+			description << approachData.jointsPwmLimitsList[i] << " ";
 		}
 		break;
 	}

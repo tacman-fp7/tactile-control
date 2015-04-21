@@ -18,6 +18,7 @@ set(INC_HEADERS
     include/iCub/plantIdentification/task/StepTask.h
     include/iCub/plantIdentification/task/ControlTask.h
     include/iCub/plantIdentification/task/RampTask.h
+    include/iCub/plantIdentification/task/ApproachTask.h
 
     include/iCub/plantIdentification/data/LogData.h
     include/iCub/plantIdentification/data/TaskData.h
@@ -41,6 +42,7 @@ set(INC_SOURCES
     task/StepTask.cpp
     task/ControlTask.cpp
     task/RampTask.cpp
+    task/ApproachTask.cpp
 
     data/LogData.cpp
     data/TaskData.cpp

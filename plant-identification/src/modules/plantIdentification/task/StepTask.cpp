@@ -33,10 +33,10 @@ void StepTask::init(){
 
 }
 
-void StepTask::calculatePwm(){
+void StepTask::calculateControlInput(){
 
 	for(size_t i = 0; i < constantPwm.size(); i++){
-		pwmToUse[i] = constantPwm[i];
+		inputCommandValue[i] = constantPwm[i];
 	}
 }
 

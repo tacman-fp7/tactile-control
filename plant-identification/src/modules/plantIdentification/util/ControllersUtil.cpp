@@ -25,8 +25,9 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
 	using yarp::os::Value;
 
 	//TODO use constants
-	jointsStoredControlMode.resize(8,VOCAB_CM_POSITION);
-
+	storedJointsControlMode.resize(8,VOCAB_CM_POSITION);
+	handJointsMaxPwmLimits.resize(8);
+	
 	string robotName = rf.check("robot", Value("icub"), "The robot name.").asString().c_str();
     string whichHand = rf.check("whichHand", Value("right"), "The hand to be used for the grasping.").asString().c_str();
 
@@ -70,6 +71,11 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
 		cout << dbgTag << "could not open velocity interface\n";
         return false;
     }
+	clientArm.view(iPid);
+    if (!iPid) {
+		cout << dbgTag << "could not open pid interface\n";
+        return false;
+    }
 
 	iPos->getAxes(&armJointsNum);
 	
@@ -88,6 +94,15 @@ bool ControllersUtil::sendPwm(int joint,double pwm){
 
 	if (!iOLC->setRefOutput(joint,pwm)){
 		cout << dbgTag << "could not send pwm\n";
+		return false;
+	}
+	return true;
+}
+
+bool ControllersUtil::sendVelocity(int joint,double velocity){
+
+	if (!iVel->velocityMove(joint,velocity)){
+		cout << dbgTag << "could not send velocity\n";
 		return false;
 	}
 	return true;
@@ -126,7 +141,7 @@ bool ControllersUtil::saveCurrentControlMode(){
 
 	// save control mode of joints 8 9 10 11 12 13 14 15
 	for(size_t i = 0; i < 8; i++){
-		if (!iCtrl->getControlMode(8 + i,&jointsStoredControlMode[i])){
+		if (!iCtrl->getControlMode(8 + i,&storedJointsControlMode[i])){
 			cout << dbgTag << "could not get current control mode\n";
 			return false;
 		}
@@ -225,7 +240,7 @@ bool ControllersUtil::restorePreviousControlMode(){
 
 	// restore control modes from joints 8 9 10 11 12 13 14 15
 	for(size_t i = 0; i < 8; i++){
-		if (!setControlMode(8 + i,jointsStoredControlMode[i],true)){
+		if (!setControlMode(8 + i,storedJointsControlMode[i],true)){
 			cout << dbgTag << "could not set all control modes\n";
 			return false;
 		}
@@ -366,6 +381,50 @@ bool ControllersUtil::openHand() {
 
 	return true;
 }
-
 /* *********************************************************************************************************************** */
 
+bool ControllersUtil::setJointMaxPwmLimit(int joint,double maxPwm){
+
+	yarp::dev::Pid pid;
+
+	if (iPid->getPid(joint,&pid)){
+		pid.max_output = maxPwm;
+		iPid->setPid(joint,pid);
+		return true;
+	}
+	return false;
+}
+
+bool ControllersUtil::setJointsMaxPwmLimit(std::vector<int> &jointsList,std::vector<double> &maxPwmList){
+
+	bool ok = true;
+
+	for(size_t i = 0; i < jointsList.size(); i++){
+		ok = ok && setJointMaxPwmLimit(jointsList[i],maxPwmList[i]);
+	}
+
+	return ok;
+}
+
+bool ControllersUtil::saveHandJointsMaxPwmLimits(){
+
+	//TODO use constants
+	for(size_t i = 8; i <= 15; i++){
+		yarp::dev::Pid pid;
+		if (iPid->getPid(i,&pid)){
+			storedHandJointsMaxPwmLimits[i] = pid.max_output;
+		}
+	}
+}
+
+bool ControllersUtil::restoreHandJointsMaxPwmLimits(){
+
+	//TODO use constants
+	for(size_t i = 8; i <= 15; i++){
+		yarp::dev::Pid pid;
+		if (iPid->getPid(i,&pid)){
+			pid.max_output = storedHandJointsMaxPwmLimits[i];
+			iPid->setPid(i,pid);
+		}
+	}
+}

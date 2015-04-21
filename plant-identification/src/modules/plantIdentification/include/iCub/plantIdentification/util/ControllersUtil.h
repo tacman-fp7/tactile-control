@@ -24,11 +24,13 @@ namespace iCub {
 				yarp::dev::IControlMode2 *iCtrl;
 				yarp::dev::IPositionControl *iPos;
 				yarp::dev::IVelocityControl *iVel;
+				yarp::dev::IPidControl *iPid;
 
 				yarp::sig::Vector armStoredPosition;
 				int armJointsNum;
-				std::vector<int> jointsStoredControlMode;
+				std::vector<int> storedJointsControlMode;
 				std::vector<int> handJointsToMove;
+				std::vector<double> storedHandJointsMaxPwmLimits;
 
                 bool graspEnabled;
 
@@ -42,6 +44,8 @@ namespace iCub {
 				bool init(yarp::os::ResourceFinder &rf);
 
 				bool sendPwm(int joint,double pwm);
+
+				bool sendVelocity(int joint,double velocity);
 
 				bool saveCurrentArmPosition();
 
@@ -62,6 +66,14 @@ namespace iCub {
 //				bool getRealPwmValue(iCub::plantIdentification::FingerJoint fingerJoint,double *pwmValue);
 
 				bool release();
+
+				bool setJointMaxPwmLimit(int joint,double maxPwm);
+
+				bool setJointsMaxPwmLimit(std::vector<int> &jointsList,std::vector<double> &maxPwmList);
+
+				bool saveHandJointsMaxPwmLimits();
+
+				bool restoreHandJointsMaxPwmLimits();
 
 			private:
 

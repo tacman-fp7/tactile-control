@@ -29,7 +29,9 @@ RPCCommandsData::RPCCommandsData(){
 
 	add("pwm_sign",PWM_SIGN,"PWM SIGN");
 	add("pwm_sign",OBJ_DETECT_PRESS_THRESHOLDS,"OBJECT DETECTION PRESSURE THRESHOLDS");
+	add("step_joints",STEP_JOINTS_LIST,"STEP TASK JOINTS LIST");
 	add("step_ls",STEP_LIFESPAN,"STEP TASK LIFESPAN");
+	add("ctrl_joints",CTRL_JOINTS_LIST,"CONTROL TASK JOINTS LIST");
 	add("kp_pe",CTRL_PID_KPF,"CONTROL PID Kp (error >= 0)");
 	add("ki_pe",CTRL_PID_KIF,"CONTROL PID Ki (error >= 0)");
 	add("kp_ne",CTRL_PID_KPB,"CONTROL PID Kp (error < 0)");
@@ -39,8 +41,14 @@ RPCCommandsData::RPCCommandsData(){
 	add("ctrl_ls",CTRL_LIFESPAN,"CONTROL TASK LIFESPAN");
 	add("slope",RAMP_SLOPE,"RAMP SLOPE");
 	add("intercept",RAMP_INTERCEPT,"RAMP INTERCEPT");
+	add("ramp_joints",RAMP_JOINTS_LIST,"RAMP TASK JOINTS LIST");
 	add("ramp_ls",RAMP_LIFESPAN,"RAMP TASK LIFESPAN");
 	add("ramp_ls_after_stab",RAMP_LIFESPAN_AFTER_STAB,"RAMP TASK LIFESPAN AFTER STABILIZATION");
+	add("appr_joints",APPR_JOINTS_LIST,"APPROACH TASK JOINTS LIST");
+	add("appr_vel",APPR_JOINTS_VELOCITIES,"APPROACH TASK JOINTS VELOCITIES");
+	add("appr_pwm_lim",APPR_JOINTS_PWM_LIMITS,"APPROACH TASK JOINTS PWM LIMITS");
+	add("appr_pwm_lim_enabl",APPR_JOINTS_PWM_LIMITS_ENABLED,"APPROACH TASK JOINTS PWM LIMITS ENABLED [0: false; 1: true]");
+	add("appr_ls",APPR_LIFESPAN,"APPROACH TASK LIFESPAN");
 
 	add("add",ADD,"add");
 	add("empty",EMPTY,"empty");
@@ -48,7 +56,8 @@ RPCCommandsData::RPCCommandsData(){
 
 	add("step",STEP,"STEP TASK");
 	add("ctrl",CONTROL,"CONTROL TASK");
-	add("appctrl",APPROACH_AND_CONTROL,"APPROACH & CONTROL TASK");
+	add("apprctrl",APPROACH_AND_CONTROL,"APPROACH & CONTROL TASK");
+	add("appr",APPROACH,"APPROACH TASK");
 	add("ramp",RAMP,"RAMP TASK");
 
 	add("set",SETTINGS,"SETTINGS");

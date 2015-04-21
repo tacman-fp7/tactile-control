@@ -28,7 +28,7 @@ Task::Task(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData 
 	for(size_t i = 0; i < fingersList.size(); i++){
 		this->fingersList[i] = fingersList[i];
 	}
-	pwmToUse.resize(jointsList.size(),0.0);
+	inputCommandValue.resize(jointsList.size(),0.0);
 
 	isFirstCall = true;
 	callsNumber = 0;
@@ -57,11 +57,9 @@ bool Task::manage(bool keepActive){
 
 	loadICubData();
 
-	calculatePwm();
+	calculateControlInput();
 
-	for(size_t i = 0; i < pwmToUse.size(); i++){
-		controllersUtil->sendPwm(jointsList[i],commonData->pwmSign*pwmToUse[i]);
-	}
+	sendCommands();
 
 	LogData logData;
 	buildLogData(logData);
@@ -80,6 +78,13 @@ bool Task::manage(bool keepActive){
 	}
 
 	return true;
+}
+
+void Task::sendCommands(){
+
+	for(size_t i = 0; i < inputCommandValue.size(); i++){
+		controllersUtil->sendPwm(jointsList[i],commonData->pwmSign*inputCommandValue[i]);
+	}
 }
 
 bool Task::loadICubData(){
@@ -144,7 +149,7 @@ void Task::addCommonLogData(LogData &logData){
 //	logData.realProximalPwm = commonData->realProximalPwm;
 //	logData.realDistalPwm = commonData->realDistalPwm;
 
-	logData.pwm = pwmToUse[0];
+	logData.pwm = inputCommandValue[0];
 }
 
 void Task::printScreenLog(){
@@ -158,7 +163,7 @@ void Task::printScreenLog(){
 	cout << "\t   Pwm: ";
 
 	for(size_t i = 0; i < jointsList.size(); i++){
-		cout << pwmToUse[i] << "(" << jointsList[i] << ") ";
+		cout << inputCommandValue[i] << "(" << jointsList[i] << ") ";
 	}
 	
 	cout << optionalLogString << "\n";

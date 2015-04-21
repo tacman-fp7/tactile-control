@@ -38,10 +38,15 @@ namespace iCub {
 			RAMP_SLOPE,
 			RAMP_INTERCEPT,
 			RAMP_LIFESPAN,
-			RAMP_LIFESPAN_AFTER_STAB
+			RAMP_LIFESPAN_AFTER_STAB,
+
+			APPR_JOINTS_LIST,
+			APPR_JOINTS_VELOCITIES,
+			APPR_JOINTS_PWM_LIMITS,
+			APPR_JOINTS_PWM_LIMITS_ENABLED,
+			APPR_LIFESPAN
 		};
     
-
 		enum RPCTaskCmdArgName {
 
 			ADD,
@@ -54,7 +59,8 @@ namespace iCub {
 			STEP = 0,
 			CONTROL = 1,
 			RAMP = 2,
-			APPROACH_AND_CONTROL = 3
+			APPROACH_AND_CONTROL = 3,
+			APPROACH = 4
 		};
 
 		enum RPCViewCmdArgName {

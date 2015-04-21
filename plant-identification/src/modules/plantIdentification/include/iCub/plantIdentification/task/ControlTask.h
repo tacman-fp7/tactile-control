@@ -45,7 +45,7 @@ namespace iCub {
 
 				virtual void buildLogData(LogData &logData);
 
-				virtual void calculatePwm();
+				virtual void calculateControlInput();
 
 				virtual void release();
 

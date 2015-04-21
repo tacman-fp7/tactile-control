@@ -37,9 +37,9 @@ void RampTask::init(){
 	cout << "\n\n";
 }
 
-void RampTask::calculatePwm(){
+void RampTask::calculateControlInput(){
 
-	double pwmToUse;
+	double inputCommandValue;
 	
 	for(size_t i = 0; i < jointsList.size(); i++){
 
@@ -47,7 +47,7 @@ void RampTask::calculatePwm(){
 	
 		case DECREASING:
 
-			pwmToUse = rampData->intercept + rampData->slope*callsNumber*commonData->threadRate;
+			inputCommandValue = rampData->intercept + rampData->slope*callsNumber*commonData->threadRate;
 
 			if (commonData->overallFingerPressureMedian[i] < pressureTargetValue[i]){
 				internalState[i] = STEADY;
@@ -56,11 +56,11 @@ void RampTask::calculatePwm(){
 
 		case STEADY:
 
-			pwmToUse = 0.0;
+			inputCommandValue = 0.0;
 			break;
 		}
 
-		this->pwmToUse[i] = pwmToUse;
+		this->inputCommandValue[i] = inputCommandValue;
 	}
 }
 
