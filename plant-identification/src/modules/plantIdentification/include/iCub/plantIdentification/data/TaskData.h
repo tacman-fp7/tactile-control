@@ -20,6 +20,7 @@ namespace iCub {
 			std::vector<int> previousPressuresIndex;
 			std::vector<double> overallFingerPressure;
 			std::vector<double> overallFingerPressureMedian;
+			std::vector<double> objDetectPressureThresholds;
 //			double realProximalPwm;
 //			double realDistalPwm;
 //			double proximalJointAngle;

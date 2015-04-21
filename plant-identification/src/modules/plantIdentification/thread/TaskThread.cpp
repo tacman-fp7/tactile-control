@@ -175,6 +175,9 @@ void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData
 	case PWM_SIGN:
 		taskData->commonData.pwmSign = paramValue.asInt();
 		break;
+	case OBJ_DETECT_PRESS_THRESHOLDS:
+		rpcCmdData.setValues(paramValue.asString(),taskData->commonData.objDetectPressureThresholds);
+		break;
 
 	// step task data
 	case STEP_LIFESPAN:
@@ -239,6 +242,10 @@ void TaskThread::task(RPCTaskCmdArgName paramName,TaskName taskName,Value paramV
 			taskList.push_back(new ControlTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->controlData,paramValue.asDouble()));
 			break;
 
+		case APPROACH_AND_CONTROL:
+			taskList.push_back(new ControlTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->controlData,paramValue.asDouble(),true));
+			break;
+
 		case RAMP:
 			taskList.push_back(new RampTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->rampData,paramValue.asDouble()));
 			break;
@@ -279,6 +286,7 @@ void TaskThread::view(RPCViewCmdArgName paramName,RPCCommandsData &rpcCmdData){
 		        "\n" <<
 		        "--- TASK COMMON DATA -----" << "\n" <<
 		        rpcCmdData.getFullDescription(PWM_SIGN) << ": " << taskData->commonData.pwmSign << "\n" <<
+				rpcCmdData.getFullDescription(OBJ_DETECT_PRESS_THRESHOLDS) << ": " << taskData->getValueDescription(OBJ_DETECT_PRESS_THRESHOLDS) << "\n" <<
 		        "\n" <<
 		        "--- STEP TASK DATA -------" << "\n" <<
 		        rpcCmdData.getFullDescription(STEP_LIFESPAN) << ": " << taskData->stepData.lifespan << "\n" <<
@@ -315,6 +323,9 @@ void TaskThread::view(RPCViewCmdArgName paramName,RPCCommandsData &rpcCmdData){
 				break;
 			case CONTROL:
 				cout << "CONTROL\t" << ((ControlTask*)taskList[i])->getPressureTargetValueDescription() << "\n";
+				break;
+			case APPROACH_AND_CONTROL:
+				cout << "APPROACH & CONTROL\t" << ((ControlTask*)taskList[i])->getPressureTargetValueDescription() << "\n";
 				break;
 			case RAMP:
 				cout << "RAMP\t" << ((RampTask*)taskList[i])->getPressureTargetValueDescription() << "\n";

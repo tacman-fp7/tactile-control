@@ -21,51 +21,46 @@ using yarp::os::Value;
 
 using std::string;
 
-ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,ControlTaskData *controlData,double pressureTargetValue):Task(controllersUtil,portsUtil,commonData,controlData->lifespan,controlData->jointsList,controlData->fingersList) {
+ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,ControlTaskData *controlData,double pressureTargetValue,bool resetErrOnContact = false):Task(controllersUtil,portsUtil,commonData,controlData->lifespan,controlData->jointsList,controlData->fingersList) {
 	using yarp::sig::Vector;
 	using yarp::sig::Matrix;
-std::cout << "1\n";
     this->controlData = controlData;
+
+	this->resetErrOnContact = resetErrOnContact;
+	fingerIsInContact.resize(commonData->objDetectPressureThresholds.size(),false);
 
 	this->pressureTargetValue.resize(fingersList.size(),pressureTargetValue);
 	pid.resize(jointsList.size());
 	pidOptionsPE.resize(jointsList.size());
 	pidOptionsNE.resize(jointsList.size());
-std::cout << "2\n";
 	
 	currentKp.resize(jointsList.size());
     kpPe.resize(jointsList.size());
 	kpNe.resize(jointsList.size());
 	previousError.resize(jointsList.size());
-std::cout << "3\n";
 
     double threadRateSec = commonData->threadRate/1000.0;
 	std::vector<double> ttPeOption,ttNeOption;
-std::cout << "4\n";
 	ttPeOption.resize(jointsList.size());
 	ttNeOption.resize(jointsList.size());
 	for(size_t i = 0; i < jointsList.size(); i++){
 		ttPeOption[i] = calculateTt(GAINS_SET_POS_ERR,i);
 		ttNeOption[i] = calculateTt(GAINS_SET_NEG_ERR,i);
 	}
-std::cout << "5\n";
 	
 	std::vector<Vector> kpPeOptionVect;
 	kpPeOptionVect.resize(jointsList.size());
 	for(size_t i = 0; i < kpPeOptionVect.size(); i++){
 		kpPeOptionVect[i].resize(1,controlData->pidKpf[i]);
 	}
-std::cout << "6\n";
 	std::vector<Vector> kiPeOptionVect;
 	kiPeOptionVect.resize(jointsList.size());
 	for(size_t i = 0; i < kiPeOptionVect.size(); i++){
 		kiPeOptionVect[i].resize(1,controlData->pidKif[i]);
 	}
-std::cout << "7\n";
 	Vector kdPeOptionVect(1,0.0);
 	std::vector<Vector> ttPeOptionVect;
 	ttPeOptionVect.resize(jointsList.size());
-std::cout << "8\n";
 	for(size_t i = 0; i < ttPeOptionVect.size(); i++){
 		ttPeOptionVect[i].resize(1,ttPeOption[i]);
 	}
@@ -73,7 +68,6 @@ std::cout << "8\n";
 	
 	std::vector<Vector> kpNeOptionVect;
 	kpNeOptionVect.resize(jointsList.size());
-std::cout << "9\n";
 	for(size_t i = 0; i < kpNeOptionVect.size(); i++){
 		kpNeOptionVect[i].resize(1,controlData->pidKpb[i]);
 	}
@@ -82,7 +76,6 @@ std::cout << "9\n";
 	for(size_t i = 0; i < kiNeOptionVect.size(); i++){
 		kiNeOptionVect[i].resize(1,controlData->pidKib[i]);
 	}
-std::cout << "10\n";
 	Vector kdNeOptionVect(1,0.0);
 	std::vector<Vector> ttNeOptionVect;
 	ttNeOptionVect.resize(jointsList.size());
@@ -90,12 +83,10 @@ std::cout << "10\n";
 		ttNeOptionVect[i].resize(1,ttNeOption[i]);
 	}
 
-std::cout << "11\n";
 	Vector wpOptionVect(1,controlData->pidWp);
 	Vector wiOptionVect(1,controlData->pidWi);
 	Vector wdOptionVect(1,controlData->pidWd);
 	Vector nOptionVect(1,controlData->pidN);
-std::cout << "12\n";
 	
 	Matrix satLimMatrix(1,2);
 	satLimMatrix[0][0] = controlData->pidMinSatLim;
@@ -108,7 +99,6 @@ std::cout << "12\n";
 	addOption(commonOptions,"Wd",Value(controlData->pidWd));
 	addOption(commonOptions,"N",Value(controlData->pidN));
 	addOption(commonOptions,"satLim",Value(controlData->pidMinSatLim),Value(controlData->pidMaxSatLim));
-std::cout << "13\n";
 
 	for(size_t i = 0; i < jointsList.size(); i++){
 		addOption(pidOptionsPE[i],"Kp",Value(controlData->pidKpf[i]));
@@ -116,7 +106,6 @@ std::cout << "13\n";
 		addOption(pidOptionsPE[i],"Kd",Value(0.0));
 		addOption(pidOptionsPE[i],"Tt",Value(ttPeOption[i]));
 		pidOptionsPE[i].append(commonOptions);
-std::cout << "14\n";
 
 		addOption(pidOptionsNE[i],"Kp",Value(controlData->pidKpb[i]));
 		addOption(pidOptionsNE[i],"Ki",Value(controlData->pidKib[i]));
@@ -124,7 +113,6 @@ std::cout << "14\n";
 		addOption(pidOptionsNE[i],"Tt",Value(ttNeOption[i]));
 		pidOptionsNE[i].append(commonOptions);
 	}
-std::cout << "15\n";
 
 	for(size_t i = 0; i < jointsList.size(); i++){
 
@@ -132,7 +120,6 @@ std::cout << "15\n";
 		kpPe[i] = controlData->pidKpf[i];
 		kpNe[i] = controlData->pidKpb[i];
 		previousError[i] = 0;
-std::cout << "16\n";
 
 		switch (controlData->controlMode){
 
@@ -140,7 +127,6 @@ std::cout << "16\n";
 				pid[i] = new parallelPID(threadRateSec,kpPeOptionVect[i],kiPeOptionVect[i],kdPeOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttPeOptionVect[i],satLimMatrix);
 				pid[i]->setOptions(pidOptionsPE[i]);
 				currentKp[i] = kpPe[i];
-std::cout << "17\n";
 				break;
 
 			case GAINS_SET_NEG_ERR:
@@ -158,8 +144,14 @@ std::cout << "19\n";
 				break;
 		}
 	}
-	taskName = CONTROL;
-	dbgTag = "ControlTask: ";
+	if (resetErrOnContact){
+		taskName = APPROACH_AND_CONTROL;
+		dbgTag = "Approach&ControlTask: ";
+	} else {
+		taskName = CONTROL;
+		dbgTag = "ControlTask: ";
+	}
+	
 
 }
 
@@ -206,6 +198,15 @@ void ControlTask::calculatePwm(){
 			optionalLogString.append("[ PID RESET ] ");
 		}
 
+		// if a finger gets in touch with the object reset its PID
+		if (resetErrOnContact && !fingerIsInContact[fingersList[i]] && commonData->overallFingerPressure[fingersList[i]] > commonData->objDetectPressureThresholds[fingersList[i]]){
+			pid[i]->reset(result);
+			fingerIsInContact[fingersList[i]] = true;
+			std::stringstream output("");
+			output << "[ Finger " << fingersList[i] << " PID RESET ] ";
+			optionalLogString.append(output.str());
+		}
+
 		pwmToUse[i] = result[0];
 
 		previousError[i] = error;
@@ -217,7 +218,11 @@ void ControlTask::buildLogData(LogData &logData){
 
 	addCommonLogData(logData);
 
-	logData.taskType = CONTROL;
+	if (resetErrOnContact) {
+		logData.taskType = APPROACH_AND_CONTROL;
+	} else {
+		logData.taskType = CONTROL;
+	}
 	logData.taskOperationMode = controlData->controlMode;
 	//TODO only first elements are logged!
 	logData.targetValue = pressureTargetValue[0];

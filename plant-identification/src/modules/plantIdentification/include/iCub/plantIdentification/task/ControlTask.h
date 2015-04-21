@@ -24,6 +24,10 @@ namespace iCub {
 				// pid options bottle when error < 0
 				std::vector<yarp::os::Bottle> pidOptionsNE;
 				std::vector<double> pressureTargetValue;
+				
+				/* variables used for error integral reset mode */
+				bool resetErrOnContact;
+				std::vector<bool> fingerIsInContact;
 
 				// TODO to be removed
 				std::vector<double> currentKp;
@@ -33,7 +37,7 @@ namespace iCub {
 
             public:
 
-                ControlTask(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,iCub::plantIdentification::ControlTaskData *controlData,double pressureTargetValue);
+                ControlTask(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,iCub::plantIdentification::ControlTaskData *controlData,double pressureTargetValue,bool resetErrOnContact = false);
 
 				std::string getPressureTargetValueDescription();
 

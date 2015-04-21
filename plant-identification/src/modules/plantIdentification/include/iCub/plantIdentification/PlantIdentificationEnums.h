@@ -20,6 +20,7 @@ namespace iCub {
 		enum RPCSetCmdArgName {
 
 			PWM_SIGN,
+			OBJ_DETECT_PRESS_THRESHOLDS,
 
 			STEP_JOINTS_LIST,
 			STEP_LIFESPAN,
@@ -50,9 +51,10 @@ namespace iCub {
 
 		enum TaskName {
 
-			STEP,
-			CONTROL,
-			RAMP,
+			STEP = 0,
+			CONTROL = 1,
+			RAMP = 2,
+			APPROACH_AND_CONTROL = 3
 		};
 
 		enum RPCViewCmdArgName {

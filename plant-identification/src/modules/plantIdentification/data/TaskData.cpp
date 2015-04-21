@@ -35,7 +35,11 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,int threadRate) {
 	commonData.overallFingerPressure.resize(5,0.0);
 	commonData.overallFingerPressureMedian.resize(5,0.0);
 
-	//TODO change the default value
+	Bottle* objDetectPressureThresholds = rf.find("objDetectPressureThresholds").asList();
+	commonData.objDetectPressureThresholds.resize(objDetectPressureThresholds->size(),0);
+	for(int i = 0; i < objDetectPressureThresholds->size(); i++){
+		commonData.objDetectPressureThresholds[i] = objDetectPressureThresholds->get(i).asDouble();
+	}
 	Bottle* stepTaskJoints = rf.find("stepTaskJoints").asList();
 	stepData.jointsList.resize(stepTaskJoints->size(),0);
 	stepData.fingersList.resize(stepTaskJoints->size(),0);
@@ -140,6 +144,13 @@ std::string TaskData::getValueDescription(iCub::plantIdentification::RPCSetCmdAr
 			description << controlData.pidKib[i] << " ";
 		}
 		break;
+
+	case OBJ_DETECT_PRESS_THRESHOLDS:
+		for(size_t i = 0; i < commonData.objDetectPressureThresholds.size(); i++){
+			description << commonData.objDetectPressureThresholds[i] << " ";
+		}
+		break;
 	}
+	
 	return description.str();
 }

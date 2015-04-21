@@ -28,6 +28,7 @@ RPCCommandsData::RPCCommandsData(){
 	add("quit",QUIT,"QUIT MODULE");
 
 	add("pwm_sign",PWM_SIGN,"PWM SIGN");
+	add("pwm_sign",OBJ_DETECT_PRESS_THRESHOLDS,"OBJECT DETECTION PRESSURE THRESHOLDS");
 	add("step_ls",STEP_LIFESPAN,"STEP TASK LIFESPAN");
 	add("kp_pe",CTRL_PID_KPF,"CONTROL PID Kp (error >= 0)");
 	add("ki_pe",CTRL_PID_KIF,"CONTROL PID Ki (error >= 0)");
@@ -47,6 +48,7 @@ RPCCommandsData::RPCCommandsData(){
 
 	add("step",STEP,"STEP TASK");
 	add("ctrl",CONTROL,"CONTROL TASK");
+	add("appctrl",APPROACH_AND_CONTROL,"APPROACH & CONTROL TASK");
 	add("ramp",RAMP,"RAMP TASK");
 
 	add("set",SETTINGS,"SETTINGS");
