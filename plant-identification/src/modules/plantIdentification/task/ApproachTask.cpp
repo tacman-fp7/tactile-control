@@ -13,7 +13,7 @@ using iCub::plantIdentification::LogData;
 using iCub::plantIdentification::ControllersUtil;
 using iCub::plantIdentification::PortsUtil;
 using iCub::plantIdentification::TaskCommonData;
-using iCub::plantIdentification::ControlTaskData;
+using iCub::plantIdentification::ApproachTaskData;
 
 using iCub::ctrl::parallelPID;
 using yarp::os::Bottle;
@@ -103,5 +103,3 @@ bool ApproachTask::eachFingerIsInContact(){
 
 	return eachFingerIsInContact;
 }
-
-

@@ -26,7 +26,7 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
 
 	//TODO use constants
 	storedJointsControlMode.resize(8,VOCAB_CM_POSITION);
-	handJointsMaxPwmLimits.resize(8);
+	storedHandJointsMaxPwmLimits.resize(8);
 	
 	string robotName = rf.check("robot", Value("icub"), "The robot name.").asString().c_str();
     string whichHand = rf.check("whichHand", Value("right"), "The hand to be used for the grasping.").asString().c_str();
@@ -415,6 +415,8 @@ bool ControllersUtil::saveHandJointsMaxPwmLimits(){
 			storedHandJointsMaxPwmLimits[i] = pid.max_output;
 		}
 	}
+
+	return true;
 }
 
 bool ControllersUtil::restoreHandJointsMaxPwmLimits(){
@@ -427,4 +429,6 @@ bool ControllersUtil::restoreHandJointsMaxPwmLimits(){
 			iPid->setPid(i,pid);
 		}
 	}
+
+	return true;
 }
