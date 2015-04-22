@@ -409,9 +409,9 @@ bool ControllersUtil::setJointsMaxPwmLimit(std::vector<int> &jointsList,std::vec
 bool ControllersUtil::saveHandJointsMaxPwmLimits(){
 
 	//TODO use constants
-	for(size_t i = 8; i <= 15; i++){
+	for(size_t i = 0; i < 8; i++){
 		yarp::dev::Pid pid;
-		if (iPid->getPid(i,&pid)){
+		if (iPid->getPid(8 + i,&pid)){
 			storedHandJointsMaxPwmLimits[i] = pid.max_output;
 		}
 	}
@@ -422,11 +422,11 @@ bool ControllersUtil::saveHandJointsMaxPwmLimits(){
 bool ControllersUtil::restoreHandJointsMaxPwmLimits(){
 
 	//TODO use constants
-	for(size_t i = 8; i <= 15; i++){
+	for(size_t i = 0; i < 8; i++){
 		yarp::dev::Pid pid;
-		if (iPid->getPid(i,&pid)){
+		if (iPid->getPid(8 + i,&pid)){
 			pid.max_output = storedHandJointsMaxPwmLimits[i];
-			iPid->setPid(i,pid);
+			iPid->setPid(8 + i,pid);
 		}
 	}
 

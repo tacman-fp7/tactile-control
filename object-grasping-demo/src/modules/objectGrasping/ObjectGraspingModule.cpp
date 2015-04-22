@@ -124,6 +124,8 @@ bool ObjectGraspingModule::updateModule() {
 
 		sendCommand("task empty");
 		
+        sendCommand("task add appr");
+
         sendCommand("task add ctrl",configData->targetPressure);
 
 		sendCommand("start");

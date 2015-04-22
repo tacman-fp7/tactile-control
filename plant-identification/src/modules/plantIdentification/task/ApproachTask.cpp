@@ -36,9 +36,8 @@ ApproachTask::ApproachTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil
 void ApproachTask::init(){
 	using std::cout;
 
-	controllersUtil->setTaskControlModes(jointsList,VOCAB_CM_VELOCITY);
 	controllersUtil->saveHandJointsMaxPwmLimits();
-
+	controllersUtil->setTaskControlModes(jointsList,VOCAB_CM_VELOCITY);
 	controllersUtil->setJointsMaxPwmLimit(jointsList,approachData->jointsPwmLimitsList);
 	
 	cout << "\n\n" << dbgTag << "TASK STARTED" << "\n\n";
@@ -50,7 +49,7 @@ void ApproachTask::calculateControlInput(){
 
 	for(size_t i = 0; i < jointsList.size(); i++){
 
-		if (!fingerIsInContact[fingersList[i]] && commonData->overallFingerPressure[fingersList[i]] > commonData->objDetectPressureThresholds[fingersList[i]]){
+		if (!fingerIsInContact[fingersList[i]] && commonData->overallFingerPressureMedian[fingersList[i]] > commonData->objDetectPressureThresholds[fingersList[i]]){
 			fingerIsInContact[fingersList[i]] = true;
 		}
 		
@@ -83,7 +82,7 @@ void ApproachTask::buildLogData(LogData &logData){
 }
 
 void ApproachTask::release(){
-
+    std::cout << " YEEEEEEEEEEEEEEEEEEEEEEEEEEE RELEASE\n";
 	controllersUtil->restoreHandJointsMaxPwmLimits();
 }
 

@@ -197,7 +197,7 @@ void ControlTask::calculateControlInput(){
 		}
 
 		// if a finger gets in touch with the object then reset its PID
-		if (resetErrOnContact && !fingerIsInContact[fingersList[i]] && commonData->overallFingerPressure[fingersList[i]] > commonData->objDetectPressureThresholds[fingersList[i]]){
+		if (resetErrOnContact && !fingerIsInContact[fingersList[i]] && commonData->overallFingerPressureMedian[fingersList[i]] > commonData->objDetectPressureThresholds[fingersList[i]]){
 			pid[i]->reset(result);
 			fingerIsInContact[fingersList[i]] = true;
 			std::stringstream output("");
