@@ -21,7 +21,7 @@ using yarp::os::Value;
 
 using std::string;
 
-ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,ControlTaskData *controlData,double pressureTargetValue,bool resetErrOnContact):Task(controllersUtil,portsUtil,commonData,controlData->lifespan,controlData->jointsList,controlData->fingersList) {
+ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,ControlTaskData *controlData,std::vector<double> &targetList,bool resetErrOnContact):Task(controllersUtil,portsUtil,commonData,controlData->lifespan,controlData->jointsList,controlData->fingersList) {
 	using yarp::sig::Vector;
 	using yarp::sig::Matrix;
     this->controlData = controlData;
@@ -29,7 +29,11 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	this->resetErrOnContact = resetErrOnContact;
 	fingerIsInContact.resize(commonData->objDetectPressureThresholds.size(),false);
 
-	this->pressureTargetValue.resize(fingersList.size(),pressureTargetValue);
+	pressureTargetValue.resize(fingersList.size());
+	for(size_t i = 0; i < pressureTargetValue.size(); i++){
+		pressureTargetValue[i] = (i >= targetList.size() ? targetList[targetList.size()-1] : targetList[i]);
+	}
+	
 	pid.resize(jointsList.size());
 	pidOptionsPE.resize(jointsList.size());
 	pidOptionsNE.resize(jointsList.size());
@@ -304,4 +308,12 @@ std::string ControlTask::getPressureTargetValueDescription(){
 	}
 	
 	return description.str();
+}
+
+void ControlTask::setTargetListRealTime(std::vector<double> &targetList){
+
+	for(size_t i = 0; i < pressureTargetValue.size(); i++){
+		pressureTargetValue[i] = (i >= targetList.size() ? targetList[targetList.size()-1] : targetList[i]);
+	}
+
 }

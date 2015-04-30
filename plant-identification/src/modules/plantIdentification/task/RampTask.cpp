@@ -11,10 +11,13 @@ using iCub::plantIdentification::PortsUtil;
 using iCub::plantIdentification::TaskCommonData;
 using iCub::plantIdentification::RampTaskData;
 
-RampTask::RampTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,RampTaskData *rampData,double pressureTargetValue):Task(controllersUtil,portsUtil,commonData,rampData->lifespan,rampData->jointsList,rampData->fingersList) {
+RampTask::RampTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,RampTaskData *rampData,std::vector<double> &targetList):Task(controllersUtil,portsUtil,commonData,rampData->lifespan,rampData->jointsList,rampData->fingersList) {
 
 	this->rampData = rampData;
-	this->pressureTargetValue.resize(fingersList.size(),pressureTargetValue);
+	pressureTargetValue.resize(fingersList.size());
+	for(size_t i = 0; i < pressureTargetValue.size(); i++){
+		pressureTargetValue[i] = (i >= targetList.size() ? targetList[targetList.size()-1] : targetList[i]);
+	}
 
 	internalState.resize(fingersList.size(),DECREASING);
 

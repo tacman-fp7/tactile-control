@@ -18,7 +18,7 @@ namespace iCub {
 
             public:
 
-                StepTask(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,iCub::plantIdentification::StepTaskData *stepData,double constantPwm);
+                StepTask(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,iCub::plantIdentification::StepTaskData *stepData,std::vector<double> &targetList);
 
 				virtual void init();
 

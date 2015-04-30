@@ -11,10 +11,13 @@ using iCub::plantIdentification::PortsUtil;
 using iCub::plantIdentification::TaskCommonData;
 using iCub::plantIdentification::StepTaskData;
 
-StepTask::StepTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,StepTaskData *stepData,double constantPwm):Task(controllersUtil,portsUtil,commonData,stepData->lifespan,stepData->jointsList,stepData->fingersList) {
+StepTask::StepTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,StepTaskData *stepData,std::vector<double> &targetList):Task(controllersUtil,portsUtil,commonData,stepData->lifespan,stepData->jointsList,stepData->fingersList) {
 
 	this->stepData = stepData;
-	this->constantPwm.resize(jointsList.size(),constantPwm);
+	constantPwm.resize(jointsList.size());
+	for(size_t i = 0; i < constantPwm.size(); i++){
+		constantPwm[i] = (i >= targetList.size() ? targetList[targetList.size()-1] : targetList[i]);
+	}
 
 	taskName = STEP;
 	dbgTag = "StepTask: ";

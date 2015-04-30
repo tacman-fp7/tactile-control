@@ -32,6 +32,7 @@ namespace iCub {
 			CTRL_PID_KIB,
 			CTRL_OP_MODE,
 			CTRL_PID_RESET_ENABLED,
+			CTRL_TARGET_REAL_TIME,
 			CTRL_LIFESPAN,
 
 			RAMP_JOINTS_LIST,
@@ -60,7 +61,8 @@ namespace iCub {
 			CONTROL = 1,
 			RAMP = 2,
 			APPROACH_AND_CONTROL = 3,
-			APPROACH = 4
+			APPROACH = 4,
+			NONE
 		};
 
 		enum RPCViewCmdArgName {

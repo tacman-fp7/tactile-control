@@ -37,9 +37,11 @@ namespace iCub {
 
             public:
 
-                ControlTask(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,iCub::plantIdentification::ControlTaskData *controlData,double pressureTargetValue,bool resetErrOnContact = false);
+                ControlTask(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,iCub::plantIdentification::ControlTaskData *controlData,std::vector<double> &targetList,bool resetErrOnContact = false);
 
 				std::string getPressureTargetValueDescription();
+
+				void setTargetListRealTime(std::vector<double> &targetList);
 
 				virtual void init();
 

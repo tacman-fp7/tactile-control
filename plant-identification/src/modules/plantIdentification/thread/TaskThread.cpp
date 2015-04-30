@@ -135,6 +135,12 @@ bool TaskThread::afterRun(bool openHand){
 	runEnabled = false;
     currentTaskIndex = 0;
 
+	// clear task list
+	for (size_t i = 0; i < taskList.size(); i++){
+		delete(taskList[i]);
+	}
+	taskList.clear();
+
 	return true;
 }
 
@@ -170,6 +176,8 @@ bool TaskThread::setArmInTaskPosition(){
 
 void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData &rpcCmdData){
 
+	bool setSuccessful = true;
+
 	switch (paramName){
 
 	// common data
@@ -203,6 +211,21 @@ void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData
 		break;
 	case CTRL_OP_MODE:
 		taskData->controlData.controlMode = static_cast<ControlTaskOpMode>(paramValue.asInt());
+		break;
+	case CTRL_TARGET_REAL_TIME:
+		if (currentTaskIndex < taskList.size()){
+			if (ControlTask* currentTask = dynamic_cast<ControlTask*>(taskList[currentTaskIndex])){
+				std::vector<double> targetList;
+				rpcCmdData.setValues(paramValue.asString(),targetList);
+				currentTask->setTargetListRealTime(targetList);
+			} else {
+				setSuccessful = false;
+				cout << "\n\n" << "CANNOT EXECUTE SET COMMAND (CONTROL TASK IS NOT RUNNING)" << "\n";
+			}
+		} else {
+			setSuccessful = false;
+			cout << "\n\n" << "CANNOT EXECUTE SET COMMAND (NO TASK RUNNING)" << "\n";
+		}
 		break;
 	case CTRL_LIFESPAN:
 		taskData->controlData.lifespan = paramValue.asInt();
@@ -239,28 +262,34 @@ void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData
 
 	}
 
-	cout << "\n" <<
-            "\n" << 
-			"'" << rpcCmdData.setCmdArgMap[paramName] << "' SET TO " << rpcCmdData.printValue(paramValue) << "\n";
+	if (setSuccessful){
+		cout << "\n" <<
+				"\n" << 
+				"'" << rpcCmdData.setCmdArgMap[paramName] << "' SET TO " << rpcCmdData.printValue(paramValue) << "\n";
+	}
 }
 
 void TaskThread::task(RPCTaskCmdArgName paramName,TaskName taskName,Value paramValue,RPCCommandsData &rpcCmdData){
+
+	std::vector<double> targetList;
 
 	switch (paramName){
 
 	case ADD:
 
+		rpcCmdData.setValues(paramValue.asString(),targetList);
+
 		switch (taskName){
 		case STEP:
-			taskList.push_back(new StepTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->stepData,paramValue.asDouble()));
+			taskList.push_back(new StepTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->stepData,targetList));
 			break;
 
 		case CONTROL:
-			taskList.push_back(new ControlTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->controlData,paramValue.asDouble()));
+			taskList.push_back(new ControlTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->controlData,targetList));
 			break;
 
 		case APPROACH_AND_CONTROL:
-			taskList.push_back(new ControlTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->controlData,paramValue.asDouble(),true));
+			taskList.push_back(new ControlTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->controlData,targetList,true));
 			break;
 
 		case APPROACH:
@@ -268,7 +297,7 @@ void TaskThread::task(RPCTaskCmdArgName paramName,TaskName taskName,Value paramV
 			break;
 
 		case RAMP:
-			taskList.push_back(new RampTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->rampData,paramValue.asDouble()));
+			taskList.push_back(new RampTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->rampData,targetList));
 			break;
 		}
 		cout << "\n" <<
@@ -332,7 +361,7 @@ void TaskThread::view(RPCViewCmdArgName paramName,RPCCommandsData &rpcCmdData){
 		        rpcCmdData.getFullDescription(APPR_JOINTS_PWM_LIMITS) << ": " << taskData->getValueDescription(APPR_JOINTS_PWM_LIMITS) << "\n" <<
 				rpcCmdData.getFullDescription(APPR_JOINTS_PWM_LIMITS_ENABLED) << ": " << taskData->approachData.jointsPwmLimitsEnabled << "\n" <<
 		        rpcCmdData.getFullDescription(APPR_LIFESPAN) << ": " << taskData->approachData.lifespan << "\n" <<
-			
+
 				"";
 		break;
 
@@ -348,27 +377,24 @@ void TaskThread::view(RPCViewCmdArgName paramName,RPCCommandsData &rpcCmdData){
 			switch (taskList[i]->getTaskName()){
 
 			case STEP:
-				cout << "STEP\t" << ((StepTask*)taskList[i])->getConstantPwmDescription() << "\n";
+				cout << "STEP\t" << (dynamic_cast<StepTask*>(taskList[i]))->getConstantPwmDescription() << "\n";
 				break;
 			case CONTROL:
-				cout << "CONTROL\t" << ((ControlTask*)taskList[i])->getPressureTargetValueDescription() << "\n";
+				cout << "CONTROL\t" << (dynamic_cast<ControlTask*>(taskList[i]))->getPressureTargetValueDescription() << "\n";
 				break;
 			case APPROACH_AND_CONTROL:
-				cout << "APPROACH & CONTROL\t" << ((ControlTask*)taskList[i])->getPressureTargetValueDescription() << "\n";
+				cout << "APPROACH & CONTROL\t" << (dynamic_cast<ControlTask*>(taskList[i]))->getPressureTargetValueDescription() << "\n";
 				break;
 			case APPROACH:
 				cout << "APPROACH\t" << "\n";
 				break;
 			case RAMP:
-				cout << "RAMP\t" << ((RampTask*)taskList[i])->getPressureTargetValueDescription() << "\n";
+				cout << "RAMP\t" << (dynamic_cast<RampTask*>(taskList[i]))->getPressureTargetValueDescription() << "\n";
 				break;
 
 			}
-
 		}
-
 	}
-
 }
 
 void TaskThread::help(RPCCommandsData &rpcCmdData){

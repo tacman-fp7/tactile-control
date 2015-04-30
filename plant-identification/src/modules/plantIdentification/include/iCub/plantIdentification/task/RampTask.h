@@ -22,7 +22,7 @@ namespace iCub {
 
             public:
 
-                RampTask(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,iCub::plantIdentification::RampTaskData *rampData,double pressureTargetValue);
+                RampTask(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,iCub::plantIdentification::RampTaskData *rampData,std::vector<double> &targetList);
 
 				virtual void init();
 
