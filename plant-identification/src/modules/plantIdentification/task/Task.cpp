@@ -138,11 +138,11 @@ void Task::addCommonLogData(LogData &logData){
 
 	logData.taskId = taskId;
 	//TODO only the first element is logged!
-	for (size_t i = 0; i < commonData->fingerTaxelsData.size(); i++){
-		logData.fingerTaxelValues[i] = commonData->fingerTaxelsData[0][i];
+	for (size_t i = 0; i < commonData->fingerTaxelsData[fingersList[0]].size(); i++){
+		logData.fingerTaxelValues[i] = commonData->fingerTaxelsData[fingersList[0]][i];
 	}
-	logData.overallFingerPressure = commonData->overallFingerPressure[0];
-	logData.overallFingerPressureMedian = commonData->overallFingerPressureMedian[0];
+	logData.overallFingerPressure = commonData->overallFingerPressure[fingersList[0]];
+	logData.overallFingerPressureMedian = commonData->overallFingerPressureMedian[fingersList[0]];
 
 //	logData.proximalJointAngle = commonData->proximalJointAngle;
 //	logData.distalJointAngle = commonData->distalJointAngle;
