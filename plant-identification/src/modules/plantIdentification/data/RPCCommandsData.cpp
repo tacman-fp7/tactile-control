@@ -108,19 +108,29 @@ std::string RPCCommandsData::getFullDescription(RPCMainCmdName mainCmdName){
 	return "'" + mainCmdMap[mainCmdName] + "' - " + mainCmdDescMap[mainCmdName];
 }
 
-void RPCCommandsData::setValues(std::string values,std::vector<double> &valueList){
+void RPCCommandsData::setValues(yarp::os::Value &value,std::vector<double> &valueList){
 
-	valueList.resize(0);
-	
-	char *valuesChar = new char[values.length() + 1];
-	strcpy(valuesChar,values.c_str());
-	char *target;
-			
-	target = strtok(valuesChar,"_");
-	while(target != NULL){
-		valueList.push_back(atof(target));
-		target = strtok(NULL,"_");
-	}
+    if (value.isString()){
+
+        std::string values = value.asString();
+
+	    valueList.resize(0);
+
+	    char *valuesChar = new char[values.length() + 1];
+	    strcpy(valuesChar,values.c_str());
+	    char *target;
+
+	    target = strtok(valuesChar,"_");
+
+        while(target != NULL){
+            valueList.push_back(atof(target));
+            target = strtok(NULL,"_");
+        }
+    } else {
+
+        valueList.push_back(value.asDouble());
+    }
+
 }
 
 std::string RPCCommandsData::printValue(yarp::os::Value &value){

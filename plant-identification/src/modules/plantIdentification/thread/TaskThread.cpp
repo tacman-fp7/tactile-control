@@ -185,7 +185,7 @@ void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData
 		taskData->commonData.pwmSign = paramValue.asInt();
 		break;
 	case OBJ_DETECT_PRESS_THRESHOLDS:
-		rpcCmdData.setValues(paramValue.asString(),taskData->commonData.objDetectPressureThresholds);
+		rpcCmdData.setValues(paramValue,taskData->commonData.objDetectPressureThresholds);
 		break;
 
 	// step task data
@@ -195,16 +195,16 @@ void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData
 
 	// control task data
 	case CTRL_PID_KPF:
-		rpcCmdData.setValues(paramValue.asString(),taskData->controlData.pidKpf);
+		rpcCmdData.setValues(paramValue,taskData->controlData.pidKpf);
 		break;
 	case CTRL_PID_KIF:
-		rpcCmdData.setValues(paramValue.asString(),taskData->controlData.pidKif);
+		rpcCmdData.setValues(paramValue,taskData->controlData.pidKif);
 		break;
 	case CTRL_PID_KPB:
-		rpcCmdData.setValues(paramValue.asString(),taskData->controlData.pidKpb);
+		rpcCmdData.setValues(paramValue,taskData->controlData.pidKpb);
 		break;
 	case CTRL_PID_KIB:
-		rpcCmdData.setValues(paramValue.asString(),taskData->controlData.pidKib);
+		rpcCmdData.setValues(paramValue,taskData->controlData.pidKib);
 		break;
 	case CTRL_PID_RESET_ENABLED:
 		taskData->controlData.pidResetEnabled = paramValue.asInt() != 0;
@@ -216,7 +216,7 @@ void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData
 		if (currentTaskIndex < taskList.size()){
 			if (ControlTask* currentTask = dynamic_cast<ControlTask*>(taskList[currentTaskIndex])){
 				std::vector<double> targetList;
-				rpcCmdData.setValues(paramValue.asString(),targetList);
+				rpcCmdData.setValues(paramValue,targetList);
 				currentTask->setTargetListRealTime(targetList);
 			} else {
 				setSuccessful = false;
@@ -247,10 +247,10 @@ void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData
 
 	// approach task data
 	case APPR_JOINTS_VELOCITIES:
-		rpcCmdData.setValues(paramValue.asString(),taskData->approachData.velocitiesList);
+		rpcCmdData.setValues(paramValue,taskData->approachData.velocitiesList);
 		break;
 	case APPR_JOINTS_PWM_LIMITS:
-		rpcCmdData.setValues(paramValue.asString(),taskData->approachData.jointsPwmLimitsList);
+		rpcCmdData.setValues(paramValue,taskData->approachData.jointsPwmLimitsList);
 		break;
 	case APPR_JOINTS_PWM_LIMITS_ENABLED:
 		taskData->approachData.jointsPwmLimitsEnabled = paramValue.asInt() != 0;
@@ -277,7 +277,7 @@ void TaskThread::task(RPCTaskCmdArgName paramName,TaskName taskName,Value paramV
 
 	case ADD:
 
-		rpcCmdData.setValues(paramValue.asString(),targetList);
+		rpcCmdData.setValues(paramValue,targetList);
 
 		switch (taskName){
 		case STEP:
@@ -348,6 +348,7 @@ void TaskThread::view(RPCViewCmdArgName paramName,RPCCommandsData &rpcCmdData){
 		        rpcCmdData.getFullDescription(CTRL_PID_KIB) << ": " << taskData->getValueDescription(CTRL_PID_KIB) << "\n" <<
 		        rpcCmdData.getFullDescription(CTRL_OP_MODE) << ": " << taskData->controlData.controlMode << "\n" <<
 				rpcCmdData.getFullDescription(CTRL_PID_RESET_ENABLED) << ": " << taskData->controlData.pidResetEnabled << "\n" <<
+				rpcCmdData.getFullDescription(CTRL_TARGET_REAL_TIME) << ": " << "(to be defined while control task is running)" << "\n" <<
 		        rpcCmdData.getFullDescription(CTRL_LIFESPAN) << ": " << taskData->controlData.lifespan << "\n" <<
 		        "\n" <<
 		        "--- RAMP TASK DATA ---" << "\n" <<

@@ -48,7 +48,7 @@ namespace iCub {
 
 				std::string getFullDescription(iCub::plantIdentification::RPCMainCmdName mainCmdName);
 
-				void setValues(std::string values,std::vector<double> &valueList);
+				void setValues(yarp::os::Value &value,std::vector<double> &valueList);
 
 				std::string printValue(yarp::os::Value &value);
 
