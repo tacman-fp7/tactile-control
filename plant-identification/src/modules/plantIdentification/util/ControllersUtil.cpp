@@ -362,7 +362,7 @@ bool ControllersUtil::openHand() {
         iPos->positionMove(11, 0);
         iPos->positionMove(12, 0);
         iPos->positionMove(13, 25);
-        iPos->positionMove(14, 25);
+        iPos->positionMove(14, 15);
         iPos->positionMove(15, 1);
     } else {
         iPos->positionMove(8 , 45);
