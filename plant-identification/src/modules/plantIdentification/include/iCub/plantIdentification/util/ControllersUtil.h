@@ -61,7 +61,7 @@ namespace iCub {
 
 				bool openHand();
 
-//				bool getEncoderAngle(iCub::plantIdentification::FingerJoint fingerJoint,double *encoderData);
+				bool getEncoderAngle(int joint,double *encoderData);
 
 //				bool getRealPwmValue(iCub::plantIdentification::FingerJoint fingerJoint,double *pwmValue);
 

@@ -293,28 +293,20 @@ bool ControllersUtil::waitMoveDone(const double &i_timeout, const double &i_dela
 }
 /* *********************************************************************************************************************** */
 
-//TODO restore getEncoderAngle and getRealPwmValue
-//bool ControllersUtil::getEncoderAngle(FingerJoint fingerJoint,double *encoderData){
-//	
-//	bool ok;
-//
-//	switch (fingerJoint){
-//
-//	case PROXIMAL:
-//		ok = iEncs->getEncoder(jointToMove,encoderData);
-//		break;
-//
-//	case DISTAL:
-//		ok = iEncs->getEncoder(jointToMove + 1,encoderData);
-//		break;
-//	}
-//	
-//	if (!ok){
-//		cout << dbgTag << "could not get encoder value\n";
-//	}
-//	return ok;
-//}
-//
+
+bool ControllersUtil::getEncoderAngle(int joint,double *encoderData){
+	
+	bool ok;
+
+	ok = iEncs->getEncoder(joint,encoderData);
+	
+	if (!ok){
+		cout << dbgTag << "could not get encoder value\n";
+	}
+	return ok;
+}
+
+//TODO restore getRealPwmValue
 //bool ControllersUtil::getRealPwmValue(FingerJoint fingerJoint,double *pwmValue){
 //
 //	bool ok;
