@@ -48,8 +48,8 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	ttPeOption.resize(jointsList.size());
 	ttNeOption.resize(jointsList.size());
 	for(size_t i = 0; i < jointsList.size(); i++){
-		ttPeOption[i] = calculateTt(GAINS_SET_POS_ERR,i);
-		ttNeOption[i] = calculateTt(GAINS_SET_NEG_ERR,i);
+		ttPeOption[i] = calculateTt(controlData->pidKpf[i],controlData->pidKif[i],0.0);
+		ttNeOption[i] = calculateTt(controlData->pidKpb[i],controlData->pidKib[i],0.0);
 	}
 	
 	std::vector<Vector> kpPeOptionVect;
@@ -146,6 +146,38 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 				break;
 		}
 	}
+
+
+
+	/*** PARTE RELATIVA AL SUPERVISOR MODE ***/
+	svKp = commonData->tpDbl(1);
+	svKi = commonData->tpDbl(2);
+	svKd = commonData->tpDbl(3);
+	supervisorControlMode = (commonData->tpInt(0) != 0);
+	Vector kpSvOptionVect(1,svKp);
+	Vector kiSvOptionVect(1,svKi);
+	Vector kdSvOptionVect(1,svKd);
+	Vector ttSvOptionVect(1,calculateTt(svKp,svKi,svKd));
+	Matrix pvSatLimMatrix(1,2);
+	pvSatLimMatrix[0][0] = -1000.0;
+	pvSatLimMatrix[0][1] = 1000.0;
+	Bottle svPidOptions;
+	addOption(svPidOptions,"Wp",Value(controlData->pidWp));
+	addOption(svPidOptions,"Wi",Value(controlData->pidWi));
+	addOption(svPidOptions,"Wd",Value(controlData->pidWd));
+	addOption(svPidOptions,"N",Value(controlData->pidN));
+	addOption(svPidOptions,"satLim",Value(-1000.0),Value(1000.0));
+	addOption(svPidOptions,"Kp",Value(svKp));
+	addOption(svPidOptions,"Ki",Value(svKi));
+	addOption(svPidOptions,"Kd",Value(svKd));
+	addOption(svPidOptions,"Tt",Value(ttSvOptionVect[0]));
+	svPid = new parallelPID(threadRateSec,kpSvOptionVect,kiSvOptionVect,kdSvOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttSvOptionVect,pvSatLimMatrix);
+	svPid->setOptions(svPidOptions);
+	/******/
+
+
+
+
 	if (resetErrOnContact){
 		taskName = APPROACH_AND_CONTROL;
 		dbgTag = "Approach&ControlTask: ";
@@ -214,6 +246,46 @@ void ControlTask::calculateControlInput(){
 		previousError[i] = error;
 
 	}
+
+	/*** PARTE RELATIVA AL SUPERVISOR MODE ***/
+	if (supervisorControlMode){
+		double middleEnc = commonData->armEncodersAngles[13];
+		double thumbEnc = commonData->armEncodersAngles[9];
+
+		double svErr = ((middleEnc + thumbEnc - (-12.042))/(1 + 0.7021)) - middleEnc;
+
+
+
+		Vector svRef(1,(middleEnc + thumbEnc - (-12.042))/(1 + 0.7021));
+		Vector svFb(1,middleEnc);
+		Vector svResult = svPid->compute(svRef,svFb);
+	
+		if (commonData->tpInt(4) != 0){
+			svPid->reset(svResult);
+			commonData->tempParameters[4] = Value(0);
+			optionalLogString.append("[ PID RESET ] ");
+		}
+
+		// valore POSITIVO se il MEDIO deve INCREMENTARE l'angolo
+		double svResultValueScaled = commonData->tpDbl(5)*svResult[0];
+		
+		// se il valore è positivo e quindi devo muovere il medio, devo aumentare la pressione richiesta al giunto 13, che si trova in posizione uno, altrimenti al giunto 9, in posizione 0
+		if (svResultValueScaled >= 0){
+			pressureTargetValue[1] += svResultValueScaled;
+		} else {
+			pressureTargetValue[0] += svResultValueScaled;
+		}
+
+		std::stringstream printLog("");
+		printLog << " [P " << pressureTargetValue[0] << " - " << pressureTargetValue[1] << "]" << " [J " << thumbEnc << " - " << middleEnc << " err " << svErr << "]" ;
+		optionalLogString.append(printLog.str());
+		
+		if (commonData->tpInt(6) != 0){
+			previousError[0] = 0.0;
+			previousError[1] = 0.0;
+		}
+	}
+	/******/
 }
 
 void ControlTask::buildLogData(LogData &logData){
@@ -270,22 +342,12 @@ void ControlTask::addOption(Bottle &bottle,char *paramName,Value paramValue1,Val
 	bottle.addList() = paramBottle;
 }
 
-double ControlTask::calculateTt(iCub::plantIdentification::ControlTaskOpMode gainsSet,int index){
+double ControlTask::calculateTt(double kp,double ki,double kd){
 
 	double tt,ti,td,minTt,maxTt;
 
-	switch (gainsSet){
-
-	case GAINS_SET_POS_ERR:
-		ti = controlData->pidKpf[index]/controlData->pidKif[index];
-	    td = 0.0; //controlData->pidKdf/controlData->pidKpf[index];
-		break;
-
-	case GAINS_SET_NEG_ERR:
-		ti = controlData->pidKpf[index]/controlData->pidKif[index];
-	    td = 0.0; //controlData->pidKdf/controlData->pidKpf[index];
-		break;
-	}
+	ti = kp/ki;
+	td = kd/kp;
 
 	// TODO check the Tt rule
 	minTt = controlData->pidWindUpCoeff*ti;

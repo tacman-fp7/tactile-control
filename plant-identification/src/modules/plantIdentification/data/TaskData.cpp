@@ -9,9 +9,24 @@
 using yarp::os::Value;
 
 using iCub::plantIdentification::TaskData;
+using iCub::plantIdentification::TaskCommonData;
 
 
-TaskData::TaskData(yarp::os::ResourceFinder &rf,int threadRate) {
+int TaskCommonData::tpInt(int index){
+	if (tempParameters.size() > index){
+		return tempParameters[index].asInt();
+	}
+	return 0;
+}
+
+int TaskCommonData::tpDbl(int index){
+	if (tempParameters.size() > index){
+		return tempParameters[index].asDouble();
+	}
+	return 0.0;
+}
+
+TaskData::TaskData(yarp::os::ResourceFinder &rf,int threadRate,iCub::plantIdentification::ControllersUtil *controllersUtil) {
 	using iCub::plantIdentification::ControlTaskOpMode;
 	using yarp::os::Bottle;
 
@@ -34,12 +49,19 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,int threadRate) {
 	commonData.previousPressuresIndex.resize(5,0);
 	commonData.overallFingerPressure.resize(5,0.0);
 	commonData.overallFingerPressureMedian.resize(5,0.0);
-
+	commonData.armEncodersAngles.resize(16,0.0);
+	controllersUtil->getArmEncodersAngles(commonData.armEncodersAngles,true);
 	Bottle* objDetectPressureThresholds = rf.find("objDetectPressureThresholds").asList();
 	commonData.objDetectPressureThresholds.resize(objDetectPressureThresholds->size(),0);
 	for(int i = 0; i < objDetectPressureThresholds->size(); i++){
 		commonData.objDetectPressureThresholds[i] = objDetectPressureThresholds->get(i).asDouble();
 	}
+	Bottle* tempParameters = rf.find("tempParameters").asList();
+	commonData.tempParameters.resize(tempParameters->size());
+	for(int i = 0; i < tempParameters->size(); i++){
+		commonData.tempParameters[i] = objDetectPressureThresholds->get(i);
+	}
+
 	Bottle* stepTaskJoints = rf.find("stepTaskJoints").asList();
 	stepData.jointsList.resize(stepTaskJoints->size(),0);
 	stepData.fingersList.resize(stepTaskJoints->size(),0);
@@ -178,6 +200,12 @@ std::string TaskData::getValueDescription(iCub::plantIdentification::RPCSetCmdAr
 	case APPR_JOINTS_PWM_LIMITS:
 		for(size_t i = 0; i < approachData.jointsPwmLimitsList.size(); i++){
 			description << approachData.jointsPwmLimitsList[i] << " ";
+		}
+		break;
+	
+	case TEMPORARY_PARAM:
+		for(size_t i = 0; i < commonData.tempParameters.size(); i++){
+			description << "(" << i << ": " << commonData.tempParameters[i].toString() << ") ";
 		}
 		break;
 	}

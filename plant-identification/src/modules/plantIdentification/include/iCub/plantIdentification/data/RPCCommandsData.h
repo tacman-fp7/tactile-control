@@ -50,6 +50,8 @@ namespace iCub {
 
 				void setValues(yarp::os::Value &value,std::vector<double> &valueList);
 
+				bool setTemporaryParam(yarp::os::Value &value,std::vector<yarp::os::Value> &valueList);
+
 				std::string printValue(yarp::os::Value &value);
 
 			private:

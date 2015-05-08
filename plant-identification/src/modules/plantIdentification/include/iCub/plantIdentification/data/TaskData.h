@@ -2,6 +2,7 @@
 #define __ICUB_PLANTIDENTIFICATION_TASKDATA_H__
 
 #include "iCub/plantIdentification/PlantIdentificationEnums.h"
+#include "iCub/plantIdentification/util/ControllersUtil.h"
 
 #include <yarp/os/BufferedPort.h>
 #include <yarp/os/ResourceFinder.h>
@@ -13,35 +14,42 @@
 namespace iCub {
     namespace plantIdentification {
 
-		struct TaskCommonData {
-
+		class TaskCommonData {
+		
+		public:
 			std::vector<std::vector<double> > fingerTaxelsData;
 			std::vector<std::vector<double> > previousOverallFingerPressures;
 			std::vector<int> previousPressuresIndex;
 			std::vector<double> overallFingerPressure;
 			std::vector<double> overallFingerPressureMedian;
 			std::vector<double> objDetectPressureThresholds;
+			std::vector<double> armEncodersAngles;
 //			double realProximalPwm;
 //			double realDistalPwm;
 //			double proximalJointAngle;
 //			double distalJointAngle;
 
+			std::vector<yarp::os::Value> tempParameters;
+
 			int threadRate;
 			int pwmSign;
 			int screenLogStride;
+
+			int tpInt(int index);
+
+			int tpDbl(int index);
+
 		};
-		typedef struct TaskCommonData TaskCommonData;
 
-		struct StepTaskData {
-
+		class StepTaskData {
+		public:
 			std::vector<int> jointsList;
 			std::vector<int> fingersList;
 			int lifespan;
 		};
-		typedef struct StepTaskData StepTaskData;
 
-		struct ControlTaskData {
-
+		class ControlTaskData {
+		public:
 			std::vector<int> jointsList;
 			std::vector<int> fingersList;
 			std::vector<double> pidKpf;
@@ -59,10 +67,9 @@ namespace iCub {
 			bool pidResetEnabled;
 			int lifespan;
 		};
-		typedef struct ControlTaskData ControlTaskData;
 
-		struct RampTaskData {
-
+		class RampTaskData {
+		public:
 			std::vector<int> jointsList;
 			std::vector<int> fingersList;
             double slope;
@@ -70,10 +77,9 @@ namespace iCub {
 			int lifespan;
 			int lifespanAfterStabilization;
 		};
-		typedef struct RampTaskData RampTaskData;
 
 		struct ApproachTaskData {
-
+		public:
 			std::vector<int> jointsList;
 			std::vector<int> fingersList;
 			std::vector<double> velocitiesList;
@@ -81,7 +87,6 @@ namespace iCub {
 			bool jointsPwmLimitsEnabled;
 			int lifespan;
 		};
-		typedef struct ApproachTaskData ApproachTaskData;
 
         class TaskData {
 
@@ -99,7 +104,7 @@ namespace iCub {
 				RampTaskData rampData;
 				ApproachTaskData approachData;
 				
-				TaskData(yarp::os::ResourceFinder &rf,int threadRate);
+				TaskData(yarp::os::ResourceFinder &rf,int threadRate,iCub::plantIdentification::ControllersUtil *controllersUtil);
 
 				std::string getValueDescription(iCub::plantIdentification::RPCSetCmdArgName cmdName);
 		

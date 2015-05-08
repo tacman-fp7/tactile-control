@@ -29,6 +29,7 @@ RPCCommandsData::RPCCommandsData(){
 
 	add("pwm_sign",PWM_SIGN,"PWM SIGN");
 	add("obj_det_thresholds",OBJ_DETECT_PRESS_THRESHOLDS,"OBJECT DETECTION PRESSURE THRESHOLDS");
+	add("tmp_par",TEMPORARY_PARAM,"TEMPORARY PARAMETER (usage: 'set tmp_par <n>_<value>'");
 	add("step_joints",STEP_JOINTS_LIST,"STEP TASK JOINTS LIST");
 	add("step_ls",STEP_LIFESPAN,"STEP TASK LIFESPAN");
 	add("ctrl_joints",CTRL_JOINTS_LIST,"CONTROL TASK JOINTS LIST");
@@ -133,6 +134,48 @@ void RPCCommandsData::setValues(yarp::os::Value &value,std::vector<double> &valu
 
 }
 
+bool RPCCommandsData::setTemporaryParam(yarp::os::Value &value,std::vector<yarp::os::Value> &valueList){
+	using yarp::os::Value;
+
+    std::string values = value.asString();
+	double tempParamIndex;
+	Value tempParamValue;
+
+	char *valuesChar = new char[values.length() + 1];
+	strcpy(valuesChar,values.c_str());
+	char *target;
+
+	target = strtok(valuesChar,"_");
+
+    if (target != NULL){
+        tempParamIndex = atoi(target);
+
+		if (tempParamIndex < valueList.size()){
+
+			target = strtok(NULL,"_");
+
+			if (target != NULL){
+
+				if (values.find('.') != string::npos){
+					tempParamValue = Value(atof(target));
+				} else {
+					tempParamValue = Value(atoi(target));
+				}
+
+				valueList[tempParamIndex] = tempParamValue;
+
+				return true;
+			}
+
+		} 
+
+	}
+
+	return false;
+
+}
+
+
 std::string RPCCommandsData::printValue(yarp::os::Value &value){
 
 	std::stringstream valueString("");
@@ -143,5 +186,3 @@ std::string RPCCommandsData::printValue(yarp::os::Value &value){
 
 	return valueString.str();
 }
-
-

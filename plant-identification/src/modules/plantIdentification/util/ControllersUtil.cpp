@@ -137,6 +137,37 @@ bool ControllersUtil::saveCurrentArmPosition(){
 	return true;
 }
 
+
+bool ControllersUtil::getArmEncodersAngles(std::vector<double> &armEncodersAngles,bool wait){
+	using yarp::os::Time;
+	
+	yarp::sig::Vector armEncodersAnglesVector;
+
+	bool encodersDataAcquired = false;
+
+	encodersDataAcquired = iEncs->getEncoders(armEncodersAnglesVector.data());
+
+	while(wait && !encodersDataAcquired) {
+
+		cout << "DEBUG: " << dbgTag << "Encoder data is not available yet. \n";
+		Time::delay(0.1);
+
+		encodersDataAcquired = iEncs->getEncoders(armEncodersAnglesVector.data());
+    
+	}
+
+	if (encodersDataAcquired){
+		for(size_t i = 0; i < armEncodersAngles.size(); i++){
+			armEncodersAngles[i] = armEncodersAnglesVector[i];
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+
 bool ControllersUtil::saveCurrentControlMode(){
 
 	// save control mode of joints 8 9 10 11 12 13 14 15

@@ -74,7 +74,7 @@ bool TaskThread::threadInit() {
         return false;
     }
 	// initialize task data
-	taskData = new TaskData(rf,period);
+	taskData = new TaskData(rf,period,controllersUtil);
 
 	// save current arm position, to be restored when the thread ends
 //	if (!controllersUtil->saveCurrentArmPosition()) {
@@ -186,6 +186,12 @@ void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData
 		break;
 	case OBJ_DETECT_PRESS_THRESHOLDS:
 		rpcCmdData.setValues(paramValue,taskData->commonData.objDetectPressureThresholds);
+		break;
+	case TEMPORARY_PARAM:
+		if (!rpcCmdData.setTemporaryParam(paramValue,taskData->commonData.tempParameters)){
+			setSuccessful = false;
+			cout << "\n\n" << "CANNOT SET TEMPORARY PARAM" << "\n";
+		}
 		break;
 
 	// step task data
@@ -337,6 +343,7 @@ void TaskThread::view(RPCViewCmdArgName paramName,RPCCommandsData &rpcCmdData){
 		        "--- TASK COMMON DATA -----" << "\n" <<
 		        rpcCmdData.getFullDescription(PWM_SIGN) << ": " << taskData->commonData.pwmSign << "\n" <<
 				rpcCmdData.getFullDescription(OBJ_DETECT_PRESS_THRESHOLDS) << ": " << taskData->getValueDescription(OBJ_DETECT_PRESS_THRESHOLDS) << "\n" <<
+				rpcCmdData.getFullDescription(TEMPORARY_PARAM) << ": " << taskData->getValueDescription(TEMPORARY_PARAM) << "\n" <<
 		        "\n" <<
 		        "--- STEP TASK DATA -------" << "\n" <<
 		        rpcCmdData.getFullDescription(STEP_LIFESPAN) << ": " << taskData->stepData.lifespan << "\n" <<

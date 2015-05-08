@@ -94,6 +94,8 @@ bool Task::loadICubData(){
 		return false;
 	}
 
+	controllersUtil->getArmEncodersAngles(commonData->armEncodersAngles);
+
 	processTactileData();
 	
 	//TODO define what encoders should be logged

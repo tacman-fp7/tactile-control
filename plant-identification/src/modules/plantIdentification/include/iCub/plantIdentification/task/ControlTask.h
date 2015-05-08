@@ -29,6 +29,12 @@ namespace iCub {
 				bool resetErrOnContact;
 				std::vector<bool> fingerIsInContact;
 
+				/* variables used for supervisor mode */
+				iCub::ctrl::parallelPID *svPid;
+				yarp::os::Bottle svPidOptions;
+				bool supervisorControlMode;
+				double svKp,svKi,svKd;
+
 				// TODO to be removed
 				std::vector<double> currentKp;
 				std::vector<double> kpPe;
@@ -57,7 +63,7 @@ namespace iCub {
 
 				void addOption(yarp::os::Bottle &bottle,char *paramName,yarp::os::Value paramValue1,yarp::os::Value paramValue2);
 
-				double calculateTt(iCub::plantIdentification::ControlTaskOpMode gainsSet,int index);
+				double calculateTt(double kp,double ki,double kd);
 
         };
     } //namespace plantIdentification

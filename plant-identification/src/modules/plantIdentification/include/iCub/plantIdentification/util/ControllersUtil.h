@@ -49,6 +49,8 @@ namespace iCub {
 
 				bool saveCurrentArmPosition();
 
+				bool getArmEncodersAngles(std::vector<double> &armEncodersAngles,bool wait = false);
+
 				bool saveCurrentControlMode();
 
 				bool setTaskControlModes(std::vector<int> &jointsList,int controlMode);
