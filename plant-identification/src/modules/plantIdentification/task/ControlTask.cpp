@@ -30,8 +30,10 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	fingerIsInContact.resize(commonData->objDetectPressureThresholds.size(),false);
 
 	pressureTargetValue.resize(fingersList.size());
+    initialPressureTargetValue.resize(fingersList.size());
 	for(size_t i = 0; i < pressureTargetValue.size(); i++){
 		pressureTargetValue[i] = (i >= targetList.size() ? targetList[targetList.size()-1] : targetList[i]);
+        initialPressureTargetValue[i] = pressureTargetValue[i];
 	}
 	
 	pid.resize(jointsList.size());
@@ -166,7 +168,7 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	addOption(svPidOptions,"Wi",Value(controlData->pidWi));
 	addOption(svPidOptions,"Wd",Value(controlData->pidWd));
 	addOption(svPidOptions,"N",Value(controlData->pidN));
-	addOption(svPidOptions,"satLim",Value(-1000.0),Value(1000.0));
+	addOption(svPidOptions,"satLim",Value(-100000.0),Value(100000.0));
 	addOption(svPidOptions,"Kp",Value(svKp));
 	addOption(svPidOptions,"Ki",Value(svKi));
 	addOption(svPidOptions,"Kd",Value(svKd));
@@ -269,20 +271,24 @@ void ControlTask::calculateControlInput(){
 		// valore POSITIVO se il MEDIO deve INCREMENTARE l'angolo
 		double svResultValueScaled = commonData->tpDbl(5)*svResult[0];
 		
-		// se il valore è positivo e quindi devo muovere il medio, devo aumentare la pressione richiesta al giunto 13, che si trova in posizione uno, altrimenti al giunto 9, in posizione 0
+		// se il valore e' positivo e quindi devo muovere il medio, devo aumentare la pressione richiesta al giunto 13, che si trova in posizione uno, altrimenti al giunto 9, in posizione 0
 		if (svResultValueScaled >= 0){
-			pressureTargetValue[1] += svResultValueScaled;
+            pressureTargetValue[0] = initialPressureTargetValue[0] - svResultValueScaled/2.0;
+			pressureTargetValue[1] = initialPressureTargetValue[1] + svResultValueScaled/2.0;
 		} else {
-			pressureTargetValue[0] += svResultValueScaled;
+            pressureTargetValue[0] = initialPressureTargetValue[0] - svResultValueScaled/2.0;
+			pressureTargetValue[1] = initialPressureTargetValue[1] + svResultValueScaled/2.0;
 		}
 
-		std::stringstream printLog("");
-		printLog << " [P " << pressureTargetValue[0] << " - " << pressureTargetValue[1] << "]" << " [J " << thumbEnc << " - " << middleEnc << " err " << svErr << "]" ;
-		optionalLogString.append(printLog.str());
+    	if (callsNumber%commonData->screenLogStride == 0){
+    		std::stringstream printLog("");
+	    	printLog << " [P " << pressureTargetValue[0] << " - " << pressureTargetValue[1] << "]" << " [J " << thumbEnc << " - " << middleEnc << " err " << svErr << "]" ;
+		    optionalLogString.append(printLog.str());
+	    }
 		
 		if (commonData->tpInt(6) != 0){
-			previousError[0] = 0.0;
-			previousError[1] = 0.0;
+			inputCommandValue[0] = 0.0;
+			inputCommandValue[1] = 0.0;
 		}
 	}
 	/******/

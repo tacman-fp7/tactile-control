@@ -37,7 +37,7 @@ namespace iCub {
 
 			int tpInt(int index);
 
-			int tpDbl(int index);
+			double tpDbl(int index);
 
 		};
 
