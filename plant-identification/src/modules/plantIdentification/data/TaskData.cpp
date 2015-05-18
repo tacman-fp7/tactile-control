@@ -19,7 +19,7 @@ int TaskCommonData::tpInt(int index){
 	return 0;
 }
 
-int TaskCommonData::tpDbl(int index){
+double TaskCommonData::tpDbl(int index){
 	if (tempParameters.size() > index){
 		return tempParameters[index].asDouble();
 	}
@@ -49,8 +49,10 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,int threadRate,iCub::plantIdenti
 	commonData.previousPressuresIndex.resize(5,0);
 	commonData.overallFingerPressure.resize(5,0.0);
 	commonData.overallFingerPressureMedian.resize(5,0.0);
-	commonData.armEncodersAngles.resize(16,0.0);
+	commonData.armEncodersAngles.resize(controllersUtil->armJointsNum,0.0);
+
 	controllersUtil->getArmEncodersAngles(commonData.armEncodersAngles,true);
+
 	Bottle* objDetectPressureThresholds = rf.find("objDetectPressureThresholds").asList();
 	commonData.objDetectPressureThresholds.resize(objDetectPressureThresholds->size(),0);
 	for(int i = 0; i < objDetectPressureThresholds->size(); i++){
@@ -59,7 +61,7 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,int threadRate,iCub::plantIdenti
 	Bottle* tempParameters = rf.find("tempParameters").asList();
 	commonData.tempParameters.resize(tempParameters->size());
 	for(int i = 0; i < tempParameters->size(); i++){
-		commonData.tempParameters[i] = objDetectPressureThresholds->get(i);
+		commonData.tempParameters[i] = tempParameters->get(i);
 	}
 
 	Bottle* stepTaskJoints = rf.find("stepTaskJoints").asList();

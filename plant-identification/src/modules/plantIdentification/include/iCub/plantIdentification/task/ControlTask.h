@@ -34,6 +34,7 @@ namespace iCub {
 				yarp::os::Bottle svPidOptions;
 				bool supervisorControlMode;
 				double svKp,svKi,svKd;
+                std::vector<double> initialPressureTargetValue;
 
 				// TODO to be removed
 				std::vector<double> currentKp;

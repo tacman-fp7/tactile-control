@@ -15,7 +15,7 @@ using yarp::os::Property;
 
 ControllersUtil::ControllersUtil(){
 
-    graspEnabled = true;
+    graspEnabled = false;
 
 	dbgTag = "ControllersUtil: ";
 }
@@ -142,6 +142,7 @@ bool ControllersUtil::getArmEncodersAngles(std::vector<double> &armEncodersAngle
 	using yarp::os::Time;
 	
 	yarp::sig::Vector armEncodersAnglesVector;
+    armEncodersAnglesVector.resize(armJointsNum);
 
 	bool encodersDataAcquired = false;
 
@@ -228,20 +229,28 @@ bool ControllersUtil::setArmInTaskPosition() {
 //        iPos->positionMove(2 , 0);
 //        iPos->positionMove(3 , 19);
         
-        iPos->positionMove(4 ,-12);
-        iPos->positionMove(5 , 0);
-        iPos->positionMove(6 , 0);
-        iPos->positionMove(7 , 15);
+        iPos->positionMove(4 , -14);// 0
+        iPos->positionMove(5 , 3);// 1
+        iPos->positionMove(6 , -20);// 1
+        iPos->positionMove(7 , 14);
         
 	    // Hand
-        iPos->positionMove(8 , 45);
+//        iPos->positionMove(8 , 50);
+//        iPos->positionMove(9 , 0);
+//        iPos->positionMove(10, 0);
+//        iPos->positionMove(11, 0);
+//        iPos->positionMove(12, 10);
+//        iPos->positionMove(13, 0);
+//        iPos->positionMove(14, 10);
+//        iPos->positionMove(15, 0);
+        iPos->positionMove(8 , 50);
         iPos->positionMove(9 , 0);
-        iPos->positionMove(10, 0);
+        iPos->positionMove(10, 15);
         iPos->positionMove(11, 0);
-        iPos->positionMove(12, 10);
+        iPos->positionMove(12, 0);
         iPos->positionMove(13, 0);
-        iPos->positionMove(14, 10);
-        iPos->positionMove(15, 0);
+        iPos->positionMove(14, 15);
+        iPos->positionMove(15, 1);
     }
 
     // Check motion done
@@ -388,14 +397,22 @@ bool ControllersUtil::openHand() {
         iPos->positionMove(14, 15);
         iPos->positionMove(15, 1);
     } else {
-        iPos->positionMove(8 , 45);
+//        iPos->positionMove(8 , 45);
+//        iPos->positionMove(9 , 0);
+//        iPos->positionMove(10, 0);
+//        iPos->positionMove(11, 0);
+//        iPos->positionMove(12, 10);
+//        iPos->positionMove(13, 0);
+//        iPos->positionMove(14, 10);
+//        iPos->positionMove(15, 0);
+        iPos->positionMove(8 , 50);
         iPos->positionMove(9 , 0);
-        iPos->positionMove(10, 0);
+        iPos->positionMove(10, 15);
         iPos->positionMove(11, 0);
-        iPos->positionMove(12, 10);
+        iPos->positionMove(12, 0);
         iPos->positionMove(13, 0);
-        iPos->positionMove(14, 10);
-        iPos->positionMove(15, 0);
+        iPos->positionMove(14, 15);
+        iPos->positionMove(15, 1);
     }
 
     // Check motion done

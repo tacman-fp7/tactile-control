@@ -16,6 +16,10 @@ namespace iCub {
 
         class ControllersUtil {
 
+            public:
+
+				int armJointsNum;
+
             private:
 
                 yarp::dev::PolyDriver clientArm;
@@ -27,7 +31,6 @@ namespace iCub {
 				yarp::dev::IPidControl *iPid;
 
 				yarp::sig::Vector armStoredPosition;
-				int armJointsNum;
 				std::vector<int> storedJointsControlMode;
 				std::vector<int> handJointsToMove;
 				std::vector<double> storedHandJointsMaxPwmLimits;
