@@ -1,0 +1,9 @@
+nparams 7
+bandwidth 1 1 1 1 1 1
+scale 2.499000e-03
+lambda 1.000000e-06
+minvalues -5.000000e-02 -5.000000e-02
+maxvalues 5.000000e-02 5.000000e-02
+stdevInit 5.000000e-02 5.000000e-02
+resetProb 2.000000e-02
+npoints 0
