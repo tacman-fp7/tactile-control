@@ -66,16 +66,17 @@ class GPController():
     
     def get_features(self,state):
         f = np.zeros([6])
-        f[0] = 2/math.pi*math.atan(math.pi/2*np.sum(np.abs(state[0:4]))/40 )
-        f[1] = 2/math.pi*math.atan(math.pi/2*np.sum(np.abs(state[4:8]))/40 )
-
-        f[2] = state[8] 
-        f[3] = state[9] 
-        f[4] = state[10]
-        f[5] = state[11]
+        tactileData = state[0]
+        encodersData = state[1]
+        f[0] = np.sum(tactileData[0:12])
+        f[1] = np.sum(tactileData[12:24])
+        f[2] = encodersData[0] 
+        f[3] = encodersData[1] 
+        f[4] = encodersData[2]
+        f[5] = encodersData[3]
         return f
     
-    def get_control(self, state):
+    def get_control(self,state):
       #get kernel-based control
       if(not self.isControllerLoaded):
         return(0,0)
