@@ -47,6 +47,9 @@ def main():
     # set start position
     iCubI.setArmPosition(startingPosEncs)
 
+    # wait for the user
+    raw_input("- press enter to start the controller -")
+
     # initialize velocity mode
     iCubI.setVelocityMode(jointsToActuate)
     iCubI.setRefAcceleration(jointsToActuate,refAcceleration)
@@ -71,6 +74,8 @@ def main():
         encodersData.append(fullEncodersData[distalJoint_1])
         encodersData.append(fullEncodersData[distalJoint_2])
         state = [tactileData,encodersData]
+
+        print state
 
         # choose action
         action = gp.get_control(state)
