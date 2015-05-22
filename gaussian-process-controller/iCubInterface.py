@@ -5,11 +5,12 @@ import yarp
 
 class ICubInterface():
 
-    def __init__(self, configFileName, path=''):
-        self.isControllerLoaded = False
+    def __init__(self, dataDumperPortName,configFileName, path=''):
+        self.isInterfaceLoaded = False
         if(path == ''):
             path = os.path.dirname(os.path.abspath(__file__))
-        self.configFileFullName = path +'/'+ configFileName + '.ini'
+        self.configFileFullName = path +'/'+ configFileName + '.txt'
+        self.dataDumperPortName = dataDumperPortName
 
     def readFloat(self,fileDescriptor,nameString):
         return float(readString(fileDescriptor,nameString))
@@ -34,20 +35,22 @@ class ICubInterface():
         # create driver and options
         self.driver = yarp.PolyDriver()
         options = yarp.Property()
-        # set poly driver options
+        # set driver options
         options.put("robot",self.params['robot'])
         options.put("device","remote_controlboard")
-        options.put("local","/example_enc/client")
+        options.put("local","/gpc/encoders/" + self.params['whichHand'] + "_arm")
         options.put("remote","/icub/" + self.params['whichHand'] + "_arm")
 
-        # open and connect ports
+        # create, open and connect ports
         self.tactDataPort = yarp.BufferedPortBottle()
-        self.tactDataPort.open("/local/icub/skin/" + self.params['whichHand'] + "_hand:i")
+        tactDataPortName = "/gpc/skin/" + self.params['whichHand'] + "_hand_comp:i"
+        self.tactDataPort.open(tactDataPortName)
+        yarp.Network.connect("/icub/skin/" + self.params['whichHand'] + "_hand_comp",tactDataPortName)
         self.logPort = yarp.BufferedPortBottle()
-        self.logPort.open("/gpc/log:o")
-        yarp.Network.connect("/icub/skin/" + self.params['whichHand'] + "_hand","/local/icub/skin/" + self.params['whichHand'] + "_hand:i")
-        yarp.Network.connect("/gpc/log:o","/gpc/log:i")
-        print "/local/icub/skin/" + self.params['whichHand'] + "_hand:i"
+        logPortName = "/gpc/log:o"
+        self.logPort.open(logPortName)
+        yarp.Network.connect(logPortName,self.dataDumperPortName)
+
         # open driver
         print 'Opening motor driver'
         self.driver.open(options)
@@ -56,7 +59,7 @@ class ICubInterface():
             sys.exit()
 
         # create interfaces
-        print 'Viewing interfaces...'
+        print 'enabling interfaces'
         self.iPos = self.driver.viewIPositionControl()
         if self.iPos is None:
             print 'Cannot view position interface!'
@@ -84,7 +87,7 @@ class ICubInterface():
         yarp.Time_delay(1.0)
 
         # read encoders for the first time
-        print 'reading encoders data'
+        print 'checking encoders data'
         self.previousEncodersData = yarp.Vector(self.numJoints)
         ret = self.iEnc.getEncoders(self.previousEncodersData.data())
         count = 0
@@ -96,7 +99,7 @@ class ICubInterface():
             print 'encoders reading failed'
 
         # read tactile data for the first time
-        print 'reading tactile data'
+        print 'checking tactile data'
         self.previousTactileData = self.tactDataPort.read(False)
         count = 0        
         while self.previousTactileData is None and count < 100:
@@ -105,16 +108,8 @@ class ICubInterface():
             self.previousTactileData = self.tactDataPort.read(False)
         if count == 100:
             print 'tactile data reading failed'
-		
-#        # store ref accelerations
-#        self.refAccelerations = yarp.Vector(self.numJoints)
-#        self.iVel.getRefAcceleration(self.refAccelerations.data())
 
-#        # store control modes
-#        self.controlModes = yarp.Vector(self.numJoints)
-#        self.iCtrl.getControlModes(self.controlModes.data())
-
-        self.isControllerLoaded = True
+        self.isInterfaceLoaded = True
 
     def readTactileData(self):
         tactBtl = self.tactDataPort.read(False)
@@ -134,15 +129,11 @@ class ICubInterface():
         return encodersData
 
     def velocityCommand(self,jointToMove,vel):
-#       self.iCtrl.setVelocityControlMode(jointToMove)
-#       self.iVel.setRefAcceleration(jointToMove,refAcc)
         ret = self.iVel.velocityMove(jointToMove,vel)
         if ret is False:
             print 'velocity command failed'
 
     def openLoopCommand(self,jointToMove,pwm):
-#       self.iCtrl.setVelocityControlMode(jointToMove)
-#       self.iVel.setRefAcceleration(jointToMove,refAcc)
         ret = self.iOlc.setRefOutput(jointToMove,pwm)
         if ret is False:
             print 'open loop command failed'
@@ -167,6 +158,17 @@ class ICubInterface():
 		for i in range(len(jointList)):
 			self.iVel.setRefAcceleration(jointList[i],refAcceleration)
 
+    def setArmPosition(self,encodersList):
+        for i in range(len(encodersList)):
+            self.iPos.positionMove(i,encodersList[i])
+        done = self.iPos.checkMotionDone()
+        while not done:
+            print "reaching starting position..."        
+            yarp.Time_delay(0.1)
+            done = self.iPos.checkMotionDone()
+        print "ready"
+        
+
     def logData(self,valuesList):
         bottle = self.logPort.prepare()
         bottle.clear()
@@ -176,7 +178,7 @@ class ICubInterface():
 
     def closeInterface(self):
 
-        # closing the driver
+        # close the driver and ports
         self.driver.close()
         self.tactDataPort.close()
         self.logPort.close()

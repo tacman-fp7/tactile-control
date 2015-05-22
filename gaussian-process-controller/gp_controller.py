@@ -11,8 +11,6 @@ def exponentialSquaredKernel(a, b, params):
     Q = 1.0/(params['bandwidth']**2)
 
   return params['scale'] * math.exp(-0.5 * np.dot(np.dot(a-b, Q),a-b))
-
-
    
 class GPController():
 
