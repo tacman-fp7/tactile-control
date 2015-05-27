@@ -80,6 +80,9 @@ def main():
         # choose action
         action = gp.get_control(state)
 
+        # log data
+        iCubI.logData(tactileData + encodersData + [action[0],action[1]])
+
         # apply action and keep it applied for 'actionDuration' seconds
         # in case of velocity mode, it should be refreshed at least every 100 ms        
         for k in range(actionApplicationNum):
@@ -92,9 +95,6 @@ def main():
         iCubI.stopMoving(jointsToActuate)
         time.sleep(pauseDuration)
  
-        # log data
-        iCubI.logData(tactileData + encodersData + [action[0],action[1]])
-
         iterCounter = iterCounter + 1
         exit = exitModule(state)
 
