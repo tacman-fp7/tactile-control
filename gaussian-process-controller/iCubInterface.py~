@@ -169,16 +169,6 @@ class ICubInterface():
         print "ready"
         
 
-    def setJointPosition(self,joint,position):
-        self.iPos.positionMove(joint,position)
-        done = self.iPos.checkMotionDone()
-        while not done:
-            print "reaching target position..."        
-            yarp.Time_delay(0.1)
-            done = self.iPos.checkMotionDone()
-        print "target position reached"
-        
-
     def logData(self,valuesList):
         bottle = self.logPort.prepare()
         bottle.clear()
