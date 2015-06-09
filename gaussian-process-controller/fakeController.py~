@@ -45,7 +45,7 @@ def main():
     iCubI.loadInterfaces()
 
     # set start position
-    iCubI.setArmPosition(startingPosEncs)
+#    iCubI.setArmPosition(startingPosEncs)
 
     # wait for the user
     raw_input("- press enter to start the controller -")
@@ -61,9 +61,11 @@ def main():
 
         # read tactile data
         fullTactileData = iCubI.readTactileData()
-        tactileData = []              
+        tactileData = []
+	tmpTactile = []              
         for j in range(12):
             tactileData.append(fullTactileData.get(12*finger_1+j).asDouble())
+            tmpTactile.append(fullTactileData.get(12*finger_1+j).asDouble())
         for j in range(12):
             tactileData.append(fullTactileData.get(12*finger_2+j).asDouble())
         # read encoders data
@@ -75,7 +77,7 @@ def main():
         encodersData.append(fullEncodersData[distalJoint_2])
         state = [tactileData,encodersData]
 
-        print state
+        print tactileData
 
         # choose action
         action = gp.get_control(state)
