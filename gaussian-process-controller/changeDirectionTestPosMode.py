@@ -4,7 +4,7 @@ import yarp
 import time
 import sys
 
-def reachPosition(jointToMove,pwm,actionSteps,velocity,kpGain,targetPos,maxIterations,logEnabled,iCubI,fd):
+def reachPosition(jointToMove,actionSteps,angleStep,kpGain,targetPos,maxIterations,logEnabled,iCubI,fd):
    
     fullEncodersData = iCubI.readEncodersData()
     startingEncoderValue = fullEncodersData[jointToMove]
@@ -14,32 +14,23 @@ def reachPosition(jointToMove,pwm,actionSteps,velocity,kpGain,targetPos,maxItera
     else:
         scale = -1
 
-    pwmToUse = kpGain*scale*velocity
-    iCubI.openLoopCommand(jointToMove,pwmToUse)
-
-    if logEnabled:
-        fd.write(str(0.00))
-        fd.write(" ")
-        fd.write(str(0))
-        fd.write(" ")
-        fd.write(str(startingEncoderValue))
-        fd.write("\n")
-
     encoderValue = startingEncoderValue
 
     iterCounter = 0
     while iterCounter < maxIterations and scale*encoderValue < scale*targetPos:
 
-        currentTarget = encoderValue + velocity;
+        currentTarget = encoderValue + angleStep;
         intIterCounter = 0
         while intIterCounter < actionSteps:
-
-            time.sleep(0.01)
 
             fullEncodersData = iCubI.readEncodersData()
             encoderValue = fullEncodersData[jointToMove]
 
             pwmToUse = kpGain*scale*(currentTarget - encoderValue)
+            if pwmToUse > 800:
+                pwmToUse = 800
+            elif pwmToUse < -800:
+                pwmToUse = -800
             iCubI.openLoopCommand(jointToMove,pwmToUse)
 
             if logEnabled:
@@ -47,20 +38,26 @@ def reachPosition(jointToMove,pwm,actionSteps,velocity,kpGain,targetPos,maxItera
                 fd.write(" ")
                 fd.write(str(encoderValue-startingEncoderValue))
                 fd.write(" ")
-                fd.write(str(encoderValue))
+                fd.write(str(currentTarget))
+                fd.write(" ")
+                fd.write(str((iterCounter+1)*angleStep))
+                fd.write(" ")
+                fd.write(str(pwmToUse))
                 fd.write("\n")
 
-            if logEnabled:
-                print iterCounter*0.10,encoderValue-startingEncoderValue,encoderValue
+#            if logEnabled:
+#                print iterCounter*0.10,encoderValue-startingEncoderValue,currentTarget,(iterCounter+1)*angleStep
 
             intIterCounter = intIterCounter + 1
+
+            time.sleep(0.01)
 
         iterCounter = iterCounter + 1
 
     iCubI.openLoopCommand(jointToMove,0.0)
 
     if iterCounter == maxIterations:
-        print 'reaching ',targetPos,' failed failed'
+        print 'reaching ',targetPos,' failed'
         sys.exit()
 
 
@@ -75,8 +72,10 @@ def main():
     startingPosition1 = 10
     startingPosition2 = 50
     targetPosition = 30
-    maxIterations = 500
-    pwm = 400
+    maxIterations = 50
+    actionSteps = 10
+    angleStep = 2
+    kpGain = 200
     
     fd = open("direction.txt","w")
 
@@ -97,31 +96,31 @@ def main():
     iCubI.setOpenLoopMode([jointToMove])
 
     # move finger from startingPosition1 to targetPosition
-    reachPosition(jointToMove,pwm,targetPosition,maxIterations,False,iCubI,fd)
+    reachPosition(jointToMove,actionSteps,angleStep,kpGain,targetPosition,maxIterations,True,iCubI,fd)
 
-    time.sleep(0.5)
+#    time.sleep(0.5)
 
     # move finger from targetPosition to startingPosition2
-    reachPosition(jointToMove,pwm,startingPosition2,maxIterations,True,iCubI,fd)
+#    reachPosition(jointToMove,pwm,startingPosition2,maxIterations,True,iCubI,fd)
 
     # set position mode
-#    iCubI.setPositionMode([jointToMove])
+##    iCubI.setPositionMode([jointToMove])
 
     # put finger in startingPosition2
-#    iCubI.setJointPosition(jointToMove,startingPosition2)
+##    iCubI.setJointPosition(jointToMove,startingPosition2)
 
-    time.sleep(0.5)
+#    time.sleep(0.5)
 
     # initialize open loop mode
-#    iCubI.setOpenLoopMode([jointToMove])
+##    iCubI.setOpenLoopMode([jointToMove])
 
     # move finger from startingPosition2 to targetPosition
-    reachPosition(jointToMove,pwm,targetPosition,maxIterations,False,iCubI,fd)
+#    reachPosition(jointToMove,pwm,targetPosition,maxIterations,False,iCubI,fd)
 
-    time.sleep(0.5)
+#    time.sleep(0.5)
 
     # move finger from targetPosition to startingPosition2
-    reachPosition(jointToMove,pwm,startingPosition2,maxIterations,True,iCubI,fd)
+#    reachPosition(jointToMove,pwm,startingPosition2,maxIterations,True,iCubI,fd)
 
     fd.close()
 
