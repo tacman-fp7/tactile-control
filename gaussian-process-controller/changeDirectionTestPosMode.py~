@@ -61,6 +61,67 @@ def reachPosition(jointToMove,actionSteps,angleStep,kpGain,maxVoltage,targetPos,
         sys.exit()
 
 
+def changeDirectionNTimes(jointToMove,actionSteps,angleStep,kpGain,maxVoltage,maxIterations,logEnabled,iCubI,fd):
+   
+    fullEncodersData = iCubI.readEncodersData()
+    startingEncoderValue = fullEncodersData[jointToMove]
+
+    encoderValue = startingEncoderValue
+
+    iterCounter = 0
+    while iterCounter < maxIterations:
+
+        if int(iterCounter/5)%2 == 0:
+            scale = 1
+        else:
+            scale = -1
+
+        currentTarget = encoderValue + scale*angleStep;
+        intIterCounter = 0
+        while intIterCounter < actionSteps:
+
+            fullEncodersData = iCubI.readEncodersData()
+            encoderValue = fullEncodersData[jointToMove]
+
+            pwmToUse = kpGain*(currentTarget - encoderValue)
+            if pwmToUse > maxVoltage:
+                pwmToUse = maxVoltage
+            elif pwmToUse < -maxVoltage:
+                pwmToUse = -maxVoltage
+            iCubI.openLoopCommand(jointToMove,pwmToUse)
+
+            if logEnabled:
+                fd.write(str(iterCounter*0.10))
+                fd.write(" ")
+                fd.write(str(encoderValue-startingEncoderValue))
+                fd.write(" ")
+                fd.write(str(currentTarget-startingEncoderValue))
+                fd.write(" ")
+                if scale == 1:
+                    fd.write(str((iterCounter%5+1)*angleStep))
+                else:
+                    fd.write(str(angleStep*5-(iterCounter%5+1)*angleStep))
+
+                fd.write(" ")
+                fd.write(str(pwmToUse))
+                fd.write("\n")
+
+#            if logEnabled:
+#                print iterCounter*0.10,encoderValue-startingEncoderValue,currentTarget,(iterCounter+1)*angleStep
+
+            intIterCounter = intIterCounter + 1
+
+            time.sleep(0.01)
+
+        iterCounter = iterCounter + 1
+
+    iCubI.openLoopCommand(jointToMove,0.0)
+
+    if iterCounter == maxIterations:
+        print 'reaching ',targetPos,' failed'
+        sys.exit()
+
+
 
 def main():
 
@@ -73,12 +134,12 @@ def main():
     startingPosition2 = 50
     targetPosition = 30
     maxIterations = 50
-    actionSteps = 20
+    actionSteps = 15
     angleStep = 3
     kpGain = 100
     maxVoltage = 250
     
-    fileName = "position_A" + str(actionSteps) + "_E" + str(angleStep) + "_K" + str(kpGain) + "_M" + str(maxVoltage) + ".txt"; 
+    fileName = "positionCD_A" + str(actionSteps) + "_E" + str(angleStep) + "_K" + str(kpGain) + "_M" + str(maxVoltage) + ".txt"; 
     fd = open(fileName,"w")
 
     # load iCub interface
@@ -98,7 +159,8 @@ def main():
     iCubI.setOpenLoopMode([jointToMove])
 
     # move finger from startingPosition1 to targetPosition
-    reachPosition(jointToMove,actionSteps,angleStep,kpGain,maxVoltage,targetPosition,maxIterations,True,iCubI,fd)
+#    reachPosition(jointToMove,actionSteps,angleStep,kpGain,maxVoltage,targetPosition,maxIterations,True,iCubI,fd)
+    changeDirectionNTimes(jointToMove,actionSteps,angleStep,kpGain,maxVoltage,15,True,iCubI,fd)
 
 #    time.sleep(0.5)
 
