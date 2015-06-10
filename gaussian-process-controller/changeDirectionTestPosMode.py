@@ -27,10 +27,10 @@ def reachPosition(jointToMove,actionSteps,angleStep,kpGain,targetPos,maxIteratio
             encoderValue = fullEncodersData[jointToMove]
 
             pwmToUse = kpGain*scale*(currentTarget - encoderValue)
-            if pwmToUse > 800:
-                pwmToUse = 800
-            elif pwmToUse < -800:
-                pwmToUse = -800
+            if pwmToUse > 400:
+                pwmToUse = 400
+            elif pwmToUse < -400:
+                pwmToUse = -400
             iCubI.openLoopCommand(jointToMove,pwmToUse)
 
             if logEnabled:
