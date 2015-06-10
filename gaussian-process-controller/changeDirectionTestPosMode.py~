@@ -4,7 +4,7 @@ import yarp
 import time
 import sys
 
-def reachPosition(jointToMove,actionSteps,angleStep,kpGain,targetPos,maxIterations,logEnabled,iCubI,fd):
+def reachPosition(jointToMove,actionSteps,angleStep,kpGain,maxVoltage,targetPos,maxIterations,logEnabled,iCubI,fd):
    
     fullEncodersData = iCubI.readEncodersData()
     startingEncoderValue = fullEncodersData[jointToMove]
@@ -27,10 +27,10 @@ def reachPosition(jointToMove,actionSteps,angleStep,kpGain,targetPos,maxIteratio
             encoderValue = fullEncodersData[jointToMove]
 
             pwmToUse = kpGain*scale*(currentTarget - encoderValue)
-            if pwmToUse > 400:
-                pwmToUse = 400
-            elif pwmToUse < -400:
-                pwmToUse = -400
+            if pwmToUse > maxVoltage:
+                pwmToUse = maxVoltage
+            elif pwmToUse < -maxVoltage:
+                pwmToUse = -maxVoltage
             iCubI.openLoopCommand(jointToMove,pwmToUse)
 
             if logEnabled:
@@ -38,7 +38,7 @@ def reachPosition(jointToMove,actionSteps,angleStep,kpGain,targetPos,maxIteratio
                 fd.write(" ")
                 fd.write(str(encoderValue-startingEncoderValue))
                 fd.write(" ")
-                fd.write(str(currentTarget))
+                fd.write(str(currentTarget-startingEncoderValue))
                 fd.write(" ")
                 fd.write(str((iterCounter+1)*angleStep))
                 fd.write(" ")
@@ -73,11 +73,12 @@ def main():
     startingPosition2 = 50
     targetPosition = 30
     maxIterations = 50
-    actionSteps = 10
-    angleStep = 2
-    kpGain = 200
+    actionSteps = 20
+    angleStep = 3
+    kpGain = 100
+    maxVoltage = 250
     
-    fileName + "position_A" + actionSteps + "_E" + angleStep + "_K" + kpGain + ".txt"; 
+    fileName = "position_A" + str(actionSteps) + "_E" + str(angleStep) + "_K" + str(kpGain) + "_M" + str(maxVoltage) + ".txt"; 
     fd = open(fileName,"w")
 
     # load iCub interface
@@ -97,7 +98,7 @@ def main():
     iCubI.setOpenLoopMode([jointToMove])
 
     # move finger from startingPosition1 to targetPosition
-    reachPosition(jointToMove,actionSteps,angleStep,kpGain,targetPosition,maxIterations,True,iCubI,fd)
+    reachPosition(jointToMove,actionSteps,angleStep,kpGain,maxVoltage,targetPosition,maxIterations,True,iCubI,fd)
 
 #    time.sleep(0.5)
 
