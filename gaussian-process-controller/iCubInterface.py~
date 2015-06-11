@@ -42,10 +42,17 @@ class ICubInterface():
         options.put("remote","/icub/" + self.params['whichHand'] + "_arm")
 
         # create, open and connect ports
+        # tactile port
         self.tactDataPort = yarp.BufferedPortBottle()
         tactDataPortName = "/gpc/skin/" + self.params['whichHand'] + "_hand_comp:i"
         self.tactDataPort.open(tactDataPortName)
         yarp.Network.connect("/icub/skin/" + self.params['whichHand'] + "_hand_comp",tactDataPortName)
+        # encoders port
+        self.encDataPort = yarp.BufferedPortBottle()
+        encDataPortName = "/gpc/" + self.params['whichHand'] + "_hand/analog:i"
+        self.encDataPort.open(encDataPortName)
+        yarp.Network.connect("/icub/" + self.params['whichHand'] + "_hand/analog:o",encDataPortName)
+        # log port
         self.logPort = yarp.BufferedPortBottle()
         logPortName = "/gpc/log:o"
         self.logPort.open(logPortName)
@@ -86,7 +93,7 @@ class ICubInterface():
         # wait a bit for the interfaces to be ready
         yarp.Time_delay(1.0)
 
-        # read encoders for the first time
+        # read encoders data for the first time
         print 'checking encoders data'
         self.previousEncodersData = yarp.Vector(self.numJoints)
         ret = self.iEnc.getEncoders(self.previousEncodersData.data())
@@ -97,6 +104,17 @@ class ICubInterface():
             ret = self.iEnc.getEncoders(self.previousEncodersData.data())
         if count == 100:
             print 'encoders reading failed'
+
+        # read encoders data from port for the first time
+        print 'checking encoders data from port'
+        self.previousEncodersDataFP = self.encDataPort.read(False)
+        count = 0        
+        while self.previousEncodersDataFP is None and count < 100:
+            yarp.Time_delay(0.01)
+            count = count + 1
+            self.previousEncodersDataFP = self.encDataPort.read(False)
+        if count == 100:
+            print 'encoders data reading from port failed'
 
         # read tactile data for the first time
         print 'checking tactile data'
@@ -119,6 +137,15 @@ class ICubInterface():
             self.previousTactileData = tactBtl
         return tactBtl
     
+    def readEncodersDataFromPort(self):
+        encBtl = self.encDataPort.read(False)
+        if encBtl is None:
+            encBtl = self.previousEncodersDataFP
+        else:
+            self.previousEncodersDataFP = encBtl
+        return encBtl
+    
+
     def readEncodersData(self):
         encodersData = yarp.Vector(self.numJoints)
         ret = self.iEnc.getEncoders(encodersData.data())
@@ -167,6 +194,16 @@ class ICubInterface():
             yarp.Time_delay(0.1)
             done = self.iPos.checkMotionDone()
         print "ready"
+        
+
+    def setJointPosition(self,joint,position):
+        self.iPos.positionMove(joint,position)
+        done = self.iPos.checkMotionDone()
+        while not done:
+            print "reaching target position..."        
+            yarp.Time_delay(0.1)
+            done = self.iPos.checkMotionDone()
+        print "target position reached"
         
 
     def logData(self,valuesList):
