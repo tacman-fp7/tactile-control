@@ -134,10 +134,10 @@ def main():
     startingPosition2 = 50
     targetPosition = 30
     maxIterations = 50
-    actionSteps = 15
-    angleStep = 4
+    actionSteps = 20
+    angleStep = 2
     kpGain = 100
-    maxVoltage = 250
+    maxVoltage = 200
     
     fileName = "positionCD_A" + str(actionSteps) + "_E" + str(angleStep) + "_K" + str(kpGain) + "_M" + str(maxVoltage) + ".txt"; 
     fd = open(fileName,"w")
