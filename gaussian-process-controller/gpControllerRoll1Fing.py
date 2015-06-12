@@ -12,9 +12,10 @@ def exitModule(state):
 def main():
 
     # module parameters
-    maxIterations = 10
+    maxIterations = 10000
+    rolloutsNum = 15
     #                    0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15 
-    startingPosEncs = [-30, 23,  0, 19,-14,  3,-20, 14, 50,  0, 15,  0,  0,  0, 15,  0]   
+    startingPosEncs = [-44, 18, -4, 39,-14,  2,  2, 18, 12, 20,163,  0,  0, 40,  0,  0]   
     
     finger = 1
     proximalJoint = 13
@@ -51,48 +52,54 @@ def main():
     # initialize velocity mode
 #    iCubI.setOpenLoopMode(jointsToActuate)
 
-    iterCounter = 0
-    exit = False
-    voltage = [0,0]
-    # main loop
-    while iterCounter < maxIterations and not exit:
+    rolloutsCounter = 0
+    while rolloutsCounter < rolloutsNum
 
-        # read tactile data
-        fullTactileData = iCubI.readTactileData()
-        tactileData = []              
-        for j in range(12):
-            tactileData.append(fullTactileData.get(12*finger+j).asDouble())
+        iterCounter = 0
+        exit = False
+        voltage = [0,0]
+        # main loop
+        while iterCounter < maxIterations and not exit:
 
-        # read encoders data from port
-        fullEncodersData = iCubI.readEncodersDataFromPort()
-        encodersData = []
-        encodersData.append(fullEncodersData.get(proximalJointEnc).asDouble())
-        encodersData.append(fullEncodersData.get(distalJointEnc_1).asDouble())
-        encodersData.append(fullEncodersData.get(distalJointEnc_2).asDouble())
+            # read tactile data
+            fullTactileData = iCubI.readTactileData()
+            tactileData = []              
+            for j in range(12):
+                tactileData.append(fullTactileData.get(12*finger+j).asDouble())
 
-        state = [tactileData,encodersData,voltage]
+            # read encoders data from port
+            fullEncodersData = iCubI.readEncodersDataFromPort()
+            encodersData = []
+            encodersData.append(fullEncodersData.get(proximalJointEnc).asDouble())
+            encodersData.append(fullEncodersData.get(distalJointEnc_1).asDouble())
+            encodersData.append(fullEncodersData.get(distalJointEnc_2).asDouble())
 
-        print state
+            state = [tactileData,encodersData,voltage]
 
-        # choose action
-        action = gp.get_control(state)
+            # choose action
+            action = gp.get_control(state)
 
-        voltage[0] = voltage[0] + action[0];
-        voltage[1] = voltage[1] + action[1];
+            voltage[0] = voltage[0] + action[0];
+            voltage[1] = voltage[1] + action[1];
 
-        # log data
-        iCubI.logData(tactileData + encodersData + voltage + [action[0],action[1]])
+            # log data
+            iCubI.logData(tactileData + encodersData + voltage + [action[0],action[1]])
 
-        # apply action
-#        iCubI.openLoopCommand(proximalJoint,voltage[0])        
-#        iCubI.openLoopCommand(distalJoint,voltage[1])        
-        time.sleep(actionDuration)
+            print state,action
 
-        # wait for stabilization
-        time.sleep(pauseDuration)
+            # apply action
+#            iCubI.openLoopCommand(proximalJoint,voltage[0])        
+#            iCubI.openLoopCommand(distalJoint,voltage[1])        
+            time.sleep(actionDuration)
+
+            # wait for stabilization
+            time.sleep(pauseDuration)
  
-        iterCounter = iterCounter + 1
-        exit = exitModule(state)
+            iterCounter = iterCounter + 1
+            exit = exitModule(state)
+
+      rolloutsCounter = rolloutsCounter + 1
+            
 
     # restore position mode and close iCubInterface
 #    iCubI.setPositionMode(jointsToActuate)
