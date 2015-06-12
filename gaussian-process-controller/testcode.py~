@@ -1,1 +1,4 @@
-print 'ciao'pytho
+print 'ciao'
+read_file = open("controller_example.txt")
+print read_file.read()
+read_file.close()
