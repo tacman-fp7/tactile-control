@@ -4,6 +4,7 @@ import numpy as np
 import yarp
 import time
 import random
+import os.path
 
 def exitModule(resetProbability):
     randomNum = random.random()
@@ -15,6 +16,21 @@ def logArray(array,fd):
     for i in range(len(array)):
         fd.write(str(array[i]))
         fd.write(" ")
+
+def readValueFromFile(fileName):
+    fd = open(fileName,"r")
+    line = fd.readline().split()
+    value = int(line[0])
+    fd.close()
+    return value
+
+def writeIntoFile(fileName,string):
+    fd = open(fileName,"w")
+    fd.write(string)
+    fd.close()
+
+def addDescriptionData(dataString,parameter,value):
+    dataString = dataString + parameter + " " + value + "\n"
 
 def main():
 
@@ -39,8 +55,8 @@ def main():
     actionDuration = 0.1
     pauseDuration = 0.0
 
-    stictionVoltage = 100
-    maxVoltage = 300
+    maxVoltageY = 300.0
+    slopeAtMaxVoltageY = 1.0
 
     dataDumperPortName = "/gpc/log:i"
     iCubIconfigFileName = "iCubInterface"
@@ -48,8 +64,39 @@ def main():
   
     jointsToActuate = [proximalJoint,distalJoint]
     
-    outputFileName = "controllerOut/session_" + + "/countroller_output.txt"
-    fd = open("controllerOut/session/countroller_output.txt","w")
+    fileNameIterID = "iterationID.txt"
+    fileNameExpParams = "parameters.txt"
+
+    # create output folder name
+    expID = 0
+    outputDataFolderName = "data/experiments/exp_" + str(expID) # could be changed adding more information about the experiment
+
+    if os.path.exists(outputDataFolderName):
+        # get iteration ID
+        iterID = readNumberFromFile(fileNameIterID)        
+        writeIntoFile(fileNameIterID,str(iterID+1))    
+    else:
+        # create directory, create an experiment descrition file and reset iteration ID
+        os.mkdir(outputDataFolderName)
+        descriptionData = ""
+        descriptionData = descriptionData + "maxVoltage " + str(maxVoltageY) + "\n"
+        descriptionData = descriptionData + "slopeAtMaxVoltage " + str(slopeAtMaxVoltageY) + "\n"
+        descriptionData = descriptionData + "actionDuration " + str(actionDuration) + "\n"
+        descriptionData = descriptionData + "pauseDuration " + str(pauseDuration) + "\n"
+        descriptionData = descriptionData + "finger " + str(finger) + "\n"
+        descriptionData = descriptionData + "jointActuated " + str(proximalJoint) + " " + str(distalJoint) + "\n"
+        descriptionData = descriptionData + "jointStartingPositions " + str(proximalJointStartPos) + " " + str(distalJointStartPos) + "\n"
+        descriptionData = descriptionData + "resetProbabilty " + str(resetProbability) + "\n"
+        writeIntoFile(outputDataFolderName + "/" + fileNameExpParams,descriptionData)
+        iterID = 0
+        writeIntoFile(fileNameIterID,"1")
+
+    outputFileFullName = outputDataFolderName + "/contr_out_" + expID + "_" + iterID + ".txt"
+    fd = open(outputFileFullName,"w")
+
+    # calculate voltageX-voltageY mapping parameters (voltageY = k*(voltageX^(1/3)))
+    k = (3*slopeAtMaxVoltageY*(maxVoltageY^2))^(1/3.0)
+    maxVoltageX = (maxVoltageY/k)^3
 
     # load gaussian process controller
     gp = gpc.GPController(gpConfigFileSuffix)
@@ -83,6 +130,7 @@ def main():
         iterCounter = 0
         exit = False
         voltage = [0,0]
+        realVoltage = [0,0]
         # main loop
         while iterCounter < maxIterations and not exit:
 
@@ -115,14 +163,27 @@ def main():
             # update and cut voltage
             voltage[0] = voltage[0] + action[0];
             voltage[1] = voltage[1] + action[1];
-            if abs(voltage[0]) > maxVoltage:
-                voltage[0] = maxVoltage*(voltage[0]/abs(voltage[0]))
-            if abs(voltage[1]) > maxVoltage:
-                voltage[1] = maxVoltage*(voltage[1]/abs(voltage[1]))
+            if abs(voltage[0]) > maxVoltageX:
+                voltage[0] = maxVoltageX*np.sign(voltage[0])
+            if abs(voltage[1]) > maxVoltageX:
+                voltage[1] = maxVoltageX*np.sign(voltage[1])
+
+            # calculate real applied voltage
+            realVoltage[0] = k*(abs(voltage[0]))^(1/3.0)*sign(voltage[0])
+            realVoltage[1] = k*(abs(voltage[1]))^(1/3.0)*sign(voltage[1])
+
+            # voltage safety check (it should never happen!)
+            if abs(realVoltage[0]) > maxVoltageY:
+                realVoltage[0] = maxVoltageY*np.sign(realVoltage[0])
+                print 'warning, voltage out of bounds!'
+            if abs(realVoltage[1]) > maxVoltageY:
+                realVoltage[1] = maxVoltageY*np.sign(realVoltage[1])
+                print 'warning, voltage out of bounds!'
+
 
             # apply action
-#            iCubI.openLoopCommand(proximalJoint,voltage[0])        
-#            iCubI.openLoopCommand(distalJoint,voltage[1])        
+#            iCubI.openLoopCommand(proximalJoint,realVoltage[0])        
+#            iCubI.openLoopCommand(distalJoint,realVoltage[1])        
             time.sleep(actionDuration)
 
             # wait for stabilization
