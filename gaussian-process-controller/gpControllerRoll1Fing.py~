@@ -137,7 +137,7 @@ def main():
         voltage = [0,0]
         realVoltage = [0,0]
         # main loop
-        while iterCounter < maxIterations and not exit:
+        while iterCounter < maxIterations: # and not exit:
 
             # read tactile data
             fullTactileData = iCubI.readTactileData()
