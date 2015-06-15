@@ -9,7 +9,7 @@ class ICubInterface():
         self.isInterfaceLoaded = False
         if(path == ''):
             path = os.path.dirname(os.path.abspath(__file__))
-        self.configFileFullName = path +'/'+ configFileName + '.txt'
+        self.configFileFullName = path +'/'+ configFileName
         self.dataDumperPortName = dataDumperPortName
 
     def readFloat(self,fileDescriptor,nameString):

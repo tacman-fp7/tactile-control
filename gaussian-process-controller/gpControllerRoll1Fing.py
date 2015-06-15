@@ -4,7 +4,7 @@ import numpy as np
 import yarp
 import time
 import random
-import os.path
+import os
 
 def exitModule(resetProbability):
     randomNum = random.random()
@@ -35,8 +35,7 @@ def addDescriptionData(dataString,parameter,value):
 def main():
 
     # module parameters
-    maxIterations = 150
-    rolloutsNum = 15
+    maxIterations = [    77,    14,   134,    66,    10,    81,    22,    31,     3,    66]
 
     proximalJointStartPos = 40
     distalJointStartPos = 0
@@ -50,7 +49,7 @@ def main():
     distalJointEnc_1 = 7
     distalJointEnc_2 = 8
 
-    resetProbability = 0.005
+    resetProbability = 0.02
 
     actionDuration = 0.1
     pauseDuration = 0.0
@@ -60,9 +59,16 @@ def main():
     maxVoltageDistJointY = 500.0
     slopeAtMaxVoltageY = 1.0
 
+    waitTimeForFingersRepositioning = 0.0
+
     dataDumperPortName = "/gpc/log:i"
-    iCubIconfigFileName = "iCubInterface"
-    gpConfigFileSuffix = "_init"
+    iCubIconfigFileName = "iCubInterface.txt"
+    inputFilePath = "./"
+    initInputFileName = "controller_init.txt"
+    standardInputFileName = "controller_input.txt"
+    outputFilePath = "./"
+    outputFileName = "controller_output.txt"
+    dataPath = "./data/experiments/"
   
     jointsToActuate = [proximalJoint,distalJoint]
     
@@ -70,16 +76,18 @@ def main():
     fileNameExpParams = "parameters.txt"
 
     # create output folder name
-    expID = 6
-    outputDataFolderName = "data/experiments/exp_" + str(expID) # could be changed adding more information about the experiment
+    expID = 8
+    experimentFolderName = dataPath + "exp_" + str(expID) + "/" # could be changed adding more information about the experiment
 
-    if os.path.exists(outputDataFolderName):
+    if os.path.exists(experimentFolderName):
         # get iteration ID
         iterID = readValueFromFile(fileNameIterID)        
         writeIntoFile(fileNameIterID,str(iterID+1))    
+        inputFileFullName = inputFilePath + standardInputFileName
+        rolloutsNum = 10
     else:
         # create directory, create an experiment descrition file and reset iteration ID
-        os.mkdir(outputDataFolderName)
+        os.mkdir(experimentFolderName)
         descriptionData = ""
         descriptionData = descriptionData + "proximalJointMaxVoltage " + str(maxVoltageProxJointY) + "\n"
         descriptionData = descriptionData + "distalJointMaxVoltage " + str(maxVoltageDistJointY) + "\n"
@@ -91,11 +99,16 @@ def main():
         descriptionData = descriptionData + "jointStartingPositions " + str(proximalJointStartPos) + " " + str(distalJointStartPos) + "\n"
         descriptionData = descriptionData + "resetProbabilty " + str(resetProbability) + "\n"
         descriptionData = descriptionData + "additionaNotes " + "" + "\n"
-        writeIntoFile(outputDataFolderName + "/" + fileNameExpParams,descriptionData)
+        writeIntoFile(experimentFolderName + fileNameExpParams,descriptionData)
         iterID = 0
         writeIntoFile(fileNameIterID,"1")
+        inputFileFullName = inputFilePath + initInputFileName
+        rolloutsNum = 30
 
-    outputFileFullName = outputDataFolderName + "/contr_out_" + str(expID) + "_" + str(iterID) + ".txt"
+    outputInputFileSuffix = str(expID) + "_" + str(iterID);
+    backupOutputFileFullName = experimentFolderName + "contr_out_" + outputInputFileSuffix + ".txt"
+    backupInputFileFullName = experimentFolderName + "contr_in_" + outputInputFileSuffix + ".txt"
+    outputFileFullName = outputFilePath + outputFileName
     fd = open(outputFileFullName,"w")
 
     # calculate voltageX-voltageY mapping parameters (voltageY = k*(voltageX^(1/3)))
@@ -104,7 +117,7 @@ def main():
     maxVoltageX = pow(normalizedMaxVoltageY/k,3)
 
     # load gaussian process controller
-    gp = gpc.GPController(gpConfigFileSuffix)
+    gp = gpc.GPController(inputFileFullName)
     gp.load_controller()
 
     # load iCub interface
@@ -112,7 +125,7 @@ def main():
     iCubI.loadInterfaces()
 
     # set start position
-    iCubI.setArmPosition(startingPosEncs)
+#    iCubI.setArmPosition(startingPosEncs)
 
     # wait for the user
     raw_input("- press enter to start the controller -")
@@ -120,14 +133,16 @@ def main():
     fd.write("nrollouts: ")
     fd.write(str(rolloutsNum))
     fd.write("\n")
+    fd.close()
     
     # initialize velocity mode
-    iCubI.setOpenLoopMode(jointsToActuate)
+#    iCubI.setOpenLoopMode(jointsToActuate)
 
     rolloutsCounter = 0
     while rolloutsCounter < rolloutsNum:
 
         print "starting iteration n. ",rolloutsCounter + 1
+        fd = open(outputFileFullName,"a")
         fd.write("# HEADER ")
         fd.write(str(rolloutsCounter + 1))
         fd.write("\n")
@@ -137,7 +152,7 @@ def main():
         voltage = [0,0]
         realVoltage = [0,0]
         # main loop
-        while iterCounter < maxIterations and not exit:
+        while iterCounter < maxIterations[rolloutsCounter%10] and not exit:
 
             # read tactile data
             fullTactileData = iCubI.readTactileData()
@@ -187,33 +202,36 @@ def main():
 
 
             # apply action
-            iCubI.openLoopCommand(proximalJoint,realVoltage[0])        
-            iCubI.openLoopCommand(distalJoint,realVoltage[1])        
+#            iCubI.openLoopCommand(proximalJoint,realVoltage[0])        
+#            iCubI.openLoopCommand(distalJoint,realVoltage[1])        
             time.sleep(actionDuration)
 
             # wait for stabilization
             time.sleep(pauseDuration)
  
             iterCounter = iterCounter + 1
-            exit = exitModule(resetProbability)
+            exit = False #exitModule(resetProbability)
 
+        fd.close()
         print "finger ripositioning..."
         # finger repositioning
-        iCubI.setPositionMode(jointsToActuate)
-        iCubI.setJointPosition(proximalJoint,0.0)
-        iCubI.setJointPosition(distalJoint,0.0)
-        time.sleep(7)
-        iCubI.setJointPosition(proximalJoint,proximalJointStartPos)
-        iCubI.setJointPosition(distalJoint,distalJointStartPos)
-        time.sleep(7)
-        iCubI.setOpenLoopMode(jointsToActuate)
+#        iCubI.setPositionMode(jointsToActuate)
+#        iCubI.setJointPosition(proximalJoint,0.0)
+#        iCubI.setJointPosition(distalJoint,0.0)
+        time.sleep(waitTimeForFingersRepositioning)
+#        iCubI.setJointPosition(proximalJoint,proximalJointStartPos)
+#        iCubI.setJointPosition(distalJoint,distalJointStartPos)
+        time.sleep(waitTimeForFingersRepositioning)
+#        iCubI.setOpenLoopMode(jointsToActuate)
         print "...done"
         rolloutsCounter = rolloutsCounter + 1
             
+    os.system("cp " + inputFileFullName + " " + backupInputFileFullName)
+    os.system("cp " + outputFileFullName + " " + backupOutputFileFullName)
 
-    fd.close()
+    # copy input and output file
     # restore position mode and close iCubInterface
-    iCubI.setPositionMode(jointsToActuate)
+#    iCubI.setPositionMode(jointsToActuate)
     iCubI.closeInterface()
  
 		

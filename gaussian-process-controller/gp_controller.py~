@@ -18,7 +18,7 @@ class GPController():
       self.isControllerLoaded = False
       if(path == ''):
         path = os.path.dirname(os.path.abspath(__file__))
-      self.controllerParamsFile = path +'/'+controllerFileName
+      self.controllerParamsFile = path +'/'+controllerFileName+'.txt'
       
     def readFloat(self, filedescriptor, namestring):
       splitline = filedescriptor.readline().split()
