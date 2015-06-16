@@ -59,7 +59,7 @@ def main():
     maxVoltageDistJointY = 500.0
     slopeAtMaxVoltageY = 1.0
 
-    waitTimeForFingersRepositioning = 0.0
+    waitTimeForFingersRepositioning = 7.0
 
     dataDumperPortName = "/gpc/log:i"
     iCubIconfigFileName = "iCubInterface.txt"
@@ -76,7 +76,7 @@ def main():
     fileNameExpParams = "parameters.txt"
 
     # create output folder name
-    expID = 8
+    expID = 10
     experimentFolderName = dataPath + "exp_" + str(expID) + "/" # could be changed adding more information about the experiment
 
     if os.path.exists(experimentFolderName):
@@ -109,7 +109,6 @@ def main():
     backupOutputFileFullName = experimentFolderName + "contr_out_" + outputInputFileSuffix + ".txt"
     backupInputFileFullName = experimentFolderName + "contr_in_" + outputInputFileSuffix + ".txt"
     outputFileFullName = outputFilePath + outputFileName
-    fd = open(outputFileFullName,"w")
 
     # calculate voltageX-voltageY mapping parameters (voltageY = k*(voltageX^(1/3)))
     k = pow(3*slopeAtMaxVoltageY*(pow(normalizedMaxVoltageY,2)),(1/3.0))
@@ -125,18 +124,19 @@ def main():
     iCubI.loadInterfaces()
 
     # set start position
-#    iCubI.setArmPosition(startingPosEncs)
+    iCubI.setArmPosition(startingPosEncs)
 
     # wait for the user
     raw_input("- press enter to start the controller -")
 
+    fd = open(outputFileFullName,"w")
     fd.write("nrollouts: ")
     fd.write(str(rolloutsNum))
     fd.write("\n")
     fd.close()
     
     # initialize velocity mode
-#    iCubI.setOpenLoopMode(jointsToActuate)
+    iCubI.setOpenLoopMode(jointsToActuate)
 
     rolloutsCounter = 0
     while rolloutsCounter < rolloutsNum:
@@ -202,8 +202,8 @@ def main():
 
 
             # apply action
-#            iCubI.openLoopCommand(proximalJoint,realVoltage[0])        
-#            iCubI.openLoopCommand(distalJoint,realVoltage[1])        
+            iCubI.openLoopCommand(proximalJoint,realVoltage[0])        
+            iCubI.openLoopCommand(distalJoint,realVoltage[1])        
             time.sleep(actionDuration)
 
             # wait for stabilization
@@ -215,14 +215,14 @@ def main():
         fd.close()
         print "finger ripositioning..."
         # finger repositioning
-#        iCubI.setPositionMode(jointsToActuate)
-#        iCubI.setJointPosition(proximalJoint,0.0)
-#        iCubI.setJointPosition(distalJoint,0.0)
+        iCubI.setPositionMode(jointsToActuate)
+        iCubI.setJointPosition(proximalJoint,0.0)
+        iCubI.setJointPosition(distalJoint,0.0)
         time.sleep(waitTimeForFingersRepositioning)
-#        iCubI.setJointPosition(proximalJoint,proximalJointStartPos)
-#        iCubI.setJointPosition(distalJoint,distalJointStartPos)
+        iCubI.setJointPosition(proximalJoint,proximalJointStartPos)
+        iCubI.setJointPosition(distalJoint,distalJointStartPos)
         time.sleep(waitTimeForFingersRepositioning)
-#        iCubI.setOpenLoopMode(jointsToActuate)
+        iCubI.setOpenLoopMode(jointsToActuate)
         print "...done"
         rolloutsCounter = rolloutsCounter + 1
             
@@ -231,7 +231,7 @@ def main():
 
     # copy input and output file
     # restore position mode and close iCubInterface
-#    iCubI.setPositionMode(jointsToActuate)
+    iCubI.setPositionMode(jointsToActuate)
     iCubI.closeInterface()
  
 		
