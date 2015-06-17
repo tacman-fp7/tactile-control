@@ -3,6 +3,7 @@ import yarp
 import matplotlib.pylab
 import time
 import sys
+import find_lines
  
 # Initialise YARP
 yarp.Network.init()
@@ -21,6 +22,9 @@ yarp_image.resize(width, height)
 yarp_image.setExternal(img_array, img_array.shape[1], img_array.shape[0])
 #yarp_image.setExternal(img_array.__array_interface__['data'][0], img_array.shape[1], img_array.shape[0]) 
 
+
+
+
 input_port.read(yarp_image)
 
 #for x in range(width):
@@ -38,7 +42,8 @@ input_port.read(yarp_image)
 # display the image that has been read
 #matplotlib.pylab.imshow(img_array)
 #matplotlib.pylab.show()
-
+img_bgr = img_array[:,:,[2,1,0]]
+find_lines.run_system(img_bgr)
 matplotlib.image.imsave('test'+sys.argv[1]+'.tiff', img_array, format='tiff')
 # Cleanup
 input_port.close()

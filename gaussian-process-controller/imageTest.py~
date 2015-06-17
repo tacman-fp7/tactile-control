@@ -2,6 +2,8 @@ import numpy
 import yarp
 import matplotlib.pylab
 import time
+import sys
+import find_lines
  
 # Initialise YARP
 yarp.Network.init()
@@ -37,7 +39,8 @@ input_port.read(yarp_image)
 # display the image that has been read
 #matplotlib.pylab.imshow(img_array)
 #matplotlib.pylab.show()
-
+img_bgr = img_array[:,:,[2,1,0]]
+find_lines.run_system(img_bgr)
 matplotlib.image.imsave('test'+sys.argv[1]+'.tiff', img_array, format='tiff')
 # Cleanup
 input_port.close()
