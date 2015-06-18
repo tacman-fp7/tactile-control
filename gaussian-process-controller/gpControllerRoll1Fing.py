@@ -106,7 +106,7 @@ def main():
     pauseDuration = 0.0
 
     maxFbAngle = math.pi
-    minFbAngle = 0
+    minFbAngle = -math.pi
     maxFbAngleDifference = math.pi/3.0
     fbAngleRange = maxFbAngle - minFbAngle
 
@@ -288,7 +288,7 @@ def main():
             matplotlib.image.imsave('images/test_'+ str(rolloutsCounter) + '_' + str(iterCounter) +'.tiff', img_array, format='tiff')
             currentFbAngle = getFeedbackAngle(yarp_image,img_array)
             fbAngleDifference = calculateFeedbackAngleDifference(previousFbAngle,currentFbAngle,fbAngleRange)
-            if abs(fbAngleDifference > maxFbAngleDifference):
+            if abs(fbAngleDifference) > maxFbAngleDifference:
                 currentFbAngle = previousFbAngle
                 fbAngleDifference = 0.0
             afterTS = time.time()
