@@ -58,17 +58,6 @@ class ICubInterface():
         self.logPort.open(logPortName)
         yarp.Network.connect(logPortName,self.dataDumperPortName)
 
-        # image settings
-        width = 640
-        height = 480 
-        # Create numpy array to receive the image and the YARP image wrapped around it
-        img_array = numpy.zeros((height, width, 3), dtype=numpy.uint8)
-        yarp_image = yarp.ImageRgb()
-        yarp_image.resize(width, height)
-        yarp_image.setExternal(img_array, img_array.shape[1], img_array.shape[0])
-        #yarp_image.setExternal(img_array.__array_interface__['data'][0], img_array.shape[1], img_array.shape[0]) 
-
-
         # open driver
         print 'Opening motor driver'
         self.driver.open(options)
@@ -195,6 +184,10 @@ class ICubInterface():
     def setRefAcceleration(self,jointList,refAcceleration):
 		for i in range(len(jointList)):
 			self.iVel.setRefAcceleration(jointList[i],refAcceleration)
+
+    def setRefVelocity(self,jointList,refVelocity):
+		for i in range(len(jointList)):
+			self.iPos.setRefAcceleration(jointList[i],refVelocity)
 
     def setArmPosition(self,encodersList):
         for i in range(len(encodersList)):

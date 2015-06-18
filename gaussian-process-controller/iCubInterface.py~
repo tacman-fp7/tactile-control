@@ -42,11 +42,6 @@ class ICubInterface():
         options.put("remote","/icub/" + self.params['whichHand'] + "_arm")
 
         # create, open and connect ports
-        # cameras port
-        self.cameraPort = yarp.Port()
-        cameraPortName = "/gpc/leftEye"
-        self.cameraPort.open(cameraPortName)
-        yarp.Network.connect("/icub/cam/left",cameraPortName)
         # tactile port
         self.tactDataPort = yarp.BufferedPortBottle()
         tactDataPortName = "/gpc/skin/" + self.params['whichHand'] + "_hand_comp:i"
@@ -189,6 +184,10 @@ class ICubInterface():
     def setRefAcceleration(self,jointList,refAcceleration):
 		for i in range(len(jointList)):
 			self.iVel.setRefAcceleration(jointList[i],refAcceleration)
+
+    def setRefAcceleration(self,jointList,refVelocity):
+		for i in range(len(jointList)):
+			self.iPos.setRefAcceleration(jointList[i],refVelocity)
 
     def setArmPosition(self,encodersList):
         for i in range(len(encodersList)):

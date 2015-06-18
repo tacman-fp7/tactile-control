@@ -3,6 +3,7 @@ import iCubInterface
 import numpy as np
 import yarp
 import time
+import math
 import random
 import os
 import find_lines
@@ -33,37 +34,51 @@ def writeIntoFile(fileName,string):
 def addDescriptionData(dataString,parameter,value):
     dataString = dataString + parameter + " " + value + "\n"
 
+def readImage(cameraPort,yarp_image):
+    cameraPort.read(yarp_image)
+
 def getFeedbackAngle(yarp_image,img_array):
 
-    input_port.read(yarp_image)
     img_bgr = img_array[:,:,[2,1,0]]
-    retList = find_lines.run_system(img_bgr)
+    retList = find_lines.run_system2(img_bgr)
     first_line_polar = retList[3]
     theta = first_line_polar[1]
     return theta
 
-def calculateFeedbackAngleVariation(previousFbAngle,currentFbAngle,fbAngleRange):
+def calculateFeedbackAngleDifference(previousFbAngle,currentFbAngle,fbAngleRange):
 
     delta = currentFbAngle - previousFbAngle
 
     if abs(delta) < fbAngleRange/2.0:
-        fbAngleVariation = delta
+        fbAngleDifference = delta
     else:
-        fbAngleVariation = np.sign(-delta)*(fbAngleRange - abs(delta))
+        fbAngleDifference = np.sign(-delta)*(fbAngleRange - abs(delta))
 
-    return fbAngleVariation
+    return fbAngleDifference
+
+def findNewAngle(angle,alpha,beta):
+
+    s = math.sin(angle)
+    c = math.cos(angle)
+
+
 
 def main():
 
     # module parameters
     maxIterations = [    77,    14,   134,    66,    10,    81,    22,    31,     3,    66]
+    maxIterations2 = [    50,    14,   134,    66,    10,    81,    22,    31,     3,    66]
 
     proximalJointStartPos = 40
     distalJointStartPos = 0
-    #                    0   1   2   3   4   5   6   7   8   9  10  11  12                    13                  14  15
-    startingPosEncs = [-44, 18, -4, 39,-14,  2,  2, 18, 12, 20,163,  0,  0,proximalJointStartPos,distalJointStartPos,  0]   
+    joint1StartPos = 18
+    #                    0               1   2   3   4   5   6   7   8   9  10  11  12                    13                  14  15
+    startingPosEncs = [-44, joint1StartPos, -4, 39,-14,  2,  2, 18, 12, 20,163,  0,  0,proximalJointStartPos,distalJointStartPos,  0]   
     
-    actionEnabled = False
+    actionEnabled = True
+
+    rolloutsNumFirst = 30
+    rolloutsNumStd = 10
 
     finger = 1
     proximalJoint = 13
@@ -77,8 +92,9 @@ def main():
     actionDuration = 0.1
     pauseDuration = 0.0
 
-    maxFbAngle = 3.1415
+    maxFbAngle = math.pi
     minFbAngle = 0
+    maxFbAngleDifference = math.pi/3.0
     fbAngleRange = maxFbAngle - minFbAngle
 
     normalizedMaxVoltageY = 1.0
@@ -86,7 +102,7 @@ def main():
     maxVoltageDistJointY = 600.0
     slopeAtMaxVoltageY = 1.0
 
-    waitTimeForFingersRepositioning = 0.0
+    waitTimeForFingersRepositioning = 7.0
 
     dataDumperPortName = "/gpc/log:i"
     iCubIconfigFileName = "iCubInterface.txt"
@@ -103,7 +119,7 @@ def main():
     fileNameExpParams = "parameters.txt"
 
     # create output folder name
-    expID = 11
+    expID = 16
     experimentFolderName = dataPath + "exp_" + str(expID) + "/" # could be changed adding more information about the experiment
 
     if os.path.exists(experimentFolderName):
@@ -111,7 +127,7 @@ def main():
         iterID = readValueFromFile(fileNameIterID)        
         writeIntoFile(fileNameIterID,str(iterID+1))    
         inputFileFullName = inputFilePath + standardInputFileName
-        rolloutsNum = 10
+        rolloutsNum = rolloutsNumStd
     else:
         # create directory, create an experiment descrition file and reset iteration ID
         os.mkdir(experimentFolderName)
@@ -130,7 +146,7 @@ def main():
         iterID = 0
         writeIntoFile(fileNameIterID,"1")
         inputFileFullName = inputFilePath + initInputFileName
-        rolloutsNum = 30
+        rolloutsNum = rolloutsNumFirst
 
     outputInputFileSuffix = str(expID) + "_" + str(iterID);
     backupOutputFileFullName = experimentFolderName + "contr_out_" + outputInputFileSuffix + ".txt"
@@ -160,7 +176,7 @@ def main():
     width = 640
     height = 480 
     # Create numpy array to receive the image and the YARP image wrapped around it
-    img_array = numpy.zeros((height, width, 3), dtype=numpy.uint8)
+    img_array = np.zeros((height, width, 3), dtype=np.uint8)
     yarp_image = yarp.ImageRgb()
     yarp_image.resize(width, height)
     yarp_image.setExternal(img_array, img_array.shape[1], img_array.shape[0])
@@ -168,6 +184,7 @@ def main():
     # set start position
     if actionEnabled:
         iCubI.setArmPosition(startingPosEncs)
+        #iCubI.setRefVelocity(jointsToActuate,1000000)
 
     # wait for the user
     raw_input("- press enter to start the controller -")
@@ -194,15 +211,12 @@ def main():
         iterCounter = 0
         exit = False
         voltage = [0,0]
+        oldVoltage = [0,0]
         realVoltage = [0,0]
+        readImage(cameraPort,yarp_image)
         currentFbAngle = getFeedbackAngle(yarp_image,img_array)
         # main loop
         while iterCounter < maxIterations[rolloutsCounter%10] and not exit:
-
-            # get feedback angle
-            previousFbAngle = currentFbAngle
-            currentFbAngle = getFeedbackAngle(yarp_image,img_array)
-            fbAngleVariation = calculateFeedbackAngleVariation(previousFbAngle,currentFbAngle,fbAngleRange)
 
             # read tactile data
             fullTactileData = iCubI.readTactileData()
@@ -219,21 +233,16 @@ def main():
 
             state = [tactileData,encodersData,voltage]
 
+            # store image to be processed while action is applied
+            readImage(cameraPort,yarp_image)
+
             # choose action
             action = gp.get_control(state)
 
-            # log data
-            iCubI.logData(tactileData + encodersData + voltage + [action[0],action[1]] + [fbAngleVariation])
-            logArray(tactileData,fd)
-            logArray(encodersData,fd)
-            logArray(voltage,fd)
-            logArray(action,fd)
-            logArray([fbAngleVariation],fd)
-            fd.write("\n")
-
-            #print 'prev ',previousFbAngle*100/3.1415,'curr ',currentFbAngle*100/3.1415,'diff ',fbAngleVariation*100/3.1415
 
             # update and cut voltage
+            oldVoltage[0] = voltage[0]
+            oldVoltage[1] = voltage[1]
             voltage[0] = voltage[0] + action[0];
             voltage[1] = voltage[1] + action[1];
             if abs(voltage[0]) > maxVoltageX:
@@ -257,12 +266,40 @@ def main():
             # apply action
             if actionEnabled:
                 iCubI.openLoopCommand(proximalJoint,realVoltage[0])        
-                iCubI.openLoopCommand(distalJoint,realVoltage[1])        
-            time.sleep(actionDuration)
+                iCubI.openLoopCommand(distalJoint,realVoltage[1])
+
+            # get feedback angle
+            previousFbAngle = currentFbAngle
+            beforeTS = time.time()
+            currentFbAngle = getFeedbackAngle(yarp_image,img_array)
+            fbAngleDifference = calculateFeedbackAngleDifference(previousFbAngle,currentFbAngle,fbAngleRange)
+            if abs(fbAngleDifference > maxFbAngleDifference):
+                currentFbAngle = previousFbAngle
+                fbAngleDifference = 0.0
+            afterTS = time.time()
+            timeToSleep = max(actionDuration-(afterTS-beforeTS),0)
+            time.sleep(timeToSleep)
+
+
+#            print "curr ",previousFbAngle*180/3.1415,"diff ",fbAngleDifference*180/3.1415,afterTS - beforeTS,timeToSleep
+
 
             # wait for stabilization
             time.sleep(pauseDuration)
  
+            print oldVoltage[0],oldVoltage[1],action[0],action[1]
+            # log data
+            iCubI.logData(tactileData + encodersData + oldVoltage + [action[0],action[1]])
+            logArray(tactileData,fd)
+            logArray(encodersData,fd)
+            logArray(oldVoltage,fd)
+            logArray(action,fd)
+            logArray([fbAngleDifference],fd)
+            fd.write("\n")
+
+            #print 'prev ',previousFbAngle*100/3.1415,'curr ',currentFbAngle*100/3.1415,'diff ',fbAngleDifference*100/3.1415
+
+
             iterCounter = iterCounter + 1
             exit = False #exitModule(resetProbability)
 
@@ -272,14 +309,26 @@ def main():
             print "finger ripositioning..."
             # finger repositioning
             iCubI.setPositionMode(jointsToActuate)
-            iCubI.setJointPosition(proximalJoint,0.0)
-            iCubI.setJointPosition(distalJoint,0.0)
-            time.sleep(waitTimeForFingersRepositioning)
+            iCubI.setJointPosition(1,joint1StartPos + 5)
+            time.sleep(1)
             iCubI.setJointPosition(proximalJoint,proximalJointStartPos)
             iCubI.setJointPosition(distalJoint,distalJointStartPos)
-            time.sleep(waitTimeForFingersRepositioning)
+            time.sleep(2)
+            iCubI.setJointPosition(1,joint1StartPos)
+            time.sleep(1)
             iCubI.setOpenLoopMode(jointsToActuate)
+
+
+#            iCubI.setPositionMode(jointsToActuate)
+#            iCubI.setJointPosition(proximalJoint,0.0)
+#            iCubI.setJointPosition(distalJoint,0.0)
+#            time.sleep(waitTimeForFingersRepositioning)
+#            iCubI.setJointPosition(proximalJoint,proximalJointStartPos)
+#            iCubI.setJointPosition(distalJoint,distalJointStartPos)
+#            time.sleep(waitTimeForFingersRepositioning)
+#            iCubI.setOpenLoopMode(jointsToActuate)
             print "...done"
+
 
         rolloutsCounter = rolloutsCounter + 1
             
@@ -290,8 +339,9 @@ def main():
     # restore position mode and close iCubInterface
     if actionEnabled:
         iCubI.setPositionMode(jointsToActuate)
+    cameraPort.close()
     iCubI.closeInterface()
- 
+    
 		
 if __name__ == "__main__":
     main()
