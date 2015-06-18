@@ -58,9 +58,14 @@ def calculateFeedbackAngleDifference(previousFbAngle,currentFbAngle,fbAngleRange
 
 def findNewAngle(angle,alpha,beta):
 
-    s = math.sin(angle)
-    c = math.cos(angle)
+    p1 = [1.0,0.0,0.0]
+    p2 = [math.cos(angle),math.sin(angle),0.0]
 
+    rx = [[1,0,0],[0,math.cos(alpha),-math.sin(alpha)],[0,math.sin(alpha),math.cos(alpha)]]
+    ry = [[math.cos(beta),0,-math.sin(beta)],[0,1,0],[math.sin(beta),0,math.cos(beta)]]
+
+    np1 = np.dot(ry,np.dot(rx,p1))
+    np2 = np.dot(ry,np.dot(rx,p2))
 
 
 def main():
