@@ -4,8 +4,10 @@ import numpy as np
 import yarp
 import time
 import math
+import matplotlib.pylab
 import random
 import os
+import sys
 import find_lines
 
 def exitModule(resetProbability):
@@ -40,9 +42,8 @@ def readImage(cameraPort,yarp_image):
 def getFeedbackAngle(yarp_image,img_array):
 
     img_bgr = img_array[:,:,[2,1,0]]
-    retList = find_lines.run_system2(img_bgr)
-    first_line_polar = retList[3]
-    theta = first_line_polar[1]
+    t = find_lines.load_t_matrix()
+    theta = find_lines.run_system(img_bgr, t)
     return theta
 
 def calculateFeedbackAngleDifference(previousFbAngle,currentFbAngle,fbAngleRange):
@@ -58,17 +59,22 @@ def calculateFeedbackAngleDifference(previousFbAngle,currentFbAngle,fbAngleRange
 
 def findNewAngle(angle,alpha,beta):
 
-    p1x = 1.0
-    p1y = 0.0
-    p1z = 0.0
-
-    p2x = math.cos(angle)
-    p2y = math.sin(angle)
-    p2z = 0.0
+    p1 = [1.0,0.0,0.0]
+    p2 = [math.cos(angle),math.sin(angle),0.0]
 
     rx = [[1,0,0],[0,math.cos(alpha),-math.sin(alpha)],[0,math.sin(alpha),math.cos(alpha)]]
     ry = [[math.cos(beta),0,-math.sin(beta)],[0,1,0],[math.sin(beta),0,math.cos(beta)]]
 
+    np1 = np.dot(ry,np.dot(rx,p1))
+    np2 = np.dot(ry,np.dot(rx,p2))
+
+    v1 = [np1[0],np1[1]]
+    v2 = [np2[0],np2[1]]
+
+    cosang = np.dot(v1,v2)
+    siang = np.linalg.norm(np.cross(v1,v2))
+    newAngle = np.arctan2(sinang,cosang)
+    return newAngle
 
 def main():
 
@@ -126,7 +132,7 @@ def main():
     fileNameExpParams = "parameters.txt"
 
     # create output folder name
-    expID = 16
+    expID = 17
     experimentFolderName = dataPath + "exp_" + str(expID) + "/" # could be changed adding more information about the experiment
 
     if os.path.exists(experimentFolderName):
@@ -278,6 +284,8 @@ def main():
             # get feedback angle
             previousFbAngle = currentFbAngle
             beforeTS = time.time()
+           # if rolloutsCounter == 0 and iterCounter < 50:
+            matplotlib.image.imsave('images/test_'+ str(rolloutsCounter) + '_' + str(iterCounter) +'.tiff', img_array, format='tiff')
             currentFbAngle = getFeedbackAngle(yarp_image,img_array)
             fbAngleDifference = calculateFeedbackAngleDifference(previousFbAngle,currentFbAngle,fbAngleRange)
             if abs(fbAngleDifference > maxFbAngleDifference):
@@ -288,13 +296,12 @@ def main():
             time.sleep(timeToSleep)
 
 
-#            print "curr ",previousFbAngle*180/3.1415,"diff ",fbAngleDifference*180/3.1415,afterTS - beforeTS,timeToSleep
+            print "curr ",previousFbAngle*180/3.1415,"diff ",fbAngleDifference*180/3.1415,afterTS - beforeTS,timeToSleep
 
 
             # wait for stabilization
             time.sleep(pauseDuration)
  
-            print oldVoltage[0],oldVoltage[1],action[0],action[1]
             # log data
             iCubI.logData(tactileData + encodersData + oldVoltage + [action[0],action[1]])
             logArray(tactileData,fd)

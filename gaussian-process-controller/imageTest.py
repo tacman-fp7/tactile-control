@@ -11,7 +11,7 @@ yarp.Network.init()
 # Create a port and connect it to the iCub simulator virtual camera
 input_port = yarp.Port()
 input_port.open("/python-image-port")
-yarp.Network.connect("/icub/cam/left", "/python-image-port")
+yarp.Network.connect("/iCub/camCalib/out", "/python-image-port")
  
 width = 640
 height = 480 
@@ -43,7 +43,9 @@ input_port.read(yarp_image)
 #matplotlib.pylab.imshow(img_array)
 #matplotlib.pylab.show()
 img_bgr = img_array[:,:,[2,1,0]]
-find_lines.run_system(img_bgr)
+#find_lines.run_system(img_bgr)
+print time.time()
 matplotlib.image.imsave('test'+sys.argv[1]+'.tiff', img_array, format='tiff')
+print time.time()
 # Cleanup
 input_port.close()
