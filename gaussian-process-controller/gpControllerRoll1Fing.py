@@ -8,7 +8,7 @@ import matplotlib.pylab
 import random
 import os
 import sys
-import find_lines
+import find_lines as find_lines
 
 def exitModule(resetProbability):
     randomNum = random.random()
@@ -44,7 +44,7 @@ def getFeedbackAngle(yarp_image,img_array):
     img_bgr = img_array[:,:,[2,1,0]]
     t = find_lines.load_t_matrix()
     theta = find_lines.run_system(img_bgr, t)
-    return theta
+    return float(theta)
 
 def calculateFeedbackAngleDifference(previousFbAngle,currentFbAngle,fbAngleRange):
 
@@ -79,6 +79,8 @@ def findNewAngle(angle,alpha,beta):
 def main():
 
     # module parameters
+    expID = 30
+
     maxIterations = [    77,    14,   134,    66,    10,    81,    22,    31,     3,    66]
     maxIterations2 = [    50,    14,   134,    66,    10,    81,    22,    31,     3,    66]
 
@@ -86,7 +88,7 @@ def main():
     distalJointStartPos = 0
     joint1StartPos = 18
     #                    0               1   2   3   4   5   6   7   8   9  10  11  12                    13                  14  15
-    startingPosEncs = [-44, joint1StartPos, -4, 39,-14,  2,  2, 18, 12, 20,163,  0,  0,proximalJointStartPos,distalJointStartPos,  0]   
+    startingPosEncs = [-44, joint1StartPos, -4, 39,-14,  2,  2, 18, 10,  0,163,  0,  0,proximalJointStartPos,distalJointStartPos,  0]   
     
     actionEnabled = True
 
@@ -102,7 +104,7 @@ def main():
 
     resetProbability = 0.02
 
-    actionDuration = 0.1
+    actionDuration = 0.15
     pauseDuration = 0.0
 
     maxFbAngle = math.pi
@@ -112,7 +114,7 @@ def main():
 
     normalizedMaxVoltageY = 1.0
     maxVoltageProxJointY = 250.0
-    maxVoltageDistJointY = 600.0
+    maxVoltageDistJointY = 800.0
     slopeAtMaxVoltageY = 1.0
 
     waitTimeForFingersRepositioning = 7.0
@@ -132,7 +134,6 @@ def main():
     fileNameExpParams = "parameters.txt"
 
     # create output folder name
-    expID = 18
     experimentFolderName = dataPath + "exp_" + str(expID) + "/" # could be changed adding more information about the experiment
 
     if os.path.exists(experimentFolderName):
@@ -236,7 +237,7 @@ def main():
             tactileData = []              
             for j in range(12):
                 tactileData.append(fullTactileData.get(12*finger+j).asDouble())
-
+            print np.sum(tactileData[0:12])
             # read encoders data from port
             fullEncodersData = iCubI.readEncodersDataFromPort()
             encodersData = []
@@ -285,7 +286,7 @@ def main():
             previousFbAngle = currentFbAngle
             beforeTS = time.time()
            # if rolloutsCounter == 0 and iterCounter < 50:
-            matplotlib.image.imsave('images/test_'+ str(rolloutsCounter) + '_' + str(iterCounter) +'.tiff', img_array, format='tiff')
+           # matplotlib.image.imsave('images/test_'+ str(rolloutsCounter) + '_' + str(iterCounter) +'.tiff', img_array, format='tiff')
             currentFbAngle = getFeedbackAngle(yarp_image,img_array)
             fbAngleDifference = calculateFeedbackAngleDifference(previousFbAngle,currentFbAngle,fbAngleRange)
             if abs(fbAngleDifference) > maxFbAngleDifference:
@@ -296,7 +297,7 @@ def main():
             time.sleep(timeToSleep)
 
 
-            print "curr ",previousFbAngle*180/3.1415,"diff ",fbAngleDifference*180/3.1415,afterTS - beforeTS,timeToSleep
+            #print "curr ",previousFbAngle*180/3.1415,"diff ",fbAngleDifference*180/3.1415,afterTS - beforeTS,timeToSleep
 
 
             # wait for stabilization
@@ -323,13 +324,13 @@ def main():
             print "finger ripositioning..."
             # finger repositioning
             iCubI.setPositionMode(jointsToActuate)
-            iCubI.setJointPosition(1,joint1StartPos + 5)
+            iCubI.setJointPosition(1,joint1StartPos + 12)
             time.sleep(1)
             iCubI.setJointPosition(proximalJoint,proximalJointStartPos)
             iCubI.setJointPosition(distalJoint,distalJointStartPos)
-            time.sleep(2)
+            time.sleep(3)
             iCubI.setJointPosition(1,joint1StartPos)
-            time.sleep(1)
+            time.sleep(2)
             iCubI.setOpenLoopMode(jointsToActuate)
 
 

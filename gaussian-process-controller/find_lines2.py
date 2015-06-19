@@ -13,8 +13,10 @@ _R_INDEX = 2
 _G_INDEX = 1
 _B_INDEX = 0
 _Y_COLOR_THRESH = 0.25
+_SHOW_DEBUG = False
 
-_TEST_PATH='/tmp/'
+_TEST_PATH='/tmp/images/'
+#_TEST_PATH='/tmp/'
 # _TEST_PATH = '/home/icub/tmp_massimo/tactile-control/gaussian-process-controller/'
 #_TEST_PATH = '/u/thermans/sandbox/icub_vision_test/test2/'
 
@@ -23,7 +25,7 @@ _MASK_THRESH = 0.7
 _BLACK_LINE_THRESH = 180
 _END_SEARCH_EDGE_BUFFER = 20
 _CLOSE_BW_IMG = False
-_LINE_INLIEAR_DIST = 3
+_LINE_INLIEAR_DIST = 5
 
 _KULER_RED = (78./255, 18./255, 178./255)
 _KULER_YELLOW = (25./255, 252./255, 1.)
@@ -40,23 +42,70 @@ _MORPH_KERNEL[2,0] = 0
 _MORPH_KERNEL[2,2] = 0
 
 def test_on_imgs(t):
-    for i in range(11,21):
+    results = np.zeros([1,76])
+    for i in range(0,76):
+        path = _TEST_PATH+'test_0_'+str(i)+'.tiff'
+        if _SHOW_DEBUG:
+            print path
+        img_i = cv2.imread(path)
+        theta = run_system(img_i,t)
+        if _SHOW_DEBUG:
+            cv2.waitKey(300)
+        results[0,i]=theta
+    print 'results', np.concatenate([results,[[0]]],1).T - np.concatenate([[[0]],results],1).T
 
-        img_i = cv2.imread(_TEST_PATH+'test'+str(i)+'.tiff')
-        run_system(img_i,t)
-
-def run_system(img_i,):
+def load_t_matrix():
+    return np.loadtxt('tmatrix.txt')
+    
+def run_system(img_i,t ):
     img_t = crop_img(img_i)
     blob_i, blob_mask = find_roller(img_t)
     line_info = find_lines(img_t, blob_mask)
-    return line_info
+    lines_i = line_info[0]
+    pts_img = line_info[1] 
+    
+    p0_img = np.asmatrix([pts_img[0][0] , pts_img[0][1] , 1]).H
+    p0_world = t.dot(p0_img)
+    p0_world = p0_world / p0_world[2]
+    
+    a0 = copy.copy(p0_world[0])
+    a1 = copy.copy(p0_world[1]) #to avoid arctan messing with these
+    theta_world = np.arctan2(a1, a0)
+
+    if(_SHOW_DEBUG):
+        world = np.zeros([100,100,3])
+        p1_img = np.asmatrix([pts_img[1][0] , pts_img[1][1] , 1]).H
+        p1_world = t.dot(p1_img)
+        p1_world = p1_world / p1_world[2]
+
+        p2_img = np.asmatrix([pts_img[2][0] , pts_img[2][1] , 1]).H
+        p2_world = t.dot(p2_img)
+        p2_world = p2_world / p2_world[2]
+
+        p3_img = np.asmatrix([pts_img[3][0] , pts_img[3][1] , 1]).H
+        p3_world = t.dot(p3_img)
+        p3_world = p3_world / p3_world[2]
+    
+        #img_center = p3_world[1]
+        cv2.line(world, (50,50), (50 + 10*p0_world[0],50 + 10*p0_world[1]), _KULER_RED, 2)
+        cv2.line(world, (50,50), (50 + 10*p1_world[0],50 + 10*p1_world[1]), _KULER_BLUE, 2)
+        cv2.line(world, (50,50), (50 + 10*p2_world[0],50 + 10*p2_world[1]), _KULER_GREEN, 2)
+        cv2.line(world, (50,50), (50 + 10*p3_world[0],50 + 10*p3_world[1]), _KULER_YELLOW, 2)
+        cv2.imshow('world',world)
+        cv2.imshow('img_i', img_i)
+        cv2.imshow('img_t', img_t)
+        cv2.imshow('roller', blob_i)
+        cv2.imshow('lines', lines_i)
+        cv2.waitKey(3)
+    return theta_world
     
 def run_system_get_transform(img_i):
     img_t = crop_img(img_i)
     blob_i, blob_mask = find_roller(img_t)
     line_info = find_lines(img_t, blob_mask)   
     pts_img = line_info[1]
-
+    if _SHOW_DEBUG:
+        print 'pts imgs', pts_img
     t = estimate_transformation(pts_img)
     return t
 
@@ -111,6 +160,8 @@ def find_lines(img_in, mask):
     second_line_polar = []
     theta_first = 0
     if lines is not None:
+        if _SHOW_DEBUG:
+            print 'Num hough lines found',len(lines[0])
         for rho,theta in lines[0]:
             a = np.cos(theta)
             b = np.sin(theta)
@@ -146,13 +197,25 @@ def find_lines(img_in, mask):
         img_bw_u8 = cv2.dilate(img_bw_u8, _MORPH_KERNEL, iterations = 1)
         img_bw_u8 = cv2.erode(img_bw_u8, _MORPH_KERNEL, iterations = 2)
 
+    if(_SHOW_DEBUG):
+        cv2.imshow('bw', img_bw_u8)
+        cv2.imshow("mask", mask.astype(np.uint8)*255)
+        cv2.imshow("disp", disp_img)
+        cv2.waitKey(3)
+    
     if first_found and second_found:
         c_pt_img = line_line_intersection(first_line, second_line)
-        cv2.circle(disp_img, c_pt_img, 5, _KULER_BLUE,2)
+        if _SHOW_DEBUG:
+            print c_pt_img
+            cv2.circle(disp_img, c_pt_img, 5, _KULER_BLUE,2)
         # Find end points and perform data association to model
         (p1_pt_img, p2_pt_img, p3_pt_img) = get_end_pts(first_line, second_line, c_pt_img, img_bw_u8)
 
-    return (first_line_polar,second_line_polar)
+    
+    # cv2.imshow('edges_full', edge_img)
+    # cv2.imshow('edges', edge_img_m)
+    
+    return (disp_img, [p1_pt_img, p2_pt_img, p3_pt_img, c_pt_img])
 
 def get_end_pts(first_line, second_line, c_pt_img, img_bw):
     '''
@@ -171,6 +234,8 @@ def get_end_pts(first_line, second_line, c_pt_img, img_bw):
     fl_ends = get_line_end_points(fl_pts)
     sl_ends = get_line_end_points(sl_pts)
 
+
+    
     # Figure out which of the four points is closest to the center,
     # we use this as the end point of the minor axis against the center
     min_fl_c_dist = 1000
@@ -189,7 +254,8 @@ def get_end_pts(first_line, second_line, c_pt_img, img_bw):
             min_sl_c_dist = d
             min_sl_c_idx = i
     if min_fl_c_dist < min_sl_c_dist:
-
+        if _SHOW_DEBUG:
+            print 'Swapping based on center point!'
         pts_long = sl_ends
         if min_fl_c_idx == 1:
             pt_short = fl_ends[0]
@@ -205,19 +271,43 @@ def get_end_pts(first_line, second_line, c_pt_img, img_bw):
     # Associate the points with the correct model locations
     pts = data_association(pts_long, pt_short)
 
-    # Display stuff
-    disp_img = cv2.cvtColor(img_bw, cv2.COLOR_GRAY2BGR)
-    for p in fl_pts:
-        disp_img[p[1],p[0],:] = np.array(_KULER_RED)*255
-    for p in sl_pts:
-        disp_img[p[1],p[0],:] = np.array(_KULER_YELLOW)*255
+    if(_SHOW_DEBUG):
+        # Display stuff
+        disp_img = cv2.cvtColor(img_bw, cv2.COLOR_GRAY2BGR)
+        for p in fl_pts:
+            disp_img[p[1],p[0],:] = np.array(_KULER_RED)*255
+        for p in sl_pts:
+            disp_img[p[1],p[0],:] = np.array(_KULER_YELLOW)*255
 
-    # Display points
-    cv2.circle(disp_img, pts[0], 3, np.array(_KULER_RED1)*255, 2)
-    cv2.circle(disp_img, pts[1], 3, np.array(_KULER_GREEN)*255, 2)
-    cv2.circle(disp_img, pts[2], 3, np.array(_KULER_BLUE)*255, 2)
+        # Display points
+        cv2.circle(disp_img, pts[0], 3, np.array(_KULER_RED1)*255, 2)
+        cv2.circle(disp_img, pts[1], 3, np.array(_KULER_GREEN)*255, 2)
+        cv2.circle(disp_img, pts[2], 3, np.array(_KULER_BLUE)*255, 2)
 
+        cv2.imshow('inliers', disp_img)
 
+    #print 'fl', fl_pts    
+    #print 'fl shape', np.asmatrix(fl_pts).shape
+    c = np.cov( np.asmatrix(fl_pts).T)
+    [w,v] = np.linalg.eig(c)
+    maxidx = np.argmax(w)
+    line = v[:,maxidx]
+    mu = np.mean(np.asmatrix(fl_pts))
+    
+    
+    old_vector = np.asarray(pts[0]) -   np.asmatrix(c_pt_img  )
+    #print 'line', line.shape, 'old_vector', old_vector.shape
+    #dotp = (old_vector).dot(line)
+    dotp = np.dot(old_vector, line)
+    if(dotp < 0):
+        line = - line
+    #length = np.sqrt(old_vector.dot(old_vector))
+    length = np.sqrt(np.dot(old_vector, old_vector.T))
+    #print 'length', length
+    line = line * float(length)
+    newpoint = mu + line
+    pts[0] = (float(newpoint[0]), float(newpoint[1]) )
+    
     return pts
 
 def get_line_end_points(line_pts):
@@ -288,8 +378,9 @@ def point_line_dist(pt, line):
     X2 = np.array([line[1][0], line[1][1]],dtype=np.float32)
     Q  = np.array([pt[0],  pt[1]],dtype=np.float32)
 
-    if X1[0] == X2[0]:
-        return abs(X1[1]-Q[1])
+    #if X1[0] == X2[0]:
+    #    return abs(X1[1]-Q[1]) 
+    # doesn't work with vertical lines - do we need it?
 
     v = X2 - X1
     w = Q - X1
@@ -328,9 +419,11 @@ def data_association(pts_long, pt_short):
     # Determine side of line the short point is on
     line_d = ((pts_long[1][0] - pts_long[0][0])*(pt_short[1]-pts_long[0][1]) -
               (pts_long[1][1] - pts_long[0][1])*(pt_short[0]-pts_long[0][0]))
-
+    
     side = copysign(1, line_d)
-
+    if(_SHOW_DEBUG):
+        print 'line_d', line_d
+        print 'line_side', side
     # Negative sign implies start point is at top when short facing right
     if side < 0:
         pts_all = [pts_long[0], pt_short, pts_long[1]]
@@ -341,31 +434,39 @@ def data_association(pts_long, pt_short):
 
 def estimate_transformation(pts_img):
     p0_world = np.matrix([0.,4.5])
-    p1_world = np.matrix([4.5,0.])
-    p2_world = np.matrix([0.,-4.5])
+    p1_world = np.matrix([4.5,4.5])
+    p2_world = np.matrix([4.5,0.])
+    p3_world = np.matrix([4.5,-4.5])
+    p4_world = np.matrix([0.,-4.5])
+    p5_world = np.matrix([-4.5,-4.5])
     #c_pt_world = np.matrix([0.,0.])
-    p3_world = np.matrix([-4.5,0.])
+    p6_world = np.matrix([-4.5,0.])
     
     p0_img =   np.matrix(pts_img[0])
     p1_img =   np.matrix(pts_img[1])
     p2_img =   np.matrix(pts_img[2])
     #c_pt_img = np.matrix(pts_img[3])
     p3_img = np.matrix(pts_img[3])
+    p4_img = np.matrix(pts_img[4])
+    p5_img = np.matrix(pts_img[5])
+    p6_img = np.matrix(pts_img[6])
     #p3_img = p1_img + p1_img - c_pt_img
     
     ax = []
     ay = []
     
-    world = [p0_world.T,p1_world.T,p2_world.T,p3_world.T ]
-    img =   [p0_img.T  ,p1_img.T  ,p2_img.T  ,p3_img.T ]
+    world = [p0_world.T,p1_world.T,p2_world.T,p3_world.T,p4_world.T,p5_world.T,p6_world.T ]
+    img =   [p0_img.T  ,p1_img.T  ,p2_img.T  ,p3_img.T  ,p4_img.T  ,p5_img.T  ,p6_img.T]
     
-    for i in range(4):
+    for i in range(len(img)):
         wi = np.asarray(world[i])
         ii = np.asarray(img[i])
-
+        #print wi
+        #print ii
         ax = ax + [[-ii[0], -ii[1], -1,      0,      0,  0, ii[0]*wi[0], ii[1]*wi[0], wi[0]]]
         ay = ay + [[0     ,      0,  0, -ii[0], -ii[1], -1, ii[0]*wi[1], ii[1]*wi[1], wi[1]]]
-    A = np.asmatrix([ax[0], ay[0], ax[1], ay[1], ax[2], ay[2], ax[3], ay[3] ])
+    A = np.concatenate([ax, ay])
+    #print A
     #print ax[0]
     #print type(ax[0])
     #print A
@@ -385,12 +486,12 @@ def estimate_transformation(pts_img):
     #print 't', t
     #print 's', s
     T = np.reshape(t, [3,3]) #np.zeros((3,3))
-    mat_in = np.concatenate([np.concatenate(img,1), [[1,1,1,1]]])
-
+    mat_in = np.concatenate([np.concatenate(img,1), [[1,1,1,1,1,1,1]]])
+    #print mat_in
     res = T.dot(mat_in)
-
+    #print 'r0', res
     res = res / np.concatenate([res[2],res[2],res[2]])
-
+    #print 'result', res.T
     return T
 
 def transform_pts(pts_a, pts_b, transform):
