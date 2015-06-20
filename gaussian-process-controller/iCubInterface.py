@@ -32,15 +32,6 @@ class ICubInterface():
         self.params['robot'] = self.readString(fileDescriptor,'robot')
         self.params['whichHand'] = self.readString(fileDescriptor,'whichHand')
 		
-        # create driver and options
-        self.driver = yarp.PolyDriver()
-        options = yarp.Property()
-        # set driver options
-        options.put("robot",self.params['robot'])
-        options.put("device","remote_controlboard")
-        options.put("local","/gpc/encoders/" + self.params['whichHand'] + "_arm")
-        options.put("remote","/icub/" + self.params['whichHand'] + "_arm")
-
         # create, open and connect ports
         # tactile port
         self.tactDataPort = yarp.BufferedPortBottle()
@@ -58,12 +49,21 @@ class ICubInterface():
         self.logPort.open(logPortName)
         yarp.Network.connect(logPortName,self.dataDumperPortName)
 
+        # create driver and options
+        self.driver = yarp.PolyDriver()
+        options = yarp.Property()
+        # set driver options
+        options.put("robot",self.params['robot'])
+        options.put("device","remote_controlboard")
+        options.put("local","/gpc/encoders/" + self.params['whichHand'] + "_arm")
+        options.put("remote","/icub/" + self.params['whichHand'] + "_arm")
+
         # open driver
         print 'Opening motor driver'
         self.driver.open(options)
         if not self.driver.isValid():
             print 'Cannot open driver!'
-            sys.exit()
+            sys.exit()        
 
         # create interfaces
         print 'enabling interfaces'
@@ -89,6 +89,28 @@ class ICubInterface():
             sys.exit()
 
         self.numJoints = self.iPos.getAxes()
+
+        ### HEAD ###
+        # create driver and options
+        self.headDriver = yarp.PolyDriver()
+        headOptions = yarp.Property()
+        # set driver options
+        headOptions.put("robot",self.params['robot'])
+        headOptions.put("device","remote_controlboard")
+        headOptions.put("local","/gpc/encodersHead/head")
+        headOptions.put("remote","/icub/head")
+        # open drivers
+        self.headDriver.open(headOptions)
+        if not self.headDriver.isValid():
+            print 'Cannot open head driver!'
+            sys.exit()
+        # create interfaces
+        print 'enabling head interfaces'
+        self.iPosHead = self.headDriver.viewIPositionControl()
+        if self.iPosHead is None:
+            print 'Cannot view head position interface!'
+            sys.exit()
+
 
         # wait a bit for the interfaces to be ready
         yarp.Time_delay(1.0)
@@ -199,6 +221,16 @@ class ICubInterface():
             done = self.iPos.checkMotionDone()
         print "ready"
         
+    def setHeadPosition(self,encodersList):
+        for i in range(len(encodersList)):
+            self.iPosHead.positionMove(i,encodersList[i])
+        done = self.iPosHead.checkMotionDone()
+        while not done:
+            print "reaching head starting position..."        
+            yarp.Time_delay(0.1)
+            done = self.iPosHead.checkMotionDone()
+        print "ready"
+        
 
     def setJointPosition(self,joint,position):
         self.iPos.positionMove(joint,position)
@@ -208,6 +240,15 @@ class ICubInterface():
             yarp.Time_delay(0.1)
             done = self.iPos.checkMotionDone()
         print "target position reached"
+        
+    def setHeadJointPosition(self,joint,position):
+        self.iPosHead.positionMove(joint,position)
+        done = self.iPosHead.checkMotionDone()
+        while not done:
+            print "reaching head target position..."        
+            yarp.Time_delay(0.1)
+            done = self.iPosHead.checkMotionDone()
+        print "head target position reached"
         
 
     def logData(self,valuesList):
