@@ -30,5 +30,15 @@
 # images
 *.tiff
 
-*.py~
+# backup
+*.*~
+
+# python
 *.pyc
+
+# gaussian processes
+gaussian-process-controller/controller_input.txt
+gaussian-process-controller/controller_output.txt
+gaussian-process-controller/iterationID.txt
+gaussian-process-controller/experimentID.txt
+

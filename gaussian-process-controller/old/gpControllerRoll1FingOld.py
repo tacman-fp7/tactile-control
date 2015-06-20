@@ -79,17 +79,17 @@ def findNewAngle(angle,alpha,beta):
 def main():
 
     # module parameters
-    expID = 39
+    expID = 30
 
-    maxIterations = [    77,    14,   134,    66,    34,    81,    52,    31,     48,    66]
+    maxIterations = [    77,    14,   134,    66,    10,    81,    22,    31,     3,    66]
+    maxIterations2 = [    50,    14,   134,    66,    10,    81,    22,    31,     3,    66]
 
     proximalJointStartPos = 40
     distalJointStartPos = 0
     joint1StartPos = 18
     #                    0               1   2   3   4   5   6   7   8   9  10  11  12                    13                  14  15
     startingPosEncs = [-44, joint1StartPos, -4, 39,-14,  2,  2, 18, 10,  0,163,  0,  0,proximalJointStartPos,distalJointStartPos,  0]   
-    #                        0   1   2   3   4   5
-    headStartingPosEncs = [-29,  0, 18,  0,  0,  0]
+    
     actionEnabled = True
 
     rolloutsNumFirst = 30
@@ -104,7 +104,7 @@ def main():
 
     resetProbability = 0.02
 
-    actionDuration = 0.25
+    actionDuration = 0.15
     pauseDuration = 0.0
 
     maxFbAngle = math.pi
@@ -113,7 +113,7 @@ def main():
     fbAngleRange = maxFbAngle - minFbAngle
 
     normalizedMaxVoltageY = 1.0
-    maxVoltageProxJointY = 300.0
+    maxVoltageProxJointY = 250.0
     maxVoltageDistJointY = 800.0
     slopeAtMaxVoltageY = 1.0
 
@@ -131,22 +131,11 @@ def main():
     jointsToActuate = [proximalJoint,distalJoint]
     
     fileNameIterID = "iterationID.txt"
-    fileNameExperimentID = "experimentID.txt"
     fileNameExpParams = "parameters.txt"
-
-    isNewExperiment = False
-    if len(sys.argv) > 1:
-        if sys.argv[1] == 'new':
-            isNewExperiment = True 
-    
-    expID = readValueFromFile(fileNameExperimentID)        
-    if isNewExperiment:
-        expID = expID + 1
-        writeIntoFile(fileNameExperimentID,str(expID))
 
     # create output folder name
     experimentFolderName = dataPath + "exp_" + str(expID) + "/" # could be changed adding more information about the experiment
-    print expID,isNewExperiment
+
     if os.path.exists(experimentFolderName):
         # get iteration ID
         iterID = readValueFromFile(fileNameIterID)        
@@ -197,7 +186,7 @@ def main():
     cameraPort.open(cameraPortName)
     yarp.Network.connect("/icub/cam/left",cameraPortName)
 
-    # image settings
+    # image setting
     width = 640
     height = 480 
     # Create numpy array to receive the image and the YARP image wrapped around it
@@ -209,8 +198,7 @@ def main():
     # set start position
     if actionEnabled:
         iCubI.setArmPosition(startingPosEncs)
-        iCubI.setHeadPosition(headStartingPosEncs)
-        #iCubI.setRefVelocity(jointsToActuate,100)
+        #iCubI.setRefVelocity(jointsToActuate,1000000)
 
     # wait for the user
     raw_input("- press enter to start the controller -")
@@ -249,7 +237,7 @@ def main():
             tactileData = []              
             for j in range(12):
                 tactileData.append(fullTactileData.get(12*finger+j).asDouble())
-            #print np.sum(tactileData[0:12])
+            print np.sum(tactileData[0:12])
             # read encoders data from port
             fullEncodersData = iCubI.readEncodersDataFromPort()
             encodersData = []
@@ -269,12 +257,12 @@ def main():
             # update and cut voltage
             oldVoltage[0] = voltage[0]
             oldVoltage[1] = voltage[1]
-            voltage[0] = action[0] #voltage[0] + action[0];
-            voltage[1] = action[1] #voltage[1] + action[1];
-            #if abs(voltage[0]) > maxVoltageX:
-            #    voltage[0] = maxVoltageX*np.sign(voltage[0])
-            #if abs(voltage[1]) > maxVoltageX:
-            #    voltage[1] = maxVoltageX*np.sign(voltage[1])
+            voltage[0] = voltage[0] + action[0];
+            voltage[1] = voltage[1] + action[1];
+            if abs(voltage[0]) > maxVoltageX:
+                voltage[0] = maxVoltageX*np.sign(voltage[0])
+            if abs(voltage[1]) > maxVoltageX:
+                voltage[1] = maxVoltageX*np.sign(voltage[1])
 
             # calculate real applied voltage
             realVoltage[0] = maxVoltageProxJointY*k*pow(abs(voltage[0]),1/3.0)*np.sign(voltage[0])
@@ -304,7 +292,6 @@ def main():
             if abs(fbAngleDifference) > maxFbAngleDifference:
                 currentFbAngle = previousFbAngle
                 fbAngleDifference = 0.0
-            print fbAngleDifference
             afterTS = time.time()
             timeToSleep = max(actionDuration-(afterTS-beforeTS),0)
             time.sleep(timeToSleep)
@@ -317,7 +304,7 @@ def main():
             time.sleep(pauseDuration)
  
             # log data
-            iCubI.logData(tactileData + encodersData + oldVoltage + voltage)#[action[0],action[1]])
+            iCubI.logData(tactileData + encodersData + oldVoltage + [action[0],action[1]])
             logArray(tactileData,fd)
             logArray(encodersData,fd)
             logArray(oldVoltage,fd)
