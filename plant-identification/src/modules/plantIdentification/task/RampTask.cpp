@@ -73,8 +73,9 @@ void RampTask::buildLogData(LogData &logData){
 
 	logData.taskType = RAMP;
 	logData.taskOperationMode = 0;
-	//TODO it should log all the array values
-	logData.targetValue = pressureTargetValue[0];
+    for(size_t i = 0; i < fingersList.size(); i++){
+        logData.targetValue[i] = pressureTargetValue[0];
+    }
 
 }
 

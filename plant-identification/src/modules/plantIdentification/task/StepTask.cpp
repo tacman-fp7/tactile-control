@@ -49,8 +49,10 @@ void StepTask::buildLogData(LogData &logData){
 
 	logData.taskType = STEP;
 	logData.taskOperationMode = 0;
-	//TODO it should log all the array values
-	logData.targetValue = constantPwm[0];
+    // TODO it should be jointsList
+    for(size_t i = 0; i < fingersList.size(); i++){
+        logData.targetValue[i] = constantPwm[i];
+    }
 }
 
 std::string StepTask::getConstantPwmDescription(){

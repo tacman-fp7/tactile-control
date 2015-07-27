@@ -305,14 +305,18 @@ void ControlTask::buildLogData(LogData &logData){
 	}
 	logData.taskOperationMode = controlData->controlMode;
 	//TODO only first elements are logged!
-	logData.targetValue = pressureTargetValue[0];
-	
-	logData.pidKpf = controlData->pidKpf[0];
-	logData.pidKif = controlData->pidKif[0];
-	logData.pidKdf = 0.0;
-	logData.pidKpb = controlData->pidKpb[0];
-	logData.pidKib = controlData->pidKib[0];
-	logData.pidKdb = 0.0;
+
+    for(size_t i = 0; i < fingersList.size(); i++){
+
+        logData.targetValue[i] = pressureTargetValue[i];
+
+        logData.pidKpf[i] = controlData->pidKpf[i];
+        logData.pidKif[i] = controlData->pidKif[i];
+        logData.pidKdf[i] = 0.0;
+        logData.pidKpb[i] = controlData->pidKpb[i];
+        logData.pidKib[i] = controlData->pidKib[i];
+        logData.pidKdb[i] = 0.0;
+    }
 }
 
 void ControlTask::release(){

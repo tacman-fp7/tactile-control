@@ -49,7 +49,7 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,int threadRate,iCub::plantIdenti
 	commonData.previousPressuresIndex.resize(5,0);
 	commonData.overallFingerPressure.resize(5,0.0);
 	commonData.overallFingerPressureMedian.resize(5,0.0);
-	commonData.armEncodersAngles.resize(controllersUtil->armJointsNum,0.0);
+	commonData.armEncodersAngles.resize(controllersUtil->armJointsNum,0.0);      
 
 	controllersUtil->getArmEncodersAngles(commonData.armEncodersAngles,true);
 
@@ -58,6 +58,12 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,int threadRate,iCub::plantIdenti
 	for(int i = 0; i < objDetectPressureThresholds->size(); i++){
 		commonData.objDetectPressureThresholds[i] = objDetectPressureThresholds->get(i).asDouble();
 	}
+
+    commonData.realProximalPwm.resize(5,0.0);
+    commonData.realDistalPwm.resize(5,0.0);
+    commonData.proximalJointAngle.resize(5,0.0);
+    commonData.distalJointAngle.resize(5,0.0);
+
 	Bottle* tempParameters = rf.find("tempParameters").asList();
 	commonData.tempParameters.resize(tempParameters->size());
 	for(int i = 0; i < tempParameters->size(); i++){

@@ -50,7 +50,7 @@ void ApproachTask::calculateControlInput(){
 	for(size_t i = 0; i < jointsList.size(); i++){
 
 		if (!fingerIsInContact[fingersList[i]] && commonData->overallFingerPressureMedian[fingersList[i]] > commonData->objDetectPressureThresholds[fingersList[i]]){
-			fingerIsInContact[fingersList[i]] = true;
+            fingerIsInContact[fingersList[i]] = true;
 		}
 		
 		if (fingerIsInContact[fingersList[i]]){
@@ -77,13 +77,14 @@ void ApproachTask::buildLogData(LogData &logData){
 
 	logData.taskOperationMode = 0;
 
-	logData.targetValue = commonData->objDetectPressureThresholds[0];
-	
+    for(size_t i = 0; i < fingersList.size(); i++){
+        logData.targetValue[i] = commonData->objDetectPressureThresholds[i];
+    }
 }
 
 void ApproachTask::release(){
-    std::cout << " YEEEEEEEEEEEEEEEEEEEEEEEEEEE RELEASE\n";
-	controllersUtil->restoreHandJointsMaxPwmLimits();
+
+    controllersUtil->restoreHandJointsMaxPwmLimits();
 }
 
 bool ApproachTask::taskIsOver(){

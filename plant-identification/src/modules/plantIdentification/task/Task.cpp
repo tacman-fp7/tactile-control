@@ -61,7 +61,7 @@ bool Task::manage(bool keepActive){
 
 	sendCommands();
 
-	LogData logData;
+    LogData logData(fingersList.size());
 	buildLogData(logData);
 
 	portsUtil->sendLogData(logData);
@@ -98,12 +98,27 @@ bool Task::loadICubData(){
 
 	processTactileData();
 	
-	//TODO define what encoders should be logged
-//	controllersUtil->getEncoderAngle(PROXIMAL,&commonData->proximalJointAngle);
-//	controllersUtil->getEncoderAngle(DISTAL,&commonData->distalJointAngle);
+    // index finger
+    controllersUtil->getEncoderAngle(11,&commonData->proximalJointAngle[0]);
+    controllersUtil->getEncoderAngle(12,&commonData->distalJointAngle[0]);
+//    controllersUtil->getRealPwmValue(11,&commonData->realProximalPwm[0]);
+//    controllersUtil->getRealPwmValue(12,&commonData->realDistalPwm[0]);
 
-//	controllersUtil->getRealPwmValue(PROXIMAL,&commonData->realProximalPwm);
-//	controllersUtil->getRealPwmValue(DISTAL,&commonData->realDistalPwm);
+    // middle finger
+    controllersUtil->getEncoderAngle(13,&commonData->proximalJointAngle[1]);
+    controllersUtil->getEncoderAngle(14,&commonData->distalJointAngle[1]);
+//    controllersUtil->getRealPwmValue(13,&commonData->realProximalPwm[1]);
+//    controllersUtil->getRealPwmValue(14,&commonData->realDistalPwm[1]);
+
+    // TODO ring finger
+
+    // TODO pinky
+
+    // thumb
+    controllersUtil->getEncoderAngle(9,&commonData->proximalJointAngle[4]);
+    controllersUtil->getEncoderAngle(10,&commonData->distalJointAngle[4]);
+//    controllersUtil->getRealPwmValue(9,&commonData->realProximalPwm[4]);
+//    controllersUtil->getRealPwmValue(10,&commonData->realDistalPwm[4]);
 
 	return true;
 }
@@ -140,18 +155,22 @@ void Task::addCommonLogData(LogData &logData){
 
 	logData.taskId = taskId;
 	//TODO only the first element is logged!
-	for (size_t i = 0; i < commonData->fingerTaxelsData[fingersList[0]].size(); i++){
-		logData.fingerTaxelValues[i] = commonData->fingerTaxelsData[fingersList[0]][i];
-	}
-	logData.overallFingerPressure = commonData->overallFingerPressure[fingersList[0]];
-	logData.overallFingerPressureMedian = commonData->overallFingerPressureMedian[fingersList[0]];
+    for (size_t i = 0; i < fingersList.size(); i++){
+        for (size_t j = 0; j < commonData->fingerTaxelsData[fingersList[i]].size(); j++){
+            logData.fingerTaxelValues[i][j] = commonData->fingerTaxelsData[fingersList[i]][j];
+        }
+        logData.overallFingerPressure[i] = commonData->overallFingerPressure[fingersList[i]];
+        logData.overallFingerPressureMedian[i] = commonData->overallFingerPressureMedian[fingersList[i]];
 
-//	logData.proximalJointAngle = commonData->proximalJointAngle;
-//	logData.distalJointAngle = commonData->distalJointAngle;
-//	logData.realProximalPwm = commonData->realProximalPwm;
-//	logData.realDistalPwm = commonData->realDistalPwm;
+        logData.proximalJointAngle[i] = commonData->proximalJointAngle[fingersList[i]];
+        logData.distalJointAngle[i] = commonData->distalJointAngle[fingersList[i]];
+//        logData.realProximalPwm[i] = commonData->realProximalPwm[fingersList[i]];
+//        logData.realDistalPwm[i] = commonData->realDistalPwm[fingersList[i]];
 
-	logData.pwm = inputCommandValue[0];
+
+        // TODO inputCommandValue has actually 'jointsList.size' values, but it works if I just command proximals joints
+        logData.pwm[i] = inputCommandValue[fingersList[i]];
+    }
 }
 
 void Task::printScreenLog(){

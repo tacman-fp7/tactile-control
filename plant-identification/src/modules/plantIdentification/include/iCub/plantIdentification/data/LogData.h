@@ -22,26 +22,27 @@ namespace iCub {
 				std::string taskId;
 				int taskType;
 				int taskOperationMode;
-				double targetValue;
-				std::vector<double> fingerTaxelValues;
-				double overallFingerPressure;
-				double overallFingerPressureMedian;
-				double pwm;
-				double realProximalPwm;
-				double realDistalPwm;
-				double proximalJointAngle;
-				double distalJointAngle;
-				double pidKpf;
-				double pidKif;
-				double pidKdf;
-				double pidKpb;
-				double pidKib;
-				double pidKdb;
-				double error;
-				double errorIntegral;
+                int fingersNum;
+                std::vector<double> targetValue;
+                std::vector<std::vector<double> > fingerTaxelValues;
+                std::vector<double> overallFingerPressure;
+                std::vector<double> overallFingerPressureMedian;
+                std::vector<double> pwm;
+//              std::vector<double> realProximalPwm;
+//              std::vector<double> realDistalPwm;
+                std::vector<double> proximalJointAngle;
+                std::vector<double> distalJointAngle;
+                std::vector<double> pidKpf;
+                std::vector<double> pidKif;
+                std::vector<double> pidKdf;
+                std::vector<double> pidKpb;
+                std::vector<double> pidKib;
+                std::vector<double> pidKdb;
+                std::vector<double> error;
+                std::vector<double> errorIntegral;
                 
 
-				LogData();
+                LogData(int fingersNum);
                 
 				void toBottle(yarp::os::Bottle &bottle);
         };

@@ -24,10 +24,10 @@ namespace iCub {
 			std::vector<double> overallFingerPressureMedian;
 			std::vector<double> objDetectPressureThresholds;
 			std::vector<double> armEncodersAngles;
-//			double realProximalPwm;
-//			double realDistalPwm;
-//			double proximalJointAngle;
-//			double distalJointAngle;
+            std::vector<double> realProximalPwm;
+            std::vector<double> realDistalPwm;
+            std::vector<double> proximalJointAngle;
+            std::vector<double> distalJointAngle;
 
 			std::vector<yarp::os::Value> tempParameters;
 
