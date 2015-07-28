@@ -1,5 +1,7 @@
 #include "iCub/plantIdentification/PlantIdentificationModule.h"
 
+#include <iCub/iKin/iKinFwd.h>
+
 using iCub::plantIdentification::PlantIdentificationModule;
 
 using std::cout;
@@ -119,7 +121,7 @@ bool PlantIdentificationModule::respond(const yarp::os::Bottle& command, yarp::o
 		arm();
 		break;
 	case QUIT:
-		quit();
+        //quit();
 		break;
 	}
 
