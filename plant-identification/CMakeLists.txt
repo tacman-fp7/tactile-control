@@ -43,7 +43,6 @@ icubcontrib_set_default_prefix()
 add_definitions(${YARP_DEFINES}) # add yarp definitions - this contains also -D_REENTRANT
 
 
-
 # Include directories
 include_directories(${YARP_INCLUDE_DIRS})
 include_directories(${ICUB_INCLUDE_DIRS})

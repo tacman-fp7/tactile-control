@@ -58,10 +58,10 @@ source_group("Header Files" FILES ${INC_HEADERS})
 
 # Include directories
 include_Directories(${skinDynLib_INCLUDE_DIRS})
-include_directories(include)
+include_directories(include ${iKin_INCLUDE_DIRS})
 
 add_executable(${MODULENAME} ${INC_SOURCES} ${INC_HEADERS})
-target_link_libraries(${MODULENAME} ${YARP_LIBRARIES} skinDynLib icubmod)
+target_link_libraries(${MODULENAME} ${YARP_LIBRARIES} skinDynLib icubmod iKin)
 
 if(WIN32)
     install(TARGETS ${PROJECT_NAME} DESTINATION bin/${CMAKE_BUILD_TYPE})

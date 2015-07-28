@@ -9,7 +9,6 @@ using std::cout;
 using yarp::os::ResourceFinder;
 using yarp::os::Value;
 
-
 /* *********************************************************************************************************************** */
 /* ******* Constructor                                                      ********************************************** */   
 PlantIdentificationModule::PlantIdentificationModule() 
@@ -91,6 +90,12 @@ bool PlantIdentificationModule::interruptModule() {
 /* *********************************************************************************************************************** */
 /* ******* Manage commands coming from RPC Port                             ********************************************** */   
 bool PlantIdentificationModule::respond(const yarp::os::Bottle& command, yarp::os::Bottle& reply){
+    using iCub::iKin::iCubFinger;
+
+    iCubFinger *thumbA = new iCubFinger("right_thumb_a");
+    iCubFinger *thumbB = new iCubFinger("right_thumb_b");
+    iCubFinger *index = new iCubFinger("right_index_na");
+    iCubFinger *middle = new iCubFinger("right_middle_na");
 
 	rpcCmdUtil.processCommand(command);
 
@@ -122,6 +127,33 @@ bool PlantIdentificationModule::respond(const yarp::os::Bottle& command, yarp::o
 		break;
 	case QUIT:
         //quit();
+        yarp::sig::Vector thumbAPose = thumbA->EndEffPose();
+        yarp::sig::Vector thumbBPose = thumbB->EndEffPose();
+        yarp::sig::Vector indexPose = index->EndEffPose();
+        yarp::sig::Vector middlePose = middle->EndEffPose();
+
+        for(size_t i = 0; i < thumbAPose.length(); i++){
+            cout << dbgTag << thumbAPose[i] << " ";
+        }
+        cout << "/n";
+
+        for(size_t i = 0; i < thumbBPose.length(); i++){
+            cout << dbgTag << thumbBPose[i] << " ";
+        }
+        cout << "/n";
+
+        for(size_t i = 0; i < indexPose.length(); i++){
+            cout << dbgTag << indexPose[i] << " ";
+        }
+        cout << "/n";
+
+        for(size_t i = 0; i < middlePose.length(); i++){
+            cout << dbgTag << middlePose[i] << " ";
+        }
+        cout << "/n";
+
+
+
 		break;
 	}
 
