@@ -209,7 +209,7 @@ void ControlTask::calculateControlInput(){
 
 	for(size_t i = 0; i < jointsList.size(); i++){
 
-		double error = pressureTargetValue[i] - commonData->overallFingerPressure[fingersList[i]];
+        double error = pressureTargetValue[i] - commonData->overallFingerPressure[fingersList[i]];
 
 
 
