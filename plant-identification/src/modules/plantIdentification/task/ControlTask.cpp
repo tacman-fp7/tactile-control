@@ -213,7 +213,7 @@ void ControlTask::calculateControlInput(){
 
 
 
-		if (controlData->controlMode == BOTH_GAINS_SETS){
+        if (controlData->controlMode == BOTH_GAINS_SETS){
 
 			if (error >= 0 && previousError[i] < 0){
 				pid[i]->setOptions(pidOptionsPE[i]);

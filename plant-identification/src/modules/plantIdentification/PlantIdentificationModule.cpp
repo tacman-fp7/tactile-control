@@ -157,6 +157,11 @@ bool PlantIdentificationModule::respond(const yarp::os::Bottle& command, yarp::o
         yarp::sig::Vector indexPosition = index->EndEffPosition(indexCJ);
         yarp::sig::Vector middlePosition = middle->EndEffPosition(middleCJ);
 
+        yarp::sig::Matrix thumbAH = thumbA->getH(thumbACJ);
+        yarp::sig::Matrix thumbBH = thumbA->getH(thumbBCJ);
+        yarp::sig::Matrix indexH = thumbA->getH(indexCJ);
+        yarp::sig::Matrix middleH = thumbA->getH(middleCJ);
+
 
         cout << dbgTag << "thumb A pose: ";
         for(size_t i = 0; i < thumbAPose.length(); i++){
@@ -202,8 +207,66 @@ bool PlantIdentificationModule::respond(const yarp::os::Bottle& command, yarp::o
         }
         cout << "\n";
 
+        cout << "------------";
 
-		break;
+        yarp::sig::Vector thumbAPos = thumbAH.getCol(3);
+        yarp::sig::Vector thumbADir = thumbAH.getCol(1);
+
+        yarp::sig::Vector thumbBPos = thumbBH.getCol(3);
+        yarp::sig::Vector thumbBDir = thumbBH.getCol(1);
+
+        yarp::sig::Vector indexPos = indexH.getCol(3);
+        yarp::sig::Vector indexDir = indexH.getCol(1);
+
+        yarp::sig::Vector middlePos = middleH.getCol(3);
+        yarp::sig::Vector middleDir = middleH.getCol(1);
+
+
+        cout << dbgTag << "thumbA pose: ";
+        for(size_t i = 0; i < thumbAPos.length(); i++){
+            cout << thumbAPos[i] << " ";
+        }
+        cout << "\n";
+        cout << dbgTag << "thumbA dir: ";
+        for(size_t i = 0; i < thumbADir.length(); i++){
+            cout << thumbADir[i] << " ";
+        }
+        cout << "\n";
+
+        cout << dbgTag << "thumbB pose: ";
+        for(size_t i = 0; i < thumbBPos.length(); i++){
+            cout << thumbBPos[i] << " ";
+        }
+        cout << "\n";
+        cout << dbgTag << "thumbB dir: ";
+        for(size_t i = 0; i < thumbBDir.length(); i++){
+            cout << thumbBDir[i] << " ";
+        }
+        cout << "\n";
+
+        cout << dbgTag << "index pose: ";
+        for(size_t i = 0; i < indexPos.length(); i++){
+            cout << indexPos[i] << " ";
+        }
+        cout << "\n";
+        cout << dbgTag << "index dir: ";
+        for(size_t i = 0; i < indexDir.length(); i++){
+            cout << indexDir[i] << " ";
+        }
+        cout << "\n";
+
+        cout << dbgTag << "middle pose: ";
+        for(size_t i = 0; i < middlePos.length(); i++){
+            cout << middlePos[i] << " ";
+        }
+        cout << "\n";
+        cout << dbgTag << "middle dir: ";
+        for(size_t i = 0; i < middleDir.length(); i++){
+            cout << middleDir[i] << " ";
+        }
+        cout << "\n";
+
+        break;
 	}
 
 	return true;
