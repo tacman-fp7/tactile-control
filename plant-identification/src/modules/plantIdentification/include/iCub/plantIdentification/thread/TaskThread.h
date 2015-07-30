@@ -65,6 +65,8 @@ namespace iCub {
 				void task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,yarp::os::Value paramValue,iCub::plantIdentification::RPCCommandsData &rpcCmdData);
 				void view(iCub::plantIdentification::RPCViewCmdArgName paramName,iCub::plantIdentification::RPCCommandsData &rpcCmdData);
 				void help(iCub::plantIdentification::RPCCommandsData &rpcCmdData);
+
+                void testShowEndEffectors();
         };
     }
 }

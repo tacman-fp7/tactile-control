@@ -423,3 +423,9 @@ void TaskThread::help(RPCCommandsData &rpcCmdData){
 		    rpcCmdData.getFullDescription(QUIT) << "\n";
 	
 }			
+
+void TaskThread::testShowEndEffectors(){
+
+    controllersUtil->testShowEndEffectors();    
+
+}

@@ -1,7 +1,5 @@
 #include "iCub/plantIdentification/PlantIdentificationModule.h"
 
-#include <iCub/iKin/iKinFwd.h>
-
 using iCub::plantIdentification::PlantIdentificationModule;
 
 using std::cout;
@@ -90,12 +88,6 @@ bool PlantIdentificationModule::interruptModule() {
 /* *********************************************************************************************************************** */
 /* ******* Manage commands coming from RPC Port                             ********************************************** */   
 bool PlantIdentificationModule::respond(const yarp::os::Bottle& command, yarp::os::Bottle& reply){
-    using iCub::iKin::iCubFinger;
-
-    iCubFinger *thumbA = new iCubFinger("left_thumb_a");
-    iCubFinger *thumbB = new iCubFinger("left_thumb_b");
-    iCubFinger *index = new iCubFinger("left_index_na");
-    iCubFinger *middle = new iCubFinger("left_middle_na");
 
 	rpcCmdUtil.processCommand(command);
 
@@ -127,148 +119,10 @@ bool PlantIdentificationModule::respond(const yarp::os::Bottle& command, yarp::o
 		break;
 	case QUIT:
         //quit();
-//        yarp::sig::Vector thumbAPose = thumbA->EndEffPose();
-//        yarp::sig::Vector thumbBPose = thumbB->EndEffPose();
-//        yarp::sig::Vector indexPose = index->EndEffPose();
-//        yarp::sig::Vector middlePose = middle->EndEffPose();
-//        yarp::sig::Vector thumbAPosition = thumbA->EndEffPosition();
-//        yarp::sig::Vector thumbBPosition = thumbB->EndEffPosition();
-//        yarp::sig::Vector indexPosition = index->EndEffPosition();
-//        yarp::sig::Vector middlePosition = middle->EndEffPosition();
-
-        yarp::sig::Vector fingEnc;
-
-        yarp::sig::Vector thumbACJ;
-        yarp::sig::Vector thumbBCJ;
-        yarp::sig::Vector indexCJ;
-        yarp::sig::Vector middleCJ;
-
-        thumbA->getChainJoints(fingEnc,thumbACJ);
-        thumbB->getChainJoints(fingEnc,thumbBCJ);
-        index->getChainJoints(fingEnc,indexCJ);
-        middle->getChainJoints(fingEnc,middleCJ);
-
-        yarp::sig::Vector thumbAPose = thumbA->EndEffPose(thumbACJ);
-        yarp::sig::Vector thumbBPose = thumbB->EndEffPose(thumbBCJ);
-        yarp::sig::Vector indexPose = index->EndEffPose(indexCJ);
-        yarp::sig::Vector middlePose = middle->EndEffPose(middleCJ);
-        yarp::sig::Vector thumbAPosition = thumbA->EndEffPosition(thumbACJ);
-        yarp::sig::Vector thumbBPosition = thumbB->EndEffPosition(thumbBCJ);
-        yarp::sig::Vector indexPosition = index->EndEffPosition(indexCJ);
-        yarp::sig::Vector middlePosition = middle->EndEffPosition(middleCJ);
-
-        yarp::sig::Matrix thumbAH = thumbA->getH(thumbACJ);
-        yarp::sig::Matrix thumbBH = thumbA->getH(thumbBCJ);
-        yarp::sig::Matrix indexH = thumbA->getH(indexCJ);
-        yarp::sig::Matrix middleH = thumbA->getH(middleCJ);
-
-
-        cout << dbgTag << "thumb A pose: ";
-        for(size_t i = 0; i < thumbAPose.length(); i++){
-            cout << thumbAPose[i] << " ";
-        }
-        cout << "\n";
-        cout << dbgTag << "thumb A position: ";
-        for(size_t i = 0; i < thumbAPosition.length(); i++){
-            cout << thumbAPosition[i] << " ";
-        }
-        cout << "\n";
-
-        cout << dbgTag << "thumb B pose: ";
-        for(size_t i = 0; i < thumbBPose.length(); i++){
-            cout << thumbBPose[i] << " ";
-        }
-        cout << "\n";
-        cout << dbgTag << "thumb B position: ";
-        for(size_t i = 0; i < thumbBPosition.length(); i++){
-            cout << thumbBPosition[i] << " ";
-        }
-        cout << "\n";
-
-        cout << dbgTag << "index pose: ";
-        for(size_t i = 0; i < indexPose.length(); i++){
-            cout << indexPose[i] << " ";
-        }
-        cout << "\n";
-        cout << dbgTag << "index position: ";
-        for(size_t i = 0; i < indexPosition.length(); i++){
-            cout << indexPosition[i] << " ";
-        }
-        cout << "\n";
-
-        cout << dbgTag << "middle pose: ";
-        for(size_t i = 0; i < middlePose.length(); i++){
-            cout << middlePose[i] << " ";
-        }
-        cout << "\n";
-        cout << dbgTag << "middle position: ";
-        for(size_t i = 0; i < middlePosition.length(); i++){
-            cout << middlePosition[i] << " ";
-        }
-        cout << "\n";
-
-        cout << "------------";
-
-        yarp::sig::Vector thumbAPos = thumbAH.getCol(3);
-        yarp::sig::Vector thumbADir = thumbAH.getCol(1);
-
-        yarp::sig::Vector thumbBPos = thumbBH.getCol(3);
-        yarp::sig::Vector thumbBDir = thumbBH.getCol(1);
-
-        yarp::sig::Vector indexPos = indexH.getCol(3);
-        yarp::sig::Vector indexDir = indexH.getCol(1);
-
-        yarp::sig::Vector middlePos = middleH.getCol(3);
-        yarp::sig::Vector middleDir = middleH.getCol(1);
-
-
-        cout << dbgTag << "thumbA pose: ";
-        for(size_t i = 0; i < thumbAPos.length(); i++){
-            cout << thumbAPos[i] << " ";
-        }
-        cout << "\n";
-        cout << dbgTag << "thumbA dir: ";
-        for(size_t i = 0; i < thumbADir.length(); i++){
-            cout << thumbADir[i] << " ";
-        }
-        cout << "\n";
-
-        cout << dbgTag << "thumbB pose: ";
-        for(size_t i = 0; i < thumbBPos.length(); i++){
-            cout << thumbBPos[i] << " ";
-        }
-        cout << "\n";
-        cout << dbgTag << "thumbB dir: ";
-        for(size_t i = 0; i < thumbBDir.length(); i++){
-            cout << thumbBDir[i] << " ";
-        }
-        cout << "\n";
-
-        cout << dbgTag << "index pose: ";
-        for(size_t i = 0; i < indexPos.length(); i++){
-            cout << indexPos[i] << " ";
-        }
-        cout << "\n";
-        cout << dbgTag << "index dir: ";
-        for(size_t i = 0; i < indexDir.length(); i++){
-            cout << indexDir[i] << " ";
-        }
-        cout << "\n";
-
-        cout << dbgTag << "middle pose: ";
-        for(size_t i = 0; i < middlePos.length(); i++){
-            cout << middlePos[i] << " ";
-        }
-        cout << "\n";
-        cout << dbgTag << "middle dir: ";
-        for(size_t i = 0; i < middleDir.length(); i++){
-            cout << middleDir[i] << " ";
-        }
-        cout << "\n";
+        taskThread->testShowEndEffectors();
 
         break;
-	}
-
+    }
 	return true;
 }
 

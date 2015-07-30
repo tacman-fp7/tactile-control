@@ -80,11 +80,14 @@ namespace iCub {
 
 				bool restoreHandJointsMaxPwmLimits();
 
+                void testShowEndEffectors();    
+
 			private:
 
 				bool waitMoveDone(const double &i_timeout, const double &i_delay);
 
 				bool setControlMode(int joint,int controlMode,bool checkCurrent);
+
 };
     } //namespace plantIdentification
 } //namespace iCub

@@ -1,5 +1,7 @@
 #include "iCub/plantIdentification/util/ControllersUtil.h"
 
+#include <iCub/iKin/iKinFwd.h>
+
 #include <vector>
 #include <ctime>
 #include <yarp/os/Time.h>
@@ -119,7 +121,7 @@ bool ControllersUtil::saveCurrentArmPosition(){
         encodersDataAcquired = iEncs->getEncoders(armStoredPosition.data());
 
 //#ifndef NODEBUG
-        cout << "DEBUG: " << dbgTag << "Encoder data is not available yet. \n";
+        cout << "DEBUG: " << dbgTag << "EncotestShowEndEffectors();    der data is not available yet. \n";
 //#endif
 
 		Time::delay(0.1);
@@ -471,4 +473,245 @@ bool ControllersUtil::restoreHandJointsMaxPwmLimits(){
 	}
 
 	return true;
+}
+
+void ControllersUtil::testShowEndEffectors(){
+
+    using iCub::iKin::iCubFinger;
+
+    saveCurrentArmPosition();
+
+    iCubFinger *thumbA = new iCubFinger("right_thumb_a");
+    iCubFinger *thumbB = new iCubFinger("right_thumb_b");
+    iCubFinger *index = new iCubFinger("right_index_na");
+    iCubFinger *middle = new iCubFinger("right_middle_na");
+
+//        yarp::sig::Vector thumbAPose = thumbA->EndEffPose();
+//        yarp::sig::Vector thumbBPose = thumbB->EndEffPose();
+//        yarp::sig::Vector indexPose = index->EndEffPose();
+//        yarp::sig::Vector middlePose = middle->EndEffPose();
+//        yarp::sig::Vector thumbAPosition = thumbA->EndEffPosition();
+//        yarp::sig::Vector thumbBPosition = thumbB->EndEffPosition();
+//        yarp::sig::Vector indexPosition = index->EndEffPosition();
+//        yarp::sig::Vector middlePosition = middle->EndEffPosition();
+
+    yarp::sig::Vector thumbAEnc;
+    yarp::sig::Vector thumbBEnc;
+    yarp::sig::Vector indexEnc;
+    yarp::sig::Vector middleEnc;
+
+    yarp::sig::Vector thumbACJ;
+    yarp::sig::Vector thumbBCJ;
+    yarp::sig::Vector indexCJ;
+    yarp::sig::Vector middleCJ;
+
+    thumbA->getChainJoints(armStoredPosition,thumbACJ);
+    thumbB->getChainJoints(armStoredPosition,thumbBCJ);
+    index->getChainJoints(armStoredPosition,indexCJ);
+    middle->getChainJoints(armStoredPosition,middleCJ);
+    
+    cout << dbgTag << "thumbA encoders: ";
+    for(size_t i = 0; i < thumbAEnc.length(); i++){
+        cout << thumbAEnc[i] << " ";
+    }
+    cout << "\n";
+    cout << dbgTag << "thumbA chain joints: ";
+    for(size_t i = 0; i < thumbACJ.length(); i++){
+        cout << thumbACJ[i] << " ";
+    }
+    cout << "\n";
+    
+    cout << dbgTag << "thumbB encoders: ";
+    for(size_t i = 0; i < thumbBEnc.length(); i++){
+        cout << thumbBEnc[i] << " ";
+    }
+    cout << "\n";
+    cout << dbgTag << "thumbB chain joints: ";
+    for(size_t i = 0; i < thumbBCJ.length(); i++){
+        cout << thumbBCJ[i] << " ";
+    }
+    cout << "\n";
+    
+    cout << dbgTag << "index encoders: ";
+    for(size_t i = 0; i < indexEnc.length(); i++){
+        cout << indexEnc[i] << " ";
+    }
+    cout << "\n";
+    cout << dbgTag << "index chain joints: ";
+    for(size_t i = 0; i < indexCJ.length(); i++){
+        cout << indexCJ[i] << " ";
+    }
+    cout << "\n";
+    
+    cout << dbgTag << "middle encoders: ";
+    for(size_t i = 0; i < middleEnc.length(); i++){
+        cout << middleEnc[i] << " ";
+    }
+    cout << "\n";
+    cout << dbgTag << "middle chain joints: ";
+    for(size_t i = 0; i < middleCJ.length(); i++){
+        cout << middleCJ[i] << " ";
+    }
+    cout << "\n";
+    
+
+    yarp::sig::Vector thumbAPose = thumbA->EndEffPose(thumbACJ);
+    yarp::sig::Vector thumbBPose = thumbB->EndEffPose(thumbBCJ);
+    yarp::sig::Vector indexPose = index->EndEffPose(indexCJ);
+    yarp::sig::Vector middlePose = middle->EndEffPose(middleCJ);
+    yarp::sig::Vector thumbAPosition = thumbA->EndEffPosition(thumbACJ);
+    yarp::sig::Vector thumbBPosition = thumbB->EndEffPosition(thumbBCJ);
+    yarp::sig::Vector indexPosition = index->EndEffPosition(indexCJ);
+    yarp::sig::Vector middlePosition = middle->EndEffPosition(middleCJ);
+
+    yarp::sig::Vector empty;
+
+    thumbA->setAng(thumbACJ);
+    thumbB->setAng(thumbBCJ);
+    index->setAng(indexCJ);
+    middle->setAng(middleCJ);
+
+
+
+    yarp::sig::Matrix thumbAH = thumbA->getH(empty);
+    yarp::sig::Matrix thumbBH = thumbA->getH(empty);
+    yarp::sig::Matrix indexH = thumbA->getH(empty);
+    yarp::sig::Matrix middleH = thumbA->getH(empty);
+
+/*
+    cout << dbgTag << "thumb A pose: ";
+    for(size_t i = 0; i < thumbAPose.length(); i++){
+        cout << thumbAPose[i] << " ";
+    }
+    cout << "\n";
+    cout << dbgTag << "thumb A position: ";
+    for(size_t i = 0; i < thumbAPosition.length(); i++){
+        cout << thumbAPosition[i] << " ";
+    }
+    cout << "\n";
+
+    cout << dbgTag << "thumb B pose: ";
+    for(size_t i = 0; i < thumbBPose.length(); i++){
+        cout << thumbBPose[i] << " ";
+    }
+    cout << "\n";
+    cout << dbgTag << "thumb B position: ";
+    for(size_t i = 0; i < thumbBPosition.length(); i++){
+        cout << thumbBPosition[i] << " ";
+    }
+    cout << "\n";
+
+    cout << dbgTag << "index pose: ";
+    for(size_t i = 0; i < indexPose.length(); i++){
+        cout << indexPose[i] << " ";
+    }
+    cout << "\n";
+    cout << dbgTag << "index position: ";
+    for(size_t i = 0; i < indexPosition.length(); i++){
+        cout << indexPosition[i] << " ";
+    }
+    cout << "\n";
+
+    cout << dbgTag << "middle pose: ";
+    for(size_t i = 0; i < middlePose.length(); i++){
+        cout << middlePose[i] << " ";
+    }
+    cout << "\n";
+    cout << dbgTag << "middle position: ";
+    for(size_t i = 0; i < middlePosition.length(); i++){
+        cout << middlePosition[i] << " ";
+    }
+    cout << "\n";
+*/
+
+    cout << "------------\n";
+
+    yarp::sig::Vector thumbAPos = thumbAH.getCol(3);
+    yarp::sig::Vector thumbADir = thumbAH.getCol(1);
+
+    yarp::sig::Vector thumbBPos = thumbBH.getCol(3);
+    yarp::sig::Vector thumbBDir = thumbBH.getCol(1);
+
+    yarp::sig::Vector indexPos = indexH.getCol(3);
+    yarp::sig::Vector indexDir = indexH.getCol(1);
+
+    yarp::sig::Vector middlePos = middleH.getCol(3);
+    yarp::sig::Vector middleDir = middleH.getCol(1);
+
+
+    
+
+    yarp::sig::Vector thumbAFB = thumbA->getAng();
+    yarp::sig::Vector thumbBFB = thumbB->getAng();
+    yarp::sig::Vector indexFB = index->getAng();
+    yarp::sig::Vector middleFB = middle->getAng();
+
+    cout << dbgTag << "thumbAFB pose: ";
+    for(size_t i = 0; i < thumbAFB.length(); i++){
+        cout << thumbAFB[i] << " ";
+    }
+    cout << "\n";
+    cout << dbgTag << "thumbBFB pose: ";
+    for(size_t i = 0; i < thumbBFB.length(); i++){
+        cout << thumbBFB[i] << " ";
+    }
+    cout << "\n";
+    cout << dbgTag << "indexFB pose: ";
+    for(size_t i = 0; i < indexFB.length(); i++){
+        cout << indexFB[i] << " ";
+    }
+    cout << "\n";
+    cout << dbgTag << "middleFB pose: ";
+    for(size_t i = 0; i < middleFB.length(); i++){
+        cout << middleFB[i] << " ";
+    }
+    cout << "\n";
+
+/*
+    cout << dbgTag << "thumbA pose: ";
+    for(size_t i = 0; i < thumbAPos.length(); i++){
+        cout << thumbAPos[i] << " ";
+    }
+    cout << "\n";
+    cout << dbgTag << "thumbA dir: ";
+    for(size_t i = 0; i < thumbADir.length(); i++){
+        cout << thumbADir[i] << " ";
+    }
+    cout << "\n";
+
+    cout << dbgTag << "thumbB pose: ";
+    for(size_t i = 0; i < thumbBPos.length(); i++){
+        cout << thumbBPos[i] << " ";
+    }
+    cout << "\n";
+    cout << dbgTag << "thumbB dir: ";
+    for(size_t i = 0; i < thumbBDir.length(); i++){
+        cout << thumbBDir[i] << " ";
+    }
+    cout << "\n";
+
+    cout << dbgTag << "index pose: ";
+    for(size_t i = 0; i < indexPos.length(); i++){
+        cout << indexPos[i] << " ";
+    }
+    cout << "\n";
+    cout << dbgTag << "index dir: ";
+    for(size_t i = 0; i < indexDir.length(); i++){
+        cout << indexDir[i] << " ";
+    }
+    cout << "\n";
+
+    cout << dbgTag << "middle pose: ";
+    for(size_t i = 0; i < middlePos.length(); i++){
+        cout << middlePos[i] << " ";
+    }
+    cout << "\n";
+    cout << dbgTag << "middle dir: ";
+    for(size_t i = 0; i < middleDir.length(); i++){
+        cout << middleDir[i] << " ";
+    }
+    cout << "\n";
+
+*/
+
 }
