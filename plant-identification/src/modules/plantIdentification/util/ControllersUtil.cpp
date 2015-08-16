@@ -226,32 +226,24 @@ bool ControllersUtil::setArmInTaskPosition() {
         iPos->positionMove(15, 1);
     } else {
 	    // Arm
-//	    iPos->positionMove(0 ,-38);
-//        iPos->positionMove(1 , 23);
-//        iPos->positionMove(2 , 0);
-//        iPos->positionMove(3 , 19);
+	    iPos->positionMove(0 ,-35);
+        iPos->positionMove(1 , 29);
+        iPos->positionMove(2 , 21);
+        iPos->positionMove(3 , 33);
         
-        iPos->positionMove(4 , -14);// 0
-        iPos->positionMove(5 , 3);// 1
+        iPos->positionMove(4 , -20);// 0
+        iPos->positionMove(5 , 2);// 1
         iPos->positionMove(6 , -20);// 1
-        iPos->positionMove(7 , 14);
+        iPos->positionMove(7 , 12);
         
 	    // Hand
-//        iPos->positionMove(8 , 50);
-//        iPos->positionMove(9 , 0);
-//        iPos->positionMove(10, 0);
-//        iPos->positionMove(11, 0);
-//        iPos->positionMove(12, 10);
-//        iPos->positionMove(13, 0);
-//        iPos->positionMove(14, 10);
-//        iPos->positionMove(15, 0);
-        iPos->positionMove(8 , 50);
-        iPos->positionMove(9 , 0);
+        iPos->positionMove(8 , 72);
+        iPos->positionMove(9 , 3);
         iPos->positionMove(10, 15);
-        iPos->positionMove(11, 0);
-        iPos->positionMove(12, 0);
-        iPos->positionMove(13, 0);
-        iPos->positionMove(14, 15);
+        iPos->positionMove(11, 2);
+        iPos->positionMove(12, 8);
+        iPos->positionMove(13, 3);
+        iPos->positionMove(14, 30);
         iPos->positionMove(15, 1);
     }
 
@@ -399,21 +391,14 @@ bool ControllersUtil::openHand() {
         iPos->positionMove(14, 15);
         iPos->positionMove(15, 1);
     } else {
-//        iPos->positionMove(8 , 45);
-//        iPos->positionMove(9 , 0);
-//        iPos->positionMove(10, 0);
-//        iPos->positionMove(11, 0);
-//        iPos->positionMove(12, 10);
-//        iPos->positionMove(13, 0);
-//        iPos->positionMove(14, 10);
-//        iPos->positionMove(15, 0);
-        iPos->positionMove(8 , 50);
-        iPos->positionMove(9 , 0);
+
+        iPos->positionMove(8 , 72);
+        iPos->positionMove(9 , 3);
         iPos->positionMove(10, 15);
-        iPos->positionMove(11, 0);
-        iPos->positionMove(12, 0);
-        iPos->positionMove(13, 0);
-        iPos->positionMove(14, 15);
+        iPos->positionMove(11, 2);
+        iPos->positionMove(12, 8);
+        iPos->positionMove(13, 3);
+        iPos->positionMove(14, 30);
         iPos->positionMove(15, 1);
     }
 
