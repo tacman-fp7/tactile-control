@@ -60,9 +60,13 @@ namespace iCub {
 
 			private :
 
-				void addOption(yarp::os::Bottle &bottle,char *paramName,yarp::os::Value paramValue);
+				void addOption(yarp::os::Bottle &bottle,const char *paramName,yarp::os::Value paramValue);
 
-				void addOption(yarp::os::Bottle &bottle,char *paramName,yarp::os::Value paramValue1,yarp::os::Value paramValue2);
+				void addOption(yarp::os::Bottle &bottle,const char *paramName,yarp::os::Value paramValue1,yarp::os::Value paramValue2);
+
+				void scaleGains(double scaleFactor);
+
+				void replaceBottle(yarp::os::Bottle &oldBottle,yarp::os::Bottle &newBottle,double scaleFactor);
 
 				double calculateTt(double kp,double ki,double kd);
 

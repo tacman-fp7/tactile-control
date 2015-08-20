@@ -21,6 +21,8 @@ namespace iCub {
 			std::vector<std::vector<double> > previousOverallFingerPressures;
 			std::vector<int> previousPressuresIndex;
 			std::vector<double> overallFingerPressure;
+			std::vector<double> overallFingerPressureBySimpleSum;
+			std::vector<double> overallFingerPressureByWeightedSum;
 			std::vector<double> overallFingerPressureMedian;
 			std::vector<double> objDetectPressureThresholds;
 			std::vector<double> armEncodersAngles;

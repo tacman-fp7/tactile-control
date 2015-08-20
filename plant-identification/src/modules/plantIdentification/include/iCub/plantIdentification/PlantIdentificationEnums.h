@@ -91,6 +91,13 @@ namespace iCub {
 			BOTH_GAINS_SETS = 2
 		};
 
+		enum ForceCalculationMode {
+
+			SIMPLE_SUM = 0,
+			WEIGHTED_SUM = 1,
+			MAPPING = 2
+		};
+
 	}
 }
 

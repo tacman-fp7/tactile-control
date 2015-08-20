@@ -27,6 +27,7 @@ set(INC_HEADERS
     include/iCub/plantIdentification/util/ControllersUtil.h
     include/iCub/plantIdentification/util/PortsUtil.h
     include/iCub/plantIdentification/util/RPCCommandsUtil.h
+    include/iCub/plantIdentification/util/ICubUtil.h
 
 )
 
@@ -51,6 +52,8 @@ set(INC_SOURCES
     util/ControllersUtil.cpp
     util/PortsUtil.cpp
     util/RPCCommandsUtil.cpp
+    util/ICubUtil.cpp
+
 )
 
 source_group("Source Files" FILES ${INC_SOURCES})

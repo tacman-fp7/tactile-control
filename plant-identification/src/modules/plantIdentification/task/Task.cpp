@@ -1,6 +1,7 @@
 #include "iCub/plantIdentification/task/Task.h"
 
 #include <iCub/plantIdentification/PlantIdentificationEnums.h>
+#include <iCub/plantIdentification/util/ICubUtil.h>
 
 #include <gsl/gsl_sort.h>
 #include <gsl/gsl_statistics.h>
@@ -65,6 +66,7 @@ bool Task::manage(bool keepActive){
 	buildLogData(logData);
 
 	portsUtil->sendLogData(logData);
+	portsUtil->sendInfoData(commonData);
 
 	if (callsNumber%commonData->screenLogStride == 0){
 		printScreenLog();
@@ -128,11 +130,16 @@ void Task::processTactileData(){
 	double partialOverallFingerPressure;
 
 	for(size_t i = 0; i < commonData->fingerTaxelsData.size(); i++){
-		partialOverallFingerPressure = 0.0;
+		
+		commonData->overallFingerPressureBySimpleSum[i] = ICubUtil::getForce(commonData->fingerTaxelsData[i],SIMPLE_SUM);
+		commonData->overallFingerPressureByWeightedSum[i] = ICubUtil::getForce(commonData->fingerTaxelsData[i],WEIGHTED_SUM);
+		
+		/*partialOverallFingerPressure = 0.0;
 		for(size_t j = 0; j < commonData->fingerTaxelsData[i].size(); j++){
 			partialOverallFingerPressure += commonData->fingerTaxelsData[i][j];
-		}
-		commonData->overallFingerPressure[i] = partialOverallFingerPressure;
+		}*/
+		
+		commonData->overallFingerPressure[i] = commonData->overallFingerPressureByWeightedSum[i];
 
 		commonData->previousOverallFingerPressures[i][commonData->previousPressuresIndex[i]] = commonData->overallFingerPressure[i];
 		commonData->previousPressuresIndex[i] = (commonData->previousPressuresIndex[i] + 1)%commonData->previousOverallFingerPressures[i].size();
@@ -169,7 +176,7 @@ void Task::addCommonLogData(LogData &logData){
 
 
         // TODO inputCommandValue has actually 'jointsList.size' values, but it works if I just command proximals joints
-        logData.pwm[i] = inputCommandValue[fingersList[i]];
+        logData.pwm[i] = inputCommandValue[i];
     }
 }
 

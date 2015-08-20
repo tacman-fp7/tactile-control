@@ -23,6 +23,7 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
     string moduleSkinCompPortName = "/plantIdentification/skin/" + whichHand + "_hand_comp:i";
     string icubSkinCompPortName = "/icub/skin/" + whichHand + "_hand_comp";
     string logDataPortName = "/plantIdentification/log:o";
+    string infoDataPortName = "/plantIdentification/info:o";
 
     // opening ports
 	if (!portSkinCompIn.open(moduleSkinCompPortName)){
@@ -31,6 +32,10 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
     }
 	if (!portLogDataOut.open(logDataPortName)){
         cout << dbgTag << "could not open " << logDataPortName << " port \n";
+        return false;
+    }
+	if (!portInfoDataOut.open(infoDataPortName)){
+        cout << dbgTag << "could not open " << infoDataPortName << " port \n";
         return false;
     }
 
@@ -50,11 +55,33 @@ bool PortsUtil::sendLogData(LogData &logData){
 
 	Bottle& logBottle = portLogDataOut.prepare();
 	logBottle.clear();
+
 	logData.toBottle(logBottle);
+
 	portLogDataOut.write();
 
 	return true;
 }
+
+bool PortsUtil::sendInfoData(iCub::plantIdentification::TaskCommonData *commonData){
+
+	using yarp::os::Bottle;
+
+	Bottle& infoBottle = portInfoDataOut.prepare();
+	infoBottle.clear();
+
+	for(size_t i; i < commonData->overallFingerPressureByWeightedSum.size(); i++){
+		infoBottle.add(commonData->overallFingerPressureByWeightedSum[i]);
+	}
+	for(size_t i; i < commonData->overallFingerPressureBySimpleSum.size(); i++){
+		infoBottle.add(commonData->overallFingerPressureBySimpleSum[i]);
+	}
+
+	portInfoDataOut.write();
+
+	return true;
+}
+
 
 bool PortsUtil::readFingerSkinCompData(std::vector<std::vector<double> > &fingerTaxelsData){
 

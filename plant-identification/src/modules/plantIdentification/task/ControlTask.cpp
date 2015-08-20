@@ -177,9 +177,6 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	svPid->setOptions(svPidOptions);
 	/******/
 
-
-
-
 	if (resetErrOnContact){
 		taskName = APPROACH_AND_CONTROL;
 		dbgTag = "Approach&ControlTask: ";
@@ -206,12 +203,101 @@ void ControlTask::init(){
 void ControlTask::calculateControlInput(){
 	using yarp::sig::Vector;
 
+	
+	if (commonData->tpDbl(10) > 0.001){
+		
+		scaleGains(commonData->tpDbl(10));
+
+		commonData->tempParameters[10] = Value(0.0);
+
+		std::stringstream gainsChangedLog("");
+		gainsChangedLog << "[ Kpf: " << controlData->pidKpf[0] << " Kif: " << controlData->pidKif[0] << " Kpb: " << controlData->pidKpb[0] << " Kib: " << controlData->pidKib[0] << " ]";
+		optionalLogString.append(gainsChangedLog.str());
+	}
+
+
+	/*** PARTE RELATIVA AL SUPERVISOR MODE ***/
+	if (supervisorControlMode){
+		double thumbEnc = commonData->armEncodersAngles[9];
+		double indexEnc = commonData->armEncodersAngles[11];
+		double middleEnc = commonData->armEncodersAngles[13];
+		double svErr;
+		Vector svRef;
+		Vector svFb;
+
+		if (jointsList.size() == 2){
+			svErr = ((middleEnc + thumbEnc - (-12.042))/(1 + 0.7021)) - middleEnc;
+			svRef.resize(1,(middleEnc + thumbEnc - (-12.042))/(1 + 0.7021));
+			svFb.resize(1,middleEnc);
+		} else {
+			// si calcola il valore dell'angolo prossimale del dito medio intersezione del piano delle pose migliori
+			double interMiddleEnc = -0.1046*thumbEnc + 0.8397*indexEnc + 10.05;
+			// si applica la formula della distanza tenendo conto che la differenza per i giunti di pollice e indice e' nulla. In teoria si sarebbe potuta evitare la divisione per due, perche' a noi interessa l'errore a meno di una costante
+			svErr = (interMiddleEnc - middleEnc)/2;
+			svRef.resize(1,interMiddleEnc);
+			svFb.resize(1,middleEnc);
+		}
+
+		
+		Vector svResult = svPid->compute(svRef,svFb);
+	
+		if (commonData->tpInt(4) != 0){
+			svPid->reset(svResult);
+			commonData->tempParameters[4] = Value(0);
+			optionalLogString.append("[ PID RESET ] ");
+		}
+
+		// 2 dita: valore POSITIVO se il MEDIO deve INCREMENTARE l'angolo 
+		// 3 dita: valore POSITIVO sempre
+		double svResultValueScaled = commonData->tpDbl(5)*svResult[0];
+		
+		if (jointsList.size() == 2){
+
+			pressureTargetValue[0] = commonData->tpDbl(7) *(1 - svResultValueScaled);
+			pressureTargetValue[1] = commonData->tpDbl(7) *(1 + svResultValueScaled);
+
+			//// se il valore e' positivo e quindi devo muovere il medio, devo aumentare la pressione richiesta al giunto 13, che si trova in posizione uno, altrimenti al giunto 9, in posizione 0
+			//if (svResultValueScaled >= 0){
+			//	pressureTargetValue[0] = initialPressureTargetValue[0] - svResultValueScaled/2.0;
+			//	pressureTargetValue[1] = initialPressureTargetValue[1] + svResultValueScaled/2.0;
+			//} else {
+			//	pressureTargetValue[0] = initialPressureTargetValue[0] - svResultValueScaled/2.0;
+			//	pressureTargetValue[1] = initialPressureTargetValue[1] + svResultValueScaled/2.0;
+			//}
+		} else {
+			// il valore temporaneo di indice 9 serve eventualmente ad equilibrare la calibratura di indice e medio
+			pressureTargetValue[0] = commonData->tpDbl(7)*(1-svResultValueScaled);
+			pressureTargetValue[1] = (1-commonData->tpDbl(9))*0.5*commonData->tpDbl(7)*(1+svResultValueScaled);
+			pressureTargetValue[2] = (1+commonData->tpDbl(9))*0.5*commonData->tpDbl(7)*(1+svResultValueScaled);
+		}
+
+    	if (callsNumber%commonData->screenLogStride == 0){
+    		std::stringstream printLog("");
+			if (jointsList.size() == 2){
+	    		printLog << " [P " << pressureTargetValue[0] << " - " << pressureTargetValue[1] << "]" << " [J " << thumbEnc << " - " << middleEnc << " err " << svErr << "]" ;
+			} else {
+				printLog << " [P " << pressureTargetValue[0] << " - " << pressureTargetValue[1] << " - " << pressureTargetValue[2] << "]" << " [J " << thumbEnc << " - " << indexEnc << " - " << middleEnc << " err " << svErr << "]" ;
+			}
+			optionalLogString.append(printLog.str());
+	    }
+		
+	}
+	/****/
+
+	// e' il generatore di onda quadra, sovrascrive quando fatto dal supervisor
+	if (commonData->tpInt(11) != 0){
+		double halfStep = commonData->tpDbl(12);
+		int div = (int)((callsNumber*commonData->threadRate/1000.0)/commonData->tpDbl(13));
+		if (div%2 == 1){
+			pressureTargetValue[0] = commonData->tpDbl(7) + halfStep;
+		} else {
+			pressureTargetValue[0] = commonData->tpDbl(7) + halfStep;
+		}
+	}
 
 	for(size_t i = 0; i < jointsList.size(); i++){
 
         double error = pressureTargetValue[i] - commonData->overallFingerPressure[fingersList[i]];
-
-
 
         if (controlData->controlMode == BOTH_GAINS_SETS){
 
@@ -247,51 +333,13 @@ void ControlTask::calculateControlInput(){
 
 		previousError[i] = error;
 
-	}
 
-	/*** PARTE RELATIVA AL SUPERVISOR MODE ***/
-	if (supervisorControlMode){
-		double middleEnc = commonData->armEncodersAngles[13];
-		double thumbEnc = commonData->armEncodersAngles[9];
-
-		double svErr = ((middleEnc + thumbEnc - (-12.042))/(1 + 0.7021)) - middleEnc;
-
-
-
-		Vector svRef(1,(middleEnc + thumbEnc - (-12.042))/(1 + 0.7021));
-		Vector svFb(1,middleEnc);
-		Vector svResult = svPid->compute(svRef,svFb);
-	
-		if (commonData->tpInt(4) != 0){
-			svPid->reset(svResult);
-			commonData->tempParameters[4] = Value(0);
-			optionalLogString.append("[ PID RESET ] ");
-		}
-
-		// valore POSITIVO se il MEDIO deve INCREMENTARE l'angolo
-		double svResultValueScaled = commonData->tpDbl(5)*svResult[0];
-		
-		// se il valore e' positivo e quindi devo muovere il medio, devo aumentare la pressione richiesta al giunto 13, che si trova in posizione uno, altrimenti al giunto 9, in posizione 0
-		if (svResultValueScaled >= 0){
-            pressureTargetValue[0] = initialPressureTargetValue[0] - svResultValueScaled/2.0;
-			pressureTargetValue[1] = initialPressureTargetValue[1] + svResultValueScaled/2.0;
-		} else {
-            pressureTargetValue[0] = initialPressureTargetValue[0] - svResultValueScaled/2.0;
-			pressureTargetValue[1] = initialPressureTargetValue[1] + svResultValueScaled/2.0;
-		}
-
-    	if (callsNumber%commonData->screenLogStride == 0){
-    		std::stringstream printLog("");
-	    	printLog << " [P " << pressureTargetValue[0] << " - " << pressureTargetValue[1] << "]" << " [J " << thumbEnc << " - " << middleEnc << " err " << svErr << "]" ;
-		    optionalLogString.append(printLog.str());
-	    }
-		
 		if (commonData->tpInt(6) != 0){
-			inputCommandValue[0] = 0.0;
-			inputCommandValue[1] = 0.0;
+			inputCommandValue[i] = 0.0;
 		}
+
 	}
-	/******/
+
 }
 
 void ControlTask::buildLogData(LogData &logData){
@@ -327,7 +375,7 @@ void ControlTask::release(){
 	
 }
 
-void ControlTask::addOption(Bottle &bottle,char *paramName,Value paramValue){
+void ControlTask::addOption(Bottle &bottle,const char *paramName,Value paramValue){
 
 	Bottle valueBottle,paramBottle;
 
@@ -339,7 +387,7 @@ void ControlTask::addOption(Bottle &bottle,char *paramName,Value paramValue){
 	bottle.addList() = paramBottle;
 }
 
-void ControlTask::addOption(Bottle &bottle,char *paramName,Value paramValue1,Value paramValue2){
+void ControlTask::addOption(Bottle &bottle,const char *paramName,Value paramValue1,Value paramValue2){
 
 	Bottle valueBottle,paramBottle;
 
@@ -350,6 +398,52 @@ void ControlTask::addOption(Bottle &bottle,char *paramName,Value paramValue1,Val
 	paramBottle.addList() = valueBottle;
 
 	bottle.addList() = paramBottle;
+}
+
+void ControlTask::scaleGains(double scaleFactor){
+
+	for(size_t i = 0; i < pid.size(); i++){
+		Bottle oldOptions;
+		pid[i]->getOptions(oldOptions);
+
+		Bottle newOptions;
+
+		replaceBottle(oldOptions,newOptions,scaleFactor);
+
+		pid[i]->setOptions(newOptions);
+
+		Bottle newOptionPE,newOptionNE;
+
+		replaceBottle(pidOptionsPE[i],newOptionPE,scaleFactor);
+		replaceBottle(pidOptionsNE[i],newOptionNE,scaleFactor);
+		pidOptionsPE[i] = newOptionPE;
+		pidOptionsNE[i] = newOptionNE;
+
+		controlData->pidKpf[i] = scaleFactor*controlData->pidKpf[i];
+		controlData->pidKif[i] = scaleFactor*controlData->pidKif[i];
+		controlData->pidKpb[i] = scaleFactor*controlData->pidKpb[i];
+		controlData->pidKib[i] = scaleFactor*controlData->pidKib[i];
+
+	}
+
+}
+
+void ControlTask::replaceBottle(yarp::os::Bottle &oldBottle,yarp::os::Bottle &newBottle,double scaleFactor){
+
+	for(size_t i; i < oldBottle.size(); i++){
+		Bottle *paramBottle = oldBottle.get(i).asList();
+
+		string paramName = paramBottle->get(0).asString();
+
+		if (paramName == "Kp" || paramName == "Ki"){
+			double gain = paramBottle->get(1).asList()->get(0).asDouble();
+			addOption(newBottle,paramName.c_str(),Value(gain*scaleFactor));
+
+		} else {
+			newBottle.addList() = *paramBottle;
+		}
+
+	}
 }
 
 double ControlTask::calculateTt(double kp,double ki,double kd){

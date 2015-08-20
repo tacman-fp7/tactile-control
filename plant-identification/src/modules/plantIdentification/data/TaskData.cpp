@@ -48,6 +48,8 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,int threadRate,iCub::plantIdenti
 	}
 	commonData.previousPressuresIndex.resize(5,0);
 	commonData.overallFingerPressure.resize(5,0.0);
+	commonData.overallFingerPressureBySimpleSum.resize(5,0.0);
+	commonData.overallFingerPressureByWeightedSum.resize(5,0.0);
 	commonData.overallFingerPressureMedian.resize(5,0.0);
 	commonData.armEncodersAngles.resize(controllersUtil->armJointsNum,0.0);      
 
