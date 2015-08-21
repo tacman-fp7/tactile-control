@@ -254,8 +254,8 @@ void ControlTask::calculateControlInput(){
 		
 		if (jointsList.size() == 2){
 
-			pressureTargetValue[0] = commonData->tpDbl(7) *(1 - svResultValueScaled);
-			pressureTargetValue[1] = commonData->tpDbl(7) *(1 + svResultValueScaled);
+			pressureTargetValue[0] = commonData->tpDbl(7) *(1 - (commonData->tpDbl(8)+svResultValueScaled));
+			pressureTargetValue[1] = commonData->tpDbl(7) *(1 + (commonData->tpDbl(8)+svResultValueScaled));
 
 			//// se il valore e' positivo e quindi devo muovere il medio, devo aumentare la pressione richiesta al giunto 13, che si trova in posizione uno, altrimenti al giunto 9, in posizione 0
 			//if (svResultValueScaled >= 0){
@@ -267,9 +267,9 @@ void ControlTask::calculateControlInput(){
 			//}
 		} else {
 			// il valore temporaneo di indice 9 serve eventualmente ad equilibrare la calibratura di indice e medio
-			pressureTargetValue[0] = commonData->tpDbl(7)*(1-svResultValueScaled);
-			pressureTargetValue[1] = (1-commonData->tpDbl(9))*0.5*commonData->tpDbl(7)*(1+svResultValueScaled);
-			pressureTargetValue[2] = (1+commonData->tpDbl(9))*0.5*commonData->tpDbl(7)*(1+svResultValueScaled);
+			pressureTargetValue[0] = commonData->tpDbl(7)*(1 - (commonData->tpDbl(8)+svResultValueScaled));
+			pressureTargetValue[1] = (1-commonData->tpDbl(9))*0.5*commonData->tpDbl(7)*(1 + (commonData->tpDbl(8)+svResultValueScaled));
+			pressureTargetValue[2] = (1+commonData->tpDbl(9))*0.5*commonData->tpDbl(7)*(1 + (commonData->tpDbl(8)+svResultValueScaled));
 		}
 
     	if (callsNumber%commonData->screenLogStride == 0){
@@ -277,7 +277,7 @@ void ControlTask::calculateControlInput(){
 			if (jointsList.size() == 2){
 	    		printLog << " [P " << pressureTargetValue[0] << " - " << pressureTargetValue[1] << "]" << " [J " << thumbEnc << " - " << middleEnc << " err " << svErr << "]" ;
 			} else {
-				printLog << " [P " << pressureTargetValue[0] << " - " << pressureTargetValue[1] << " - " << pressureTargetValue[2] << "]" << " [J " << thumbEnc << " - " << indexEnc << " - " << middleEnc << " err " << svErr << "]" ;
+				printLog << " [P " << pressureTargetValue[0] << " - " << pressureTargetValue[1] << " - " << pressureTargetValue[2] << "]" << " [J " << thumbEnc << " - " << indexEnc << " - " << middleEnc << " err " << svErr << " u " << commonData->tpDbl(8)+svResultValueScaled << "]" ;
 			}
 			optionalLogString.append(printLog.str());
 	    }
