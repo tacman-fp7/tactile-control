@@ -23,7 +23,7 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
     string moduleSkinCompPortName = "/plantIdentification/skin/" + whichHand + "_hand_comp:i";
     string icubSkinCompPortName = "/icub/skin/" + whichHand + "_hand_comp";
     string logDataPortName = "/plantIdentification/log:o";
-    string infoDataPortName = "/plantIdentification/info:o";
+    string infoDataPortName = "/plantIdentification/info";
 
     // opening ports
 	if (!portSkinCompIn.open(moduleSkinCompPortName)){

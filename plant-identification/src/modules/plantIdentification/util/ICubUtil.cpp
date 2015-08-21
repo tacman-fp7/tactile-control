@@ -1,5 +1,6 @@
 #include "iCub/plantIdentification/util/ICubUtil.h"
 
+#include <cmath>
 
 using iCub::plantIdentification::ICubUtil;
 
@@ -30,7 +31,7 @@ double ICubUtil::getForceBySimpleSum(std::vector<double>& tactileData){
 
 	double partialSum = 0.0;
 
-	for(size_t i = 0; i < tactileData.size(); i++){
+	for(int i = 0; i < tactileData.size(); i++){
 		partialSum += tactileData[i];
 	}
 
@@ -44,7 +45,7 @@ double ICubUtil::getForceByWeightedSum(std::vector<double>& tactileData){
 	double partialZSum = 0.0;
 	std::vector<double> unitVector(3);
 
-	for(size_t i = 0; i < tactileData.size(); i++){
+	for(int i = 0; i < tactileData.size(); i++){
 		
 		getUnitVector(i,unitVector);
 

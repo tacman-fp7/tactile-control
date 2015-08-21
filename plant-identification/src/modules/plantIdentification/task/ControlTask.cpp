@@ -291,7 +291,7 @@ void ControlTask::calculateControlInput(){
 		if (div%2 == 1){
 			pressureTargetValue[0] = commonData->tpDbl(7) + halfStep;
 		} else {
-			pressureTargetValue[0] = commonData->tpDbl(7) + halfStep;
+			pressureTargetValue[0] = commonData->tpDbl(7) - halfStep;
 		}
 	}
 
@@ -339,6 +339,11 @@ void ControlTask::calculateControlInput(){
 		}
 
 	}
+    if (callsNumber%commonData->screenLogStride == 0 && commonData->tpInt(14)!=0){
+        std::stringstream gainsLog("");
+		gainsLog << "[K " << controlData->pidKpf[0] << " " << controlData->pidKif[0] << "][T " << pressureTargetValue[0] << "]";
+		optionalLogString.append(gainsLog.str());
+    }
 
 }
 
@@ -402,8 +407,9 @@ void ControlTask::addOption(Bottle &bottle,const char *paramName,Value paramValu
 
 void ControlTask::scaleGains(double scaleFactor){
 
-	for(size_t i = 0; i < pid.size(); i++){
-		Bottle oldOptions;
+	for(int i = 0; i < pid.size(); i++){
+		
+        Bottle oldOptions;
 		pid[i]->getOptions(oldOptions);
 
 		Bottle newOptions;
@@ -430,7 +436,8 @@ void ControlTask::scaleGains(double scaleFactor){
 
 void ControlTask::replaceBottle(yarp::os::Bottle &oldBottle,yarp::os::Bottle &newBottle,double scaleFactor){
 
-	for(size_t i; i < oldBottle.size(); i++){
+	for(int i = 0; i < oldBottle.size(); i++){
+        
 		Bottle *paramBottle = oldBottle.get(i).asList();
 
 		string paramName = paramBottle->get(0).asString();
@@ -438,7 +445,9 @@ void ControlTask::replaceBottle(yarp::os::Bottle &oldBottle,yarp::os::Bottle &ne
 		if (paramName == "Kp" || paramName == "Ki"){
 			double gain = paramBottle->get(1).asList()->get(0).asDouble();
 			addOption(newBottle,paramName.c_str(),Value(gain*scaleFactor));
-
+            if (commonData->tpInt(14)!=0){
+                //std::cout << "old " << paramName << ": " << gain << " new: " << gain*scaleFactor << "\n";
+            }
 		} else {
 			newBottle.addList() = *paramBottle;
 		}
