@@ -231,7 +231,8 @@ void ControlTask::calculateControlInput(){
 			svFb.resize(1,middleEnc);
 		} else {
 			// si calcola il valore dell'angolo prossimale del dito medio intersezione del piano delle pose migliori
-			double interMiddleEnc = -0.1046*thumbEnc + 0.8397*indexEnc + 10.05;
+			//double interMiddleEnc = -0.1046*thumbEnc + 0.8397*indexEnc + 10.05;
+			double interMiddleEnc = 1.4667*thumbEnc -1.0*indexEnc + 34.96;
 			// si applica la formula della distanza tenendo conto che la differenza per i giunti di pollice e indice e' nulla. In teoria si sarebbe potuta evitare la divisione per due, perche' a noi interessa l'errore a meno di una costante
 			svErr = (interMiddleEnc - middleEnc)/2;
 			svRef.resize(1,interMiddleEnc);
