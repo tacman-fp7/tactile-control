@@ -24,6 +24,7 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
     string icubSkinCompPortName = "/icub/skin/" + whichHand + "_hand_comp";
     string logDataPortName = "/plantIdentification/log:o";
     string infoDataPortName = "/plantIdentification/info";
+    string controlDataPortName = "/plantIdentification/control";
 
     // opening ports
 	if (!portSkinCompIn.open(moduleSkinCompPortName)){
@@ -36,6 +37,10 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
     }
 	if (!portInfoDataOut.open(infoDataPortName)){
         cout << dbgTag << "could not open " << infoDataPortName << " port \n";
+        return false;
+    }
+	if (!portControlDataOut.open(controlDataPortName)){
+        cout << dbgTag << "could not open " << controlDataPortName << " port \n";
         return false;
     }
 
@@ -78,6 +83,38 @@ bool PortsUtil::sendInfoData(iCub::plantIdentification::TaskCommonData *commonDa
 	}
 
 	portInfoDataOut.write();
+
+	return true;
+}
+
+bool PortsUtil::sendControlData(double s,double u,double error,double svKp,double svKi,std::vector<double> &armEncodersAngles,std::vector<double> &pressureTarget,std::vector<double> &actualPressure,std::vector<int> &fingersList){
+
+	using yarp::os::Bottle;
+
+	Bottle& ctrlBottle = portControlDataOut.prepare();
+	ctrlBottle.clear();
+
+	double fingerJoint;
+
+	ctrlBottle.addInt(pressureTarget.size());//1
+	ctrlBottle.addDouble(s);//2
+	ctrlBottle.addDouble(u);//3
+	ctrlBottle.addDouble(error);//4
+	ctrlBottle.addDouble(svKp);//5
+	ctrlBottle.addDouble(svKi);//6
+	for(int i = 0; i < pressureTarget.size(); i++){
+		// TODO use function getProximalJointFromFingerNumber
+		if (fingersList[i] == 0) fingerJoint == 11;
+		else if (fingersList[i] == 1) fingerJoint == 13;
+		else fingerJoint == 9;
+		
+		ctrlBottle.addInt(fingersList[i]);// 7 ... 11 ...
+		ctrlBottle.addDouble(armEncodersAngles[fingerJoint]);// 8 ... 12 ...
+		ctrlBottle.addDouble(pressureTarget[i]);// 9 ... 13 ...
+		ctrlBottle.addDouble(actualPressure[fingersList[i]]);// 10 ... 14...
+	}
+
+	portControlDataOut.write();
 
 	return true;
 }

@@ -22,6 +22,7 @@ namespace iCub {
                 yarp::os::BufferedPort<yarp::sig::Vector> portSkinCompIn;
 				yarp::os::BufferedPort<yarp::os::Bottle> portLogDataOut;
 				yarp::os::BufferedPort<yarp::os::Bottle> portInfoDataOut;
+				yarp::os::BufferedPort<yarp::os::Bottle> portControlDataOut;
 
                 /* ******* Debug attributes.                ******* */
                 std::string dbgTag;
@@ -35,6 +36,8 @@ namespace iCub {
 				bool sendLogData(iCub::plantIdentification::LogData &logData);
 
 				bool sendInfoData(iCub::plantIdentification::TaskCommonData *commonData);
+
+				bool sendControlData(double s,double u,double error,double svKp,double svKi,std::vector<double> &armEncodersAngles,std::vector<double> &pressureTarget,std::vector<double> &actualPressure,std::vector<int> &fingersList);
 
 				bool readFingerSkinCompData(std::vector<std::vector<double> > &fingerTaxelsData);
 

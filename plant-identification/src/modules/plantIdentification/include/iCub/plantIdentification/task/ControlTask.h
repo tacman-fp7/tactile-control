@@ -24,6 +24,8 @@ namespace iCub {
 				// pid options bottle when error < 0
 				std::vector<yarp::os::Bottle> pidOptionsNE;
 				std::vector<double> pressureTargetValue;
+
+				iCub::plantIdentification::PortsUtil *portsUtil;
 				
 				/* variables used for error integral reset mode */
 				bool resetErrOnContact;

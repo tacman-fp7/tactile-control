@@ -26,6 +26,8 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	using yarp::sig::Matrix;
     this->controlData = controlData;
 
+	this->portsUtil = portsUtil;
+
 	this->resetErrOnContact = resetErrOnContact;
 	fingerIsInContact.resize(commonData->objDetectPressureThresholds.size(),false);
 
@@ -202,7 +204,6 @@ void ControlTask::init(){
 
 void ControlTask::calculateControlInput(){
 	using yarp::sig::Vector;
-
 	
 	if (commonData->tpDbl(10) > 0.001){
 		
@@ -217,11 +218,12 @@ void ControlTask::calculateControlInput(){
 
 
 	/*** PARTE RELATIVA AL SUPERVISOR MODE ***/
+	double svResultValueScaled;
+	double svErr;
 	if (supervisorControlMode){
 		double thumbEnc = commonData->armEncodersAngles[9];
 		double indexEnc = commonData->armEncodersAngles[11];
 		double middleEnc = commonData->armEncodersAngles[13];
-		double svErr;
 		Vector svRef;
 		Vector svFb;
 
@@ -250,7 +252,7 @@ void ControlTask::calculateControlInput(){
 
 		// 2 dita: valore POSITIVO se il MEDIO deve INCREMENTARE l'angolo 
 		// 3 dita: valore POSITIVO sempre
-		double svResultValueScaled = commonData->tpDbl(5)*svResult[0];
+		svResultValueScaled = commonData->tpDbl(5)*svResult[0];
 		
 		if (jointsList.size() == 2){
 
@@ -345,6 +347,9 @@ void ControlTask::calculateControlInput(){
 		gainsLog << "[K " << controlData->pidKpf[0] << " " << controlData->pidKif[0] << "][T " << pressureTargetValue[0] << "]";
 		optionalLogString.append(gainsLog.str());
     }
+
+	//double s,double u,double error,double svKp,double svKi,std::vector<double> &pressureTarget,std::vector<double> &actualPressure){
+	portsUtil->sendControlData(commonData->tpDbl(7),commonData->tpDbl(8)+svResultValueScaled,svErr,svKp*commonData->tpDbl(5),svKi*commonData->tpDbl(5),commonData->armEncodersAngles,pressureTargetValue,commonData->overallFingerPressure,fingersList);
 
 }
 
