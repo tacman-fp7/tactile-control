@@ -37,7 +37,7 @@ namespace iCub {
 
 				bool sendInfoData(iCub::plantIdentification::TaskCommonData *commonData);
 
-				bool sendControlData(double s,double u,double error,double svKp,double svKi,std::vector<double> &armEncodersAngles,std::vector<double> &pressureTarget,std::vector<double> &actualPressure,std::vector<int> &fingersList);
+				bool sendControlData(double s,double u,double error,double svKp,double svKi,double thumbEnc,double indexEnc,double middleEnc,std::vector<double> &pressureTarget,std::vector<double> &actualPressure,std::vector<int> &fingersList);
 
 				bool readFingerSkinCompData(std::vector<std::vector<double> > &fingerTaxelsData);
 

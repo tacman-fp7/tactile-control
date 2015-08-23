@@ -87,7 +87,7 @@ bool PortsUtil::sendInfoData(iCub::plantIdentification::TaskCommonData *commonDa
 	return true;
 }
 
-bool PortsUtil::sendControlData(double s,double u,double error,double svKp,double svKi,std::vector<double> &armEncodersAngles,std::vector<double> &pressureTarget,std::vector<double> &actualPressure,std::vector<int> &fingersList){
+bool PortsUtil::sendControlData(double s,double u,double error,double svKp,double svKi,double thumbEnc,double indexEnc,double middleEnc,std::vector<double> &pressureTarget,std::vector<double> &actualPressure,std::vector<int> &fingersList){
 
 	using yarp::os::Bottle;
 
@@ -102,16 +102,19 @@ bool PortsUtil::sendControlData(double s,double u,double error,double svKp,doubl
 	ctrlBottle.addDouble(error);//4
 	ctrlBottle.addDouble(svKp);//5
 	ctrlBottle.addDouble(svKi);//6
+	ctrlBottle.addDouble(thumbEnc);//7
+	ctrlBottle.addDouble(indexEnc);//8
+	ctrlBottle.addDouble(middleEnc);//9
 	for(int i = 0; i < pressureTarget.size(); i++){
 		// TODO use function getProximalJointFromFingerNumber
-		if (fingersList[i] == 0) fingerJoint == 11;
-		else if (fingersList[i] == 1) fingerJoint == 13;
-		else fingerJoint == 9;
+//		if (fingersList[i] == 0) fingerJoint == 11;
+//		else if (fingersList[i] == 1) fingerJoint == 13;
+//		else fingerJoint == 9;
 		
-		ctrlBottle.addInt(fingersList[i]);// 7 ... 11 ...
-		ctrlBottle.addDouble(armEncodersAngles[fingerJoint]);// 8 ... 12 ...
-		ctrlBottle.addDouble(pressureTarget[i]);// 9 ... 13 ...
-		ctrlBottle.addDouble(actualPressure[fingersList[i]]);// 10 ... 14...
+		ctrlBottle.addInt(fingersList[i]);// 10 ... 13 ...
+//		ctrlBottle.addDouble(armEncodersAngles[fingerJoint]);// 8 ... 12 ...
+		ctrlBottle.addDouble(pressureTarget[i]);// 11 ... 14 ...
+		ctrlBottle.addDouble(actualPressure[fingersList[i]]);// 12 ... 15...
 	}
 
 	portControlDataOut.write();

@@ -220,10 +220,11 @@ void ControlTask::calculateControlInput(){
 	/*** PARTE RELATIVA AL SUPERVISOR MODE ***/
 	double svResultValueScaled;
 	double svErr;
+	double thumbEnc,indexEnc,middleEnc;
 	if (supervisorControlMode){
-		double thumbEnc = commonData->armEncodersAngles[9];
-		double indexEnc = commonData->armEncodersAngles[11];
-		double middleEnc = commonData->armEncodersAngles[13];
+		thumbEnc = commonData->armEncodersAngles[9];
+		indexEnc = commonData->armEncodersAngles[11];
+		middleEnc = commonData->armEncodersAngles[13];
 		Vector svRef;
 		Vector svFb;
 
@@ -349,7 +350,7 @@ void ControlTask::calculateControlInput(){
     }
 
 	//double s,double u,double error,double svKp,double svKi,std::vector<double> &pressureTarget,std::vector<double> &actualPressure){
-	portsUtil->sendControlData(commonData->tpDbl(7),commonData->tpDbl(8)+svResultValueScaled,svErr,svKp*commonData->tpDbl(5),svKi*commonData->tpDbl(5),commonData->armEncodersAngles,pressureTargetValue,commonData->overallFingerPressure,fingersList);
+	portsUtil->sendControlData(commonData->tpDbl(7),commonData->tpDbl(8)+svResultValueScaled,svErr,svKp*commonData->tpDbl(5),svKi*commonData->tpDbl(5),thumbEnc,indexEnc,middleEnc,pressureTargetValue,commonData->overallFingerPressure,fingersList);
 
 }
 
