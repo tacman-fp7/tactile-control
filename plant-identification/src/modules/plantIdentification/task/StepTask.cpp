@@ -62,7 +62,6 @@ void StepTask::calculateControlInput(){
 				if (inputCommandValue[i]<0) inputCommandValue[i]=0;
 			}
 
-
 		}
 	}
 }
