@@ -34,12 +34,36 @@ void StepTask::init(){
 	}
 	cout << "\n\n";
 
+	//TODO TO BE REMOVED
+	pinkyAngleReference = commonData->armEncodersAngles[15];
+
 }
 
 void StepTask::calculateControlInput(){
 
 	for(size_t i = 0; i < constantPwm.size(); i++){
 		inputCommandValue[i] = constantPwm[i];
+	}
+
+	//TODO TO BE REMOVED!
+	if (commonData->tpInt(15) != 0){
+		if (inputCommandValue.size() == 3){
+			double pinkyEnc = commonData->armEncodersAngles[15];
+			double diff = pinkyEnc - pinkyAngleReference;
+			inputCommandValue[0] = constantPwm[0] - diff*10;
+			inputCommandValue[1] = constantPwm[1] + diff*5;
+			inputCommandValue[2] = constantPwm[2] + diff*5;
+			
+			std::stringstream printLog("");
+			printLog << "[ref " << pinkyAngleReference << " pinky " << pinkyEnc << " diff " << diff << "]";
+			optionalLogString.append(printLog.str());
+
+			for(size_t i = 0; i < inputCommandValue.size(); i++){
+				if (inputCommandValue[i]<0) inputCommandValue[i]=0;
+			}
+
+
+		}
 	}
 }
 

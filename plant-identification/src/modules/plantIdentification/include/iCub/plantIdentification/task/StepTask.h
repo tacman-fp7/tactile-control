@@ -16,6 +16,9 @@ namespace iCub {
 				iCub::plantIdentification::StepTaskData *stepData;
 				std::vector<double> constantPwm;
 
+				//TODO TO BE REMOVED
+				double pinkyAngleReference;
+
             public:
 
                 StepTask(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,iCub::plantIdentification::StepTaskData *stepData,std::vector<double> &targetList);
