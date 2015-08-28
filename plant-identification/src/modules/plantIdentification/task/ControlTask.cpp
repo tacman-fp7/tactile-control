@@ -229,9 +229,12 @@ void ControlTask::calculateControlInput(){
 		Vector svFb;
 
 		if (jointsList.size() == 2){
-			svErr = ((middleEnc + thumbEnc - (-12.042))/(1 + 0.7021)) - middleEnc;
-			svRef.resize(1,(middleEnc + thumbEnc - (-12.042))/(1 + 0.7021));
+			svErr = (1.417*thumbEnc - 12.22) - middleEnc;
+			svRef.resize(1,1.417*thumbEnc - 12.22);
 			svFb.resize(1,middleEnc);
+			//svErr = ((middleEnc + thumbEnc - (-12.042))/(1 + 0.7021)) - middleEnc;
+			//svRef.resize(1,(middleEnc + thumbEnc - (-12.042))/(1 + 0.7021));
+			//svFb.resize(1,middleEnc);
 		} else {
 			// si calcola il valore dell'angolo prossimale del dito medio intersezione del piano delle pose migliori
 			//double interMiddleEnc = -0.1046*thumbEnc + 0.8397*indexEnc + 10.05;
@@ -278,7 +281,7 @@ void ControlTask::calculateControlInput(){
     	if (callsNumber%commonData->screenLogStride == 0){
     		std::stringstream printLog("");
 			if (jointsList.size() == 2){
-	    		printLog << " [P " << pressureTargetValue[0] << " - " << pressureTargetValue[1] << "]" << " [J " << thumbEnc << " - " << middleEnc << " err " << svErr << "]" ;
+	    		printLog << " [P " << pressureTargetValue[0] << " - " << pressureTargetValue[1] << "]" << " [J " << thumbEnc << " - " << middleEnc << " err " << svErr << " u " << commonData->tpDbl(8)+svResultValueScaled << "]" ;
 			} else {
 				printLog << " [P " << pressureTargetValue[0] << " - " << pressureTargetValue[1] << " - " << pressureTargetValue[2] << "]" << " [J " << thumbEnc << " - " << indexEnc << " - " << middleEnc << " err " << svErr << " u " << commonData->tpDbl(8)+svResultValueScaled << "]" ;
 			}
