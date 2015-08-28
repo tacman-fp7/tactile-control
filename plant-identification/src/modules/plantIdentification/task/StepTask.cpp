@@ -46,6 +46,7 @@ void StepTask::calculateControlInput(){
 	}
 
 	//TODO TO BE REMOVED!
+    pinkyAngleReference = 45;
 	if (commonData->tpInt(15) != 0){
 		if (inputCommandValue.size() == 3){
 			double pinkyEnc = commonData->armEncodersAngles[15];
@@ -54,12 +55,14 @@ void StepTask::calculateControlInput(){
 			inputCommandValue[1] = constantPwm[1] + diff*5;
 			inputCommandValue[2] = constantPwm[2] + diff*5;
 			
-			std::stringstream printLog("");
-			printLog << "[ref " << pinkyAngleReference << " pinky " << pinkyEnc << " diff " << diff << "]";
-			optionalLogString.append(printLog.str());
+            if (callsNumber%commonData->screenLogStride == 0){
+			    std::stringstream printLog("");
+			    printLog << "[ref " << pinkyAngleReference << " pinky " << pinkyEnc << " diff " << diff << "]";
+			    optionalLogString.append(printLog.str());
+            }
 
 			for(size_t i = 0; i < inputCommandValue.size(); i++){
-				if (inputCommandValue[i]<0) inputCommandValue[i]=0;
+				//if (inputCommandValue[i]<0) inputCommandValue[i]=0;
 			}
 
 		}
