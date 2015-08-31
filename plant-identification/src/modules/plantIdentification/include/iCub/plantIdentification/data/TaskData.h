@@ -30,6 +30,25 @@ namespace iCub {
             std::vector<double> realDistalPwm;
             std::vector<double> proximalJointAngle;
             std::vector<double> distalJointAngle;
+            
+            /*  TEMP PARAMETERS USED DURING CONTROL TASKS (EXCEPT THE 15th, USED DURING STEP TASKS)
+            *   0: supervisor mode on/off [0/1]
+            *   1: supervisor Kp
+            *   2: supervisor Ki
+            *   3: supervisor Kd
+            *   4: if set > 0, reset pid and returns to 0
+            *   5: supervisor gains scale factor
+            *   6: if != 0, set all voltages to 0 (maximum priority)
+            *   7: grasp squeezing factor
+            *   8: grasp balance factor
+            *   9: index/middle fingers balance factor
+            *   10: if set > 0, scales low level PID gains and returns to 0
+            *   11: square wave mode (to test low level PID)
+            *   12: wave amplitude
+            *   13: wave half period
+            *   14: prints on screen extra data about low level pid tuning
+            *   15: pinky mode on/off (control grasp balance with the pinky, settable during step tasks!)
+            */
 
 			std::vector<yarp::os::Value> tempParameters;
 

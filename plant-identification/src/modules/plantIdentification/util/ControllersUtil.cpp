@@ -241,7 +241,7 @@ bool ControllersUtil::setArmInTaskPosition() {
         iPos->positionMove(9 , 3);
         iPos->positionMove(10, 15);
         iPos->positionMove(11, 2);
-        iPos->positionMove(12, 30);// 0 if two fingers
+        iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
         iPos->positionMove(13, 3);
         iPos->positionMove(14, 30);
         iPos->positionMove(15, 1);
@@ -396,7 +396,7 @@ bool ControllersUtil::openHand() {
         iPos->positionMove(9 , 3);
         iPos->positionMove(10, 15);
         iPos->positionMove(11, 2);
-        iPos->positionMove(12, 30);// 0 if two fingers
+        iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
         iPos->positionMove(13, 3);
         iPos->positionMove(14, 30);
         iPos->positionMove(15, 1);

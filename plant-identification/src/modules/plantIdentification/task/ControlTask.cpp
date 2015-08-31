@@ -352,7 +352,7 @@ void ControlTask::calculateControlInput(){
 		optionalLogString.append(gainsLog.str());
     }
 
-	//double s,double u,double error,double svKp,double svKi,std::vector<double> &pressureTarget,std::vector<double> &actualPressure){
+	// log control data
 	portsUtil->sendControlData(commonData->tpDbl(7),commonData->tpDbl(8)+svResultValueScaled,svErr,svKp*commonData->tpDbl(5),svKi*commonData->tpDbl(5),thumbEnc,indexEnc,middleEnc,pressureTargetValue,commonData->overallFingerPressure,fingersList);
 
 }
