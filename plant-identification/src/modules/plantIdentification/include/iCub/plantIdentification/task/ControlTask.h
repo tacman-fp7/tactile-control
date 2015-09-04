@@ -6,6 +6,7 @@
 #include "iCub/plantIdentification/util/ControllersUtil.h"
 #include "iCub/plantIdentification/util/PortsUtil.h"
 
+#include <iCub/ctrl/neuralNetworks.h>
 #include <iCub/ctrl/pids.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/Value.h>
@@ -37,6 +38,9 @@ namespace iCub {
 				bool supervisorControlMode;
 				double svKp,svKi,svKd;
                 std::vector<double> initialPressureTargetValue;
+
+				// neural network
+				iCub::ctrl::ff2LayNN_tansig_purelin neuralNetwork;
 
 				// TODO to be removed
 				std::vector<double> currentKp;

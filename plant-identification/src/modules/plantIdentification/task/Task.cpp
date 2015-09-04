@@ -1,7 +1,7 @@
 #include "iCub/plantIdentification/task/Task.h"
 
-#include <iCub/plantIdentification/PlantIdentificationEnums.h>
-#include <iCub/plantIdentification/util/ICubUtil.h>
+#include "iCub/plantIdentification/PlantIdentificationEnums.h"
+#include "iCub/plantIdentification/util/ICubUtil.h"
 
 #include <gsl/gsl_sort.h>
 #include <gsl/gsl_statistics.h>
@@ -15,6 +15,7 @@ using iCub::plantIdentification::LogData;
 using iCub::plantIdentification::ControllersUtil;
 using iCub::plantIdentification::PortsUtil;
 using iCub::plantIdentification::TaskCommonData;
+using iCub::plantIdentification::ICubUtil;
 
 Task::Task(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,int taskLifespan,std::vector<int> &jointsList,std::vector<int> &fingersList){
 	

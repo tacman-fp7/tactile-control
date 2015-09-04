@@ -4,6 +4,9 @@
 #include <string>
 #include <sstream>
 
+#define N_HID_NODES_2F 3
+#define N_HID_NODES_3F 3
+
 using iCub::plantIdentification::ICubUtil;
 
 using yarp::os::Bottle;
@@ -146,37 +149,36 @@ double ICubUtil::getForceByLearntMapping(std::vector<double>& tactileData){
 	return 0;
 }
 
-Bottle* ICubUtil::getNNOptionsForErrorPrediction2Fingers(){
-
-	Bottle neuralNetworkOptions;
+void ICubUtil::getNNOptionsForErrorPrediction2Fingers(Bottle& neuralNetworkOptions){
 
 	int numInputNodes = 2;
-	int numHiddenNodes = 10;
+	int numHiddenNodes = N_HID_NODES_2F;
 	int numOutputNodes = 1;
-	double inputWeights_0[10] = {0};
-	double inputWeights_1[10] = {0};
-	double outputWeights[10] = {0};
-	double inputBiases[10] = {0};
-	double outputBiases[1] = {0};
-	double inMinMaxX_0[2] = {0,0};
-	double inMinMaxX_1[2] = {0,0};
+	double inputWeights_0[N_HID_NODES_2F] = {0.9475,-0.3622,1.1300};
+	double inputWeights_1[N_HID_NODES_2F] = {0.1268,9.6247,0.3733};
+	double outputWeights[N_HID_NODES_2F] = {1.8636,-0.0991,0.8172};
+	double inputBiases[N_HID_NODES_2F] = {-1.6453,1.2764,0.3451};
+	double outputBiases[1] = {1.3827};
+	double inMinMaxX_0[2] = {-45.3710,41.5327};
+	double inMinMaxX_1[2] = {25.9258,64.9437};
 	double inMinMaxY[2] = {-1,1};
 	double outMinMaxY[2] = {-1,1};
-	double outMinMaxX[2] = {0,0};
+	double outMinMaxX[2] = {-55.7832,57.9475};
+
 	std::stringstream ss;
 	
 	addOption(neuralNetworkOptions,"numInputNodes",numInputNodes);
 	addOption(neuralNetworkOptions,"numHiddenNodes",numHiddenNodes);
 	addOption(neuralNetworkOptions,"numOutputNodes",numOutputNodes);
 
-	for(int i = 0; i < 10; i++){
+	for(int i = 0; i < N_HID_NODES_2F; i++){
 		ss.clear();
 		ss << "IW_" << i;
 		addOption(neuralNetworkOptions,ss.str().c_str(),inputWeights_0[i],inputWeights_1[i]);
 	}
-	addOption(neuralNetworkOptions,"LW_0",outputWeights,10);
+	addOption(neuralNetworkOptions,"LW_0",outputWeights,N_HID_NODES_2F);
 
-	addOption(neuralNetworkOptions,"b1",inputBiases,10);
+	addOption(neuralNetworkOptions,"b1",inputBiases,N_HID_NODES_2F);
 	addOption(neuralNetworkOptions,"b2",outputBiases,1);
 
 	addOption(neuralNetworkOptions,"inMinMaxX_0",inMinMaxX_0[0],inMinMaxX_0[1]);
@@ -188,42 +190,39 @@ Bottle* ICubUtil::getNNOptionsForErrorPrediction2Fingers(){
 	addOption(neuralNetworkOptions,"outMinMaxY_0",outMinMaxY[0],outMinMaxY[1]);
 	addOption(neuralNetworkOptions,"outMinMaxX_0",outMinMaxX[0],outMinMaxX[1]);
 
-	return &neuralNetworkOptions;
 }
 
-Bottle* ICubUtil::getNNOptionsForErrorPrediction3Fingers(){
-
-	Bottle neuralNetworkOptions;
+void ICubUtil::getNNOptionsForErrorPrediction3Fingers(Bottle& neuralNetworkOptions){
 
 	int numInputNodes = 3;
-	int numHiddenNodes = 10;
+	int numHiddenNodes = N_HID_NODES_3F;
 	int numOutputNodes = 1;
-	double inputWeights_0[10] = {0};
-	double inputWeights_1[10] = {0};
-	double inputWeights_2[10] = {0};
-	double outputWeights[10] = {0};
-	double inputBiases[10] = {0};
-	double outputBiases[1] = {0};
-	double inMinMaxX_0[2] = {0,0};
-	double inMinMaxX_1[2] = {0,0};
-	double inMinMaxX_2[2] = {0,0};
+	double inputWeights_0[N_HID_NODES_3F] = {0.6257,-0.1632,1.3617};
+	double inputWeights_1[N_HID_NODES_3F] = {0.2470,0.0537,15.1220};
+	double inputWeights_2[N_HID_NODES_3F] = {2.0194,-0.0460,3.2803};
+	double outputWeights[N_HID_NODES_3F] = {0.2803,6.8676,0.0386};
+	double inputBiases[N_HID_NODES_3F] = {-1.4054,0.3551,-6.7669};
+	double outputBiases[1] = {-2.2777};
+	double inMinMaxX_0[2] = {-21.1274,88.1176};
+	double inMinMaxX_1[2] = {25.3521,75.3450};
+	double inMinMaxX_2[2] = {-1.0962,6.3491};
 	double inMinMaxY[2] = {-1,1};
 	double outMinMaxY[2] = {-1,1};
-	double outMinMaxX[2] = {0,0};
+	double outMinMaxX[2] = {-55.7063,62.0727};
 	std::stringstream ss;
 	
 	addOption(neuralNetworkOptions,"numInputNodes",numInputNodes);
 	addOption(neuralNetworkOptions,"numHiddenNodes",numHiddenNodes);
 	addOption(neuralNetworkOptions,"numOutputNodes",numOutputNodes);
 
-	for(int i = 0; i < 10; i++){
+	for(int i = 0; i < N_HID_NODES_3F; i++){
 		ss.clear();
 		ss << "IW_" << i;
 		addOption(neuralNetworkOptions,ss.str().c_str(),inputWeights_0[i],inputWeights_1[i],inputWeights_2[i]);
 	}
-	addOption(neuralNetworkOptions,"LW_0",outputWeights,10);
+	addOption(neuralNetworkOptions,"LW_0",outputWeights,N_HID_NODES_3F);
 
-	addOption(neuralNetworkOptions,"b1",inputBiases,10);
+	addOption(neuralNetworkOptions,"b1",inputBiases,N_HID_NODES_3F);
 	addOption(neuralNetworkOptions,"b2",outputBiases,1);
 
 	addOption(neuralNetworkOptions,"inMinMaxX_0",inMinMaxX_0[0],inMinMaxX_0[1]);
@@ -237,9 +236,25 @@ Bottle* ICubUtil::getNNOptionsForErrorPrediction3Fingers(){
 	addOption(neuralNetworkOptions,"outMinMaxY_0",outMinMaxY[0],outMinMaxY[1]);
 	addOption(neuralNetworkOptions,"outMinMaxX_0",outMinMaxX[0],outMinMaxX[1]);
 
-	return &neuralNetworkOptions;
 }
 
+void ICubUtil::rotateFingersData(std::vector<double>& fingersAngles,std::vector<double>& rotatedFingersAngles){
+
+	if (fingersAngles.size() == 2){
+		rotatedFingersAngles.resize(2);
+
+		rotatedFingersAngles[0] = fingersAngles[0]*0.7226 + fingersAngles[1]*(-0.6913);
+		rotatedFingersAngles[1] = fingersAngles[0]*0.6913 + fingersAngles[1]*(0.7226);
+
+	} else { // fingersAngles.size() == 3
+		rotatedFingersAngles.resize(3);
+
+		rotatedFingersAngles[0] = fingersAngles[0]*-(0.4686) + fingersAngles[1]*0.6483 + fingersAngles[2]*0.6001;
+		rotatedFingersAngles[1] = fingersAngles[0]*0.8831 + fingersAngles[1]*0.3630 + fingersAngles[2]*0.2973;
+		rotatedFingersAngles[2] = fingersAngles[0]*0.0251 + fingersAngles[1]*(-0.6693) + fingersAngles[2]*0.7426;
+
+	}
+}
 
 void ICubUtil::addOption(Bottle &bottle,const char *paramName,Value paramValue){
 

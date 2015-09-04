@@ -16,8 +16,10 @@ namespace iCub {
 
 				static double getForce(std::vector<double>& tactileData,iCub::plantIdentification::ForceCalculationMode forceCalculationMode);
 
-				static yarp::os::Bottle* getNNOptionsForErrorPrediction2Fingers();
-				static yarp::os::Bottle* getNNOptionsForErrorPrediction3Fingers();
+				static void getNNOptionsForErrorPrediction2Fingers(yarp::os::Bottle& bottle);
+				static void getNNOptionsForErrorPrediction3Fingers(yarp::os::Bottle& bottle);
+				static void rotateFingersData(std::vector<double>& fingersAngles,std::vector<double>& rotatedFingersAngles);
+
 
 		private:
 

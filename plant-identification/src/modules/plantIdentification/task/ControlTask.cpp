@@ -1,9 +1,13 @@
 #include "iCub/plantIdentification/task/ControlTask.h"
 
 #include "iCub/plantIdentification/PlantIdentificationEnums.h"
+#include "iCub/plantIdentification/util/ICubUtil.h"
 
 #include <yarp/sig/Vector.h>
 #include <yarp/sig/Matrix.h>
+#include <yarp/os/Property.h>
+#include <yarp/os/ConstString.h>
+
 
 #include <sstream>
 #include <string>
@@ -14,6 +18,7 @@ using iCub::plantIdentification::ControllersUtil;
 using iCub::plantIdentification::PortsUtil;
 using iCub::plantIdentification::TaskCommonData;
 using iCub::plantIdentification::ControlTaskData;
+using iCub::plantIdentification::ICubUtil;
 
 using iCub::ctrl::parallelPID;
 using yarp::os::Bottle;
@@ -187,6 +192,19 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 		dbgTag = "ControlTask: ";
 	}
 	
+	// create the neural network and configure it
+
+	yarp::os::Property nnConfProperty;
+	Bottle nnConfBottle;
+
+	if (fingersList.size() == 2){
+		ICubUtil::getNNOptionsForErrorPrediction2Fingers(nnConfBottle);
+	} else {
+		ICubUtil::getNNOptionsForErrorPrediction3Fingers(nnConfBottle);
+	}
+
+	nnConfProperty.fromString(nnConfBottle.toString());
+	neuralNetwork.configure(nnConfProperty);
 
 }
 
@@ -229,9 +247,26 @@ void ControlTask::calculateControlInput(){
 		Vector svFb;
 
 		if (jointsList.size() == 2){
-			svErr = (1.417*thumbEnc - 12.22) - middleEnc;
-			svRef.resize(1,1.417*thumbEnc - 12.22);
-			svFb.resize(1,middleEnc);
+			// using the "simple" method
+			double svErrOld = (1.417*thumbEnc - 12.22) - middleEnc;
+			
+			// using the neural network
+			std::vector<double> actualAngles(2);
+			std::vector<double> rotatedAngles;
+			actualAngles[0] = thumbEnc;
+			actualAngles[1] = middleEnc;
+			ICubUtil::rotateFingersData(actualAngles,rotatedAngles);
+			Vector rotatedAnglesVector;
+			rotatedAnglesVector.resize(2);
+			rotatedAnglesVector[0] = rotatedAngles[0];
+			rotatedAnglesVector[1] = rotatedAngles[1];
+			Vector svErrNNVector = neuralNetwork.predict(rotatedAnglesVector);
+			double svErrNN = svErrNNVector[0];
+
+			svErr = svErrNN;
+
+			svRef.resize(1,svErr);
+			svFb.resize(1,0);
 			//svErr = ((middleEnc + thumbEnc - (-12.042))/(1 + 0.7021)) - middleEnc;
 			//svRef.resize(1,(middleEnc + thumbEnc - (-12.042))/(1 + 0.7021));
 			//svFb.resize(1,middleEnc);
@@ -239,10 +274,29 @@ void ControlTask::calculateControlInput(){
 			// si calcola il valore dell'angolo prossimale del dito medio intersezione del piano delle pose migliori
 			//double interMiddleEnc = -0.1046*thumbEnc + 0.8397*indexEnc + 10.05;
 			double interMiddleEnc = 1.4667*thumbEnc -1.0*indexEnc + 34.96;
+			
 			// si applica la formula della distanza tenendo conto che la differenza per i giunti di pollice e indice e' nulla. In teoria si sarebbe potuta evitare la divisione per due, perche' a noi interessa l'errore a meno di una costante
-			svErr = (interMiddleEnc - middleEnc)/2;
-			svRef.resize(1,interMiddleEnc);
-			svFb.resize(1,middleEnc);
+			double svErrOld = (interMiddleEnc - middleEnc)/2;
+
+			// using the neural network
+			std::vector<double> actualAngles(3);
+			std::vector<double> rotatedAngles;
+			actualAngles[0] = thumbEnc;
+			actualAngles[1] = indexEnc;
+			actualAngles[2] = middleEnc;
+			ICubUtil::rotateFingersData(actualAngles,rotatedAngles);
+			Vector rotatedAnglesVector;
+			rotatedAnglesVector.resize(3);
+			rotatedAnglesVector[0] = rotatedAngles[0];
+			rotatedAnglesVector[1] = rotatedAngles[1];
+			rotatedAnglesVector[2] = rotatedAngles[2];
+			Vector svErrNNVector = neuralNetwork.predict(rotatedAnglesVector);
+			double svErrNN = svErrNNVector[0];
+
+			svErr = svErrNN;
+
+			svRef.resize(1,svErr);
+			svFb.resize(1,0);
 		}
 
 		
