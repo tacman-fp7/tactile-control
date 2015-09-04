@@ -380,6 +380,8 @@ void TaskThread::task(RPCTaskCmdArgName paramName,TaskName taskName,Value paramV
 		yarp::sig::Vector svErrNNVector = neuralNetwork.predict(rotatedAnglesVector);
 		double svErrNN = svErrNNVector[0];
 
+		std::cout << "Error: " << svErrNN << "\n";
+
 	} else if (targetList.size() == 3){
 		iCub::ctrl::ff2LayNN_tansig_purelin neuralNetwork;
 		yarp::os::Property nnConfProperty;
@@ -401,6 +403,8 @@ void TaskThread::task(RPCTaskCmdArgName paramName,TaskName taskName,Value paramV
 
 		std::cout << "Bottle: " << nnConfBottle.toString() << "\n";
 		std::cout << "Property: " << nnConfProperty.toString() << "\n";
+		std::cout << "b1: " << neuralNetwork.get_b1().toString() << "\n";
+		std::cout << "b2: " << neuralNetwork.get_b2().toString() << "\n";
 
 		std::vector<double> actualAngles(3);
 		std::vector<double> rotatedAngles;

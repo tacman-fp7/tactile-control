@@ -172,7 +172,7 @@ void ICubUtil::getNNOptionsForErrorPrediction2Fingers(Bottle& neuralNetworkOptio
 	addOption(neuralNetworkOptions,"numOutputNodes",numOutputNodes);
 
 	for(int i = 0; i < N_HID_NODES_2F; i++){
-		ss.clear();
+		ss.str("");
 		ss << "IW_" << i;
 		addOption(neuralNetworkOptions,ss.str().c_str(),inputWeights_0[i],inputWeights_1[i]);
 	}
@@ -216,7 +216,7 @@ void ICubUtil::getNNOptionsForErrorPrediction3Fingers(Bottle& neuralNetworkOptio
 	addOption(neuralNetworkOptions,"numOutputNodes",numOutputNodes);
 
 	for(int i = 0; i < N_HID_NODES_3F; i++){
-		ss.clear();
+		ss.str("");
 		ss << "IW_" << i;
 		addOption(neuralNetworkOptions,ss.str().c_str(),inputWeights_0[i],inputWeights_1[i],inputWeights_2[i]);
 	}

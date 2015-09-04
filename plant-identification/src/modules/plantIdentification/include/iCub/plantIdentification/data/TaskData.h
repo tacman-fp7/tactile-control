@@ -49,7 +49,6 @@ namespace iCub {
             *   14: prints on screen extra data about low level pid tuning
             *   15: pinky mode on/off (control grasp balance with the pinky, settable during step tasks!)
             */
-
 			std::vector<yarp::os::Value> tempParameters;
 
 			int threadRate;

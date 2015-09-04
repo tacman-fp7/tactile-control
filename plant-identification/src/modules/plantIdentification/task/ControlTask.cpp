@@ -263,6 +263,16 @@ void ControlTask::calculateControlInput(){
 			Vector svErrNNVector = neuralNetwork.predict(rotatedAnglesVector);
 			double svErrNN = svErrNNVector[0];
 
+            std::stringstream tempLog("");
+		    tempLog << "[nn: " << svErrNN << " old: " << svErrOld << " r: " << svErrOld/svErrNN << "]";
+		    optionalLogString.append(tempLog.str());
+
+            if (callsNumber%commonData->screenLogStride == 0){
+                std::stringstream tempLog("");
+		        tempLog << "[nn: " << svErrNN << " old: " << svErrOld << " r: " << svErrOld/svErrNN << "]";
+		        optionalLogString.append(tempLog.str());
+            }
+
 			svErr = svErrNN;
 
 			svRef.resize(1,svErr);
@@ -292,6 +302,12 @@ void ControlTask::calculateControlInput(){
 			rotatedAnglesVector[2] = rotatedAngles[2];
 			Vector svErrNNVector = neuralNetwork.predict(rotatedAnglesVector);
 			double svErrNN = svErrNNVector[0];
+
+            if (callsNumber%commonData->screenLogStride == 0){
+                std::stringstream tempLog("");
+		        tempLog << "[nn: " << svErrNN << " old: " << svErrOld << " r: " << svErrOld/svErrNN << "]";
+		        optionalLogString.append(tempLog.str());
+            }
 
 			svErr = svErrNN;
 
