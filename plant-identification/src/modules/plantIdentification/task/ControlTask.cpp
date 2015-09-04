@@ -8,9 +8,7 @@
 #include <yarp/os/Property.h>
 #include <yarp/os/ConstString.h>
 
-
 #include <sstream>
-#include <string>
 
 using iCub::plantIdentification::ControlTask;
 using iCub::plantIdentification::LogData;
@@ -267,16 +265,28 @@ void ControlTask::calculateControlInput(){
 		    tempLog << "[nn: " << svErrNN << " old: " << svErrOld << " r: " << svErrOld/svErrNN << "]";
 		    optionalLogString.append(tempLog.str());
 
-            if (callsNumber%commonData->screenLogStride == 0){
-                std::stringstream tempLog("");
-		        tempLog << "[nn: " << svErrNN << " old: " << svErrOld << " r: " << svErrOld/svErrNN << "]";
-		        optionalLogString.append(tempLog.str());
-            }
+          //  if (callsNumber%commonData->screenLogStride == 0){
+          //      std::stringstream tempLog("");
+		        //tempLog << "[nn: " << svErrNN << " old: " << svErrOld << " r: " << svErrOld/svErrNN << "]";
+		        //optionalLogString.append(tempLog.str());
+          //  }
 
 			svErr = svErrNN;
 
-			svRef.resize(1,svErr);
-			svFb.resize(1,0);
+			double errorIncrement = 0;
+			// e' il generatore di onda quadra, sovrascrive quando fatto dal supervisor
+			if (commonData->tpInt(18) != 0){
+				double halfStep = commonData->tpDbl(19);
+				int div = (int)((callsNumber*commonData->threadRate/1000.0)/commonData->tpDbl(20));
+				if (div%2 == 1){
+					errorIncrement = halfStep;
+				} else {
+					errorIncrement = -halfStep;
+				}
+			}
+
+			svRef.resize(1,errorIncrement);
+			svFb.resize(1,-svErr);
 			//svErr = ((middleEnc + thumbEnc - (-12.042))/(1 + 0.7021)) - middleEnc;
 			//svRef.resize(1,(middleEnc + thumbEnc - (-12.042))/(1 + 0.7021));
 			//svFb.resize(1,middleEnc);
@@ -303,16 +313,28 @@ void ControlTask::calculateControlInput(){
 			Vector svErrNNVector = neuralNetwork.predict(rotatedAnglesVector);
 			double svErrNN = svErrNNVector[0];
 
-            if (callsNumber%commonData->screenLogStride == 0){
-                std::stringstream tempLog("");
-		        tempLog << "[nn: " << svErrNN << " old: " << svErrOld << " r: " << svErrOld/svErrNN << "]";
-		        optionalLogString.append(tempLog.str());
-            }
+          //  if (callsNumber%commonData->screenLogStride == 0){
+          //      std::stringstream tempLog("");
+		        //tempLog << "[nn: " << svErrNN << " old: " << svErrOld << " r: " << svErrOld/svErrNN << "]";
+		        //optionalLogString.append(tempLog.str());
+          //  }
 
 			svErr = svErrNN;
 
-			svRef.resize(1,svErr);
-			svFb.resize(1,0);
+			double errorIncrement = 0;
+			// e' il generatore di onda quadra, sovrascrive quando fatto dal supervisor
+			if (commonData->tpInt(18) != 0){
+				double halfStep = commonData->tpDbl(19);
+				int div = (int)((callsNumber*commonData->threadRate/1000.0)/commonData->tpDbl(20));
+				if (div%2 == 1){
+					errorIncrement = halfStep;
+				} else {
+					errorIncrement = -halfStep;
+				}
+			}
+
+			svRef.resize(1,errorIncrement);
+			svFb.resize(1,-svErr);
 		}
 
 		
@@ -423,7 +445,28 @@ void ControlTask::calculateControlInput(){
     }
 
 	// log control data
-	portsUtil->sendControlData(commonData->tpDbl(7),commonData->tpDbl(8)+svResultValueScaled,svErr,svKp*commonData->tpDbl(5),svKi*commonData->tpDbl(5),thumbEnc,indexEnc,middleEnc,pressureTargetValue,commonData->overallFingerPressure,fingersList);
+	portsUtil->sendControlData(taskId,commonData->tpStr(16),commonData->tpStr(17),commonData->tpDbl(7),commonData->tpDbl(8)+svResultValueScaled,svErr,svKp*commonData->tpDbl(5),svKi*commonData->tpDbl(5),svKd*commonData->tpDbl(5),thumbEnc,indexEnc,middleEnc,pressureTargetValue,commonData->overallFingerPressure,inputCommandValue,fingersList);
+
+
+	//TODO TO REMOVE if the suprvisor PID gains change (in the temperary variables), update them (in the PID object)
+	if (abs(svKp - commonData->tpDbl(1)) > 0.0001){
+		svKp = commonData->tpDbl(1);
+		changeSVGain("Kp",svKp);
+		Bottle tmp; svPid->getOptions(tmp);
+		optionalLogString.append(tmp.toString());
+	}
+	if (abs(svKi - commonData->tpDbl(2)) > 0.0001){
+		svKi = commonData->tpDbl(2);
+		changeSVGain("Ki",svKi);
+		Bottle tmp; svPid->getOptions(tmp);
+		optionalLogString.append(tmp.toString());
+	}
+	if (abs(svKd - commonData->tpDbl(3)) > 0.0001){
+		svKd = commonData->tpDbl(3);
+		changeSVGain("Kd",svKd);
+		Bottle tmp; svPid->getOptions(tmp);
+		optionalLogString.append(tmp.toString());
+	}
 
 }
 
@@ -457,7 +500,9 @@ void ControlTask::release(){
 	for(size_t i = 0; i < jointsList.size(); i++){
 		delete(pid[i]);
 	}
-	
+
+	// TODO TO REMOVE serve solo in fase di test
+	commonData->tempParameters[17] = Value("#");
 }
 
 void ControlTask::addOption(Bottle &bottle,const char *paramName,Value paramValue){
@@ -514,6 +559,20 @@ void ControlTask::scaleGains(double scaleFactor){
 
 }
 
+void ControlTask::changeSVGain(string gainName,double newGainValue){
+
+        Bottle oldOptions;
+		Bottle newOptions;
+		
+		svPid->getOptions(oldOptions);
+
+		replaceBottle(oldOptions,newOptions,gainName,newGainValue);
+
+		svPid->setOptions(newOptions);
+
+}
+
+
 void ControlTask::replaceBottle(yarp::os::Bottle &oldBottle,yarp::os::Bottle &newBottle,double scaleFactor){
 
 	for(int i = 0; i < oldBottle.size(); i++){
@@ -522,12 +581,29 @@ void ControlTask::replaceBottle(yarp::os::Bottle &oldBottle,yarp::os::Bottle &ne
 
 		string paramName = paramBottle->get(0).asString();
 
-		if (paramName == "Kp" || paramName == "Ki"){
+		if (paramName == "Kp" || paramName == "Ki" || paramName == "Kd"){
 			double gain = paramBottle->get(1).asList()->get(0).asDouble();
 			addOption(newBottle,paramName.c_str(),Value(gain*scaleFactor));
             if (commonData->tpInt(14)!=0){
                 //std::cout << "old " << paramName << ": " << gain << " new: " << gain*scaleFactor << "\n";
             }
+		} else {
+			newBottle.addList() = *paramBottle;
+		}
+
+	}
+}
+
+void ControlTask::replaceBottle(yarp::os::Bottle &oldBottle,yarp::os::Bottle &newBottle,string gainName,double newGainValue){
+
+	for(int i = 0; i < oldBottle.size(); i++){
+        
+		Bottle *paramBottle = oldBottle.get(i).asList();
+
+		string paramName = paramBottle->get(0).asString();
+
+		if (paramName == gainName){
+			addOption(newBottle,paramName.c_str(),Value(newGainValue));
 		} else {
 			newBottle.addList() = *paramBottle;
 		}

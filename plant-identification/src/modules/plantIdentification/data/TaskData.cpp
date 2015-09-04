@@ -26,6 +26,13 @@ double TaskCommonData::tpDbl(int index){
 	return 0.0;
 }
 
+std::string TaskCommonData::tpStr(int index){
+	if (tempParameters.size() > index){
+		return tempParameters[index].asString();
+	}
+	return "";
+}
+
 TaskData::TaskData(yarp::os::ResourceFinder &rf,int threadRate,iCub::plantIdentification::ControllersUtil *controllersUtil) {
 	using iCub::plantIdentification::ControlTaskOpMode;
 	using yarp::os::Bottle;

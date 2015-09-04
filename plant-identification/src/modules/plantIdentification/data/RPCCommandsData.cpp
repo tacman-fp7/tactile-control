@@ -151,17 +151,15 @@ bool RPCCommandsData::setTemporaryParam(yarp::os::Value &value,std::vector<yarp:
         tempParamIndex = atoi(target);
         std::cout << tempParamIndex << " " << valueList.size() << "\n";
 		if (tempParamIndex < valueList.size()){
-            std::cout << "2";
 			target = strtok(NULL,"_");
 
 			if (target != NULL){
-                std::cout << "3";
 				if (values.find('.') != string::npos){
 					tempParamValue = Value(atof(target));
-                    std::cout << "4";
+				} else if (values.find('#') != string::npos){
+					tempParamValue = Value(target);
 				} else {
 					tempParamValue = Value(atoi(target));
-                    std::cout << "5";
 				}
 
 				valueList[tempParamIndex] = tempParamValue;

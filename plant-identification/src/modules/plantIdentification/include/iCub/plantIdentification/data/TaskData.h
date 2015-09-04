@@ -43,11 +43,19 @@ namespace iCub {
             *   8: grasp balance factor
             *   9: index/middle fingers balance factor
             *   10: if set > 0, scales low level PID gains and returns to 0
-            *   11: square wave mode (to test low level PID)
+            *   11: square wave mode (to test LOW level PID)
             *   12: wave amplitude
             *   13: wave half period
             *   14: prints on screen extra data about low level pid tuning
             *   15: pinky mode on/off (control grasp balance with the pinky, settable during step tasks!)
+			*   16: string describing the next experiment. it is logged in the control log
+			*   17: string describing the previous experiment. it is logged in the control log
+			*   18: square wave mode (to test HIGH level PID)
+            *   19: wave amplitude
+            *   20: wave half period
+			*
+			*   Note: double values have to contain a dot, while strings have to start with '#'
+			*
             */
 			std::vector<yarp::os::Value> tempParameters;
 
@@ -58,6 +66,8 @@ namespace iCub {
 			int tpInt(int index);
 
 			double tpDbl(int index);
+
+			std::string tpStr(int index);
 
 		};
 

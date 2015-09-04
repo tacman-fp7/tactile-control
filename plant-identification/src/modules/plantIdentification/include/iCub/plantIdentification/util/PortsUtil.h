@@ -10,6 +10,7 @@
 #include <yarp/sig/Vector.h>
 
 #include <vector>
+#include <string>
 
 namespace iCub {
     namespace plantIdentification {
@@ -37,7 +38,7 @@ namespace iCub {
 
 				bool sendInfoData(iCub::plantIdentification::TaskCommonData *commonData);
 
-				bool sendControlData(double s,double u,double error,double svKp,double svKi,double thumbEnc,double indexEnc,double middleEnc,std::vector<double> &pressureTarget,std::vector<double> &actualPressure,std::vector<int> &fingersList);
+				bool sendControlData(std::string taskId,std::string experimentDescription,std::string previousExperimentDescription,double s,double u,double error,double svKp,double svKi,double svKd,double thumbEnc,double indexEnc,double middleEnc,std::vector<double> &pressureTarget,std::vector<double> &actualPressure,std::vector<double> &pwm,std::vector<int> &fingersList);
 
 				bool readFingerSkinCompData(std::vector<std::vector<double> > &fingerTaxelsData);
 

@@ -11,6 +11,8 @@
 #include <yarp/os/Bottle.h>
 #include <yarp/os/Value.h>
 
+#include <string>
+
 namespace iCub {
     namespace plantIdentification {
 
@@ -72,7 +74,11 @@ namespace iCub {
 
 				void scaleGains(double scaleFactor);
 
+				void changeSVGain(std::string gainName,double newGainValue);
+
 				void replaceBottle(yarp::os::Bottle &oldBottle,yarp::os::Bottle &newBottle,double scaleFactor);
+				
+				void replaceBottle(yarp::os::Bottle &oldBottle,yarp::os::Bottle &newBottle,std::string gainName,double newGainValue);
 
 				double calculateTt(double kp,double ki,double kd);
 

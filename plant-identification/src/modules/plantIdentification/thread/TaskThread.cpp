@@ -340,92 +340,92 @@ void TaskThread::task(RPCTaskCmdArgName paramName,TaskName taskName,Value paramV
 
 
 	// TODO TO REMOVE!!!!!!!
-	if (targetList.size() == 2){
-		iCub::ctrl::ff2LayNN_tansig_purelin neuralNetwork;
-		yarp::os::Property nnConfProperty;
-		yarp::os::Bottle nnConfBottle;
-		ICubUtil::getNNOptionsForErrorPrediction2Fingers(nnConfBottle);
-		nnConfProperty.fromString(nnConfBottle.toString());
-		neuralNetwork.configure(nnConfProperty);
+	//if (targetList.size() == 2){
+	//	iCub::ctrl::ff2LayNN_tansig_purelin neuralNetwork;
+	//	yarp::os::Property nnConfProperty;
+	//	yarp::os::Bottle nnConfBottle;
+	//	ICubUtil::getNNOptionsForErrorPrediction2Fingers(nnConfBottle);
+	//	nnConfProperty.fromString(nnConfBottle.toString());
+	//	neuralNetwork.configure(nnConfProperty);
 
-		std::cout << "Bottle: " << nnConfBottle.toString() << "\n";
-		std::cout << "Property: " << nnConfProperty.toString() << "\n";
-		std::cout << "b1: " << neuralNetwork.get_b1().toString() << "\n";
-		std::cout << "b2: " << neuralNetwork.get_b2().toString() << "\n";
-		
-		std::deque<yarp::sig::Vector,std::allocator<yarp::sig::Vector> > iwDeque = neuralNetwork.get_IW();
-		for (int i=0;i<iwDeque.size();i++){
-			yarp::sig::Vector tmp = iwDeque.at(i);
-			std::cout << "IW" << i << ": " << tmp.toString() << "\n";
-		}
-		std::deque<yarp::sig::Vector,std::allocator<yarp::sig::Vector> > lwDeque = neuralNetwork.get_LW();
-		for (int i=0;i<lwDeque.size();i++){
-			yarp::sig::Vector tmp = lwDeque.at(i);
-			std::cout << "LW" << i << ": " << tmp.toString() << "\n";
-		}
+	//	std::cout << "Bottle: " << nnConfBottle.toString() << "\n";
+	//	std::cout << "Property: " << nnConfProperty.toString() << "\n";
+	//	std::cout << "b1: " << neuralNetwork.get_b1().toString() << "\n";
+	//	std::cout << "b2: " << neuralNetwork.get_b2().toString() << "\n";
+	//	
+	//	std::deque<yarp::sig::Vector,std::allocator<yarp::sig::Vector> > iwDeque = neuralNetwork.get_IW();
+	//	for (int i=0;i<iwDeque.size();i++){
+	//		yarp::sig::Vector tmp = iwDeque.at(i);
+	//		std::cout << "IW" << i << ": " << tmp.toString() << "\n";
+	//	}
+	//	std::deque<yarp::sig::Vector,std::allocator<yarp::sig::Vector> > lwDeque = neuralNetwork.get_LW();
+	//	for (int i=0;i<lwDeque.size();i++){
+	//		yarp::sig::Vector tmp = lwDeque.at(i);
+	//		std::cout << "LW" << i << ": " << tmp.toString() << "\n";
+	//	}
 
-		std::vector<double> actualAngles(2);
-		std::vector<double> rotatedAngles;
-		actualAngles[0] = targetList[0];
-		actualAngles[1] = targetList[1];
-		iCub::plantIdentification::ICubUtil::rotateFingersData(actualAngles,rotatedAngles);
+	//	std::vector<double> actualAngles(2);
+	//	std::vector<double> rotatedAngles;
+	//	actualAngles[0] = targetList[0];
+	//	actualAngles[1] = targetList[1];
+	//	iCub::plantIdentification::ICubUtil::rotateFingersData(actualAngles,rotatedAngles);
 
-		std::cout << "Actual angles: " << actualAngles[0] << " " << actualAngles[1] << "\n";
-		std::cout << "Rotated angles: " << rotatedAngles[0] << " " << rotatedAngles[1] << "\n";
+	//	std::cout << "Actual angles: " << actualAngles[0] << " " << actualAngles[1] << "\n";
+	//	std::cout << "Rotated angles: " << rotatedAngles[0] << " " << rotatedAngles[1] << "\n";
 
-		yarp::sig::Vector rotatedAnglesVector;
-		rotatedAnglesVector.resize(2);
-		rotatedAnglesVector[0] = rotatedAngles[0];
-		rotatedAnglesVector[1] = rotatedAngles[1];
-		yarp::sig::Vector svErrNNVector = neuralNetwork.predict(rotatedAnglesVector);
-		double svErrNN = svErrNNVector[0];
+	//	yarp::sig::Vector rotatedAnglesVector;
+	//	rotatedAnglesVector.resize(2);
+	//	rotatedAnglesVector[0] = rotatedAngles[0];
+	//	rotatedAnglesVector[1] = rotatedAngles[1];
+	//	yarp::sig::Vector svErrNNVector = neuralNetwork.predict(rotatedAnglesVector);
+	//	double svErrNN = svErrNNVector[0];
 
-		std::cout << "Error: " << svErrNN << "\n";
+	//	std::cout << "Error: " << svErrNN << "\n";
 
-	} else if (targetList.size() == 3){
-		iCub::ctrl::ff2LayNN_tansig_purelin neuralNetwork;
-		yarp::os::Property nnConfProperty;
-		yarp::os::Bottle nnConfBottle;
-		ICubUtil::getNNOptionsForErrorPrediction3Fingers(nnConfBottle);
-		nnConfProperty.fromString(nnConfBottle.toString());
-		neuralNetwork.configure(nnConfProperty);
+	//} else if (targetList.size() == 3){
+	//	iCub::ctrl::ff2LayNN_tansig_purelin neuralNetwork;
+	//	yarp::os::Property nnConfProperty;
+	//	yarp::os::Bottle nnConfBottle;
+	//	ICubUtil::getNNOptionsForErrorPrediction3Fingers(nnConfBottle);
+	//	nnConfProperty.fromString(nnConfBottle.toString());
+	//	neuralNetwork.configure(nnConfProperty);
 
-		std::deque<yarp::sig::Vector,std::allocator<yarp::sig::Vector> > iwDeque = neuralNetwork.get_IW();
-		for (int i=0;i<iwDeque.size();i++){
-			yarp::sig::Vector tmp = iwDeque.at(i);
-			std::cout << "IW" << i << ": " << tmp.toString() << "\n";
-		}
-		std::deque<yarp::sig::Vector,std::allocator<yarp::sig::Vector> > lwDeque = neuralNetwork.get_LW();
-		for (int i=0;i<lwDeque.size();i++){
-			yarp::sig::Vector tmp = lwDeque.at(i);
-			std::cout << "LW" << i << ": " << tmp.toString() << "\n";
-		}
+	//	std::cout << "Bottle: " << nnConfBottle.toString() << "\n";
+	//	std::cout << "Property: " << nnConfProperty.toString() << "\n";
+	//	std::cout << "b1: " << neuralNetwork.get_b1().toString() << "\n";
+	//	std::cout << "b2: " << neuralNetwork.get_b2().toString() << "\n";
 
-		std::cout << "Bottle: " << nnConfBottle.toString() << "\n";
-		std::cout << "Property: " << nnConfProperty.toString() << "\n";
-		std::cout << "b1: " << neuralNetwork.get_b1().toString() << "\n";
-		std::cout << "b2: " << neuralNetwork.get_b2().toString() << "\n";
+	//	std::deque<yarp::sig::Vector,std::allocator<yarp::sig::Vector> > iwDeque = neuralNetwork.get_IW();
+	//	for (int i=0;i<iwDeque.size();i++){
+	//		yarp::sig::Vector tmp = iwDeque.at(i);
+	//		std::cout << "IW" << i << ": " << tmp.toString() << "\n";
+	//	}
+	//	std::deque<yarp::sig::Vector,std::allocator<yarp::sig::Vector> > lwDeque = neuralNetwork.get_LW();
+	//	for (int i=0;i<lwDeque.size();i++){
+	//		yarp::sig::Vector tmp = lwDeque.at(i);
+	//		std::cout << "LW" << i << ": " << tmp.toString() << "\n";
+	//	}
 
-		std::vector<double> actualAngles(3);
-		std::vector<double> rotatedAngles;
-		actualAngles[0] = targetList[0];
-		actualAngles[1] = targetList[1];
-		actualAngles[2] = targetList[2];
-		ICubUtil::rotateFingersData(actualAngles,rotatedAngles);
+	//	std::vector<double> actualAngles(3);
+	//	std::vector<double> rotatedAngles;
+	//	actualAngles[0] = targetList[0];
+	//	actualAngles[1] = targetList[1];
+	//	actualAngles[2] = targetList[2];
+	//	ICubUtil::rotateFingersData(actualAngles,rotatedAngles);
 
-		std::cout << "Actual angles: " << actualAngles[0] << " " << actualAngles[1] << " " << actualAngles[2] << "\n";
-		std::cout << "Rotated angles: " << rotatedAngles[0] << " " << rotatedAngles[1] << " " << rotatedAngles[2] << "\n";
+	//	std::cout << "Actual angles: " << actualAngles[0] << " " << actualAngles[1] << " " << actualAngles[2] << "\n";
+	//	std::cout << "Rotated angles: " << rotatedAngles[0] << " " << rotatedAngles[1] << " " << rotatedAngles[2] << "\n";
 
-		yarp::sig::Vector rotatedAnglesVector;
-		rotatedAnglesVector.resize(3);
-		rotatedAnglesVector[0] = rotatedAngles[0];
-		rotatedAnglesVector[1] = rotatedAngles[1];
-		rotatedAnglesVector[2] = rotatedAngles[2];
-		yarp::sig::Vector svErrNNVector = neuralNetwork.predict(rotatedAnglesVector);
-		double svErrNN = svErrNNVector[0];
+	//	yarp::sig::Vector rotatedAnglesVector;
+	//	rotatedAnglesVector.resize(3);
+	//	rotatedAnglesVector[0] = rotatedAngles[0];
+	//	rotatedAnglesVector[1] = rotatedAngles[1];
+	//	rotatedAnglesVector[2] = rotatedAngles[2];
+	//	yarp::sig::Vector svErrNNVector = neuralNetwork.predict(rotatedAnglesVector);
+	//	double svErrNN = svErrNNVector[0];
 
-		std::cout << "Error: " << svErrNN << "\n";
-	}
+	//	std::cout << "Error: " << svErrNN << "\n";
+	//}
 
 }
 
