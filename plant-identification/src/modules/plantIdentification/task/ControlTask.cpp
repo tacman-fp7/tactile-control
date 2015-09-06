@@ -236,11 +236,12 @@ void ControlTask::calculateControlInput(){
 	/*** PARTE RELATIVA AL SUPERVISOR MODE ***/
 	double svResultValueScaled;
 	double svErr;
-	double thumbEnc,indexEnc,middleEnc;
+	double thumbEnc,indexEnc,middleEnc,enc8;
 	if (supervisorControlMode){
 		thumbEnc = commonData->armEncodersAngles[9];
 		indexEnc = commonData->armEncodersAngles[11];
 		middleEnc = commonData->armEncodersAngles[13];
+		enc8 = commonData->armEncodersAngles[8];
 		Vector svRef;
 		Vector svFb;
 
@@ -445,7 +446,7 @@ void ControlTask::calculateControlInput(){
     }
 
 	// log control data
-	portsUtil->sendControlData(taskId,commonData->tpStr(16),commonData->tpStr(17),commonData->tpDbl(7),commonData->tpDbl(8)+svResultValueScaled,svErr,svKp*commonData->tpDbl(5),svKi*commonData->tpDbl(5),svKd*commonData->tpDbl(5),thumbEnc,indexEnc,middleEnc,pressureTargetValue,commonData->overallFingerPressure,inputCommandValue,fingersList);
+	portsUtil->sendControlData(taskId,commonData->tpStr(16),commonData->tpStr(17),commonData->tpDbl(7),commonData->tpDbl(8)+svResultValueScaled,svErr,svKp*commonData->tpDbl(5),svKi*commonData->tpDbl(5),svKd*commonData->tpDbl(5),thumbEnc,indexEnc,middleEnc,enc8,pressureTargetValue,commonData->overallFingerPressure,inputCommandValue,fingersList);
 
 
 	//TODO TO REMOVE if the suprvisor PID gains change (in the temperary variables), update them (in the PID object)
