@@ -139,11 +139,12 @@ bool TaskThread::afterRun(bool openHand){
 		if (!controllersUtil->openHand()) return false;
 	}
 	runEnabled = false;
+    taskList[currentTaskIndex]->clean();
     currentTaskIndex = 0;
 
 	// clear task list
-	for (size_t i = 0; i < taskList.size(); i++){
-		delete(taskList[i]);
+	for (size_t i = 0; i < taskList.size(); i++){	
+        delete(taskList[i]);
 	}
 	taskList.clear();
 

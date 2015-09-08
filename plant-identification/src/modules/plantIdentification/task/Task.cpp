@@ -35,6 +35,7 @@ Task::Task(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData 
 	isFirstCall = true;
 	callsNumber = 0;
 	maxCallsNumber = taskLifespan*1000/commonData->threadRate;
+    isClean = false;
 	optionalLogString = "";
 }
 
@@ -77,10 +78,20 @@ bool Task::manage(bool keepActive){
 
 	if (taskIsOver() && !keepActive){
 		release();
+        isClean = true;
 		return false;
 	}
 
 	return true;
+}
+
+void Task::clean(){
+
+    if (!isClean){
+        release();
+        isClean = true;
+    }
+
 }
 
 void Task::sendCommands(){

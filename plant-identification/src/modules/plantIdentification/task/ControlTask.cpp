@@ -9,6 +9,7 @@
 #include <yarp/os/ConstString.h>
 
 #include <sstream>
+#include <cmath>
 
 using iCub::plantIdentification::ControlTask;
 using iCub::plantIdentification::LogData;
@@ -262,9 +263,6 @@ void ControlTask::calculateControlInput(){
 			Vector svErrNNVector = neuralNetwork.predict(rotatedAnglesVector);
 			double svErrNN = svErrNNVector[0];
 
-            std::stringstream tempLog("");
-		    tempLog << "[nn: " << svErrNN << " old: " << svErrOld << " r: " << svErrOld/svErrNN << "]";
-		    optionalLogString.append(tempLog.str());
 
           //  if (callsNumber%commonData->screenLogStride == 0){
           //      std::stringstream tempLog("");
@@ -334,8 +332,17 @@ void ControlTask::calculateControlInput(){
 				}
 			}
 
+        	if (callsNumber%commonData->screenLogStride == 0){
+        		std::stringstream printLog("");
+			  	printLog << "[" << errorIncrement << "]" ;
+			    optionalLogString.append(printLog.str());
+	        }
+
 			svRef.resize(1,errorIncrement);
 			svFb.resize(1,-svErr);
+
+
+
 		}
 
 		
@@ -450,19 +457,19 @@ void ControlTask::calculateControlInput(){
 
 
 	//TODO TO REMOVE if the suprvisor PID gains change (in the temperary variables), update them (in the PID object)
-	if (abs(svKp - commonData->tpDbl(1)) > 0.0001){
+    if (fabs(svKp - commonData->tpDbl(1)) > 0.0001){
 		svKp = commonData->tpDbl(1);
 		changeSVGain("Kp",svKp);
 		Bottle tmp; svPid->getOptions(tmp);
 		optionalLogString.append(tmp.toString());
 	}
-	if (abs(svKi - commonData->tpDbl(2)) > 0.0001){
+	if (fabs(svKi - commonData->tpDbl(2)) > 0.0001){
 		svKi = commonData->tpDbl(2);
 		changeSVGain("Ki",svKi);
 		Bottle tmp; svPid->getOptions(tmp);
 		optionalLogString.append(tmp.toString());
 	}
-	if (abs(svKd - commonData->tpDbl(3)) > 0.0001){
+	if (fabs(svKd - commonData->tpDbl(3)) > 0.0001){
 		svKd = commonData->tpDbl(3);
 		changeSVGain("Kd",svKd);
 		Bottle tmp; svPid->getOptions(tmp);

@@ -33,6 +33,7 @@ namespace iCub {
 
 				int callsNumber;
 				int maxCallsNumber;
+                bool isClean;
 				std::vector<double> inputCommandValue;
 
 				std::string taskId;
@@ -49,6 +50,8 @@ namespace iCub {
 				iCub::plantIdentification::TaskName getTaskName(){ return taskName; }
 
 				bool manage(bool keepActive);
+
+                void clean();
 
 			protected:
 
