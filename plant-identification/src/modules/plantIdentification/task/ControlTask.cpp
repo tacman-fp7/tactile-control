@@ -157,7 +157,7 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 
 
 
-	/*** PARTE RELATIVA AL SUPERVISOR MODE ***/
+	/*** CODE RELATED TO SUPERVISOR MODE ***/
 	svKp = commonData->tpDbl(1);
 	svKi = commonData->tpDbl(2);
 	svKd = commonData->tpDbl(3);
@@ -181,15 +181,6 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	addOption(svPidOptions,"Tt",Value(ttSvOptionVect[0]));
 	svPid = new parallelPID(threadRateSec,kpSvOptionVect,kiSvOptionVect,kdSvOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttSvOptionVect,pvSatLimMatrix);
 	svPid->setOptions(svPidOptions);
-	/******/
-
-	if (resetErrOnContact){
-		taskName = APPROACH_AND_CONTROL;
-		dbgTag = "Approach&ControlTask: ";
-	} else {
-		taskName = CONTROL;
-		dbgTag = "ControlTask: ";
-	}
 	
 	// create the neural network and configure it
 
@@ -204,6 +195,21 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 
 	nnConfProperty.fromString(nnConfBottle.toString());
 	neuralNetwork.configure(nnConfProperty);
+	
+	targetAlongTrajectory = 0;
+	trackingModeEnabled = false;
+
+	/*** END OF CODE RELATED TO SUPERVISOR MODE ***/
+
+	if (resetErrOnContact){
+		taskName = APPROACH_AND_CONTROL;
+		dbgTag = "Approach&ControlTask: ";
+	} else {
+		taskName = CONTROL;
+		dbgTag = "ControlTask: ";
+	}
+	
+
 
 }
 
@@ -234,10 +240,13 @@ void ControlTask::calculateControlInput(){
 	}
 
 
-	/*** PARTE RELATIVA AL SUPERVISOR MODE ***/
+	/*** CODE RELATED TO SUPERVISOR MODE ***/
 	double svResultValueScaled;
-	double svErr;
-	double thumbEnc,indexEnc,middleEnc,enc8;
+	double svErr,svErrOld,svErrNN;
+	double svCurrentPosition;
+	double svTarget;
+	double thumbEnc,indexEnc,middleEnc,interMiddleEnc,enc8;
+	double svTrackerVel = commonData->tpDbl(22);
 	if (supervisorControlMode){
 		thumbEnc = commonData->armEncodersAngles[9];
 		indexEnc = commonData->armEncodersAngles[11];
@@ -248,7 +257,7 @@ void ControlTask::calculateControlInput(){
 
 		if (jointsList.size() == 2){
 			// using the "simple" method
-			double svErrOld = (1.417*thumbEnc - 12.22) - middleEnc;
+			svErrOld = (1.417*thumbEnc - 12.22) - middleEnc;
 			
 			// using the neural network
 			std::vector<double> actualAngles(2);
@@ -261,41 +270,14 @@ void ControlTask::calculateControlInput(){
 			rotatedAnglesVector[0] = rotatedAngles[0];
 			rotatedAnglesVector[1] = rotatedAngles[1];
 			Vector svErrNNVector = neuralNetwork.predict(rotatedAnglesVector);
-			double svErrNN = svErrNNVector[0];
-
-
-          //  if (callsNumber%commonData->screenLogStride == 0){
-          //      std::stringstream tempLog("");
-		        //tempLog << "[nn: " << svErrNN << " old: " << svErrOld << " r: " << svErrOld/svErrNN << "]";
-		        //optionalLogString.append(tempLog.str());
-          //  }
-
-			svErr = svErrNN;
-
-			double errorIncrement = 0;
-			// e' il generatore di onda quadra, sovrascrive quando fatto dal supervisor
-			if (commonData->tpInt(18) != 0){
-				double halfStep = commonData->tpDbl(19);
-				int div = (int)((callsNumber*commonData->threadRate/1000.0)/commonData->tpDbl(20));
-				if (div%2 == 1){
-					errorIncrement = halfStep;
-				} else {
-					errorIncrement = -halfStep;
-				}
-			}
-
-			svRef.resize(1,errorIncrement);
-			svFb.resize(1,-svErr);
-			//svErr = ((middleEnc + thumbEnc - (-12.042))/(1 + 0.7021)) - middleEnc;
-			//svRef.resize(1,(middleEnc + thumbEnc - (-12.042))/(1 + 0.7021));
-			//svFb.resize(1,middleEnc);
+			svErrNN = svErrNNVector[0];
 		} else {
 			// si calcola il valore dell'angolo prossimale del dito medio intersezione del piano delle pose migliori
 			//double interMiddleEnc = -0.1046*thumbEnc + 0.8397*indexEnc + 10.05;
-			double interMiddleEnc = 1.4667*thumbEnc -1.0*indexEnc + 34.96;
+			interMiddleEnc = 1.4667*thumbEnc -1.0*indexEnc + 34.96;
 			
 			// si applica la formula della distanza tenendo conto che la differenza per i giunti di pollice e indice e' nulla. In teoria si sarebbe potuta evitare la divisione per due, perche' a noi interessa l'errore a meno di una costante
-			double svErrOld = (interMiddleEnc - middleEnc)/2;
+			svErrOld = (interMiddleEnc - middleEnc)/2;
 
 			// using the neural network
 			std::vector<double> actualAngles(3);
@@ -310,41 +292,61 @@ void ControlTask::calculateControlInput(){
 			rotatedAnglesVector[1] = rotatedAngles[1];
 			rotatedAnglesVector[2] = rotatedAngles[2];
 			Vector svErrNNVector = neuralNetwork.predict(rotatedAnglesVector);
-			double svErrNN = svErrNNVector[0];
-
-          //  if (callsNumber%commonData->screenLogStride == 0){
-          //      std::stringstream tempLog("");
-		        //tempLog << "[nn: " << svErrNN << " old: " << svErrOld << " r: " << svErrOld/svErrNN << "]";
-		        //optionalLogString.append(tempLog.str());
-          //  }
-
-			svErr = svErrNN;
-
-			double errorIncrement = 0;
-			// e' il generatore di onda quadra, sovrascrive quando fatto dal supervisor
-			if (commonData->tpInt(18) != 0){
-				double halfStep = commonData->tpDbl(19);
-				int div = (int)((callsNumber*commonData->threadRate/1000.0)/commonData->tpDbl(20));
-				if (div%2 == 1){
-					errorIncrement = halfStep;
-				} else {
-					errorIncrement = -halfStep;
-				}
-			}
-
-        	if (callsNumber%commonData->screenLogStride == 0){
-        		std::stringstream printLog("");
-			  	printLog << "[" << errorIncrement << "]" ;
-			    optionalLogString.append(printLog.str());
-	        }
-
-			svRef.resize(1,errorIncrement);
-			svFb.resize(1,-svErr);
-
-
+			svErrNN = svErrNNVector[0];
 
 		}
 
+        //  if (callsNumber%commonData->screenLogStride == 0){
+        //      std::stringstream tempLog("");
+		    //tempLog << "[nn: " << svErrNN << " old: " << svErrOld << " r: " << svErrOld/svErrNN << "]";
+		    //optionalLogString.append(tempLog.str());
+        //  }
+
+		svErr = svErrNN;
+		svCurrentPosition = -svErr;
+
+		// if square wave genrator and tracking mode are not enabled, the target is 0 (that is error = 0)
+		svTarget = 0;
+
+		// square wave / sinusoid generator
+		if (commonData->tpInt(18) != 0){
+			if (commonData->tpInt(18) == 1){
+				double halfStep = commonData->tpDbl(19);
+				int div = (int)((callsNumber*commonData->threadRate/1000.0)/commonData->tpDbl(20));
+				if (div%2 == 1){
+					svTarget = halfStep;
+				} else {
+					svTarget = -halfStep;
+				}
+			} else if (commonData->tpInt(18) == 2){
+				int numCallsPerPeriod = (int)(2*(commonData->tpDbl(19)/(commonData->threadRate/1000.0)));
+				int callsNumberMod = callsNumber%numCallsPerPeriod;
+				double ratio = (1.0*callsNumberMod)/numCallsPerPeriod;
+				svTarget = commonData->tpDbl(19) * sin(ratio*2*3.14159265);
+			}
+		}
+
+		// if tracking mode is activated, targetAlongTrajectory is initialized, if tracking mode is disabled, trackingModeEnabled is set to false so that next time targetAlongTrajectory will be initialized again
+		if (commonData->tpInt(21) != 0){
+			if (trackingModeEnabled == false){
+				targetAlongTrajectory = -svErr;
+				trackingModeEnabled = true;
+			}
+
+			double wayLeft = svTarget - targetAlongTrajectory;
+			int wayLeftSign = (wayLeft > 0) ? 1 : ( (wayLeft < 0) ? -1 : 0 );
+			double step = fabs(svTrackerVel) * commonData->threadRate / 1000.0;
+			targetAlongTrajectory = ( fabs(wayLeft) < step ) ? svTarget : (targetAlongTrajectory + wayLeftSign * step); 
+			svTarget = targetAlongTrajectory;
+
+		} else {
+			if (trackingModeEnabled == true){
+				trackingModeEnabled = false;
+			}
+		}
+
+		svRef.resize(1,svTarget);
+		svFb.resize(1,svCurrentPosition);
 		
 		Vector svResult = svPid->compute(svRef,svFb);
 	
@@ -389,9 +391,9 @@ void ControlTask::calculateControlInput(){
 	    }
 		
 	}
-	/****/
+	/*** END OF CODE RELATED TO SUPERVISOR MODE ***/
 
-	// e' il generatore di onda quadra, sovrascrive quando fatto dal supervisor
+	// square wave generator, it overrides what done by the supervisor, if active
 	if (commonData->tpInt(11) != 0){
 		double halfStep = commonData->tpDbl(12);
 		int div = (int)((callsNumber*commonData->threadRate/1000.0)/commonData->tpDbl(13));
@@ -451,9 +453,9 @@ void ControlTask::calculateControlInput(){
 		gainsLog << "[K " << controlData->pidKpf[0] << " " << controlData->pidKif[0] << "][T " << pressureTargetValue[0] << "]";
 		optionalLogString.append(gainsLog.str());
     }
-
+	
 	// log control data
-	portsUtil->sendControlData(taskId,commonData->tpStr(16),commonData->tpStr(17),commonData->tpDbl(7),commonData->tpDbl(8)+svResultValueScaled,svErr,svKp*commonData->tpDbl(5),svKi*commonData->tpDbl(5),svKd*commonData->tpDbl(5),thumbEnc,indexEnc,middleEnc,enc8,pressureTargetValue,commonData->overallFingerPressure,inputCommandValue,fingersList);
+	portsUtil->sendControlData(taskId,commonData->tpStr(16),commonData->tpStr(17),commonData->tpDbl(7),commonData->tpDbl(8)+svResultValueScaled,svErr,svCurrentPosition,svTarget,svKp*commonData->tpDbl(5),svKi*commonData->tpDbl(5),svKd*commonData->tpDbl(5),thumbEnc,indexEnc,middleEnc,enc8,pressureTargetValue,commonData->overallFingerPressure,inputCommandValue,fingersList);
 
 
 	//TODO TO REMOVE if the suprvisor PID gains change (in the temperary variables), update them (in the PID object)

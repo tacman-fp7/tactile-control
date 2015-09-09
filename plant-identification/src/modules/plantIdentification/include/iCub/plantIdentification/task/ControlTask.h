@@ -40,6 +40,8 @@ namespace iCub {
 				bool supervisorControlMode;
 				double svKp,svKi,svKd;
                 std::vector<double> initialPressureTargetValue;
+				double targetAlongTrajectory;
+				bool trackingModeEnabled;
 
 				// neural network
 				iCub::ctrl::ff2LayNN_tansig_purelin neuralNetwork;

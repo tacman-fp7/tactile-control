@@ -32,7 +32,7 @@ namespace iCub {
             std::vector<double> distalJointAngle;
             
             /*  TEMP PARAMETERS USED DURING CONTROL TASKS (EXCEPT THE 15th, USED DURING STEP TASKS)
-            *   0: supervisor mode on/off [0/1]
+            *   0: supervisor mode off/on [0/1]
             *   1: supervisor Kp
             *   2: supervisor Ki
             *   3: supervisor Kd
@@ -43,23 +43,25 @@ namespace iCub {
             *   8: grasp balance factor
             *   9: index/middle fingers balance factor
             *   10: if set > 0, scales low level PID gains and returns to 0
-            *   11: square wave mode (to test LOW level PID)
+            *   11: square wave mode off/on [0/1] (to test LOW level PID)
             *   12: wave amplitude
             *   13: wave half period
             *   14: prints on screen extra data about low level pid tuning
             *   15: pinky mode on/off (control grasp balance with the pinky, settable during step tasks!)
 			*   16: string describing the next experiment. it is logged in the control log
 			*   17: string describing the previous experiment. it is logged in the control log
-			*   18: square wave mode (to test HIGH level PID)
+			*   18: supervisor square wave / sinusoid generator mode [0:off 1:square wave 2:sinusoid] (to test HIGH level PID)
             *   19: wave amplitude
             *   20: wave half period
+			*   21: supervisor tracker mode off/on [0/1]
+			*   22: supervisor tracker velocity (error/second)
 			*
 			*   Note: double values have to contain a dot, while strings have to start with '#'
 			*
             */
 			std::vector<yarp::os::Value> tempParameters;
 
-			int threadRate;
+			int threadRate; // milliseconds between two consecutive thread calls
 			int pwmSign;
 			int screenLogStride;
 
