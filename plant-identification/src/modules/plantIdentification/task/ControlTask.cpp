@@ -319,7 +319,7 @@ void ControlTask::calculateControlInput(){
 					svTarget = -halfStep;
 				}
 			} else if (commonData->tpInt(18) == 2){
-				int numCallsPerPeriod = (int)(2*(commonData->tpDbl(19)/(commonData->threadRate/1000.0)));
+				int numCallsPerPeriod = (int)(2*(commonData->tpDbl(20)/(commonData->threadRate/1000.0)));
 				int callsNumberMod = callsNumber%numCallsPerPeriod;
 				double ratio = (1.0*callsNumberMod)/numCallsPerPeriod;
 				svTarget = commonData->tpDbl(19) * sin(ratio*2*3.14159265);
@@ -455,7 +455,7 @@ void ControlTask::calculateControlInput(){
     }
 	
 	// log control data
-	portsUtil->sendControlData(taskId,commonData->tpStr(16),commonData->tpStr(17),commonData->tpDbl(7),commonData->tpDbl(8)+svResultValueScaled,svErr,svCurrentPosition,svTarget,svKp*commonData->tpDbl(5),svKi*commonData->tpDbl(5),svKd*commonData->tpDbl(5),thumbEnc,indexEnc,middleEnc,enc8,pressureTargetValue,commonData->overallFingerPressure,inputCommandValue,fingersList);
+	portsUtil->sendControlData(taskId,commonData->tpStr(16),commonData->tpStr(17),commonData->tpDbl(7),commonData->tpDbl(8)+svResultValueScaled,svErr,svCurrentPosition,svTarget,targetAlongTrajectory,svKp*commonData->tpDbl(5),svKi*commonData->tpDbl(5),svKd*commonData->tpDbl(5),thumbEnc,indexEnc,middleEnc,enc8,pressureTargetValue,commonData->overallFingerPressure,inputCommandValue,fingersList);
 
 
 	//TODO TO REMOVE if the suprvisor PID gains change (in the temperary variables), update them (in the PID object)
