@@ -41,6 +41,7 @@ namespace iCub {
 				double svKp,svKi,svKd;
                 std::vector<double> initialPressureTargetValue;
 				double targetAlongTrajectory;
+				double trajectoryInitialPose;
 				bool trackingModeEnabled;
 
 				// neural network

@@ -228,6 +228,7 @@ void ControlTask::init(){
 void ControlTask::calculateControlInput(){
 	using yarp::sig::Vector;
 	
+	// scala i guadagni del pid di basso livello
 	if (commonData->tpDbl(10) > 0.001){
 		
 		scaleGains(commonData->tpDbl(10));
@@ -245,8 +246,10 @@ void ControlTask::calculateControlInput(){
 	double svErr,svErrOld,svErrNN;
 	double svCurrentPosition;
 	double svTarget;
-	double thumbEnc,indexEnc,middleEnc,interMiddleEnc,enc8;
-	double svTrackerVel = commonData->tpDbl(22);
+	double thumbEnc,indexEnc,middleEnc,interMiddleEnc,enc8,handPosition;
+	double svTrackerVel = commonData->tpDbl(27);
+	double svTrackerAccTimeSlot = commonData->tpDbl(28);
+	double gripStrength;
 	if (supervisorControlMode){
 		thumbEnc = commonData->armEncodersAngles[9];
 		indexEnc = commonData->armEncodersAngles[11];
@@ -271,6 +274,8 @@ void ControlTask::calculateControlInput(){
 			rotatedAnglesVector[1] = rotatedAngles[1];
 			Vector svErrNNVector = neuralNetwork.predict(rotatedAnglesVector);
 			svErrNN = svErrNNVector[0];
+
+			handPosition = middleEnc - thumbEnc;
 		} else {
 			// si calcola il valore dell'angolo prossimale del dito medio intersezione del piano delle pose migliori
 			//double interMiddleEnc = -0.1046*thumbEnc + 0.8397*indexEnc + 10.05;
@@ -294,48 +299,60 @@ void ControlTask::calculateControlInput(){
 			Vector svErrNNVector = neuralNetwork.predict(rotatedAnglesVector);
 			svErrNN = svErrNNVector[0];
 
+			handPosition = (middleEnc + indexEnc)/2 - thumbEnc;
 		}
 
-        //  if (callsNumber%commonData->screenLogStride == 0){
-        //      std::stringstream tempLog("");
-		    //tempLog << "[nn: " << svErrNN << " old: " << svErrOld << " r: " << svErrOld/svErrNN << "]";
-		    //optionalLogString.append(tempLog.str());
-        //  }
 
 		svErr = svErrNN;
-		svCurrentPosition = -svErr;
 
-		// if square wave genrator and tracking mode are not enabled, the target is 0 (that is error = 0)
+		// if the wave generator and tracking mode are not enabled, the current position is that one that is "err" far from 0, and the target is 0 (that is error = 0)
+		svCurrentPosition = -svErr;
 		svTarget = 0;
 
-		// square wave / sinusoid generator
+		// hand pose square wave / sinusoid generator
 		if (commonData->tpInt(18) != 0){
+			
+			// if the wave generatore is active, che current position is the hand position
+			svCurrentPosition = handPosition;
+			double waveMean = commonData->tpInt(21);
+
 			if (commonData->tpInt(18) == 1){
 				double halfStep = commonData->tpDbl(19);
 				int div = (int)((callsNumber*commonData->threadRate/1000.0)/commonData->tpDbl(20));
 				if (div%2 == 1){
-					svTarget = halfStep;
+					svTarget = waveMean + halfStep;
 				} else {
-					svTarget = -halfStep;
+					svTarget = waveMean - halfStep;
 				}
 			} else if (commonData->tpInt(18) == 2){
 				int numCallsPerPeriod = (int)(2*(commonData->tpDbl(20)/(commonData->threadRate/1000.0)));
 				int callsNumberMod = callsNumber%numCallsPerPeriod;
 				double ratio = (1.0*callsNumberMod)/numCallsPerPeriod;
-				svTarget = commonData->tpDbl(19) * sin(ratio*2*3.14159265);
+				svTarget = waveMean + commonData->tpDbl(19) * sin(ratio*2*3.14159265);
 			}
 		}
 
 		// if tracking mode is activated, targetAlongTrajectory is initialized, if tracking mode is disabled, trackingModeEnabled is set to false so that next time targetAlongTrajectory will be initialized again
-		if (commonData->tpInt(21) != 0){
+		// here svTarget gets modified! tracking mode should be disabled when used with waves tracking
+		if (commonData->tpInt(26) != 0){
 			if (trackingModeEnabled == false){
-				targetAlongTrajectory = -svErr;
+				targetAlongTrajectory = trajectoryInitialPose = svCurrentPosition;
 				trackingModeEnabled = true;
+			}
+
+			double timeSlotFactor;
+			bool initialTrajectory = fabs(targetAlongTrajectory - trajectoryInitialPose) < svTrackerAccTimeSlot;
+			bool finalTrajectory = fabs(svTarget - targetAlongTrajectory) < svTrackerAccTimeSlot;
+
+			timeSlotFactor = 1.0; // default
+			
+			if (initialTrajectory || finalTrajectory){
+				timeSlotFactor = std::min(fabs(targetAlongTrajectory - trajectoryInitialPose)/svTrackerAccTimeSlot,fabs(svTarget - targetAlongTrajectory)/svTrackerAccTimeSlot);
 			}
 
 			double wayLeft = svTarget - targetAlongTrajectory;
 			int wayLeftSign = (wayLeft > 0) ? 1 : ( (wayLeft < 0) ? -1 : 0 );
-			double step = fabs(svTrackerVel) * commonData->threadRate / 1000.0;
+			double step = timeSlotFactor * fabs(svTrackerVel) * commonData->threadRate / 1000.0;
 			targetAlongTrajectory = ( fabs(wayLeft) < step ) ? svTarget : (targetAlongTrajectory + wayLeftSign * step); 
 			svTarget = targetAlongTrajectory;
 
@@ -360,10 +377,41 @@ void ControlTask::calculateControlInput(){
 		// 3 dita: valore POSITIVO sempre
 		svResultValueScaled = commonData->tpDbl(5)*svResult[0];
 		
+		// if the grip strength wave generatore is not active, I get the grip strength from the temp params 
+		gripStrength = commonData->tpDbl(7);
+
+		// grip strength square wave / sinusoid generator
+		if (commonData->tpInt(22) != 0){
+			
+			// if the grip strength wave generatore is active, che current position is the hand position
+			double waveMean = commonData->tpInt(25);
+
+			if (commonData->tpInt(22) == 1){
+				double halfStep = commonData->tpDbl(23);
+				int div = (int)((callsNumber*commonData->threadRate/1000.0)/commonData->tpDbl(24));
+				if (div%2 == 1){
+					gripStrength = waveMean + halfStep;
+				} else {
+					gripStrength = waveMean - halfStep;
+				}
+			} else if (commonData->tpInt(22) == 2){
+				int numCallsPerPeriod = (int)(2*(commonData->tpDbl(24)/(commonData->threadRate/1000.0)));
+				int callsNumberMod = callsNumber%numCallsPerPeriod;
+				double ratio = (1.0*callsNumberMod)/numCallsPerPeriod;
+				gripStrength = waveMean + commonData->tpDbl(23) * sin(ratio*2*3.14159265);
+			}
+		}
+
+
+
+
 		if (jointsList.size() == 2){
 
-			pressureTargetValue[0] = commonData->tpDbl(7) *(1 - (commonData->tpDbl(8)+svResultValueScaled));
-			pressureTargetValue[1] = commonData->tpDbl(7) *(1 + (commonData->tpDbl(8)+svResultValueScaled));
+//			pressureTargetValue[0] = gripStrength *(1 - (commonData->tpDbl(8)+svResultValueScaled));
+//			pressureTargetValue[1] = gripStrength *(1 + (commonData->tpDbl(8)+svResultValueScaled));
+
+			pressureTargetValue[0] = gripStrength - (commonData->tpDbl(8)+svResultValueScaled);
+			pressureTargetValue[1] = gripStrength + (commonData->tpDbl(8)+svResultValueScaled);
 
 			//// se il valore e' positivo e quindi devo muovere il medio, devo aumentare la pressione richiesta al giunto 13, che si trova in posizione uno, altrimenti al giunto 9, in posizione 0
 			//if (svResultValueScaled >= 0){
@@ -375,9 +423,13 @@ void ControlTask::calculateControlInput(){
 			//}
 		} else {
 			// il valore temporaneo di indice 9 serve eventualmente ad equilibrare la calibratura di indice e medio
-			pressureTargetValue[0] = commonData->tpDbl(7)*(1 - (commonData->tpDbl(8)+svResultValueScaled));
-			pressureTargetValue[1] = (1-commonData->tpDbl(9))*0.5*commonData->tpDbl(7)*(1 + (commonData->tpDbl(8)+svResultValueScaled));
-			pressureTargetValue[2] = (1+commonData->tpDbl(9))*0.5*commonData->tpDbl(7)*(1 + (commonData->tpDbl(8)+svResultValueScaled));
+//			pressureTargetValue[0] = gripStrength*(1 - (commonData->tpDbl(8)+svResultValueScaled));
+//			pressureTargetValue[1] = (1-commonData->tpDbl(9))*0.5*gripStrength*(1 + (commonData->tpDbl(8)+svResultValueScaled));
+//			pressureTargetValue[2] = (1+commonData->tpDbl(9))*0.5*gripStrength*(1 + (commonData->tpDbl(8)+svResultValueScaled));
+			
+			pressureTargetValue[0] = gripStrength - (commonData->tpDbl(8)+svResultValueScaled)/3.0;
+			pressureTargetValue[1] = (1-commonData->tpDbl(9))*0.5*(gripStrength + 2.0*(commonData->tpDbl(8)+svResultValueScaled))/3.0;
+			pressureTargetValue[2] = (1+commonData->tpDbl(9))*0.5*(gripStrength + 2.0*(commonData->tpDbl(8)+svResultValueScaled))/3.0;
 		}
 
     	if (callsNumber%commonData->screenLogStride == 0){
@@ -398,9 +450,9 @@ void ControlTask::calculateControlInput(){
 		double halfStep = commonData->tpDbl(12);
 		int div = (int)((callsNumber*commonData->threadRate/1000.0)/commonData->tpDbl(13));
 		if (div%2 == 1){
-			pressureTargetValue[0] = commonData->tpDbl(7) + halfStep;
+			pressureTargetValue[0] = gripStrength + halfStep;
 		} else {
-			pressureTargetValue[0] = commonData->tpDbl(7) - halfStep;
+			pressureTargetValue[0] = gripStrength - halfStep;
 		}
 	}
 
@@ -455,7 +507,7 @@ void ControlTask::calculateControlInput(){
     }
 	
 	// log control data
-	portsUtil->sendControlData(taskId,commonData->tpStr(16),commonData->tpStr(17),commonData->tpDbl(7),commonData->tpDbl(8)+svResultValueScaled,svErr,svCurrentPosition,svTarget,targetAlongTrajectory,svKp*commonData->tpDbl(5),svKi*commonData->tpDbl(5),svKd*commonData->tpDbl(5),thumbEnc,indexEnc,middleEnc,enc8,pressureTargetValue,commonData->overallFingerPressure,inputCommandValue,fingersList);
+	portsUtil->sendControlData(taskId,commonData->tpStr(16),commonData->tpStr(17),gripStrength,commonData->tpDbl(8)+svResultValueScaled,svErr,svCurrentPosition,svTarget,targetAlongTrajectory,svKp*commonData->tpDbl(5),svKi*commonData->tpDbl(5),svKd*commonData->tpDbl(5),thumbEnc,indexEnc,middleEnc,enc8,pressureTargetValue,commonData->overallFingerPressure,inputCommandValue,fingersList);
 
 
 	//TODO TO REMOVE if the suprvisor PID gains change (in the temperary variables), update them (in the PID object)

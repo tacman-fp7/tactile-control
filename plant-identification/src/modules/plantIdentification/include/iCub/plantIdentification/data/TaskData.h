@@ -50,11 +50,17 @@ namespace iCub {
             *   15: pinky mode on/off (control grasp balance with the pinky, settable during step tasks!)
 			*   16: string describing the next experiment. it is logged in the control log
 			*   17: string describing the previous experiment. it is logged in the control log
-			*   18: supervisor square wave / sinusoid generator mode [0:off 1:square wave 2:sinusoid] (to test HIGH level PID)
+			*   18: supervisor hand pose square wave / sinusoid generator mode [0:off 1:square wave 2:sinusoid] (to test HIGH level PID)
             *   19: wave amplitude
             *   20: wave half period
-			*   21: supervisor tracker mode off/on [0/1]
-			*   22: supervisor tracker velocity (error/second)
+			*   21: wave mean
+			*   22: supervisor grip strength square wave / sinusoid generator mode [0:off 1:square wave 2:sinusoid] (to test HIGH level PID)
+            *   23: wave amplitude
+            *   24: wave half period
+			*   25: wave mean
+			*   26: supervisor tracker mode off/on [0/1]
+			*   27: supervisor tracker velocity (error/second)
+			*   28: supervisor tracker acceleration (and deceleration) time slot
 			*
 			*   Note: double values have to contain a dot, while strings have to start with '#'
 			*
