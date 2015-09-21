@@ -40,7 +40,7 @@ namespace iCub {
 				bool supervisorControlMode;
 				double svKp,svKi,svKd;
                 std::vector<double> initialPressureTargetValue;
-				double targetAlongTrajectory;
+                double trajectoryInitialTime;
 				double trajectoryInitialPose;
 				bool trackingModeEnabled;
 

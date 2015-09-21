@@ -39,7 +39,7 @@ namespace iCub {
             *   4: if set > 0, reset pid and returns to 0
             *   5: supervisor gains scale factor
             *   6: if != 0, set all voltages to 0 (maximum priority)
-            *   7: grasp squeezing factor
+            *   7: grip strength
             *   8: grasp balance factor
             *   9: index/middle fingers balance factor
             *   10: if set > 0, scales low level PID gains and returns to 0
@@ -59,8 +59,8 @@ namespace iCub {
             *   24: wave half period
 			*   25: wave mean
 			*   26: supervisor tracker mode off/on [0/1]
-			*   27: supervisor tracker velocity (error/second)
-			*   28: supervisor tracker acceleration (and deceleration) time slot
+			*   27: supervisor tracker velocity (degrees/second)
+			*   28: supervisor tracker acceleration (degrees/(second*second))
 			*
 			*   Note: double values have to contain a dot, while strings have to start with '#'
 			*
