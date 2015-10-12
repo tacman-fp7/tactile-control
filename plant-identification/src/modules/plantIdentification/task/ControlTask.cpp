@@ -305,15 +305,15 @@ void ControlTask::calculateControlInput(){
 
 		svErr = svErrNN;
 
-		// if the wave generator and tracking mode are not enabled, the current position is that one that is "err" far from 0, and the target is 0 (that is error = 0)
-		svCurrentPosition = -svErr;
-		svTarget = 0;
+		svCurrentPosition = handPosition;
+		svTarget = svCurrentPosition + svErr;
+
+        // we store the estimatedFinalPose, since svTarget could change
+        estimatedFinalPose =  svTarget;
 
 		// hand pose square wave / sinusoid generator
 		if (commonData->tpInt(18) != 0){
 			
-			// if the wave generatore is active, che current position is the hand position
-			svCurrentPosition = handPosition;
 			double waveMean = commonData->tpInt(21);
 
 			if (commonData->tpInt(18) == 1){
@@ -333,7 +333,6 @@ void ControlTask::calculateControlInput(){
 		}
 
 
-        estimatedFinalPose =  handPosition + (svTarget - svCurrentPosition);
 
 		// if tracking mode is activated, trajectoryInitialPose is initialized, if tracking mode is disabled, trackingModeEnabled is set to false so that next time trajectoryInitialPose will be initialized again
 		// here svTarget gets modified! tracking mode should be disabled when used with waves tracking
@@ -344,7 +343,7 @@ void ControlTask::calculateControlInput(){
 				trackingModeEnabled = true;
 			}
 
-            double trajectoryFinalPose = estimatedFinalPose;
+            double trajectoryFinalPose = svTarget;
             double d = fabs(trajectoryFinalPose - trajectoryInitialPose);
             double v = svTrackerVel;
             double a = svTrackerAcc;
