@@ -87,7 +87,7 @@ bool PortsUtil::sendInfoData(iCub::plantIdentification::TaskCommonData *commonDa
 	return true;
 }
 
-bool PortsUtil::sendControlData(string taskId,string experimentDescription,string previousExperimentDescription,double targetGripStrength,double actualGripStrength,double u,double error,double svCurrentPosition,double svTarget,double estimatedFinalPose,double svKp,double svKi,double svKd,double thumbEnc,double indexEnc,double middleEnc,double enc8,std::vector<double> &pressureTarget,std::vector<double> &actualPressure,std::vector<double> &pwm,std::vector<int> &fingersList){
+bool PortsUtil::sendControlData(string taskId,string experimentDescription,string previousExperimentDescription,double targetGripStrength,double actualGripStrength,double u,double error,double svCurrentPosition,double actualCurrentTargetPose,double finalTargetPose,double estimatedFinalPose,double svKp,double svKi,double svKd,double thumbEnc,double indexEnc,double middleEnc,double enc8,std::vector<double> &pressureTarget,std::vector<double> &actualPressure,std::vector<double> &pwm,std::vector<int> &fingersList){
 
 	using yarp::os::Bottle;
 
@@ -104,27 +104,28 @@ bool PortsUtil::sendControlData(string taskId,string experimentDescription,strin
 	ctrlBottle.addDouble(actualGripStrength);//6
 	ctrlBottle.addDouble(u);//7
 	ctrlBottle.addDouble(error);//8
-	ctrlBottle.addDouble(svTarget);//9
-	ctrlBottle.addDouble(svCurrentPosition);//10
-	ctrlBottle.addDouble(estimatedFinalPose);//11
-	ctrlBottle.addDouble(svKp);//12
-	ctrlBottle.addDouble(svKi);//13
-	ctrlBottle.addDouble(svKd);//14
-	ctrlBottle.addDouble(thumbEnc);//15
-	ctrlBottle.addDouble(indexEnc);//16
-	ctrlBottle.addDouble(middleEnc);//17
-	ctrlBottle.addDouble(enc8);//18
+	ctrlBottle.addDouble(actualCurrentTargetPose);//9
+	ctrlBottle.addDouble(finalTargetPose);//10
+	ctrlBottle.addDouble(svCurrentPosition);//11
+	ctrlBottle.addDouble(estimatedFinalPose);//12
+	ctrlBottle.addDouble(svKp);//13
+	ctrlBottle.addDouble(svKi);//14
+	ctrlBottle.addDouble(svKd);//15
+	ctrlBottle.addDouble(thumbEnc);//16
+	ctrlBottle.addDouble(indexEnc);//17
+	ctrlBottle.addDouble(middleEnc);//18
+	ctrlBottle.addDouble(enc8);//19
 	for(int i = 0; i < pressureTarget.size(); i++){
 		// TODO use function getProximalJointFromFingerNumber
 //		if (fingersList[i] == 0) fingerJoint == 11;
 //		else if (fingersList[i] == 1) fingerJoint == 13;
 //		else fingerJoint == 9;
 		
-		ctrlBottle.addInt(fingersList[i]);// 19 ... 23 ...
+		ctrlBottle.addInt(fingersList[i]);// 20 ... 24 ...
 //		ctrlBottle.addDouble(armEncodersAngles[fingerJoint]);// 8 ... 12 ...
-		ctrlBottle.addDouble(pwm[i]);// 20 ... 24 ...
-		ctrlBottle.addDouble(pressureTarget[i]);// 21 ... 25 ...
-		ctrlBottle.addDouble(actualPressure[fingersList[i]]);// 22 ... 26...
+		ctrlBottle.addDouble(pwm[i]);// 21 ... 25 ...
+		ctrlBottle.addDouble(pressureTarget[i]);// 22 ... 26 ...
+		ctrlBottle.addDouble(actualPressure[fingersList[i]]);// 23 ... 27...
 	}
 
 	portControlDataOut.write();

@@ -20,6 +20,7 @@ using iCub::plantIdentification::ControlTaskData;
 using iCub::plantIdentification::ICubUtil;
 
 using iCub::ctrl::parallelPID;
+using iCub::ctrl::minJerkTrajGen;
 using yarp::os::Bottle;
 using yarp::os::Value;
 
@@ -197,6 +198,10 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	neuralNetwork.configure(nnConfProperty);
 	
 	trackingModeEnabled = false;
+	minJerkTrackingModeEnabled = false;
+
+	// initialize the minimum jerk trajectory class 
+	minJerkTrajectory = new minJerkTrajGen(1,commonData->threadRate/1000.0,4); //(dimensions,sample time in seconds, trajectory reference time)
 
 	/*** END OF CODE RELATED TO SUPERVISOR MODE ***/
 
@@ -207,8 +212,6 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 		taskName = CONTROL;
 		dbgTag = "ControlTask: ";
 	}
-	
-
 
 }
 
@@ -227,10 +230,13 @@ void ControlTask::init(){
 void ControlTask::calculateControlInput(){
 	using yarp::sig::Vector;
 	
+	double TP_1S_scaleLowLevelPidGains = commonData->tpDbl(10);
+
+
 	// scala i guadagni del pid di basso livello
-	if (commonData->tpDbl(10) > 0.001){
+	if (TP_1S_scaleLowLevelPidGains > 0.001){
 		
-		scaleGains(commonData->tpDbl(10));
+		scaleGains(TP_1S_scaleLowLevelPidGains);
 
 		commonData->tempParameters[10] = Value(0.0);
 
@@ -244,8 +250,9 @@ void ControlTask::calculateControlInput(){
 	double svResultValueScaled;
 	double svErr,svErrOld,svErrNN;
 	double svCurrentPosition;
-	double svTarget;
-    double estimatedFinalPose;
+    double estimatedFinalPose; // best pose estimated either by neural networks or by plane fitting
+	double finalTargetPose; // pose equal to either estimatedFinalPose or the pose coming out from the wave generator, depending on which mode is activated
+	double actualCurrentTargetPose; // actual pose used as target in the supervising controller, it can be either finalTargetPose or the filtered pose coming out from the pose tracking 
 	double thumbEnc,indexEnc,middleEnc,interMiddleEnc,enc8,handPosition;
 	double svTrackerVel = commonData->tpDbl(27);
 	double svTrackerAcc = commonData->tpDbl(28);
@@ -306,10 +313,7 @@ void ControlTask::calculateControlInput(){
 		svErr = svErrNN;
 
 		svCurrentPosition = handPosition;
-		svTarget = svCurrentPosition + svErr;
-
-        // we store the estimatedFinalPose, since svTarget could change
-        estimatedFinalPose =  svTarget;
+		estimatedFinalPose = svCurrentPosition + svErr;
 
 		// hand pose square wave / sinusoid generator
 		if (commonData->tpInt(18) != 0){
@@ -320,22 +324,23 @@ void ControlTask::calculateControlInput(){
 				double halfStep = commonData->tpDbl(19);
 				int div = (int)((callsNumber*commonData->threadRate/1000.0)/commonData->tpDbl(20));
 				if (div%2 == 1){
-					svTarget = waveMean + halfStep;
+					finalTargetPose = waveMean + halfStep;
 				} else {
-					svTarget = waveMean - halfStep;
+					finalTargetPose = waveMean - halfStep;
 				}
 			} else if (commonData->tpInt(18) == 2){
 				int numCallsPerPeriod = (int)(2*(commonData->tpDbl(20)/(commonData->threadRate/1000.0)));
 				int callsNumberMod = callsNumber%numCallsPerPeriod;
 				double ratio = (1.0*callsNumberMod)/numCallsPerPeriod;
-				svTarget = waveMean + commonData->tpDbl(19) * sin(ratio*2*3.14159265);
+				finalTargetPose = waveMean + commonData->tpDbl(19) * sin(ratio*2*3.14159265);
 			}
+		} else {
+			finalTargetPose = estimatedFinalPose;
 		}
 
 
-
+		// TRACKING MODE
 		// if tracking mode is activated, trajectoryInitialPose is initialized, if tracking mode is disabled, trackingModeEnabled is set to false so that next time trajectoryInitialPose will be initialized again
-		// here svTarget gets modified! tracking mode should be disabled when used with waves tracking
 		if (commonData->tpInt(26) != 0){
 			if (trackingModeEnabled == false){
 				trajectoryInitialPose = handPosition;
@@ -343,7 +348,7 @@ void ControlTask::calculateControlInput(){
 				trackingModeEnabled = true;
 			}
 
-            double trajectoryFinalPose = svTarget;
+            double trajectoryFinalPose = finalTargetPose;
             double d = fabs(trajectoryFinalPose - trajectoryInitialPose);
             double v = svTrackerVel;
             double a = svTrackerAcc;
@@ -351,7 +356,7 @@ void ControlTask::calculateControlInput(){
             double s;
 
             if (d == 0){
-                svTarget = trajectoryFinalPose;    
+                actualCurrentTargetPose = trajectoryFinalPose;    
             } else {
                 if (0.5*v*v/a < 0.5*d){
                     if (t < v/a){
@@ -372,25 +377,8 @@ void ControlTask::calculateControlInput(){
                         s = d;
                     }
                 }
-                svTarget = trajectoryInitialPose + (s/d)*(trajectoryFinalPose - trajectoryInitialPose);        
+                actualCurrentTargetPose = trajectoryInitialPose + (s/d)*(trajectoryFinalPose - trajectoryInitialPose);        
             }
-
-
-			//double timeSlotFactor;
-			//bool initialTrajectory = fabs(targetAlongTrajectory - trajectoryInitialPose) < svTrackerAccTimeSlot;
-			//bool finalTrajectory = fabs(svTarget - targetAlongTrajectory) < svTrackerAccTimeSlot;
-
-			//timeSlotFactor = 1.0; // default
-			
-			//if (initialTrajectory || finalTrajectory){
-			//	timeSlotFactor = std::min(fabs(targetAlongTrajectory - trajectoryInitialPose)/svTrackerAccTimeSlot,fabs(svTarget - targetAlongTrajectory)/svTrackerAccTimeSlot);
-			//}
-
-			//double wayLeft = svTarget - targetAlongTrajectory;
-			//int wayLeftSign = (wayLeft > 0) ? 1 : ( (wayLeft < 0) ? -1 : 0 );
-			//double step = timeSlotFactor * fabs(svTrackerVel) * commonData->threadRate / 1000.0;
-			//targetAlongTrajectory = ( fabs(wayLeft) < step ) ? svTarget : (targetAlongTrajectory + wayLeftSign * step); 
-			//svTarget = targetAlongTrajectory;
 
 		} else {
 			if (trackingModeEnabled == true){
@@ -398,7 +386,36 @@ void ControlTask::calculateControlInput(){
 			}
 		}
 
-		svRef.resize(1,svTarget);
+		// MIN JERK TRACKING
+		// if minJerkTracking mode is activated, minJerkTrackingModeEnabled is initialized, if minJerkTracking mode is disabled, minJerkTrackingModeEnabled is set to false so that next time initPosition will be initialized again
+		if (commonData->tpInt(29) != 0){
+			if (minJerkTrackingModeEnabled == false){
+
+				Vector initPosition(1,handPosition);
+				minJerkTrajectory->init(initPosition);
+				minJerkTrajectory->setT(commonData->tpDbl(30));
+				minJerkTrackingModeEnabled = true;
+			}
+
+			Vector targetPosition(1,finalTargetPose);
+			minJerkTrajectory->computeNextValues(targetPosition);
+
+			Vector currentTargetPosition = minJerkTrajectory->getPos();
+			actualCurrentTargetPose = currentTargetPosition[0];
+
+
+		} else {
+			if (minJerkTrackingModeEnabled == true){
+				minJerkTrackingModeEnabled = false;
+			}
+		}
+
+		// if no tracking modes are active, use the finalTargetPose as target reference in the supervising controller
+		if (commonData->tpInt(26) == 0 && commonData->tpInt(29) == 0){
+			actualCurrentTargetPose = finalTargetPose;
+		}
+
+		svRef.resize(1,actualCurrentTargetPose);
 		svFb.resize(1,svCurrentPosition);
 		
 		Vector svResult = svPid->compute(svRef,svFb);
@@ -409,10 +426,34 @@ void ControlTask::calculateControlInput(){
 			optionalLogString.append("[ PID RESET ] ");
 		}
 
+		double balanceFactor;
+
+		balanceFactor = svResult[0];
+
+		// if pinky control mode is active, overwrite balanceFactor
+		double pinkyAngleReference = 45;
+		if (commonData->tpInt(31) != 0){
+				double pinkyEnc = commonData->armEncodersAngles[15];
+				double diff = pinkyEnc - pinkyAngleReference;
+			
+				if (callsNumber%commonData->screenLogStride == 0){
+					std::stringstream printLog("");
+					printLog << "[ref " << pinkyAngleReference << " pinky " << pinkyEnc << " diff " << diff << "]";
+					optionalLogString.append(printLog.str());
+				}
+
+				balanceFactor = diff;
+		}
+
+
 		// 2 dita: valore POSITIVO se il MEDIO deve INCREMENTARE l'angolo 
 		// 3 dita: valore POSITIVO sempre
-		svResultValueScaled = commonData->tpDbl(5)*svResult[0];
+		svResultValueScaled = commonData->tpDbl(5)*balanceFactor;
 		
+
+
+
+
 		// if the grip strength wave generatore is not active, I get the grip strength from the temp params 
 		gripStrength = commonData->tpDbl(7);
 
@@ -561,7 +602,7 @@ void ControlTask::calculateControlInput(){
 
 
 	// log control data
-	portsUtil->sendControlData(taskId,commonData->tpStr(16),commonData->tpStr(17),gripStrength,actualGripStrength,commonData->tpDbl(8)+svResultValueScaled,svErr,svCurrentPosition,svTarget,estimatedFinalPose,svKp*commonData->tpDbl(5),svKi*commonData->tpDbl(5),svKd*commonData->tpDbl(5),thumbEnc,indexEnc,middleEnc,enc8,pressureTargetValue,commonData->overallFingerPressure,inputCommandValue,fingersList);
+	portsUtil->sendControlData(taskId,commonData->tpStr(16),commonData->tpStr(17),gripStrength,actualGripStrength,commonData->tpDbl(8)+svResultValueScaled,svErr,svCurrentPosition,actualCurrentTargetPose,finalTargetPose,estimatedFinalPose,svKp*commonData->tpDbl(5),svKi*commonData->tpDbl(5),svKd*commonData->tpDbl(5),thumbEnc,indexEnc,middleEnc,enc8,pressureTargetValue,commonData->overallFingerPressure,inputCommandValue,fingersList);
 
 
 	//TODO TO REMOVE if the suprvisor PID gains change (in the temperary variables), update them (in the PID object)
@@ -616,6 +657,8 @@ void ControlTask::release(){
 	for(size_t i = 0; i < jointsList.size(); i++){
 		delete(pid[i]);
 	}
+
+	delete(minJerkTrajectory);
 
 	// TODO TO REMOVE serve solo in fase di test
 	commonData->tempParameters[17] = Value("#");

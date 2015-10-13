@@ -61,6 +61,9 @@ namespace iCub {
 			*   26: supervisor tracker mode off/on [0/1]
 			*   27: supervisor tracker velocity (degrees/second)
 			*   28: supervisor tracker acceleration (degrees/(second*second))
+			*   29: minimum jerk tracking mode off/on [0/1]
+			*   30: minimum jerk trajectory reference time (90% of steady-state value in this time, transient estinguished after 150%)
+			*   31: pinky control mode on/off (control grasp balance with the pinky, but working with control mode! it affects the balance factor)
 			*
 			*   Note: double values have to contain a dot, while strings have to start with '#'
 			*

@@ -8,6 +8,7 @@
 
 #include <iCub/ctrl/neuralNetworks.h>
 #include <iCub/ctrl/pids.h>
+#include <iCub/ctrl/minJerkCtrl.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/Value.h>
 
@@ -43,6 +44,8 @@ namespace iCub {
                 double trajectoryInitialTime;
 				double trajectoryInitialPose;
 				bool trackingModeEnabled;
+				bool minJerkTrackingModeEnabled;
+				iCub::ctrl::minJerkTrajGen* minJerkTrajectory;
 
 				// neural network
 				iCub::ctrl::ff2LayNN_tansig_purelin neuralNetwork;
