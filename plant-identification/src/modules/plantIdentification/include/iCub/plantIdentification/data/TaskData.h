@@ -64,6 +64,11 @@ namespace iCub {
 			*   29: minimum jerk tracking mode off/on [0/1]
 			*   30: minimum jerk trajectory reference time (90% of steady-state value in this time, transient estinguished after 150%) (restart minJerk to take effect)
 			*   31: pinky control mode on/off (control grasp balance with the pinky, but working with control mode! it affects the balance factor)
+			*	32: approach task control mode [0:velocity / 1:openloop]
+			*	33: approach task stop condition [0:tactile / 2:position]
+			*	34: approach window size (valid for task stop condition)
+			*	35: approach initial check threshold (valid for task stop condition)
+			*	36: approach final check threshold (valid for task stop condition)
 			*
 			*   Note: double values have to contain a dot, while strings have to start with '#'
 			*
@@ -124,6 +129,7 @@ namespace iCub {
 			std::vector<int> jointsList;
 			std::vector<int> fingersList;
 			std::vector<double> velocitiesList;
+			std::vector<double> pwmList;
 			std::vector<double> jointsPwmLimitsList;
 			bool jointsPwmLimitsEnabled;
 			int lifespan;

@@ -460,7 +460,7 @@ void ControlTask::calculateControlInput(){
 		// grip strength square wave / sinusoid generator
 		if (commonData->tpInt(22) != 0){
 			
-			// if the grip strength wave generatore is active, che current position is the hand position
+			// if the grip strength wave generatore is active, the current position is the hand position
 			double waveMean = commonData->tpInt(25);
 
 			if (commonData->tpInt(22) == 1){

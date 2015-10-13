@@ -151,6 +151,11 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,int threadRate,iCub::plantIdenti
 	for(int i = 0; i < approachJointsVelocities->size(); i++){
 		approachData.velocitiesList[i] = approachJointsVelocities->get(i).asDouble();
 	}
+	Bottle* approachJointsPwm = rf.find("approach.jointsPwm").asList();
+	approachData.pwmList.resize(approachJointsPwm->size());
+	for(int i = 0; i < approachJointsPwm->size(); i++){
+		approachData.pwmList[i] = approachJointsPwm->get(i).asDouble();
+	}
 	Bottle* approachJointsPwmLimits = rf.find("approach.jointsPwmLimits").asList();
 	approachData.jointsPwmLimitsList.resize(approachJointsVelocities->size());
 	for(int i = 0; i < approachJointsPwmLimits->size(); i++){
