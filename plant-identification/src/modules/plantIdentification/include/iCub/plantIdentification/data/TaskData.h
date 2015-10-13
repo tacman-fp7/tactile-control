@@ -40,7 +40,7 @@ namespace iCub {
             *   5: supervisor gains scale factor
             *   6: if != 0, set all voltages to 0 (maximum priority)
             *   7: grip strength
-            *   8: grasp balance factor
+            *   8: starting grasp balance factor
             *   9: index/middle fingers balance factor
             *   10: if set > 0, scales low level PID gains and returns to 0
             *   11: square wave mode off/on [0/1] (to test LOW level PID)
@@ -62,7 +62,7 @@ namespace iCub {
 			*   27: supervisor tracker velocity (degrees/second)
 			*   28: supervisor tracker acceleration (degrees/(second*second))
 			*   29: minimum jerk tracking mode off/on [0/1]
-			*   30: minimum jerk trajectory reference time (90% of steady-state value in this time, transient estinguished after 150%)
+			*   30: minimum jerk trajectory reference time (90% of steady-state value in this time, transient estinguished after 150%) (restart minJerk to take effect)
 			*   31: pinky control mode on/off (control grasp balance with the pinky, but working with control mode! it affects the balance factor)
 			*
 			*   Note: double values have to contain a dot, while strings have to start with '#'
