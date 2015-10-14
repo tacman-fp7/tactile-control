@@ -34,7 +34,7 @@ Task::Task(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData 
 
 	isFirstCall = true;
 	callsNumber = 0;
-	maxCallsNumber = taskLifespan*1000/commonData->threadRate;
+	maxCallsNumber = secondsToCallsNumber(static_cast<double>(taskLifespan));
     isClean = false;
 	optionalLogString = "";
 }
@@ -219,4 +219,9 @@ void Task::saveProgress(){
 bool Task::taskIsOver(){
 
 	return callsNumber >= maxCallsNumber;
+}
+
+int Task::secondsToCallsNumber(double seconds){
+
+	return static_cast<int>(seconds*1000/commonData->threadRate);
 }

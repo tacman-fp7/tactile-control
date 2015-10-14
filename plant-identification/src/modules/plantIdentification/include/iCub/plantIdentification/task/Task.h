@@ -43,6 +43,7 @@ namespace iCub {
                 /* ******* Debug attributes.                ******* */
                 std::string dbgTag;
 
+
             public:
                 
 				Task(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,int maxCallsNumber,std::vector<int> &jointsList,std::vector<int> &fingersList);
@@ -58,6 +59,8 @@ namespace iCub {
 				void addCommonLogData(iCub::plantIdentification::LogData &logData);
 
 				void processTactileData();
+
+				int secondsToCallsNumber(double seconds);
 
 			private:
 			

@@ -20,18 +20,28 @@ namespace iCub {
 				iCub::plantIdentification::ApproachTaskData *approachData;
 				
 				int controlMode; // 0:velocity  1:openloop
-				int stopCondition; // 0:tactile  1:position
-
-				// tactile stop condition data
+				int stopCondition; // 0:none  1:tactile  2:position  3:both tactile and position
+				bool stopFingers;
 				std::vector<bool> fingerIsInContact;
+				int callsNumberForAvarage;
+				int callsNumberForMovementTimeout;
+				double thresholdScaleFactor;
 
-				// position stop condition data
+				// stop condition by tactile feedback data
+				std::vector<bool> thresholdExceeded;
+				std::vector<double> tactileAvarage;
+				std::vector<double> tactileMaximum;
+				std::vector<double> tactileThreshold;
+
+				// stop condition by position data
 				std::vector<int> fingerState; // 0: before moving; 1:while moving; 2:after moving
 				std::vector<std::vector<double> > fingerPositions;
 				int windowSize;
-				double initialCheckThreshold;
 				double finalCheckThreshold;
 				int positionIndex;
+
+				void moveFinger(int finger);
+				void stopFinger(int finger);
 
             public:
 

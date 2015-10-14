@@ -65,10 +65,13 @@ namespace iCub {
 			*   30: minimum jerk trajectory reference time (90% of steady-state value in this time, transient estinguished after 150%) (restart minJerk to take effect)
 			*   31: pinky control mode on/off (control grasp balance with the pinky, but working with control mode! it affects the balance factor)
 			*	32: approach task control mode [0:velocity / 1:openloop]
-			*	33: approach task stop condition [0:tactile / 2:position]
-			*	34: approach window size (valid for task stop condition)
-			*	35: approach initial check threshold (valid for task stop condition)
-			*	36: approach final check threshold (valid for task stop condition)
+			*	33: approach task stop condition [0:none / 1:tactile / 2:position / 3:both]
+			*	34: approach threshold scale factor (valid for stop condition by tactile data)
+			*	35: approach seconds for avarage (valid for stop condition by tactile data)
+			*	36: approach window size (valid for stop condition by position)
+			*	37: approach final check threshold (valid for stop condition by position)
+			*	38: approach seconds for movement timeout (valid for stop condition by position)
+			*	39: approach stop-fingers mode off/on [0/1] (fingers are stopped when in contact with the object)
 			*
 			*   Note: double values have to contain a dot, while strings have to start with '#'
 			*
