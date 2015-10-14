@@ -27,7 +27,7 @@ namespace iCub {
 
 				// position stop condition data
 				std::vector<int> fingerState; // 0: before moving; 1:while moving; 2:after moving
-				std::vector<std::vector<double>> fingerPositions;
+				std::vector<std::vector<double> > fingerPositions;
 				int windowSize;
 				double initialCheckThreshold;
 				double finalCheckThreshold;
