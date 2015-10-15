@@ -704,7 +704,7 @@ void ControllersUtil::testShowEndEffectors(){
 bool ControllersUtil::resetPIDIntegralGain(double joint){
 
 	yarp::dev::Pid pid;
-
+	std::cout << "resetting\n";
 	if (iPid->getPid(joint,&pid)){
 		storedPIDIntegralGain = pid.ki;
 		std::cout << "old ki " << pid.ki << "\n";
@@ -719,7 +719,7 @@ bool ControllersUtil::resetPIDIntegralGain(double joint){
 bool ControllersUtil::restorePIDIntegralGain(double joint){
 
 	yarp::dev::Pid pid;
-
+	std::cout << "restoring\n";
 	if (iPid->getPid(joint,&pid)){
 		std::cout << "old ki " << pid.ki << "\n";
 		pid.setKi(storedPIDIntegralGain);
