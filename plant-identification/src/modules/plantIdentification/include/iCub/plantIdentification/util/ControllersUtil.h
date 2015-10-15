@@ -34,6 +34,9 @@ namespace iCub {
 				std::vector<int> storedJointsControlMode;
 				std::vector<int> handJointsToMove;
 				std::vector<double> storedHandJointsMaxPwmLimits;
+				
+				//TODO TEMPORARY WORKAROUND
+				double storedPIDIntegralGain;
 
                 bool graspEnabled;
 
@@ -83,6 +86,9 @@ namespace iCub {
                 void testShowEndEffectors();    
 
 				bool setControlMode(int joint,int controlMode,bool checkCurrent);
+
+				bool resetPIDIntegralGain(double joint);
+				bool restorePIDIntegralGain(double joint);
 
 			private:
 

@@ -700,3 +700,32 @@ void ControllersUtil::testShowEndEffectors(){
 */
 
 }
+
+bool ControllersUtil::resetPIDIntegralGain(double joint){
+
+	yarp::dev::Pid pid;
+
+	if (iPid->getPid(joint,&pid)){
+		storedPIDIntegralGain = pid.ki;
+		std::cout << "old ki " << pid.ki << "\n";
+		pid.setKi(0);
+		std::cout << "new ki " << pid.ki << "\n";
+		iPid->setPid(joint,pid);
+		return true;
+	}
+	return false;
+}
+
+bool ControllersUtil::restorePIDIntegralGain(double joint){
+
+	yarp::dev::Pid pid;
+
+	if (iPid->getPid(joint,&pid)){
+		std::cout << "old ki " << pid.ki << "\n";
+		pid.setKi(storedPIDIntegralGain);
+		std::cout << "stored: " << storedPIDIntegralGain << "  new ki " << pid.ki << "\n";
+		iPid->setPid(joint,pid);
+		return true;
+	}
+	return false;
+}
