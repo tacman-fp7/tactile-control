@@ -23,6 +23,7 @@ namespace iCub {
 				int stopCondition; // 0:none  1:tactile  2:position  3:both tactile and position
 				bool stopFingers;
 				std::vector<bool> fingerIsInContact;
+				std::vector<bool> fingerSetInPosition;
 				int callsNumberForAvarage;
 				int callsNumberForMovementTimeout;
 				double thresholdScaleFactor;

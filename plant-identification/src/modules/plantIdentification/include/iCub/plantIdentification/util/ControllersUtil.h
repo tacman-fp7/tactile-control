@@ -82,11 +82,11 @@ namespace iCub {
 
                 void testShowEndEffectors();    
 
+				bool setControlMode(int joint,int controlMode,bool checkCurrent);
+
 			private:
 
 				bool waitMoveDone(const double &i_timeout, const double &i_delay);
-
-				bool setControlMode(int joint,int controlMode,bool checkCurrent);
 
 };
     } //namespace plantIdentification

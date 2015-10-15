@@ -46,11 +46,13 @@ ApproachTask::ApproachTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil
 	thresholdExceeded.resize(jointsList.size(),false);
 	tactileAvarage.resize(jointsList.size(),0);
 	tactileMaximum.resize(jointsList.size(),0);
+    tactileThreshold.resize(jointsList.size());
 	
 	fingerState.resize(jointsList.size(),0);
 	fingerPositions.resize(jointsList.size());
 
 	fingerIsInContact.resize(jointsList.size(),false);
+    fingerSetInPosition.resize(jointsList.size(),false);
 
 	taskName = APPROACH;
 	dbgTag = "Approach: ";
@@ -88,12 +90,15 @@ void ApproachTask::calculateControlInput(){
 				tactileMaximum[i] = std::max(tactileMaximum[i],commonData->overallFingerPressureMedian[fingersList[i]]);
 			}
 		} else {
+
 			// evaluate contact threshold on each fingertip
 			if (callsNumber == medianWindowSize + callsNumberForAvarage){
 
 				for(size_t i = 0; i < jointsList.size(); i++){
+                    std::cout << callsNumberForAvarage << " " << tactileAvarage[i] << "\n";
 					if (callsNumberForAvarage != 0) tactileAvarage[i] /= callsNumberForAvarage;
-					tactileThreshold[i] = tactileAvarage[i] + (tactileMaximum[i]-tactileAvarage[i])*thresholdScaleFactor;
+                    std::cout << tactileAvarage[i] << " " << tactileMaximum[i] << "\n";
+					tactileThreshold[i] = std::max(tactileAvarage[i] + (tactileMaximum[i]-tactileAvarage[i])*thresholdScaleFactor,tactileMaximum[i] + 10);
 				}
 
 				// valid if stop condition is position
@@ -129,13 +134,12 @@ void ApproachTask::calculateControlInput(){
 				printLog << "]";
 				printLog << " [pDiff ";
 				for(size_t i = 0; i < jointsList.size(); i++){
-	    			printLog << fingerPositions[i][positionIndex] - fingerPositions[i][(positionIndex + 1)%windowSize] << " ";
+	    			printLog << commonData->armEncodersAngles[jointsList[i]] << "/" <<  fingerPositions[i][(positionIndex + 1)%windowSize] << " ";
 				}
 				printLog << "]";
-				printLog << "[t/o " << (callsNumber > callsNumberForMovementTimeout  ? 1 : 0) << "]";
+				printLog << "[t/o " << (callsNumber > medianWindowSize + callsNumberForAvarage + callsNumberForMovementTimeout  ? 1 : 0) << "]";
 				optionalLogString.append(printLog.str());
 			}
-
 
 			double tempAngleDifference;
 			int nextPositionIndex = (positionIndex + 1)%windowSize;
@@ -145,7 +149,7 @@ void ApproachTask::calculateControlInput(){
 				fingerPositions[i][positionIndex] = commonData->armEncodersAngles[jointsList[i]];
 				tempAngleDifference = fingerPositions[i][positionIndex] - fingerPositions[i][nextPositionIndex];
 
-				if (fingerState[i] == 0 && callsNumber > callsNumberForMovementTimeout && tempAngleDifference > finalCheckThreshold){
+				if (fingerState[i] == 0 && callsNumber > medianWindowSize + callsNumberForAvarage + callsNumberForMovementTimeout && tempAngleDifference < finalCheckThreshold){
 					fingerState[i] = 1;
 				} 
 
@@ -171,9 +175,14 @@ void ApproachTask::calculateControlInput(){
 
 	// move fingers
 	for(size_t i = 0; i < jointsList.size(); i++){	
-		if (!manageFingers || (fingerIsInContact[i] && stopFingers)){
-			stopFinger(i);	
-		} else {
+		if (!manageFingers){
+			stopFinger(i);
+        } else if (fingerIsInContact[i] && stopFingers){	
+            if (!fingerSetInPosition[i]){
+                controllersUtil->setControlMode(jointsList[i],VOCAB_CM_POSITION,true);
+                fingerSetInPosition[i] = true;
+            }
+   	    } else {
 			moveFinger(i);
 		}
 	}
@@ -261,11 +270,11 @@ void ApproachTask::sendCommands(){
 
 	if (controlMode == 0){ // velocity control mode
 		for(size_t i = 0; i < inputCommandValue.size(); i++){
-			controllersUtil->sendVelocity(jointsList[i],inputCommandValue[i]);
+			if (!(fingerIsInContact[i] && stopFingers)) controllersUtil->sendVelocity(jointsList[i],inputCommandValue[i]);
 		}
 	} else { // openloop control mode
 		for(size_t i = 0; i < inputCommandValue.size(); i++){
-			controllersUtil->sendPwm(jointsList[i],commonData->pwmSign*inputCommandValue[i]);
+			if (!(fingerIsInContact[i] && stopFingers)) controllersUtil->sendPwm(jointsList[i],commonData->pwmSign*inputCommandValue[i]);
 		}
 	}
 }
