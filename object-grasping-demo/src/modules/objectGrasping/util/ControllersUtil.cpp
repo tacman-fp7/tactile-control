@@ -87,7 +87,6 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
        clientArmCartContr.view(iCart);
     }
 
-
 	return true;
 }
 
@@ -193,83 +192,159 @@ bool ControllersUtil::testCartesianController() {
 
     std::cout << "\n";
 
+
+	Vector xd = x0;
+	Vector od = o0;
+
+	xd[0] += -0.05;
+
+	bool exec = false;
+	// exec = true;
+	if (exec){
+
+		iCart->setTrajTime(2.0);
+		//iCart->setInTargetTol(0.001);
+
+		iCart->goToPoseSync(xd,od);   // send request and wait for reply
+		bool done=false;
+		while (!done) {
+		   iCart->checkMotionDone(&done);
+		   yarp::os::Time::delay(0.04);
+		}
+
+		iCart->goToPoseSync(x0,o0);   // send request and wait for reply
+		done=false;
+		while (!done) {
+		   iCart->checkMotionDone(&done);
+		   yarp::os::Time::delay(0.04);
+		}
+	}
+
     // Check motion done
-//    waitMoveDone(10, 1);
+	//    waitMoveDone(10, 1);
 	cout << "Done. \n";
 
 	return true;
 }
 /* *********************************************************************************************************************** */
 
+bool ControllersUtil::incrementEndEffectorPosition(double incrementValue,int coordinate,double seconds){
+	using yarp::sig::Vector;
+
+	Vector x0,o0;
+    if (!iCart->getPose(x0,o0)) {
+	
+		cout << "could not read pose!\n";
+		return false;
+	
+	} else { 
+
+		Vector xd = x0;
+
+		// coordinate: 0:x / 1:y / 2:z
+		xd[coordinate] += incrementValue;
+
+		iCart->setTrajTime(seconds);
+		//iCart->setInTargetTol(0.001);
+
+		iCart->goToPoseSync(xd,o0);   // send request and wait for reply
+		bool done=false;
+		while (!done) {
+			iCart->checkMotionDone(&done);
+			yarp::os::Time::delay(0.04);
+		}
+
+
+		return true;
+	}
+}
+
+
 /* ******* Place arm in grasping position                                   ********************************************** */ 
-bool ControllersUtil::setArmInGraspPosition() {
+bool ControllersUtil::setArmInGraspPosition(bool cartesianMode) {
 
     cout << dbgTag << "Reaching arm grasp position ... \t";
     
-	iVel->stop();
+	if (cartesianMode){
 
-	// Arm
-	iPos->positionMove(0 ,-36);
-    iPos->positionMove(1 , 30);
-    iPos->positionMove(2 , -5);
-    iPos->positionMove(3 , 45);
+		this->incrementEndEffectorPosition(-0.05,0,2.0);
+
+		return true;
+	} else {
+	
+		iVel->stop();
+
+		// Arm
+		iPos->positionMove(0 ,-36);
+		iPos->positionMove(1 , 30);
+		iPos->positionMove(2 , -5);
+		iPos->positionMove(3 , 45);
         
-    iPos->positionMove(4 , -1);
-    iPos->positionMove(5 , 18);
-    iPos->positionMove(6 , 7);
-    iPos->positionMove(7 , 15);
+		iPos->positionMove(4 , -1);
+		iPos->positionMove(5 , 18);
+		iPos->positionMove(6 , 7);
+		iPos->positionMove(7 , 15);
         
-	// Hand
-//    iPos->positionMove(8 , 79);
-//    iPos->positionMove(9 , 0);
-//    iPos->positionMove(10, 0);// 29
-//    iPos->positionMove(11, 0);
-//    iPos->positionMove(12, 0);
-//    iPos->positionMove(13, 0);
-//    iPos->positionMove(14, 0);//15
-//    iPos->positionMove(15, 0);
+		// Hand
+	//    iPos->positionMove(8 , 79);
+	//    iPos->positionMove(9 , 0);
+	//    iPos->positionMove(10, 0);// 29
+	//    iPos->positionMove(11, 0);
+	//    iPos->positionMove(12, 0);
+	//    iPos->positionMove(13, 0);
+	//    iPos->positionMove(14, 0);//15
+	//    iPos->positionMove(15, 0);
 
-    // Check motion done
-    waitMoveDone(10, 1,true);
-	cout << "Done. \n";
+		// Check motion done
+		waitMoveDone(10, 1,true);
+		cout << "Done. \n";
 
-	return true;
+		return true;
+	}
 }
 /* *********************************************************************************************************************** */
 
 /* ******* Place arm in grasping position                                   ********************************************** */ 
-bool ControllersUtil::raiseArm() {
+bool ControllersUtil::raiseArm(bool cartesianMode) {
 
     cout << dbgTag << "Reaching arm grasp position ... \t";
     
-//	iVel->stop();
+	if (cartesianMode){
 
-	// Arm
-	iPos->positionMove(0 ,-36);
-    iPos->positionMove(1 , 30);
-    iPos->positionMove(2 , -5);
-    iPos->positionMove(3 , 90);
+		this->incrementEndEffectorPosition(-0.05,0,2.0);
+
+		return true;
+	} else {
+
+	//	iVel->stop();
+
+		// Arm
+		iPos->positionMove(0 ,-36);
+		iPos->positionMove(1 , 30);
+		iPos->positionMove(2 , -5);
+		iPos->positionMove(3 , 90);
         
-    iPos->positionMove(4 , -20);
-    iPos->positionMove(5 , 18);
-    iPos->positionMove(6 , 7);
-    iPos->positionMove(7 , 15);
+		iPos->positionMove(4 , -20);
+		iPos->positionMove(5 , 18);
+		iPos->positionMove(6 , 7);
+		iPos->positionMove(7 , 15);
         
-	// Hand
-    //iPos->positionMove(8 , 79);
-    //iPos->positionMove(9 , 2);
-    //iPos->positionMove(10, 29);
-    //iPos->positionMove(11, 0);
-    //iPos->positionMove(12, 0);
-    //iPos->positionMove(13, 25);
-    //iPos->positionMove(14, 15);
-    //iPos->positionMove(15, 1);
+		// Hand
+		//iPos->positionMove(8 , 79);
+		//iPos->positionMove(9 , 2);
+		//iPos->positionMove(10, 29);
+		//iPos->positionMove(11, 0);
+		//iPos->positionMove(12, 0);
+		//iPos->positionMove(13, 25);
+		//iPos->positionMove(14, 15);
+		//iPos->positionMove(15, 1);
 
-    // Check motion done
-    waitMoveDone(10, 1,true);
-	cout << "Done. \n";
+		// Check motion done
+		waitMoveDone(10, 1,true);
+		cout << "Done. \n";
 
-	return true;
+		return true;
+	}
 }
 /* *********************************************************************************************************************** */
 

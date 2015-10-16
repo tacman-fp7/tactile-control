@@ -26,6 +26,8 @@ namespace iCub {
 				double pidKd;
 				double targetPressure;
 				
+				bool cartesianMode;
+
 				ConfigData(yarp::os::ResourceFinder &rf);
 		
         };

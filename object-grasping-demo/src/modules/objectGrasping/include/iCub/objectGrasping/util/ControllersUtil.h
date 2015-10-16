@@ -51,9 +51,9 @@ namespace iCub {
 
 				bool setArmInStartPosition();
 
-				bool setArmInGraspPosition();
+				bool setArmInGraspPosition(bool cartesianMode);
 
-				bool raiseArm();
+				bool raiseArm(bool cartesianMode);
 
 				bool restorePreviousArmPosition();
 
@@ -64,6 +64,8 @@ namespace iCub {
 				bool openHand();
 
 				bool moveFingers();
+
+				bool incrementEndEffectorPosition(double incrementValue,int coordinate,double seconds);
 
 			private:
 

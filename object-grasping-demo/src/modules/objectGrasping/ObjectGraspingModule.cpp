@@ -101,17 +101,16 @@ bool ObjectGraspingModule::updateModule() {
 
 	case SET_ARM_IN_GRASP_POSITION:
 
-//        controllersUtil->testCartesianController();
-//        taskState = WAIT_TO_START;
+        controllersUtil->testCartesianController();
+        taskState = WAIT_TO_START;
 
-		if (controllersUtil->setArmInGraspPosition()) {
-//			taskState = WAIT_TO_START;
+		//if (controllersUtil->setArmInGraspPosition()) {
 
-			taskState = BEGIN_GRASP_THREAD;
-		} else{
-	        cout << dbgTag << "failed to set the arm in grasp position\n";
-	        return false;
-		}
+		//	taskState = BEGIN_GRASP_THREAD;
+		//} else{
+	 //       cout << dbgTag << "failed to set the arm in grasp position\n";
+	 //       return false;
+		//}
 		break;
 
 	case BEGIN_GRASP_THREAD:
@@ -139,7 +138,7 @@ bool ObjectGraspingModule::updateModule() {
 		break;
 
 	case RAISE_ARM:
-		if (controllersUtil->raiseArm()) {
+		if (controllersUtil->raiseArm(configData->cartesianMode)) {
 			taskState = SET_ARM_BACK_IN_GRASP_POSITION;
 		} else{
 	        cout << dbgTag << "failed to raise the arm\n";
@@ -152,7 +151,7 @@ bool ObjectGraspingModule::updateModule() {
 		break;
 
 	case SET_ARM_BACK_IN_GRASP_POSITION:
-		if (controllersUtil->setArmInGraspPosition()) {
+		if (controllersUtil->setArmInGraspPosition(configData->cartesianMode)) {
 			taskState = OPEN_HAND;
 		} else{
 	        cout << dbgTag << "failed to set the arm in grasp position\n";
@@ -161,7 +160,7 @@ bool ObjectGraspingModule::updateModule() {
 		break;
 
 	case OPEN_HAND:
-		sendCommand("stop");
+		sendCommand("open");
         yarp::os::Time::delay(1);
 		sendCommand("task empty");
         taskState = SET_ARM_BACK_IN_START_POSITION;
