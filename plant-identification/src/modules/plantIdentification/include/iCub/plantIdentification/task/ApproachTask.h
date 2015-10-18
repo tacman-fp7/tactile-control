@@ -22,6 +22,7 @@ namespace iCub {
 				int controlMode; // 0:velocity  1:openloop
 				int stopCondition; // 0:none  1:tactile  2:position  3:both tactile and position
 				bool stopFingers;
+                bool manageFingers;
 				std::vector<bool> fingerIsInContact;
 				std::vector<bool> fingerSetInPosition;
 				int callsNumberForAvarage;

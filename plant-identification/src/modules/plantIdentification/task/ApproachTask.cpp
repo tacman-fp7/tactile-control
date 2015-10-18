@@ -62,21 +62,13 @@ ApproachTask::ApproachTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil
 void ApproachTask::init(){
 	using std::cout;
 
-	if (controlMode == 0){ // velocity control mode
-		controllersUtil->saveHandJointsMaxPwmLimits();
-		controllersUtil->setTaskControlModes(jointsList,VOCAB_CM_VELOCITY);
-		controllersUtil->setJointsMaxPwmLimit(jointsList,approachData->jointsPwmLimitsList);
-	} else { // openloop control mode
-		controllersUtil->setTaskControlModes(jointsList,VOCAB_CM_OPENLOOP);
-	}
-
 	cout << "\n\n" << dbgTag << "TASK STARTED" << "\n\n";
 }
 
 void ApproachTask::calculateControlInput(){
 	using yarp::sig::Vector;
 
-	bool manageFingers = false; // true if fingers can be moved
+	manageFingers = false; // true if fingers can be moved
 	int medianWindowSize = commonData->previousOverallFingerPressures[0].size();
 	
 	// if (callsNumber < medianWindowSize) nothing happens, because the tactile median cannot be evaluated
@@ -93,6 +85,14 @@ void ApproachTask::calculateControlInput(){
 
 			// evaluate contact threshold on each fingertip
 			if (callsNumber == medianWindowSize + callsNumberForAvarage){
+
+	            if (controlMode == 0){ // velocity control mode
+		            controllersUtil->saveHandJointsMaxPwmLimits();
+		            controllersUtil->setTaskControlModes(jointsList,VOCAB_CM_VELOCITY);
+		            controllersUtil->setJointsMaxPwmLimit(jointsList,approachData->jointsPwmLimitsList);
+	            } else { // openloop control mode
+		            controllersUtil->setTaskControlModes(jointsList,VOCAB_CM_OPENLOOP);
+	            }
 
 				for(size_t i = 0; i < jointsList.size(); i++){
                     std::cout << callsNumberForAvarage << " " << tactileAvarage[i] << "\n";
@@ -268,15 +268,17 @@ void ApproachTask::stopFinger(int finger){
 
 void ApproachTask::sendCommands(){
 
-	if (controlMode == 0){ // velocity control mode
-		for(size_t i = 0; i < inputCommandValue.size(); i++){
-			if (!(fingerIsInContact[i] && stopFingers)) controllersUtil->sendVelocity(jointsList[i],inputCommandValue[i]);
-		}
-	} else { // openloop control mode
-		for(size_t i = 0; i < inputCommandValue.size(); i++){
-			if (!(fingerIsInContact[i] && stopFingers)) controllersUtil->sendPwm(jointsList[i],commonData->pwmSign*inputCommandValue[i]);
-		}
-	}
+    if (manageFingers){
+	    if (controlMode == 0){ // velocity control mode
+		    for(size_t i = 0; i < inputCommandValue.size(); i++){
+			    if (!(fingerIsInContact[i] && stopFingers)) controllersUtil->sendVelocity(jointsList[i],inputCommandValue[i]);
+		    }
+	    } else { // openloop control mode
+		    for(size_t i = 0; i < inputCommandValue.size(); i++){
+			    if (!(fingerIsInContact[i] && stopFingers)) controllersUtil->sendPwm(jointsList[i],commonData->pwmSign*inputCommandValue[i]);
+		    }
+	    }
+    }
 }
 
 void ApproachTask::buildLogData(LogData &logData){
