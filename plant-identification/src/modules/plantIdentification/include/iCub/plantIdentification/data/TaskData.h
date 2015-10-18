@@ -72,7 +72,8 @@ namespace iCub {
 			*	37: approach final check threshold (valid for stop condition by position)
 			*	38: approach seconds for movement timeout (valid for stop condition by position)
 			*	39: approach stop-fingers mode off/on [0/1] (fingers are stopped when in contact with the object)
-			*
+			*   40: grasp task: disable PID integral gain from joint 8. no/yes [0/1]
+            *
 			*   Note: double values have to contain a dot, while strings have to start with '#'
 			*
             */

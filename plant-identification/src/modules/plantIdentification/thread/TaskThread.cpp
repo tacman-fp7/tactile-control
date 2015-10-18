@@ -252,11 +252,9 @@ void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData
 		taskData->rampData.intercept = paramValue.asDouble();
 		break;
 	case RAMP_LIFESPAN:
-		controllersUtil->resetPIDIntegralGain(8);
 		taskData->rampData.lifespan = paramValue.asInt();
 		break;
 	case RAMP_LIFESPAN_AFTER_STAB:
-		controllersUtil->restorePIDIntegralGain(8);
 		taskData->rampData.lifespanAfterStabilization = paramValue.asInt();
 		break;
 

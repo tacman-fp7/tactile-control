@@ -203,6 +203,8 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	// initialize the minimum jerk trajectory class 
 	minJerkTrajectory = new minJerkTrajGen(1,commonData->threadRate/1000.0,4); //(dimensions,sample time in seconds, trajectory reference time)
 
+    disablePIDIntegralGain = (commonData->tpInt(40) != 0);
+
 	/*** END OF CODE RELATED TO SUPERVISOR MODE ***/
 
 	if (resetErrOnContact){
@@ -219,6 +221,9 @@ void ControlTask::init(){
 	using std::cout;
 
 	controllersUtil->setTaskControlModes(jointsList,VOCAB_CM_OPENLOOP);
+
+    // TODO WORKAROUND TO REMOVE
+    if (disablePIDIntegralGain) controllersUtil->resetPIDIntegralGain(8);
 
 	cout << "\n\n" << dbgTag << "TASK STARTED - Target: ";
 	for(size_t i = 0; i < pressureTargetValue.size(); i++){
@@ -662,6 +667,9 @@ void ControlTask::release(){
 
 	// TODO TO REMOVE serve solo in fase di test
 	commonData->tempParameters[17] = Value("#");
+
+    // TODO WORKAROUND TO REMOVE
+    if (disablePIDIntegralGain) controllersUtil->restorePIDIntegralGain(8);
 }
 
 void ControlTask::addOption(Bottle &bottle,const char *paramName,Value paramValue){

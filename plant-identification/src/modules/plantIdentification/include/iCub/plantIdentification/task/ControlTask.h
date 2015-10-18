@@ -47,6 +47,9 @@ namespace iCub {
 				bool minJerkTrackingModeEnabled;
 				iCub::ctrl::minJerkTrajGen* minJerkTrajectory;
 
+                // TODO TEMPORARY WORKAROUND, variable used to disable the PID integral gain of the joint 8 while the hand grasps the object
+                bool disablePIDIntegralGain;
+
 				// neural network
 				iCub::ctrl::ff2LayNN_tansig_purelin neuralNetwork;
 

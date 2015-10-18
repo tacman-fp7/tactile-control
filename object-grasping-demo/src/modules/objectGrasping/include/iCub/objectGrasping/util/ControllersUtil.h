@@ -49,7 +49,7 @@ namespace iCub {
 
 				bool testCartesianController();
 
-				bool setArmInStartPosition();
+				bool setArmInStartPosition(bool cartesianMode);
 
 				bool setArmInGraspPosition(bool cartesianMode);
 

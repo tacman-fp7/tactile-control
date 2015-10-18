@@ -78,13 +78,16 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
     
     Property cartContrOptions;
     cartContrOptions.put("device","cartesiancontrollerclient");
-    cartContrOptions.put("remote","/icub/cartesianController/right_arm");
+    cartContrOptions.put("remote","/" + robotName + "/cartesianController/right_arm");
     cartContrOptions.put("local","/objectGrasping/client/right_arm");
-     
-    clientArmCartContr.open(cartContrOptions);
     
+    clientArmCartContr.open(cartContrOptions);
+
     if (clientArmCartContr.isValid()) {
        clientArmCartContr.view(iCart);
+    }
+    if (!iCart) {
+		cout << dbgTag << "could not open cartesian controller interface\n";
     }
 
 	return true;
@@ -134,32 +137,59 @@ bool ControllersUtil::saveCurrentControlMode(){
 
 
 /* ******* Place arm in grasping position                                   ********************************************** */ 
-bool ControllersUtil::setArmInStartPosition() {
+bool ControllersUtil::setArmInStartPosition(bool cartesianMode){
 
     cout << dbgTag << "Reaching arm grasp position ... \t";
     
 	iVel->stop();
 
-	// Arm
-	iPos->positionMove(0 ,-29);
-    iPos->positionMove(1 , 54);
-    iPos->positionMove(2 , -22);
-    iPos->positionMove(3 , 45);
+    if (cartesianMode){
+
+	    // Arm
+	    iPos->positionMove(0 ,-30);
+        iPos->positionMove(1 , 30);
+        iPos->positionMove(2 , 0);
+        iPos->positionMove(3 , 45);
         
-    iPos->positionMove(4 , -3);
-    iPos->positionMove(5 , 17);
-    iPos->positionMove(6 , 7);
-    iPos->positionMove(7 , 15);
+        iPos->positionMove(4 , -14);// 0
+        iPos->positionMove(5 , 3);// 1
+        iPos->positionMove(6 , -20);// 1
+        iPos->positionMove(7 , 14);
         
-	// Hand
-    iPos->positionMove(8 , 79);
-    iPos->positionMove(9 , 0);
-    iPos->positionMove(10, 0);// 29
-    iPos->positionMove(11, 0);
-    iPos->positionMove(12, 0);
-    iPos->positionMove(13, 0);
-    iPos->positionMove(14, 0);//15
-    iPos->positionMove(15, 0);
+	    // Hand
+        iPos->positionMove(8 , 79);
+        iPos->positionMove(9 , 2);
+        iPos->positionMove(10, 29);
+        iPos->positionMove(11, 0);
+        iPos->positionMove(12, 0);
+        iPos->positionMove(13, 25);
+        iPos->positionMove(14, 15);
+        iPos->positionMove(15, 1);
+
+    } else {
+
+	    // Arm
+	    iPos->positionMove(0 ,-29);
+        iPos->positionMove(1 , 54);
+        iPos->positionMove(2 , -22);
+        iPos->positionMove(3 , 45);
+            
+        iPos->positionMove(4 , -3);
+        iPos->positionMove(5 , 17);
+        iPos->positionMove(6 , 7);
+        iPos->positionMove(7 , 15);
+            
+	    // Hand
+        iPos->positionMove(8 , 79);
+        iPos->positionMove(9 , 0);
+        iPos->positionMove(10, 0);// 29
+        iPos->positionMove(11, 0);
+        iPos->positionMove(12, 0);
+        iPos->positionMove(13, 0);
+        iPos->positionMove(14, 0);//15
+        iPos->positionMove(15, 0);
+
+    }
 
     // Check motion done
     waitMoveDone(10, 1);
@@ -179,6 +209,15 @@ bool ControllersUtil::testCartesianController() {
 //	iVel->stop();
 
     Vector x0,o0;
+    x0.resize(3);
+    o0.resize(4);
+
+    cout << dbgTag << "1\n";
+    
+    iCart->getPose(x0,o0);
+    
+    cout << dbgTag << "2\n";
+
     if (!iCart->getPose(x0,o0)) cout << "could not read pose!\n";
     else { cout << "pose read! n is " << x0.size() << "\n";}
     
@@ -196,10 +235,10 @@ bool ControllersUtil::testCartesianController() {
 	Vector xd = x0;
 	Vector od = o0;
 
-	xd[0] += -0.05;
+	xd[2] += -0.005;
 
 	bool exec = false;
-	// exec = true;
+	exec = true;
 	if (exec){
 
 		iCart->setTrajTime(2.0);
@@ -267,7 +306,7 @@ bool ControllersUtil::setArmInGraspPosition(bool cartesianMode) {
     
 	if (cartesianMode){
 
-		this->incrementEndEffectorPosition(-0.05,0,2.0);
+		this->incrementEndEffectorPosition(-0.02,0,1.0);
 
 		return true;
 	} else {
@@ -311,7 +350,7 @@ bool ControllersUtil::raiseArm(bool cartesianMode) {
     
 	if (cartesianMode){
 
-		this->incrementEndEffectorPosition(-0.05,0,2.0);
+		this->incrementEndEffectorPosition(0.02,3,1.0);
 
 		return true;
 	} else {

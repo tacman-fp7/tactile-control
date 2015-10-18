@@ -87,7 +87,7 @@ bool ObjectGraspingModule::updateModule() {
 	switch(taskState){
 
 	case SET_ARM_IN_START_POSITION:
-		if (controllersUtil->setArmInStartPosition()) {
+		if (controllersUtil->setArmInStartPosition(configData->cartesianMode)) {
 			taskState = WAIT_TO_START;
 		} else{
 	        cout << dbgTag << "failed to set the arm in start position\n";
@@ -167,7 +167,7 @@ bool ObjectGraspingModule::updateModule() {
 	break;
 
 	case SET_ARM_BACK_IN_START_POSITION:
-		if (controllersUtil->setArmInStartPosition()) {
+		if (controllersUtil->setArmInStartPosition(configData->cartesianMode)) {
 			taskState = WAIT_FOR_CLOSURE;
 		} else{
 	        cout << dbgTag << "failed to set the arm in start position\n";
