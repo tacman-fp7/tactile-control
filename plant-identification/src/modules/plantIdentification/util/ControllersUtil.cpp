@@ -284,9 +284,7 @@ bool ControllersUtil::restorePreviousControlMode(){
 }
 
 bool ControllersUtil::setControlMode(int joint,int controlMode,bool checkCurrent){
-    std::cout << "1 asdfkljasdfkl;jasdfkl;asdfjkl;asdfjkl;asdfjkl;asdfkl;sdfajkl;asdfjkl;asdfjkl;asdf;jkljkl;ajk;asdfkl;kl;sdjfkl;asjdfkl;asdjfkl;asdkl;asdjfklsdjfkl;fjasdf\n";
-    std::cout << "2 asdfkljasdfkl;jasdfkl;asdfjkl;asdfjkl;asdfjkl;asdfkl;sdfajkl;asdfjkl;asdfjkl;asdf;jkljkl;ajk;asdfkl;kl;sdjfkl;asjdfkl;asdjfkl;asdkl;asdjfklsdjfkl;fjasdf\n";
-    std::cout << "3 asdfkljasdfkl;jasdfkl;asdfjkl;asdfjkl;asdfjkl;asdfkl;sdfajkl;asdfjkl;asdfjkl;asdf;jkljkl;ajk;asdfkl;kl;sdjfkl;asjdfkl;asdjfkl;asdkl;asdjfklsdjfkl;fjasdf\n";
+
 	if (checkCurrent){
 		int currentControlMode = -1;
 		if (iCtrl->getControlMode(joint,&currentControlMode)){

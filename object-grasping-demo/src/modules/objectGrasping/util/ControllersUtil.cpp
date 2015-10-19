@@ -180,13 +180,13 @@ bool ControllersUtil::setArmInStartPosition(bool cartesianMode){
         iPos->positionMove(7 , 15);
             
 	    // Hand
-        iPos->positionMove(8 , 79);
+        iPos->positionMove(8 , 72);
         iPos->positionMove(9 , 0);
-        iPos->positionMove(10, 0);// 29
+        iPos->positionMove(10, 0);
         iPos->positionMove(11, 0);
         iPos->positionMove(12, 0);
         iPos->positionMove(13, 0);
-        iPos->positionMove(14, 0);//15
+        iPos->positionMove(14, 0);
         iPos->positionMove(15, 0);
 
     }
@@ -469,7 +469,7 @@ bool ControllersUtil::waitMoveDone(const double &i_timeout, const double &i_dela
 
     if (excludeHand){
 
-        for (size_t i = 0; i <= 7; i++){
+        for (size_t i = 0; i <= 6; i++){
             ok = false;            
             while (!ok && (Time::now() - start <= i_timeout)) {
                 iPos->checkMotionDone(i,&ok);
@@ -532,9 +532,9 @@ bool ControllersUtil::openHand() {
 
 bool ControllersUtil::moveFingers() {
     
-    iPos->positionMove(10, 29);
-    iPos->positionMove(12, 15);
-    iPos->positionMove(14, 15);
+    iPos->positionMove(10, 15);
+    iPos->positionMove(12, 30);
+    iPos->positionMove(14, 30);
 
 	return true;
 }
