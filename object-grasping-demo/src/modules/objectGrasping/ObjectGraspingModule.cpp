@@ -87,7 +87,7 @@ bool ObjectGraspingModule::updateModule() {
 	switch(taskState){
 
 	case SET_ARM_IN_START_POSITION:
-		if (controllersUtil->setArmInStartPosition(configData->cartesianMode)) {
+		if (controllersUtil->setArmInStartPosition(configData->cartesianMode,false)) {
 			taskState = WAIT_TO_START;
 		} else{
 	        cout << dbgTag << "failed to set the arm in start position\n";
@@ -104,7 +104,7 @@ bool ObjectGraspingModule::updateModule() {
 //        controllersUtil->testCartesianController();
 //        taskState = WAIT_TO_START;
 
-		if (controllersUtil->setArmInGraspPosition(configData->cartesianMode)) {
+		if (controllersUtil->setArmInGraspPosition(configData->cartesianMode,false)) {
 
 			taskState = BEGIN_GRASP_THREAD;
 		} else{
@@ -133,13 +133,13 @@ bool ObjectGraspingModule::updateModule() {
 		break;
 	
 	case WAIT_FOR_GRASP_THREAD:
-		yarp::os::Time::delay(7);
+		yarp::os::Time::delay(3);
         taskState = RAISE_ARM;
 		break;
 
 	case RAISE_ARM:
 		if (controllersUtil->raiseArm(configData->cartesianMode)) {
-			taskState = SET_ARM_BACK_IN_GRASP_POSITION;
+			taskState = WAIT_WITH_ARM_RAISED;
 		} else{
 	        cout << dbgTag << "failed to raise the arm\n";
 	        return false;
@@ -147,11 +147,13 @@ bool ObjectGraspingModule::updateModule() {
 		break;
 
 	case WAIT_WITH_ARM_RAISED:
+		yarp::os::Time::delay(3);
 		// do nothing
+        taskState = SET_ARM_BACK_IN_GRASP_POSITION;
 		break;
 
 	case SET_ARM_BACK_IN_GRASP_POSITION:
-		if (controllersUtil->setArmInGraspPosition(configData->cartesianMode)) {
+		if (controllersUtil->setArmInGraspPosition(configData->cartesianMode,true)) {
 			taskState = OPEN_HAND;
 		} else{
 	        cout << dbgTag << "failed to set the arm in grasp position\n";
@@ -167,7 +169,7 @@ bool ObjectGraspingModule::updateModule() {
 	break;
 
 	case SET_ARM_BACK_IN_START_POSITION:
-		if (controllersUtil->setArmInStartPosition(configData->cartesianMode)) {
+		if (controllersUtil->setArmInStartPosition(configData->cartesianMode,true)) {
 			taskState = WAIT_FOR_CLOSURE;
 		} else{
 	        cout << dbgTag << "failed to set the arm in start position\n";

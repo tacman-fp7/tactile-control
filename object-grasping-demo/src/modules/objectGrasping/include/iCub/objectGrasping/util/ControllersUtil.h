@@ -49,9 +49,9 @@ namespace iCub {
 
 				bool testCartesianController();
 
-				bool setArmInStartPosition(bool cartesianMode);
+				bool setArmInStartPosition(bool cartesianMode,bool back);
 
-				bool setArmInGraspPosition(bool cartesianMode);
+				bool setArmInGraspPosition(bool cartesianMode,bool back);
 
 				bool raiseArm(bool cartesianMode);
 
@@ -65,7 +65,9 @@ namespace iCub {
 
 				bool moveFingers();
 
-				bool incrementEndEffectorPosition(double incrementValue,int coordinate,double seconds);
+				bool incrementEndEffectorPosition(double incrX,double incrY,double incrZ,double seconds);
+
+                bool setPositionControlModeToArm(bool excludeHand,bool checkCurrent);
 
 			private:
 

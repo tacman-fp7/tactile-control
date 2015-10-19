@@ -137,36 +137,49 @@ bool ControllersUtil::saveCurrentControlMode(){
 
 
 /* ******* Place arm in grasping position                                   ********************************************** */ 
-bool ControllersUtil::setArmInStartPosition(bool cartesianMode){
+bool ControllersUtil::setArmInStartPosition(bool cartesianMode,bool back){
 
     cout << dbgTag << "Reaching arm grasp position ... \t";
     
-	iVel->stop();
 
     if (cartesianMode){
 
-	    // Arm
-	    iPos->positionMove(0 ,-30);
-        iPos->positionMove(1 , 30);
-        iPos->positionMove(2 , 0);
-        iPos->positionMove(3 , 45);
-        
-        iPos->positionMove(4 , -14);// 0
-        iPos->positionMove(5 , 3);// 1
-        iPos->positionMove(6 , -20);// 1
-        iPos->positionMove(7 , 14);
-        
-	    // Hand
-        iPos->positionMove(8 , 79);
-        iPos->positionMove(9 , 2);
-        iPos->positionMove(10, 29);
-        iPos->positionMove(11, 0);
-        iPos->positionMove(12, 0);
-        iPos->positionMove(13, 25);
-        iPos->positionMove(14, 15);
-        iPos->positionMove(15, 1);
+        if (!back){
+
+            setPositionControlModeToArm(true,true);
+
+	        // Arm
+	        iPos->positionMove(0 , -11);
+            iPos->positionMove(1 , 29);
+            iPos->positionMove(2 , -22);
+            iPos->positionMove(3 , 93);
+            
+            iPos->positionMove(4 , 0);// 0
+            iPos->positionMove(5 , -14);// 1
+            iPos->positionMove(6 , 9);// 1
+            iPos->positionMove(7 , 14);
+            
+	        // Hand
+            iPos->positionMove(8 , 72);
+            iPos->positionMove(9 , 0);
+            iPos->positionMove(10, 0);
+            iPos->positionMove(11, 0);
+            iPos->positionMove(12, 0);
+            iPos->positionMove(13, 0);
+            iPos->positionMove(14, 0);
+            iPos->positionMove(15, 0);
+
+      
+        } else {
+
+            incrementEndEffectorPosition(0.08,0.05,0,3.0);
+
+        }
+
 
     } else {
+
+        setPositionControlModeToArm(true,true);
 
 	    // Arm
 	    iPos->positionMove(0 ,-29);
@@ -235,16 +248,19 @@ bool ControllersUtil::testCartesianController() {
 	Vector xd = x0;
 	Vector od = o0;
 
-	xd[2] += -0.005;
+	xd[0] += -0.06;
+	xd[1] += -0.03;
 
 	bool exec = false;
 	exec = true;
 	if (exec){
 
-		iCart->setTrajTime(2.0);
+		iCart->setTrajTime(3.0);
 		//iCart->setInTargetTol(0.001);
 
 		iCart->goToPoseSync(xd,od);   // send request and wait for reply
+
+
 		bool done=false;
 		while (!done) {
 		   iCart->checkMotionDone(&done);
@@ -252,6 +268,7 @@ bool ControllersUtil::testCartesianController() {
 		}
 
 		iCart->goToPoseSync(x0,o0);   // send request and wait for reply
+
 		done=false;
 		while (!done) {
 		   iCart->checkMotionDone(&done);
@@ -267,7 +284,7 @@ bool ControllersUtil::testCartesianController() {
 }
 /* *********************************************************************************************************************** */
 
-bool ControllersUtil::incrementEndEffectorPosition(double incrementValue,int coordinate,double seconds){
+bool ControllersUtil::incrementEndEffectorPosition(double incrX,double incrY,double incrZ,double seconds){
 	using yarp::sig::Vector;
 
 	Vector x0,o0;
@@ -280,8 +297,9 @@ bool ControllersUtil::incrementEndEffectorPosition(double incrementValue,int coo
 
 		Vector xd = x0;
 
-		// coordinate: 0:x / 1:y / 2:z
-		xd[coordinate] += incrementValue;
+		xd[0] += incrX;
+		xd[1] += incrY;
+		xd[2] += incrZ;
 
 		iCart->setTrajTime(seconds);
 		//iCart->setInTargetTol(0.001);
@@ -300,18 +318,26 @@ bool ControllersUtil::incrementEndEffectorPosition(double incrementValue,int coo
 
 
 /* ******* Place arm in grasping position                                   ********************************************** */ 
-bool ControllersUtil::setArmInGraspPosition(bool cartesianMode) {
+bool ControllersUtil::setArmInGraspPosition(bool cartesianMode,bool back) {
 
     cout << dbgTag << "Reaching arm grasp position ... \t";
     
 	if (cartesianMode){
 
-		this->incrementEndEffectorPosition(-0.02,0,1.0);
+        if (!back){
 
+            incrementEndEffectorPosition(-0.08,-0.05,0,3.0);
+
+        } else {
+
+            incrementEndEffectorPosition(0.02,0,-0.13,4.0);
+
+        }
 		return true;
+
 	} else {
 	
-		iVel->stop();
+        setPositionControlModeToArm(true,true);
 
 		// Arm
 		iPos->positionMove(0 ,-36);
@@ -350,12 +376,12 @@ bool ControllersUtil::raiseArm(bool cartesianMode) {
     
 	if (cartesianMode){
 
-		this->incrementEndEffectorPosition(0.02,3,1.0);
+        incrementEndEffectorPosition(-0.02,0,0.13,4.0);
 
 		return true;
 	} else {
 
-	//	iVel->stop();
+        setPositionControlModeToArm(true,true);
 
 		// Arm
 		iPos->positionMove(0 ,-36);
@@ -389,6 +415,8 @@ bool ControllersUtil::raiseArm(bool cartesianMode) {
 
 bool ControllersUtil::restorePreviousArmPosition(){
 	
+    setPositionControlModeToArm(true,true);
+
 	// Stop interfaces
     if (iVel) {
         iVel->stop();
@@ -415,6 +443,16 @@ bool ControllersUtil::restorePreviousControlMode(){
 	return true;
 }
 
+bool ControllersUtil::setPositionControlModeToArm(bool excludeHand,bool checkCurrent){
+
+    for(size_t i = 0; i <= 6 || ((i > 6 && i <= 15) && !excludeHand); i++){
+        setControlMode(i,VOCAB_CM_POSITION,checkCurrent);
+    }
+
+    return true;
+}
+
+
 bool ControllersUtil::setControlMode(int joint,int controlMode,bool checkCurrent){
 
 	if (checkCurrent){
@@ -430,7 +468,7 @@ bool ControllersUtil::setControlMode(int joint,int controlMode,bool checkCurrent
                     return false;
                 }	
 			} else {
-                cout << dbgTag << "open loop control mode already set (" << currentControlMode << ")\n";
+                cout << dbgTag << ".control mode already set (" << currentControlMode << ")\n";
                 return true;
             }
 		} else {
