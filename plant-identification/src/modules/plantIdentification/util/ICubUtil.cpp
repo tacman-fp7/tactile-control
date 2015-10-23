@@ -151,19 +151,41 @@ double ICubUtil::getForceByLearntMapping(std::vector<double>& tactileData){
 
 void ICubUtil::getNNOptionsForErrorPrediction2Fingers(Bottle& neuralNetworkOptions){
 
+	// values taken from net2F3 in 2-3fingManifoldsNeuralNetworks_dist.mat, where distance from best position and current position is learnt, and
+	// where the definition of position is "MID - TH". Used in September/October 2015.
+	// if uncommented, N_HID_NODES_2F = 3 and N_HID_NODES_3F = 3 have to be assigned
+	//int numInputNodes = 2;
+	//int numHiddenNodes = N_HID_NODES_2F;
+	//int numOutputNodes = 1;
+	//double inputWeights_0[N_HID_NODES_2F] = {0.9475,-0.3622,1.1300};
+	//double inputWeights_1[N_HID_NODES_2F] = {0.1268,9.6247,0.3733};
+	//double outputWeights[N_HID_NODES_2F] = {1.8636,-0.0991,0.8172};
+	//double inputBiases[N_HID_NODES_2F] = {-1.6453,1.2764,0.3451};
+	//double outputBiases[1] = {1.3827};
+	//double inMinMaxX_0[2] = {-45.3710,41.5327};
+	//double inMinMaxX_1[2] = {25.9258,64.9437};
+	//double inMinMaxY_0[2] = {-1,1};
+	//double inMinMaxY_1[2] = {-1,1};
+	//double outMinMaxY[2] = {-1,1};
+	//double outMinMaxX[2] = {-55.7832,57.9475};
+
+	// values taken from net2F1 in 2-3fingManifoldsNeuralNetworks_pos.mat, where best position is learnt, and
+	// where the definition of position is "(MID - TH)/2". Used in from the ond of October 2015.
+	// if uncommented, N_HID_NODES_2F = 1 and N_HID_NODES_3F = 3 have to be assigned
 	int numInputNodes = 2;
 	int numHiddenNodes = N_HID_NODES_2F;
 	int numOutputNodes = 1;
-	double inputWeights_0[N_HID_NODES_2F] = {0.9475,-0.3622,1.1300};
-	double inputWeights_1[N_HID_NODES_2F] = {0.1268,9.6247,0.3733};
-	double outputWeights[N_HID_NODES_2F] = {1.8636,-0.0991,0.8172};
-	double inputBiases[N_HID_NODES_2F] = {-1.6453,1.2764,0.3451};
-	double outputBiases[1] = {1.3827};
+	double inputWeights_0[N_HID_NODES_2F] = {-0.1748};
+	double inputWeights_1[N_HID_NODES_2F] = {0.3504};
+	double outputWeights[N_HID_NODES_2F] = {1.7567};
+	double inputBiases[N_HID_NODES_2F] = {0.2792};
+	double outputBiases[1] = {-0.5383};
 	double inMinMaxX_0[2] = {-45.3710,41.5327};
 	double inMinMaxX_1[2] = {25.9258,64.9437};
-	double inMinMaxY[2] = {-1,1};
+	double inMinMaxY_0[2] = {-1,1};
+	double inMinMaxY_1[2] = {-1,1};
 	double outMinMaxY[2] = {-1,1};
-	double outMinMaxX[2] = {-55.7832,57.9475};
+	double outMinMaxX[2] = {-5.9985,6.7621};
 
 	std::stringstream ss;
 	
@@ -184,8 +206,8 @@ void ICubUtil::getNNOptionsForErrorPrediction2Fingers(Bottle& neuralNetworkOptio
 	addOption(neuralNetworkOptions,"inMinMaxX_0",inMinMaxX_0[0],inMinMaxX_0[1]);
 	addOption(neuralNetworkOptions,"inMinMaxX_1",inMinMaxX_1[0],inMinMaxX_1[1]);
 	
-	addOption(neuralNetworkOptions,"inMinMaxY_0",inMinMaxY[0],inMinMaxY[1]);
-	addOption(neuralNetworkOptions,"inMinMaxY_1",inMinMaxY[0],inMinMaxY[1]);
+	addOption(neuralNetworkOptions,"inMinMaxY_0",inMinMaxY_0[0],inMinMaxY_0[1]);
+	addOption(neuralNetworkOptions,"inMinMaxY_1",inMinMaxY_1[0],inMinMaxY_1[1]);
 
 	addOption(neuralNetworkOptions,"outMinMaxY_0",outMinMaxY[0],outMinMaxY[1]);
 	addOption(neuralNetworkOptions,"outMinMaxX_0",outMinMaxX[0],outMinMaxX[1]);
@@ -194,21 +216,48 @@ void ICubUtil::getNNOptionsForErrorPrediction2Fingers(Bottle& neuralNetworkOptio
 
 void ICubUtil::getNNOptionsForErrorPrediction3Fingers(Bottle& neuralNetworkOptions){
 
+	// values taken from net3F3 in 2-3fingManifoldsNeuralNetworks_dist.mat, where distance from best position and current position is learnt, and
+	// where the definition of position is "(IND + MID)/2 - TH". Used in September/October 2015.
+	// if uncommented, N_HID_NODES_2F = 3 and N_HID_NODES_3F = 3 have to be assigned
+	//int numInputNodes = 3;
+	//int numHiddenNodes = N_HID_NODES_3F;
+	//int numOutputNodes = 1;
+	//double inputWeights_0[N_HID_NODES_3F] = {0.6257,-0.1632,1.3617};
+	//double inputWeights_1[N_HID_NODES_3F] = {0.2470,0.0537,15.1220};
+	//double inputWeights_2[N_HID_NODES_3F] = {2.0194,-0.0460,3.2803};
+	//double outputWeights[N_HID_NODES_3F] = {0.2803,6.8676,0.0386};
+	//double inputBiases[N_HID_NODES_3F] = {-1.4054,0.3551,-6.7669};
+	//double outputBiases[1] = {-2.2777};
+	//double inMinMaxX_0[2] = {-21.1274,88.1176};
+	//double inMinMaxX_1[2] = {25.3521,75.3450};
+	//double inMinMaxX_2[2] = {-1.0962,6.3491};
+	//double inMinMaxY_0[2] = {-1,1};
+	//double inMinMaxY_1[2] = {-1,1};
+	//double inMinMaxY_2[2] = {-1,1};
+	//double outMinMaxY[2] = {-1,1};
+	double outMinMaxX[2] = {-55.7063,62.0727};
+
+	// values taken from net3F3 in 2-3fingManifoldsNeuralNetworks_dist.mat, where distance from best position and current position is learnt, and
+	// where the definition of position is "(IND + MID)/2 - TH". Used in September/October 2015.
+	// if uncommented, N_HID_NODES_2F = 1 and N_HID_NODES_3F = 3 have to be assigned
 	int numInputNodes = 3;
 	int numHiddenNodes = N_HID_NODES_3F;
 	int numOutputNodes = 1;
-	double inputWeights_0[N_HID_NODES_3F] = {0.6257,-0.1632,1.3617};
-	double inputWeights_1[N_HID_NODES_3F] = {0.2470,0.0537,15.1220};
-	double inputWeights_2[N_HID_NODES_3F] = {2.0194,-0.0460,3.2803};
-	double outputWeights[N_HID_NODES_3F] = {0.2803,6.8676,0.0386};
-	double inputBiases[N_HID_NODES_3F] = {-1.4054,0.3551,-6.7669};
-	double outputBiases[1] = {-2.2777};
+	double inputWeights_0[N_HID_NODES_3F] = {2.2680, 0.1827, -2.1783};
+	double inputWeights_1[N_HID_NODES_3F] = {1.2908, 0.3028, -3.3035};
+	double inputWeights_2[N_HID_NODES_3F] = {9.1037, -0.1681, -6.4834};
+	double outputWeights[N_HID_NODES_3F] = {0.1558, 4.1576, -0.1811};
+	double inputBiases[N_HID_NODES_3F] = {-6.3656, 0.7623, 3.7774};
+	double outputBiases[1] = {-2.2479};
 	double inMinMaxX_0[2] = {-21.1274,88.1176};
 	double inMinMaxX_1[2] = {25.3521,75.3450};
 	double inMinMaxX_2[2] = {-1.0962,6.3491};
-	double inMinMaxY[2] = {-1,1};
+	double inMinMaxY_0[2] = {-1,1};
+	double inMinMaxY_1[2] = {-1,1};
+	double inMinMaxY_2[2] = {-1,1};
 	double outMinMaxY[2] = {-1,1};
-	double outMinMaxX[2] = {-55.7063,62.0727};
+	double outMinMaxX[2] = { 0.3040, 21.8555};
+
 	std::stringstream ss;
 	
 	addOption(neuralNetworkOptions,"numInputNodes",numInputNodes);
@@ -229,9 +278,9 @@ void ICubUtil::getNNOptionsForErrorPrediction3Fingers(Bottle& neuralNetworkOptio
 	addOption(neuralNetworkOptions,"inMinMaxX_1",inMinMaxX_1[0],inMinMaxX_1[1]);
 	addOption(neuralNetworkOptions,"inMinMaxX_2",inMinMaxX_2[0],inMinMaxX_2[1]);
 	
-	addOption(neuralNetworkOptions,"inMinMaxY_0",inMinMaxY[0],inMinMaxY[1]);
-	addOption(neuralNetworkOptions,"inMinMaxY_1",inMinMaxY[0],inMinMaxY[1]);
-	addOption(neuralNetworkOptions,"inMinMaxY_2",inMinMaxY[0],inMinMaxY[1]);
+	addOption(neuralNetworkOptions,"inMinMaxY_0",inMinMaxY_0[0],inMinMaxY_0[1]);
+	addOption(neuralNetworkOptions,"inMinMaxY_1",inMinMaxY_1[0],inMinMaxY_1[1]);
+	addOption(neuralNetworkOptions,"inMinMaxY_2",inMinMaxY_2[0],inMinMaxY_2[1]);
 
 	addOption(neuralNetworkOptions,"outMinMaxY_0",outMinMaxY[0],outMinMaxY[1]);
 	addOption(neuralNetworkOptions,"outMinMaxX_0",outMinMaxX[0],outMinMaxX[1]);
@@ -249,7 +298,7 @@ void ICubUtil::rotateFingersData(std::vector<double>& fingersAngles,std::vector<
 	} else { // fingersAngles.size() == 3
 		rotatedFingersAngles.resize(3);
 
-		rotatedFingersAngles[0] = fingersAngles[0]*-(0.4686) + fingersAngles[1]*0.6483 + fingersAngles[2]*0.6001;
+		rotatedFingersAngles[0] = fingersAngles[0]*(-0.4686) + fingersAngles[1]*0.6483 + fingersAngles[2]*0.6001;
 		rotatedFingersAngles[1] = fingersAngles[0]*0.8831 + fingersAngles[1]*0.3630 + fingersAngles[2]*0.2973;
 		rotatedFingersAngles[2] = fingersAngles[0]*0.0251 + fingersAngles[1]*(-0.6693) + fingersAngles[2]*0.7426;
 

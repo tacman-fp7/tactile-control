@@ -253,7 +253,7 @@ void ControlTask::calculateControlInput(){
 
 	/*** CODE RELATED TO SUPERVISOR MODE ***/
 	double svResultValueScaled;
-	double svErr,svErrOld,svErrNN;
+	double svErr;
 	double svCurrentPosition;
     double estimatedFinalPose; // best pose estimated either by neural networks or by plane fitting
 	double finalTargetPose; // pose equal to either estimatedFinalPose or the pose coming out from the wave generator, depending on which mode is activated
@@ -271,8 +271,9 @@ void ControlTask::calculateControlInput(){
 		Vector svFb;
 
 		if (jointsList.size() == 2){
+
 			// using the "simple" method
-			svErrOld = (1.417*thumbEnc - 12.22) - middleEnc;
+			//svErrOld = (1.417*thumbEnc - 12.22) - middleEnc;
 			
 			// using the neural network
 			std::vector<double> actualAngles(2);
@@ -284,17 +285,20 @@ void ControlTask::calculateControlInput(){
 			rotatedAnglesVector.resize(2);
 			rotatedAnglesVector[0] = rotatedAngles[0];
 			rotatedAnglesVector[1] = rotatedAngles[1];
-			Vector svErrNNVector = neuralNetwork.predict(rotatedAnglesVector);
-			svErrNN = svErrNNVector[0];
+			Vector estimatedBestPositionNNVector = neuralNetwork.predict(rotatedAnglesVector);
+			estimatedFinalPose = estimatedBestPositionNNVector[0];
 
-			handPosition = middleEnc - thumbEnc;
+			// handPosition = middleEnc - thumbEnc;
+			handPosition = (middleEnc - thumbEnc)/2;
+
 		} else {
+
 			// si calcola il valore dell'angolo prossimale del dito medio intersezione del piano delle pose migliori
 			//double interMiddleEnc = -0.1046*thumbEnc + 0.8397*indexEnc + 10.05;
-			interMiddleEnc = 1.4667*thumbEnc -1.0*indexEnc + 34.96;
+			//interMiddleEnc = 1.4667*thumbEnc -1.0*indexEnc + 34.96;
 			
 			// si applica la formula della distanza tenendo conto che la differenza per i giunti di pollice e indice e' nulla. In teoria si sarebbe potuta evitare la divisione per due, perche' a noi interessa l'errore a meno di una costante
-			svErrOld = (interMiddleEnc - middleEnc)/2;
+			//svErrOld = (interMiddleEnc - middleEnc)/2;
 
 			// using the neural network
 			std::vector<double> actualAngles(3);
@@ -308,17 +312,15 @@ void ControlTask::calculateControlInput(){
 			rotatedAnglesVector[0] = rotatedAngles[0];
 			rotatedAnglesVector[1] = rotatedAngles[1];
 			rotatedAnglesVector[2] = rotatedAngles[2];
-			Vector svErrNNVector = neuralNetwork.predict(rotatedAnglesVector);
-			svErrNN = svErrNNVector[0];
+			Vector estimatedBestPositionNNVector = neuralNetwork.predict(rotatedAnglesVector);
+			estimatedFinalPose = estimatedBestPositionNNVector[0];
 
-			handPosition = (middleEnc + indexEnc)/2 - thumbEnc;
+			// handPosition = (middleEnc + indexEnc)/2 - thumbEnc;
+			handPosition = (middleEnc + indexEnc - thumbEnc)/3;
 		}
 
-
-		svErr = svErrNN;
-
 		svCurrentPosition = handPosition;
-		estimatedFinalPose = svCurrentPosition + svErr;
+		svErr = estimatedFinalPose - svCurrentPosition;
 
 		// hand pose square wave / sinusoid generator
 		if (commonData->tpInt(18) != 0){
