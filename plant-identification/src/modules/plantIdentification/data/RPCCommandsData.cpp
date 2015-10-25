@@ -15,6 +15,19 @@ using iCub::plantIdentification::TaskName;
 using std::string;
 using std::pair;
 
+
+
+
+
+// TO UNCOMMENT IF NEURAL NETWORKS HAVE TO BE TESTED
+//#include <yarp/os/Property.h>
+//#include "iCub/plantIdentification/util/ICubUtil.h"
+//#include <yarp/os/Bottle.h>
+//#include <iCub/ctrl/neuralNetworks.h>
+//#include <yarp/sig/Vector.h>
+//using iCub::plantIdentification::ICubUtil;
+//using yarp::sig::Vector;
+
 RPCCommandsData::RPCCommandsData(){
 
 	add("help",HELP,"THIS HELP");
@@ -131,6 +144,60 @@ void RPCCommandsData::setValues(yarp::os::Value &value,std::vector<double> &valu
 
         valueList.push_back(value.asDouble());
     }
+
+
+
+
+
+    // TO UNCOMMENT IF NEURAL NETWORKS HAVE TO BE TESTED
+	//// create the neural network and configure it
+    //iCub::ctrl::ff2LayNN_tansig_purelin neuralNetwork;
+	//yarp::os::Property nnConfProperty;
+	//yarp::os::Bottle nnConfBottle;
+	//if (valueList.size() == 2){
+	//	ICubUtil::getNNOptionsForErrorPrediction2Fingers(nnConfBottle);
+	//} else {
+	//	ICubUtil::getNNOptionsForErrorPrediction3Fingers(nnConfBottle);
+	//}
+	//nnConfProperty.fromString(nnConfBottle.toString());
+	//neuralNetwork.configure(nnConfProperty);
+	//if (valueList.size() == 2){
+	//	// using the neural network
+	//	std::vector<double> actualAngles(2);
+	//	std::vector<double> rotatedAngles;
+	//	actualAngles[0] = valueList[0];
+	//	actualAngles[1] = valueList[1];
+	//	ICubUtil::rotateFingersData(actualAngles,rotatedAngles);
+	//	Vector rotatedAnglesVector;
+	//	rotatedAnglesVector.resize(2);
+	//	rotatedAnglesVector[0] = rotatedAngles[0];
+	//	rotatedAnglesVector[1] = rotatedAngles[1];
+	//	Vector estimatedBestPositionNNVector = neuralNetwork.predict(rotatedAnglesVector);
+	//	double estimatedFinalPose = estimatedBestPositionNNVector[0];
+    //  std::cout << "INPUT: " << valueList[0] << "  " << valueList[1] << "\n"; 
+    //  std::cout << "ESTIMATED POSE <<<<<<<   " << estimatedFinalPose << "   >>>>>>>\n";
+
+	//} else {
+
+	//	// using the neural network
+	//	std::vector<double> actualAngles(3);
+	//	std::vector<double> rotatedAngles;
+	//	actualAngles[0] = valueList[0];
+	//	actualAngles[1] = valueList[1];
+	//	actualAngles[2] = valueList[2];
+	//	ICubUtil::rotateFingersData(actualAngles,rotatedAngles);
+	//	Vector rotatedAnglesVector;
+	//	rotatedAnglesVector.resize(3);
+	//	rotatedAnglesVector[0] = rotatedAngles[0];
+	//	rotatedAnglesVector[1] = rotatedAngles[1];
+	//	rotatedAnglesVector[2] = rotatedAngles[2];
+	//	Vector estimatedBestPositionNNVector = neuralNetwork.predict(rotatedAnglesVector);
+	//	double estimatedFinalPose = estimatedBestPositionNNVector[0];
+    //  std::cout << "INPUT: " << valueList[0] << "  " << valueList[1] << "  " << valueList[2] << "\n"; 
+    //  std::cout << "ESTIMATED POSE <<<<<<<   " << estimatedFinalPose << "   >>>>>>>\n";
+
+    }
+
 
 }
 

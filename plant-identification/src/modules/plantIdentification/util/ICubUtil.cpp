@@ -170,7 +170,7 @@ void ICubUtil::getNNOptionsForErrorPrediction2Fingers(Bottle& neuralNetworkOptio
 	//double outMinMaxX[2] = {-55.7832,57.9475};
 
 	// values taken from net2F1 in 2-3fingManifoldsNeuralNetworks_pos.mat, where best position is learnt, and
-	// where the definition of position is "(MID - TH)/2". Used in from the ond of October 2015.
+	// where the definition of position is "(MID - TH)/2". Used from the ond of October 2015.
 	// if uncommented, N_HID_NODES_2F = 1 and N_HID_NODES_3F = 3 have to be assigned
 	int numInputNodes = 2;
 	int numHiddenNodes = N_HID_NODES_2F;
@@ -235,10 +235,10 @@ void ICubUtil::getNNOptionsForErrorPrediction3Fingers(Bottle& neuralNetworkOptio
 	//double inMinMaxY_1[2] = {-1,1};
 	//double inMinMaxY_2[2] = {-1,1};
 	//double outMinMaxY[2] = {-1,1};
-	double outMinMaxX[2] = {-55.7063,62.0727};
+	//double outMinMaxX[2] = {-55.7063,62.0727};
 
-	// values taken from net3F3 in 2-3fingManifoldsNeuralNetworks_dist.mat, where distance from best position and current position is learnt, and
-	// where the definition of position is "(IND + MID)/2 - TH". Used in September/October 2015.
+	// values taken from net3F3 in 2-3fingManifoldsNeuralNetworks_pos.mat, where distance from best position and current position is learnt, and
+	// where the definition of position is "(IND + MID - TH)/3". Used from the ond of October 2015.
 	// if uncommented, N_HID_NODES_2F = 1 and N_HID_NODES_3F = 3 have to be assigned
 	int numInputNodes = 3;
 	int numHiddenNodes = N_HID_NODES_3F;
