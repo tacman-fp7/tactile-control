@@ -157,7 +157,6 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	}
 
 
-
 	/*** CODE RELATED TO SUPERVISOR MODE ***/
 	svKp = commonData->tpDbl(1);
 	svKi = commonData->tpDbl(2);
@@ -316,7 +315,7 @@ void ControlTask::calculateControlInput(){
 			estimatedFinalPose = estimatedBestPositionNNVector[0];
 
 			// handPosition = (middleEnc + indexEnc)/2 - thumbEnc;
-			handPosition = (middleEnc + indexEnc - thumbEnc)/3;
+			handPosition = ((middleEnc + indexEnc)/2 - thumbEnc)/2;
 		}
 
 		svCurrentPosition = handPosition;

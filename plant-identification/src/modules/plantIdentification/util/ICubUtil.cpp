@@ -4,8 +4,8 @@
 #include <string>
 #include <sstream>
 
-#define N_HID_NODES_2F 3
-#define N_HID_NODES_3F 3
+#define N_HID_NODES_2F 1
+#define N_HID_NODES_3F 1
 
 using iCub::plantIdentification::ICubUtil;
 
@@ -171,7 +171,7 @@ void ICubUtil::getNNOptionsForErrorPrediction2Fingers(Bottle& neuralNetworkOptio
 
 	// values taken from net2F1 in 2-3fingManifoldsNeuralNetworks_pos.mat, where best position is learnt, and
 	// where the definition of position is "(MID - TH)/2". Used from the ond of October 2015.
-	// if uncommented, N_HID_NODES_2F = 1 and N_HID_NODES_3F = 3 have to be assigned
+	// if uncommented, N_HID_NODES_2F = 1 has to be assigned
 	int numInputNodes = 2;
 	int numHiddenNodes = N_HID_NODES_2F;
 	int numOutputNodes = 1;
@@ -237,18 +237,18 @@ void ICubUtil::getNNOptionsForErrorPrediction3Fingers(Bottle& neuralNetworkOptio
 	//double outMinMaxY[2] = {-1,1};
 	//double outMinMaxX[2] = {-55.7063,62.0727};
 
-	// values taken from net3F3 in 2-3fingManifoldsNeuralNetworks_pos.mat, where distance from best position and current position is learnt, and
-	// where the definition of position is "(IND + MID - TH)/3". Used from the ond of October 2015.
-	// if uncommented, N_HID_NODES_2F = 1 and N_HID_NODES_3F = 3 have to be assigned
+	// values taken from net3F3 in 2-3fingManifoldsNeuralNetworks_pos.mat, where best position is learnt, and
+	// where the definition of position is "((IND + MID)/2 - TH)/2". Used from the end of October 2015.
+	// if uncommented, N_HID_NODES_3F = 1 has to be assigned
 	int numInputNodes = 3;
 	int numHiddenNodes = N_HID_NODES_3F;
 	int numOutputNodes = 1;
-	double inputWeights_0[N_HID_NODES_3F] = {2.2680, 0.1827, -2.1783};
-	double inputWeights_1[N_HID_NODES_3F] = {1.2908, 0.3028, -3.3035};
-	double inputWeights_2[N_HID_NODES_3F] = {9.1037, -0.1681, -6.4834};
-	double outputWeights[N_HID_NODES_3F] = {0.1558, 4.1576, -0.1811};
-	double inputBiases[N_HID_NODES_3F] = {-6.3656, 0.7623, 3.7774};
-	double outputBiases[1] = {-2.2479};
+	double inputWeights_0[N_HID_NODES_3F] = {0.4308};
+	double inputWeights_1[N_HID_NODES_3F] = {0.5713};
+	double inputWeights_2[N_HID_NODES_3F] = {-0.3086};
+	double outputWeights[N_HID_NODES_3F] = {1.6268};
+	double inputBiases[N_HID_NODES_3F] = {0.7023};
+	double outputBiases[1] = {-0.8966};
 	double inMinMaxX_0[2] = {-21.1274,88.1176};
 	double inMinMaxX_1[2] = {25.3521,75.3450};
 	double inMinMaxX_2[2] = {-1.0962,6.3491};
@@ -256,7 +256,7 @@ void ICubUtil::getNNOptionsForErrorPrediction3Fingers(Bottle& neuralNetworkOptio
 	double inMinMaxY_1[2] = {-1,1};
 	double inMinMaxY_2[2] = {-1,1};
 	double outMinMaxY[2] = {-1,1};
-	double outMinMaxX[2] = { 0.3040, 21.8555};
+	double outMinMaxX[2] = { -6.4613, 7.5325};
 
 	std::stringstream ss;
 	
