@@ -133,7 +133,7 @@ bool ObjectGraspingModule::updateModule() {
 		break;
 	
 	case WAIT_FOR_GRASP_THREAD:
-		yarp::os::Time::delay(3);
+		yarp::os::Time::delay(6);
         taskState = RAISE_ARM;
 		break;
 

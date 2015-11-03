@@ -468,7 +468,7 @@ bool ControllersUtil::setControlMode(int joint,int controlMode,bool checkCurrent
                     return false;
                 }	
 			} else {
-                cout << dbgTag << ".control mode already set (" << currentControlMode << ")\n";
+                // cout << dbgTag << ".control mode already set (" << currentControlMode << ")\n";
                 return true;
             }
 		} else {

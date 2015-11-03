@@ -43,7 +43,7 @@ include_Directories(${skinDynLib_INCLUDE_DIRS})
 include_directories(include)
 
 add_executable(${MODULENAME} ${INC_SOURCES} ${INC_HEADERS})
-target_link_libraries(${MODULENAME} ${YARP_LIBRARIES} skinDynLib icubmod)
+target_link_libraries(${MODULENAME} ${YARP_LIBRARIES} skinDynLib)
 
 if(WIN32)
     install(TARGETS ${PROJECT_NAME} DESTINATION bin/${CMAKE_BUILD_TYPE})

@@ -64,7 +64,7 @@ include_Directories(${ctrlLib_INCLUDE_DIRS} ${skinDynLib_INCLUDE_DIRS})
 include_directories(include ${iKin_INCLUDE_DIRS})
 
 add_executable(${MODULENAME} ${INC_SOURCES} ${INC_HEADERS})
-target_link_libraries(${MODULENAME} ${YARP_LIBRARIES} ctrlLib skinDynLib icubmod iKin)
+target_link_libraries(${MODULENAME} ${YARP_LIBRARIES} ctrlLib skinDynLib iKin)
 
 if(WIN32)
     install(TARGETS ${PROJECT_NAME} DESTINATION bin/${CMAKE_BUILD_TYPE})

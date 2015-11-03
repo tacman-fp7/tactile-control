@@ -4,12 +4,12 @@
 using yarp::os::Network;
 using yarp::os::ResourceFinder;
 
-YARP_DECLARE_DEVICES(icubmod);
+//YARP_DECLARE_DEVICES(icubmod);
 
 int main(int argc, char * argv[])
 {
     /*initializing device driver list */
-    YARP_REGISTER_DEVICES(icubmod);
+//    YARP_REGISTER_DEVICES(icubmod);
     
     /* initializing yarp network */ 
     Network yarp;
