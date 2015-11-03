@@ -237,7 +237,7 @@ void ICubUtil::getNNOptionsForErrorPrediction3Fingers(Bottle& neuralNetworkOptio
 	//double outMinMaxY[2] = {-1,1};
 	//double outMinMaxX[2] = {-55.7063,62.0727};
 
-	// values taken from net3F3 in 2-3fingManifoldsNeuralNetworks_pos.mat, where best position is learnt, and
+	// values taken from net3F1 in 2-3fingManifoldsNeuralNetworks_pos2.mat, where best position is learnt, and
 	// where the definition of position is "((IND + MID)/2 - TH)/2". Used from the end of October 2015.
 	// if uncommented, N_HID_NODES_3F = 1 has to be assigned
 	int numInputNodes = 3;
