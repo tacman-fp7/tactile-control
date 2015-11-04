@@ -1,24 +1,18 @@
 <application>
-     <name>Grasp Task Demo</name>
-     <version>1.0</version>
-     <authors>
-         <author email=""></author>
-     </authors>
+     <name>Object Grasping With Force Control</name>
 
      <module>
          <name>plantIdentification</name>
          <parameters>-whichHand left</parameters>
-         <node>localhost</node>
-         <prefix></prefix>
-         <deployer>yarpdev</deployer>
+         <node>icub10</node>
+         <tag>handController</tag>
      </module>
 
      <module>
          <name>objectGrasping</name>
          <parameters>-whichHand left</parameters>
-         <node>localhost</node>
-         <prefix></prefix>
-         <deployer>yarpdev</deployer>
+         <node>icub10</node>
+         <tag>graspingDemo</tag>
      </module>
 <!--
      <module>
