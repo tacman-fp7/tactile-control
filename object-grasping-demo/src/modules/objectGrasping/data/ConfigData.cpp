@@ -21,6 +21,6 @@ ConfigData::ConfigData(yarp::os::ResourceFinder &rf) {
 	pidKi = rf.check("pidKi",Value(1.0)).asDouble();
 	pidKd = rf.check("pidKd",Value(0.0)).asDouble();
 	
-	cartesianMode = false;
+	cartesianMode = rf.check("cartesianMode",Value(0)).asInt() != 0;
 }
 

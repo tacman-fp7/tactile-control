@@ -40,6 +40,7 @@ RPCCommandsData::RPCCommandsData(){
 	add("arm",ARM,"set ARM IN TASK POSITION");
 	add("quit",QUIT,"QUIT MODULE");
 
+	// SET <?>
 	add("pwm_sign",PWM_SIGN,"PWM SIGN");
 	add("obj_det_thresholds",OBJ_DETECT_PRESS_THRESHOLDS,"OBJECT DETECTION PRESSURE THRESHOLDS");
 	add("tmp_par",TEMPORARY_PARAM,"TEMPORARY PARAMETER (usage: 'set tmp_par <n>_<value>'");
@@ -65,16 +66,19 @@ RPCCommandsData::RPCCommandsData(){
 	add("appr_pwm_lim_enabl",APPR_JOINTS_PWM_LIMITS_ENABLED,"APPROACH TASK JOINTS PWM LIMITS ENABLED [0: false; 1: true]");
 	add("appr_ls",APPR_LIFESPAN,"APPROACH TASK LIFESPAN");
 
+	// TASK <?>
 	add("add",ADD,"add");
 	add("empty",EMPTY,"empty");
 	add("pop",POP,"pop");
 
+	// TASK ADD <?>
 	add("step",STEP,"STEP TASK");
 	add("ctrl",CONTROL,"CONTROL TASK");
 	add("apprctrl",APPROACH_AND_CONTROL,"APPROACH & CONTROL TASK");
 	add("appr",APPROACH,"APPROACH TASK");
 	add("ramp",RAMP,"RAMP TASK");
 
+	// VIEW <?>
 	add("set",SETTINGS,"SETTINGS");
 	add("tasks",TASKS,"TASKS");
 

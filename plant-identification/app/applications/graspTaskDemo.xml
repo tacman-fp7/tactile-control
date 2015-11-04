@@ -14,6 +14,28 @@
          <node>icub10</node>
          <tag>graspingDemo</tag>
      </module>
+
+	 <module>
+         <name>yarpscope</name>
+         <parameters>--remote /plantIdentification/control --index "(4 5)"</parameters>
+         <node>icub10</node>
+         <tag>yarpscope_gripStrength</tag>
+		 <dependencies>
+            <port timeout="5.0">/plantIdentification/control</port>
+         </dependencies>
+     </module>
+
+	 <module>
+         <name>yarpscope</name>
+         <parameters>--remote /plantIdentification/control --index "(8 9 10)"</parameters>
+         <node>icub10</node>
+         <tag>yarpscope_position</tag>
+		 <dependencies>
+            <port timeout="5.0">/plantIdentification/control</port>
+         </dependencies>
+     </module>
+
+
 <!--
      <module>
          <name>xterm</name>

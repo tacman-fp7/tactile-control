@@ -33,6 +33,8 @@ namespace iCub {
 				int armJointsNum;
 				std::vector<int> jointsStoredControlMode;
 				std::vector<int> handJointsToMove;
+				std::string whichHand;
+
 
 				/* ****** Debug attributes                              ****** */
                 std::string dbgTag;

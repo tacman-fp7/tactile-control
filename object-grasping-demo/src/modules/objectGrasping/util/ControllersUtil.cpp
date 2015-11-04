@@ -27,7 +27,7 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
 	jointsStoredControlMode.resize(8,VOCAB_CM_POSITION);
 
 	string robotName = rf.check("robot", Value("icub"), "The robot name.").asString().c_str();
-    string whichHand = rf.check("whichHand", Value("right"), "The hand to be used for the grasping.").asString().c_str();
+    whichHand = rf.check("whichHand", Value("right"), "The hand to be used for the grasping.").asString().c_str();
 
 	 /* ******* Joint interfaces                     ******* */
     string arm = whichHand + "_arm";
@@ -324,9 +324,11 @@ bool ControllersUtil::setArmInGraspPosition(bool cartesianMode,bool back) {
     
 	if (cartesianMode){
 
-        if (!back){
+		double sign = (whichHand == "left" ? 1 : -1);
 
-            incrementEndEffectorPosition(-0.08,-0.05,0,3.0);
+        if (!back){
+			
+            incrementEndEffectorPosition(-0.08,sign*0.05,0,3.0);
 
         } else {
 
