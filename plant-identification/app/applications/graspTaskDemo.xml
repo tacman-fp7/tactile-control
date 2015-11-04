@@ -1,0 +1,41 @@
+<application>
+     <name>Grasp Task Demo</name>
+     <version>1.0</version>
+     <authors>
+         <author email=""></author>
+     </authors>
+
+     <module>
+         <name>plantIdentification</name>
+         <parameters>-whichHand left</parameters>
+         <node>localhost</node>
+         <prefix></prefix>
+         <deployer>yarpdev</deployer>
+     </module>
+
+     <module>
+         <name>objectGrasping</name>
+         <parameters>-whichHand left</parameters>
+         <node>localhost</node>
+         <prefix></prefix>
+         <deployer>yarpdev</deployer>
+     </module>
+<!--
+     <module>
+         <name>xterm</name>
+         <parameters>-hold -e yarp write ... /test_grabber/quit</parameters>
+         <node>localhost</node>
+         <prefix></prefix>
+         <dependencies>
+            <port timeout="5.0">/test_grabber/quit</port>
+         </dependencies>
+     </module>
+-->
+	<connection>
+		<from>/objectGrasping/graspTaskCmd:o</from>
+		<to>/plantIdentification/cmd:i</to>
+		<protocol>tcp</protocol>
+	</connection>
+	
+	
+</application>
