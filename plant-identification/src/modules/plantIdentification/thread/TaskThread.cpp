@@ -7,6 +7,7 @@
 #include <yarp/os/Property.h>
 #include <yarp/os/Network.h>
 #include <yarp/os/Time.h>
+#include <yarp/os/LogStream.h>
 
 #include <iostream>
 #include <sstream>
@@ -30,6 +31,7 @@ using iCub::plantIdentification::RPCTaskCmdArgName;
 using iCub::plantIdentification::TaskName;
 using iCub::plantIdentification::RPCViewCmdArgName;
 using iCub::plantIdentification::RPCCommandsData;
+using iCub::plantIdentification::ICubUtil;
 
 using yarp::os::RateThread;
 using yarp::os::Value;
@@ -41,7 +43,7 @@ TaskThread::TaskThread(const int period, const yarp::os::ResourceFinder &aRf)
     : RateThread(period) {
 		this->period = period;
         rf = aRf;
-
+		
         dbgTag = "TaskThread: ";
 }
 /* *********************************************************************************************************************** */
@@ -61,6 +63,7 @@ bool TaskThread::threadInit() {
     using yarp::os::Bottle;
     using yarp::os::Time;
     using std::vector;
+	using yarp::os::Log;
 
 	cout << dbgTag << "Initialising. \n";
 
@@ -79,18 +82,14 @@ bool TaskThread::threadInit() {
         cout << dbgTag << "failed to initialize ports utility\n";
         return false;
     }
+
 	// initialize task data
 	taskData = new TaskData(rf,period,controllersUtil);
 
-	// save current arm position, to be restored when the thread ends
-//	if (!controllersUtil->saveCurrentArmPosition()) {
-//        cout << dbgTag << "failed to store current arm position\n";
-//        return false;
-//    }
-//	if (!controllersUtil->setArmInTaskPosition()) {
-//        cout << dbgTag << "failed to set arm in task position\n";
-//        return false;
-//    }
+
+	// initialize events
+	eventsUtil = new EventsUtil(&taskData->commonData);
+	eventsUtil->init();
  
 	// this prevent the run() method to be executed between the taskThread->start() and the taskThread->suspend() calls during the PlantIdentificationModule initialization
 	runEnabled = false;
@@ -107,6 +106,8 @@ bool TaskThread::initializeGrasping(){
 	if (!controllersUtil->saveCurrentControlMode()) return false;
 	runEnabled = true;
 
+	controllersUtil->lookAtTheHand();
+
 	return true;
 }
 
@@ -114,6 +115,10 @@ bool TaskThread::initializeGrasping(){
 /* *********************************************************************************************************************** */
 /* ******* Run thread                                                       ********************************************** */
 void TaskThread::run() {
+	
+	ICubUtil::updateExternalData(controllersUtil,portsUtil,&taskData->commonData);
+
+	eventsUtil->checkEvents();
 
 	if (runEnabled){
 
@@ -134,6 +139,8 @@ void TaskThread::run() {
 
 bool TaskThread::afterRun(bool openHand){
 
+	controllersUtil->restoreFixationPoint();
+
 	if (!controllersUtil->restorePreviousControlMode()) return false;
 	if (openHand) {
 		if (!controllersUtil->openHand()) return false;
@@ -150,6 +157,7 @@ bool TaskThread::afterRun(bool openHand){
 
 	return true;
 }
+
 
 /* *********************************************************************************************************************** */
 /* ******* Release thread                                                   ********************************************** */
@@ -197,7 +205,7 @@ void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData
 	case TEMPORARY_PARAM:
 		if (!rpcCmdData.setTemporaryParam(paramValue,taskData->commonData.tempParameters)){
 			setSuccessful = false;
-			cout << "\n\n" << "CANNOT SET TEMPORARY PARAM" << "\n";
+			yInfo() << "\n\n" << "CANNOT SET TEMPORARY PARAM";
 		}
 		break;
 
@@ -233,11 +241,11 @@ void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData
 				currentTask->setTargetListRealTime(targetList);
 			} else {
 				setSuccessful = false;
-				cout << "\n\n" << "CANNOT EXECUTE SET COMMAND (CONTROL TASK IS NOT RUNNING)" << "\n";
+				yInfo()  << "\n\n" << "CANNOT EXECUTE SET COMMAND (CONTROL TASK IS NOT RUNNING)";
 			}
 		} else {
 			setSuccessful = false;
-			cout << "\n\n" << "CANNOT EXECUTE SET COMMAND (NO TASK RUNNING)" << "\n";
+			yInfo() << "\n\n" << "CANNOT EXECUTE SET COMMAND (NO TASK RUNNING)";
 		}
 		break;
 	case CTRL_LIFESPAN:
@@ -276,9 +284,9 @@ void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData
 	}
 
 	if (setSuccessful){
-		cout << "\n" <<
-				"\n" << 
-				"'" << rpcCmdData.setCmdArgMap[paramName] << "' SET TO " << rpcCmdData.printValue(paramValue) << "\n";
+		yInfo()	 << "\n" <<
+					"\n" << 
+					"'" << rpcCmdData.setCmdArgMap[paramName] << "' SET TO " << rpcCmdData.printValue(paramValue);
 	}
 }
 
@@ -314,9 +322,9 @@ void TaskThread::task(RPCTaskCmdArgName paramName,TaskName taskName,Value paramV
 			taskList.push_back(new RampTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->rampData,targetList));
 			break;
 		}
-		cout << "\n" <<
-				"\n" << 
-				"ADDED '" << rpcCmdData.taskMap[taskName] << "' TASK" << "\n";
+		yInfo()  << "\n" <<
+					"\n" << 
+					"ADDED '" << rpcCmdData.taskMap[taskName] << "' TASK";
 		break;
 
 	case EMPTY:
@@ -324,109 +332,20 @@ void TaskThread::task(RPCTaskCmdArgName paramName,TaskName taskName,Value paramV
 			delete(taskList[i]);
 		}
 		taskList.clear();
-		cout << "\n" <<
-				"\n" << 
-				"'" << "TASK LIST CLEARED" << "\n";
+		yInfo()  << "\n" <<
+					"\n" << 
+					"'" << "TASK LIST CLEARED";
 		break;
 
 	case POP:
 		delete(taskList[taskList.size() - 1]);
 		taskList.pop_back();
-		cout << "\n" <<
-				"\n" << 
-				"'" << "LAST TASK REMOVED" << "\n";
+		yInfo()  << "\n" <<
+					"\n" << 
+					"'" << "LAST TASK REMOVED" << "\n";
 		break;
 	}
 
-
-
-	// TODO TO REMOVE!!!!!!!
-	//if (targetList.size() == 2){
-	//	iCub::ctrl::ff2LayNN_tansig_purelin neuralNetwork;
-	//	yarp::os::Property nnConfProperty;
-	//	yarp::os::Bottle nnConfBottle;
-	//	ICubUtil::getNNOptionsForErrorPrediction2Fingers(nnConfBottle);
-	//	nnConfProperty.fromString(nnConfBottle.toString());
-	//	neuralNetwork.configure(nnConfProperty);
-
-	//	std::cout << "Bottle: " << nnConfBottle.toString() << "\n";
-	//	std::cout << "Property: " << nnConfProperty.toString() << "\n";
-	//	std::cout << "b1: " << neuralNetwork.get_b1().toString() << "\n";
-	//	std::cout << "b2: " << neuralNetwork.get_b2().toString() << "\n";
-	//	
-	//	std::deque<yarp::sig::Vector,std::allocator<yarp::sig::Vector> > iwDeque = neuralNetwork.get_IW();
-	//	for (int i=0;i<iwDeque.size();i++){
-	//		yarp::sig::Vector tmp = iwDeque.at(i);
-	//		std::cout << "IW" << i << ": " << tmp.toString() << "\n";
-	//	}
-	//	std::deque<yarp::sig::Vector,std::allocator<yarp::sig::Vector> > lwDeque = neuralNetwork.get_LW();
-	//	for (int i=0;i<lwDeque.size();i++){
-	//		yarp::sig::Vector tmp = lwDeque.at(i);
-	//		std::cout << "LW" << i << ": " << tmp.toString() << "\n";
-	//	}
-
-	//	std::vector<double> actualAngles(2);
-	//	std::vector<double> rotatedAngles;
-	//	actualAngles[0] = targetList[0];
-	//	actualAngles[1] = targetList[1];
-	//	iCub::plantIdentification::ICubUtil::rotateFingersData(actualAngles,rotatedAngles);
-
-	//	std::cout << "Actual angles: " << actualAngles[0] << " " << actualAngles[1] << "\n";
-	//	std::cout << "Rotated angles: " << rotatedAngles[0] << " " << rotatedAngles[1] << "\n";
-
-	//	yarp::sig::Vector rotatedAnglesVector;
-	//	rotatedAnglesVector.resize(2);
-	//	rotatedAnglesVector[0] = rotatedAngles[0];
-	//	rotatedAnglesVector[1] = rotatedAngles[1];
-	//	yarp::sig::Vector svErrNNVector = neuralNetwork.predict(rotatedAnglesVector);
-	//	double svErrNN = svErrNNVector[0];
-
-	//	std::cout << "Error: " << svErrNN << "\n";
-
-	//} else if (targetList.size() == 3){
-	//	iCub::ctrl::ff2LayNN_tansig_purelin neuralNetwork;
-	//	yarp::os::Property nnConfProperty;
-	//	yarp::os::Bottle nnConfBottle;
-	//	ICubUtil::getNNOptionsForErrorPrediction3Fingers(nnConfBottle);
-	//	nnConfProperty.fromString(nnConfBottle.toString());
-	//	neuralNetwork.configure(nnConfProperty);
-
-	//	std::cout << "Bottle: " << nnConfBottle.toString() << "\n";
-	//	std::cout << "Property: " << nnConfProperty.toString() << "\n";
-	//	std::cout << "b1: " << neuralNetwork.get_b1().toString() << "\n";
-	//	std::cout << "b2: " << neuralNetwork.get_b2().toString() << "\n";
-
-	//	std::deque<yarp::sig::Vector,std::allocator<yarp::sig::Vector> > iwDeque = neuralNetwork.get_IW();
-	//	for (int i=0;i<iwDeque.size();i++){
-	//		yarp::sig::Vector tmp = iwDeque.at(i);
-	//		std::cout << "IW" << i << ": " << tmp.toString() << "\n";
-	//	}
-	//	std::deque<yarp::sig::Vector,std::allocator<yarp::sig::Vector> > lwDeque = neuralNetwork.get_LW();
-	//	for (int i=0;i<lwDeque.size();i++){
-	//		yarp::sig::Vector tmp = lwDeque.at(i);
-	//		std::cout << "LW" << i << ": " << tmp.toString() << "\n";
-	//	}
-
-	//	std::vector<double> actualAngles(3);
-	//	std::vector<double> rotatedAngles;
-	//	actualAngles[0] = targetList[0];
-	//	actualAngles[1] = targetList[1];
-	//	actualAngles[2] = targetList[2];
-	//	ICubUtil::rotateFingersData(actualAngles,rotatedAngles);
-
-	//	std::cout << "Actual angles: " << actualAngles[0] << " " << actualAngles[1] << " " << actualAngles[2] << "\n";
-	//	std::cout << "Rotated angles: " << rotatedAngles[0] << " " << rotatedAngles[1] << " " << rotatedAngles[2] << "\n";
-
-	//	yarp::sig::Vector rotatedAnglesVector;
-	//	rotatedAnglesVector.resize(3);
-	//	rotatedAnglesVector[0] = rotatedAngles[0];
-	//	rotatedAnglesVector[1] = rotatedAngles[1];
-	//	rotatedAnglesVector[2] = rotatedAngles[2];
-	//	yarp::sig::Vector svErrNNVector = neuralNetwork.predict(rotatedAnglesVector);
-	//	double svErrNN = svErrNNVector[0];
-
-	//	std::cout << "Error: " << svErrNN << "\n";
-	//}
 
 }
 
@@ -435,68 +354,64 @@ void TaskThread::view(RPCViewCmdArgName paramName,RPCCommandsData &rpcCmdData){
 	switch (paramName){
 
 	case SETTINGS:
-		cout << "\n" <<
-		        "\n" <<
-                "-------- SETTINGS --------" << "\n" <<
-		        "\n" <<
-		        "--- TASK COMMON DATA -----" << "\n" <<
-		        rpcCmdData.getFullDescription(PWM_SIGN) << ": " << taskData->commonData.pwmSign << "\n" <<
-				rpcCmdData.getFullDescription(OBJ_DETECT_PRESS_THRESHOLDS) << ": " << taskData->getValueDescription(OBJ_DETECT_PRESS_THRESHOLDS) << "\n" <<
-				rpcCmdData.getFullDescription(TEMPORARY_PARAM) << ": " << taskData->getValueDescription(TEMPORARY_PARAM) << "\n" <<
-		        "\n" <<
-		        "--- STEP TASK DATA -------" << "\n" <<
-		        rpcCmdData.getFullDescription(STEP_LIFESPAN) << ": " << taskData->stepData.lifespan << "\n" <<
-		        "\n" <<
-		        "--- CONTROL TASK DATA ----" << "\n" <<
-				rpcCmdData.getFullDescription(CTRL_PID_KPF) << ": " << taskData->getValueDescription(CTRL_PID_KPF) << "\n" <<
-		        rpcCmdData.getFullDescription(CTRL_PID_KIF) << ": " << taskData->getValueDescription(CTRL_PID_KIF) << "\n" <<
-		        rpcCmdData.getFullDescription(CTRL_PID_KPB) << ": " << taskData->getValueDescription(CTRL_PID_KPB) << "\n" <<
-		        rpcCmdData.getFullDescription(CTRL_PID_KIB) << ": " << taskData->getValueDescription(CTRL_PID_KIB) << "\n" <<
-		        rpcCmdData.getFullDescription(CTRL_OP_MODE) << ": " << taskData->controlData.controlMode << "\n" <<
-				rpcCmdData.getFullDescription(CTRL_PID_RESET_ENABLED) << ": " << taskData->controlData.pidResetEnabled << "\n" <<
-				rpcCmdData.getFullDescription(CTRL_TARGET_REAL_TIME) << ": " << "(to be defined while control task is running)" << "\n" <<
-		        rpcCmdData.getFullDescription(CTRL_LIFESPAN) << ": " << taskData->controlData.lifespan << "\n" <<
-		        "\n" <<
-		        "--- RAMP TASK DATA ---" << "\n" <<
-		        rpcCmdData.getFullDescription(RAMP_SLOPE) << ": " << taskData->rampData.slope << "\n" <<
-		        rpcCmdData.getFullDescription(RAMP_INTERCEPT) << ": " << taskData->rampData.intercept << "\n" <<
-		        rpcCmdData.getFullDescription(RAMP_LIFESPAN) << ": " << taskData->rampData.lifespan << "\n" <<
-		        rpcCmdData.getFullDescription(RAMP_LIFESPAN_AFTER_STAB) << ": " << taskData->rampData.lifespanAfterStabilization << "\n" <<
-		        "\n" <<
-		        "--- APPROACH TASK DATA ---" << "\n" <<
-		        rpcCmdData.getFullDescription(APPR_JOINTS_VELOCITIES) << ": " << taskData->getValueDescription(APPR_JOINTS_VELOCITIES) << "\n" <<
-		        rpcCmdData.getFullDescription(APPR_JOINTS_PWM_LIMITS) << ": " << taskData->getValueDescription(APPR_JOINTS_PWM_LIMITS) << "\n" <<
-				rpcCmdData.getFullDescription(APPR_JOINTS_PWM_LIMITS_ENABLED) << ": " << taskData->approachData.jointsPwmLimitsEnabled << "\n" <<
-		        rpcCmdData.getFullDescription(APPR_LIFESPAN) << ": " << taskData->approachData.lifespan << "\n" <<
-
-				"";
+		yInfo()  << "\n" <<
+					"\n" <<
+					"-------- SETTINGS --------" << "\n" <<
+					"\n" <<
+					"--- TASK COMMON DATA -----" << "\n" <<
+					rpcCmdData.getFullDescription(PWM_SIGN) << ": " << taskData->commonData.pwmSign << "\n" <<
+					rpcCmdData.getFullDescription(OBJ_DETECT_PRESS_THRESHOLDS) << ": " << taskData->getValueDescription(OBJ_DETECT_PRESS_THRESHOLDS) << "\n" <<
+					rpcCmdData.getFullDescription(TEMPORARY_PARAM) << ": " << taskData->getValueDescription(TEMPORARY_PARAM) << "\n" <<
+					"\n" <<
+					"--- STEP TASK DATA -------" << "\n" <<
+					rpcCmdData.getFullDescription(STEP_LIFESPAN) << ": " << taskData->stepData.lifespan << "\n" <<
+					"\n" <<
+					"--- CONTROL TASK DATA ----" << "\n" <<
+					rpcCmdData.getFullDescription(CTRL_PID_KPF) << ": " << taskData->getValueDescription(CTRL_PID_KPF) << "\n" <<
+					rpcCmdData.getFullDescription(CTRL_PID_KIF) << ": " << taskData->getValueDescription(CTRL_PID_KIF) << "\n" <<
+					rpcCmdData.getFullDescription(CTRL_PID_KPB) << ": " << taskData->getValueDescription(CTRL_PID_KPB) << "\n" <<
+					rpcCmdData.getFullDescription(CTRL_PID_KIB) << ": " << taskData->getValueDescription(CTRL_PID_KIB) << "\n" <<
+					rpcCmdData.getFullDescription(CTRL_OP_MODE) << ": " << taskData->controlData.controlMode << "\n" <<
+					rpcCmdData.getFullDescription(CTRL_PID_RESET_ENABLED) << ": " << taskData->controlData.pidResetEnabled << "\n" <<
+					rpcCmdData.getFullDescription(CTRL_TARGET_REAL_TIME) << ": " << "(to be defined while control task is running)" << "\n" <<
+					rpcCmdData.getFullDescription(CTRL_LIFESPAN) << ": " << taskData->controlData.lifespan << "\n" <<
+					"\n" <<
+					"--- RAMP TASK DATA ---" << "\n" <<
+					rpcCmdData.getFullDescription(RAMP_SLOPE) << ": " << taskData->rampData.slope << "\n" <<
+					rpcCmdData.getFullDescription(RAMP_INTERCEPT) << ": " << taskData->rampData.intercept << "\n" <<
+					rpcCmdData.getFullDescription(RAMP_LIFESPAN) << ": " << taskData->rampData.lifespan << "\n" <<
+					rpcCmdData.getFullDescription(RAMP_LIFESPAN_AFTER_STAB) << ": " << taskData->rampData.lifespanAfterStabilization << "\n" <<
+					"\n" <<
+					"--- APPROACH TASK DATA ---" << "\n" <<
+					rpcCmdData.getFullDescription(APPR_JOINTS_VELOCITIES) << ": " << taskData->getValueDescription(APPR_JOINTS_VELOCITIES) << "\n" <<
+					rpcCmdData.getFullDescription(APPR_JOINTS_PWM_LIMITS) << ": " << taskData->getValueDescription(APPR_JOINTS_PWM_LIMITS) << "\n" <<
+					rpcCmdData.getFullDescription(APPR_JOINTS_PWM_LIMITS_ENABLED) << ": " << taskData->approachData.jointsPwmLimitsEnabled << "\n" <<
+					rpcCmdData.getFullDescription(APPR_LIFESPAN) << ": " << taskData->approachData.lifespan;
 		break;
 
 	case TASKS:
-		cout << "\n" <<
-				"\n" << 
-				"------- TASK LIST -------" << "\n" <<
-					"\n";
+		yInfo()  << "\n" <<
+						"\n" << 
+				"------- TASK LIST -------" << "\n";
 
 		for (size_t i = 0; i < taskList.size(); i++){
 			
-			cout << "- ";
 			switch (taskList[i]->getTaskName()){
 
 			case STEP:
-				cout << "STEP\t" << (dynamic_cast<StepTask*>(taskList[i]))->getConstantPwmDescription() << "\n";
+				yInfo() << "- STEP\t" << (dynamic_cast<StepTask*>(taskList[i]))->getConstantPwmDescription();
 				break;
 			case CONTROL:
-				cout << "CONTROL\t" << (dynamic_cast<ControlTask*>(taskList[i]))->getPressureTargetValueDescription() << "\n";
+				yInfo() << "- CONTROL\t" << (dynamic_cast<ControlTask*>(taskList[i]))->getPressureTargetValueDescription();
 				break;
 			case APPROACH_AND_CONTROL:
-				cout << "APPROACH & CONTROL\t" << (dynamic_cast<ControlTask*>(taskList[i]))->getPressureTargetValueDescription() << "\n";
+				yInfo() << "- APPROACH & CONTROL\t" << (dynamic_cast<ControlTask*>(taskList[i]))->getPressureTargetValueDescription();
 				break;
 			case APPROACH:
-				cout << "APPROACH\t" << "\n";
+				yInfo() << "- APPROACH";
 				break;
 			case RAMP:
-				cout << "RAMP\t" << (dynamic_cast<RampTask*>(taskList[i]))->getPressureTargetValueDescription() << "\n";
+				yInfo() << "- RAMP\t" << (dynamic_cast<RampTask*>(taskList[i]))->getPressureTargetValueDescription();
 				break;
 
 			}
@@ -506,20 +421,20 @@ void TaskThread::view(RPCViewCmdArgName paramName,RPCCommandsData &rpcCmdData){
 
 void TaskThread::help(RPCCommandsData &rpcCmdData){
 
-	cout << "\n" <<
-		    "\n" <<
-            "----------- HELP -----------" << "\n" <<
-		    "---- AVAILABLE COMMANDS ----" << "\n" <<
-		    "\n" <<
-		    rpcCmdData.getFullDescription(HELP) << "\n" <<
-		    rpcCmdData.getFullDescription(SET) << "\n" <<
-		    rpcCmdData.getFullDescription(TASK) << "\n" <<
-		    rpcCmdData.getFullDescription(VIEW) << "\n" <<
-		    rpcCmdData.getFullDescription(START) << "\n" <<
-		    rpcCmdData.getFullDescription(STOP) << "\n" <<
-		    rpcCmdData.getFullDescription(OPEN) << "\n" <<
-		    rpcCmdData.getFullDescription(ARM) << "\n" <<
-		    rpcCmdData.getFullDescription(QUIT) << "\n";
+	yInfo()  << "\n" <<
+				"\n" <<
+				"----------- HELP -----------" << "\n" <<
+				"---- AVAILABLE COMMANDS ----" << "\n" <<
+				"\n" <<
+				rpcCmdData.getFullDescription(HELP) << "\n" <<
+				rpcCmdData.getFullDescription(SET) << "\n" <<
+				rpcCmdData.getFullDescription(TASK) << "\n" <<
+				rpcCmdData.getFullDescription(VIEW) << "\n" <<
+				rpcCmdData.getFullDescription(START) << "\n" <<
+				rpcCmdData.getFullDescription(STOP) << "\n" <<
+				rpcCmdData.getFullDescription(OPEN) << "\n" <<
+				rpcCmdData.getFullDescription(ARM) << "\n" <<
+				rpcCmdData.getFullDescription(QUIT);
 	
 }			
 
@@ -527,4 +442,18 @@ void TaskThread::testShowEndEffectors(){
 
     controllersUtil->testShowEndEffectors();    
 
+}
+
+bool TaskThread::eventTriggered(EventToTrigger eventToTrigger,int index = 0){
+
+	switch(eventToTrigger){
+
+	case FINGERTIP_PUSHED:
+
+		return eventsUtil->eventFPTriggered(index);
+		break;
+
+	}
+
+	return false;
 }

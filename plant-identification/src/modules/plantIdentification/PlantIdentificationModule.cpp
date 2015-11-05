@@ -12,6 +12,7 @@ using yarp::os::Value;
 PlantIdentificationModule::PlantIdentificationModule() 
     : RFModule() {
         closing = false;
+		tasksRunning = false;
 
         dbgTag = "PlantIdentificationModule: ";
 }
@@ -66,6 +67,28 @@ bool PlantIdentificationModule::configure(ResourceFinder &rf) {
 /* *********************************************************************************************************************** */
 /* ******* Update    module                                                 ********************************************** */   
 bool PlantIdentificationModule::updateModule() { 
+
+	// check events
+	if (taskThread->eventTriggered(FINGERTIP_PUSHED,3)){ // pinky
+		if (tasksRunning){
+			open();
+		} else {
+			task(EMPTY,NONE,Value(0));
+			task(ADD,APPROACH,Value(0));
+			task(ADD,CONTROL,Value(0));
+			start();
+		}
+	}
+	if (taskThread->eventTriggered(FINGERTIP_PUSHED,2)){ // ring finger
+		int positionTrackingMode = taskThread->taskData->commonData.tempParameters[18].asInt();
+		if (positionTrackingMode == 0){
+			taskThread->taskData->commonData.tempParameters[18] = Value(2);
+		} else {
+			taskThread->taskData->commonData.tempParameters[18] = Value(0);
+		}
+	}
+
+
     return !closing; 
 }
 /* *********************************************************************************************************************** */
@@ -118,8 +141,7 @@ bool PlantIdentificationModule::respond(const yarp::os::Bottle& command, yarp::o
 		arm();
 		break;
 	case QUIT:
-        //quit();
-        taskThread->testShowEndEffectors();
+        quit();
 
         break;
     }
@@ -152,6 +174,8 @@ bool PlantIdentificationModule::close() {
 /* ******* RPC Stop task execution without opening the hand                 ********************************************** */
 bool PlantIdentificationModule::stop() {
     
+	tasksRunning = false;
+
 	taskThread->suspend();
 
 	taskThread->afterRun(false);
@@ -164,6 +188,8 @@ bool PlantIdentificationModule::stop() {
 /* ******* RPC Stop task execution and open the hand                        ********************************************** */
 bool PlantIdentificationModule::open() {
     
+	tasksRunning = false;
+
 	taskThread->suspend();
 
 	taskThread->afterRun(true);
@@ -176,6 +202,8 @@ bool PlantIdentificationModule::open() {
 /* *********************************************************************************************************************** */
 /* ******* RPC Grasp object                                                 ********************************************** */
 bool PlantIdentificationModule::start() {
+
+	tasksRunning = true;
 
 	if (!taskThread->initializeGrasping()) return false;
 

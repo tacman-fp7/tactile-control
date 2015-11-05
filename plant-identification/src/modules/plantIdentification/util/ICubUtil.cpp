@@ -4,10 +4,16 @@
 #include <string>
 #include <sstream>
 
+#include <gsl/gsl_sort.h>
+#include <gsl/gsl_statistics.h>
+
 #define N_HID_NODES_2F 1
 #define N_HID_NODES_3F 1
 
 using iCub::plantIdentification::ICubUtil;
+using iCub::plantIdentification::ControllersUtil;
+using iCub::plantIdentification::PortsUtil;
+using iCub::plantIdentification::TaskCommonData;
 
 using yarp::os::Bottle;
 using yarp::os::Value;
@@ -211,6 +217,68 @@ void ICubUtil::getNNOptionsForErrorPrediction2Fingers(Bottle& neuralNetworkOptio
 
 	addOption(neuralNetworkOptions,"outMinMaxY_0",outMinMaxY[0],outMinMaxY[1]);
 	addOption(neuralNetworkOptions,"outMinMaxX_0",outMinMaxX[0],outMinMaxX[1]);
+
+}
+
+bool ICubUtil::updateExternalData(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData){
+
+	using yarp::sig::Vector;
+
+	if (!portsUtil->readFingerSkinCompData(commonData->fingerTaxelsData)){
+		return false;
+	}
+
+	controllersUtil->getArmEncodersAngles(commonData->armEncodersAngles);
+
+	processTactileData(commonData);
+	
+    // index finger
+    controllersUtil->getEncoderAngle(11,&commonData->proximalJointAngle[0]);
+    controllersUtil->getEncoderAngle(12,&commonData->distalJointAngle[0]);
+
+
+    // middle finger
+    controllersUtil->getEncoderAngle(13,&commonData->proximalJointAngle[1]);
+    controllersUtil->getEncoderAngle(14,&commonData->distalJointAngle[1]);
+
+
+    // ring finger
+    double enc15;
+    controllersUtil->getEncoderAngle(15,&enc15);
+	commonData->proximalJointAngle[2] = commonData->distalJointAngle[2] = enc15/2;
+		
+
+    // TODO pinky
+	commonData->proximalJointAngle[3] = commonData->distalJointAngle[3] = enc15/2;
+
+
+    // thumb
+    controllersUtil->getEncoderAngle(9,&commonData->proximalJointAngle[4]);
+    controllersUtil->getEncoderAngle(10,&commonData->distalJointAngle[4]);
+
+
+}
+
+void ICubUtil::processTactileData(TaskCommonData *commonData){
+
+	double partialOverallFingerPressure;
+
+	for(size_t i = 0; i < commonData->fingerTaxelsData.size(); i++){
+		
+		commonData->overallFingerPressureBySimpleSum[i] = ICubUtil::getForce(commonData->fingerTaxelsData[i],SIMPLE_SUM);
+		commonData->overallFingerPressureByWeightedSum[i] = ICubUtil::getForce(commonData->fingerTaxelsData[i],WEIGHTED_SUM);
+		
+		commonData->overallFingerPressure[i] = commonData->overallFingerPressureByWeightedSum[i];
+
+		commonData->previousOverallFingerPressures[i][commonData->previousPressuresIndex[i]] = commonData->overallFingerPressure[i];
+		commonData->previousPressuresIndex[i] = (commonData->previousPressuresIndex[i] + 1)%commonData->previousOverallFingerPressures[i].size();
+
+		std::vector<double> previousOverallFingerPressuresCopy(commonData->previousOverallFingerPressures[i]);
+
+		gsl_sort(&previousOverallFingerPressuresCopy[0],1,previousOverallFingerPressuresCopy.size());
+		commonData->overallFingerPressureMedian[i] = gsl_stats_median_from_sorted_data(&previousOverallFingerPressuresCopy[0],1,previousOverallFingerPressuresCopy.size());
+
+	}
 
 }
 

@@ -261,6 +261,7 @@ void ApproachTask::moveFinger(int finger){
 		inputCommandValue[finger] = approachData->pwmList[finger];
 	}
 }
+
 void ApproachTask::stopFinger(int finger){
 	
 	inputCommandValue[finger] = 0;
@@ -305,7 +306,6 @@ bool ApproachTask::taskIsOver(){
 
 	return callsNumber >= maxCallsNumber || eachFingerIsInContact();
 }
-
 
 bool ApproachTask::eachFingerIsInContact(){
 

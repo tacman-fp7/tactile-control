@@ -44,7 +44,7 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
     
     // Open driver
     if (!clientArm.open(options)) {
-        cout << dbgTag << "could not open driver\n";
+        cout << dbgTag << "could not open arm driver\n";
 		return false;
     }
     // Open interfaces
@@ -88,6 +88,43 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
         refSpeeds[i] = 50;
     }
     iPos->setRefSpeeds(&refSpeeds[0]);
+
+
+
+	Property gazeCtrlOptions;
+	gazeCtrlOptions.put("device","gazecontrollerclient");
+	gazeCtrlOptions.put("remote","/iKinGazeCtrl");
+	gazeCtrlOptions.put("local","/plantIdentification/gaze");
+ 
+    if (!clientGazeCtrl.open(gazeCtrlOptions)) {
+        cout << dbgTag << "could not open gaze controller driver\n";
+		return false;
+    }
+	
+	clientGazeCtrl.view(iGaze);
+    if (!iGaze) {
+		cout << dbgTag << "could not open gaze controller interface\n";
+        return false;
+    }
+
+	// store fixation point
+	iGaze->getFixationPoint(storedFixationPoint);
+
+
+	   
+	Property cartCtrlOptions;
+    cartCtrlOptions.put("device","cartesiancontrollerclient");
+    cartCtrlOptions.put("remote","/" + robotName + "/cartesianController/" + arm);
+    cartCtrlOptions.put("local","/plantIdentification/cartContr/" + arm);
+    
+    clientArmCartCtrl.open(cartCtrlOptions);
+
+    if (clientArmCartCtrl.isValid()) {
+       clientArmCartCtrl.view(iCart);
+    }
+    if (!iCart) {
+		cout << dbgTag << "could not open cartesian controller interface\n";
+    }
 
 	return true;
 }
@@ -364,9 +401,13 @@ bool ControllersUtil::getEncoderAngle(int joint,double *encoderData){
 
 bool ControllersUtil::release(){
 
-    // Close driver
+    // Close drivers
     if (!clientArm.close()){
-		cout << dbgTag << "could not close driver\n";	
+		cout << dbgTag << "could not close arm driver\n";	
+		return false;
+	}
+    if (!clientGazeCtrl.close()){
+		cout << dbgTag << "could not close gaze controller driver\n";	
 		return false;
 	}
 	return true;
@@ -728,4 +769,25 @@ bool ControllersUtil::restorePIDIntegralGain(double joint){
 		return true;
 	}
 	return false;
+}
+
+bool ControllersUtil::lookAtTheHand(){
+
+	yarp::sig::Vector handPosition,handOrientation;
+    handPosition.resize(3);
+    handOrientation.resize(4);
+
+    iCart->getPose(handPosition,handOrientation);
+
+	iGaze->lookAtFixationPoint(handPosition);
+	//iGaze->waitMotionDone();
+
+	return true;
+}
+
+bool ControllersUtil::restoreFixationPoint(){
+
+	iGaze->lookAtFixationPoint(storedFixationPoint);
+
+	return true;
 }

@@ -1,7 +1,11 @@
 #ifndef __ICUB_PLANTIDENTIFICATION_ICUBUTIL_H__
 #define __ICUB_PLANTIDENTIFICATION_ICUBUTIL_H__
 
-#include <iCub/plantIdentification/PlantIdentificationEnums.h>
+#include "iCub/plantIdentification/PlantIdentificationEnums.h"
+#include "iCub/plantIdentification/data/TaskData.h"
+#include "iCub/plantIdentification/util/ControllersUtil.h"
+#include "iCub/plantIdentification/util/PortsUtil.h"
+
 #include <yarp/os/Bottle.h>
 #include <yarp/os/Value.h>
 
@@ -20,8 +24,11 @@ namespace iCub {
 				static void getNNOptionsForErrorPrediction3Fingers(yarp::os::Bottle& bottle);
 				static void rotateFingersData(std::vector<double>& fingersAngles,std::vector<double>& rotatedFingersAngles);
 
+				static bool updateExternalData(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData);
 
 		private:
+
+				static void processTactileData(iCub::plantIdentification::TaskCommonData *commonData);
 
 				static double getForceBySimpleSum(std::vector<double>& tactileData);
 
@@ -29,7 +36,6 @@ namespace iCub {
 				static void getUnitVector(int index,std::vector<double>& unitVector);
 
 				static double getForceByLearntMapping(std::vector<double>& tactileData);
-
 				
 				static void addOption(yarp::os::Bottle &bottle,const char *paramName,yarp::os::Value paramValue);
 

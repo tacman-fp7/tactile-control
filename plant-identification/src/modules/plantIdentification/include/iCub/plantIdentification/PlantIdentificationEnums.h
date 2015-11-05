@@ -98,6 +98,11 @@ namespace iCub {
 			MAPPING = 2
 		};
 
+		enum EventToTrigger {
+
+			FINGERTIP_PUSHED
+		};
+
 	}
 }
 

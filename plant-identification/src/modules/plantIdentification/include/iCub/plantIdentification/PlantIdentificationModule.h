@@ -24,7 +24,8 @@ namespace iCub {
 				std::string moduleName;
 				std::string robotName;
 				bool closing;
-                
+                bool tasksRunning;
+
 				/* ****** RPC Ports                                     ****** */
 				yarp::os::RpcServer portPlantIdentificationRPC;
 

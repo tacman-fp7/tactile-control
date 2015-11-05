@@ -3,8 +3,6 @@
 #include "iCub/plantIdentification/PlantIdentificationEnums.h"
 #include "iCub/plantIdentification/util/ICubUtil.h"
 
-#include <gsl/gsl_sort.h>
-#include <gsl/gsl_statistics.h>
 
 #include <yarp/os/Time.h>
 
@@ -102,66 +100,68 @@ void Task::sendCommands(){
 }
 
 bool Task::loadICubData(){
-	using yarp::sig::Vector;
 
-	if (!portsUtil->readFingerSkinCompData(commonData->fingerTaxelsData)){
-		return false;
-	}
+	// TODO - TO REMOVE, SECTION MOVED TO ICubUtil
 
-	controllersUtil->getArmEncodersAngles(commonData->armEncodersAngles);
+	//using yarp::sig::Vector;
 
-	processTactileData();
-	
-    // index finger
-    controllersUtil->getEncoderAngle(11,&commonData->proximalJointAngle[0]);
-    controllersUtil->getEncoderAngle(12,&commonData->distalJointAngle[0]);
-//    controllersUtil->getRealPwmValue(11,&commonData->realProximalPwm[0]);
-//    controllersUtil->getRealPwmValue(12,&commonData->realDistalPwm[0]);
+	//if (!portsUtil->readFingerSkinCompData(commonData->fingerTaxelsData)){
+	//	return false;
+	//}
 
-    // middle finger
-    controllersUtil->getEncoderAngle(13,&commonData->proximalJointAngle[1]);
-    controllersUtil->getEncoderAngle(14,&commonData->distalJointAngle[1]);
-//    controllersUtil->getRealPwmValue(13,&commonData->realProximalPwm[1]);
-//    controllersUtil->getRealPwmValue(14,&commonData->realDistalPwm[1]);
+	//controllersUtil->getArmEncodersAngles(commonData->armEncodersAngles);
 
-    // TODO ring finger
+	//processTactileData();
+	//
+ //   // index finger
+ //   controllersUtil->getEncoderAngle(11,&commonData->proximalJointAngle[0]);
+ //   controllersUtil->getEncoderAngle(12,&commonData->distalJointAngle[0]);
 
-    // TODO pinky
 
-    // thumb
-    controllersUtil->getEncoderAngle(9,&commonData->proximalJointAngle[4]);
-    controllersUtil->getEncoderAngle(10,&commonData->distalJointAngle[4]);
-//    controllersUtil->getRealPwmValue(9,&commonData->realProximalPwm[4]);
-//    controllersUtil->getRealPwmValue(10,&commonData->realDistalPwm[4]);
+ //   // middle finger
+ //   controllersUtil->getEncoderAngle(13,&commonData->proximalJointAngle[1]);
+ //   controllersUtil->getEncoderAngle(14,&commonData->distalJointAngle[1]);
+
+
+ //   // TODO ring finger
+
+ //   // TODO pinky
+
+ //   // thumb
+ //   controllersUtil->getEncoderAngle(9,&commonData->proximalJointAngle[4]);
+ //   controllersUtil->getEncoderAngle(10,&commonData->distalJointAngle[4]);
+
 
 	return true;
 }
 
 void Task::processTactileData(){
 
-	double partialOverallFingerPressure;
+	// TODO - TO REMOVE, SECTION MOVED TO ICubUtil
 
-	for(size_t i = 0; i < commonData->fingerTaxelsData.size(); i++){
-		
-		commonData->overallFingerPressureBySimpleSum[i] = ICubUtil::getForce(commonData->fingerTaxelsData[i],SIMPLE_SUM);
-		commonData->overallFingerPressureByWeightedSum[i] = ICubUtil::getForce(commonData->fingerTaxelsData[i],WEIGHTED_SUM);
-		
-		/*partialOverallFingerPressure = 0.0;
-		for(size_t j = 0; j < commonData->fingerTaxelsData[i].size(); j++){
-			partialOverallFingerPressure += commonData->fingerTaxelsData[i][j];
-		}*/
-		
-		commonData->overallFingerPressure[i] = commonData->overallFingerPressureByWeightedSum[i];
+	//double partialOverallFingerPressure;
 
-		commonData->previousOverallFingerPressures[i][commonData->previousPressuresIndex[i]] = commonData->overallFingerPressure[i];
-		commonData->previousPressuresIndex[i] = (commonData->previousPressuresIndex[i] + 1)%commonData->previousOverallFingerPressures[i].size();
+	//for(size_t i = 0; i < commonData->fingerTaxelsData.size(); i++){
+	//	
+	//	commonData->overallFingerPressureBySimpleSum[i] = ICubUtil::getForce(commonData->fingerTaxelsData[i],SIMPLE_SUM);
+	//	commonData->overallFingerPressureByWeightedSum[i] = ICubUtil::getForce(commonData->fingerTaxelsData[i],WEIGHTED_SUM);
+	//	
+	//	/*partialOverallFingerPressure = 0.0;
+	//	for(size_t j = 0; j < commonData->fingerTaxelsData[i].size(); j++){
+	//		partialOverallFingerPressure += commonData->fingerTaxelsData[i][j];
+	//	}*/
+	//	
+	//	commonData->overallFingerPressure[i] = commonData->overallFingerPressureByWeightedSum[i];
 
-		std::vector<double> previousOverallFingerPressuresCopy(commonData->previousOverallFingerPressures[i]);
+	//	commonData->previousOverallFingerPressures[i][commonData->previousPressuresIndex[i]] = commonData->overallFingerPressure[i];
+	//	commonData->previousPressuresIndex[i] = (commonData->previousPressuresIndex[i] + 1)%commonData->previousOverallFingerPressures[i].size();
 
-		gsl_sort(&previousOverallFingerPressuresCopy[0],1,previousOverallFingerPressuresCopy.size());
-		commonData->overallFingerPressureMedian[i] = gsl_stats_median_from_sorted_data(&previousOverallFingerPressuresCopy[0],1,previousOverallFingerPressuresCopy.size());
+	//	std::vector<double> previousOverallFingerPressuresCopy(commonData->previousOverallFingerPressures[i]);
 
-	}
+	//	gsl_sort(&previousOverallFingerPressuresCopy[0],1,previousOverallFingerPressuresCopy.size());
+	//	commonData->overallFingerPressureMedian[i] = gsl_stats_median_from_sorted_data(&previousOverallFingerPressuresCopy[0],1,previousOverallFingerPressuresCopy.size());
+
+	//}
 
 }
 

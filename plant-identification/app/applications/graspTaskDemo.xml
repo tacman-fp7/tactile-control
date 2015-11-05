@@ -4,17 +4,18 @@
      <module>
          <name>plantIdentification</name>
          <parameters>-whichHand left</parameters>
-         <node>icub10</node>
+         <node>icub14</node>
          <tag>handController</tag>
      </module>
 
      <module>
          <name>objectGrasping</name>
          <parameters>-whichHand left</parameters>
-         <node>icub10</node>
+         <node>icub14</node>
          <tag>graspingDemo</tag>
      </module>
 
+<!--
 	 <module>
          <name>yarpscope</name>
          <parameters>--remote /plantIdentification/control --index "(4 5)"</parameters>
@@ -30,6 +31,17 @@
          <parameters>--remote /plantIdentification/control --index "(8 9 10)"</parameters>
          <node>icub10</node>
          <tag>yarpscope_position</tag>
+		 <dependencies>
+            <port timeout="5.0">/plantIdentification/control</port>
+         </dependencies>
+     </module>
+-->
+	 
+	 <module>
+         <name>yarpscope</name>
+         <parameters>–context plantIdentification –xml graspingDemoPortScopeConf.xml</parameters>
+         <node>icub10</node>
+         <tag>demo_port_scope</tag>
 		 <dependencies>
             <port timeout="5.0">/plantIdentification/control</port>
          </dependencies>

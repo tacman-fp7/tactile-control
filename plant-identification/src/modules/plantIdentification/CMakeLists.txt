@@ -28,6 +28,7 @@ set(INC_HEADERS
     include/iCub/plantIdentification/util/PortsUtil.h
     include/iCub/plantIdentification/util/RPCCommandsUtil.h
     include/iCub/plantIdentification/util/ICubUtil.h
+    include/iCub/plantIdentification/util/EventsUtil.h
 
 )
 
@@ -53,6 +54,7 @@ set(INC_SOURCES
     util/PortsUtil.cpp
     util/RPCCommandsUtil.cpp
     util/ICubUtil.cpp
+    util/EventsUtil.cpp
 
 )
 

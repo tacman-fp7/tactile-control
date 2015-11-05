@@ -5,6 +5,8 @@
 
 #include <yarp/dev/PolyDriver.h>
 #include <yarp/dev/IEncoders.h>
+#include <yarp/dev/GazeControl.h>
+#include <yarp/dev/CartesianControl.h>
 #include <yarp/dev/ControlBoardInterfaces.h>
 #include <yarp/os/ResourceFinder.h>
 #include <yarp/sig/Vector.h>
@@ -21,16 +23,21 @@ namespace iCub {
 				int armJointsNum;
 
             private:
-
+				
                 yarp::dev::PolyDriver clientArm;
+				yarp::dev::PolyDriver clientGazeCtrl;
+				yarp::dev::PolyDriver clientArmCartCtrl;
                 yarp::dev::IEncoders *iEncs;
 				yarp::dev::IOpenLoopControl *iOLC;
 				yarp::dev::IControlMode2 *iCtrl;
 				yarp::dev::IPositionControl *iPos;
 				yarp::dev::IVelocityControl *iVel;
 				yarp::dev::IPidControl *iPid;
+				yarp::dev::IGazeControl *iGaze;
+                yarp::dev::ICartesianControl *iCart;
 
 				yarp::sig::Vector armStoredPosition;
+				yarp::sig::Vector storedFixationPoint;
 				std::vector<int> storedJointsControlMode;
 				std::vector<int> handJointsToMove;
 				std::vector<double> storedHandJointsMaxPwmLimits;
@@ -89,6 +96,11 @@ namespace iCub {
 
 				bool resetPIDIntegralGain(double joint);
 				bool restorePIDIntegralGain(double joint);
+
+				bool lookAtTheHand();
+
+				bool restoreFixationPoint();
+
 
 			private:
 
