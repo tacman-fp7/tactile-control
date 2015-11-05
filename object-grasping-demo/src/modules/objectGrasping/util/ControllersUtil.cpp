@@ -225,8 +225,6 @@ bool ControllersUtil::testCartesianController() {
     x0.resize(3);
     o0.resize(4);
 
-    cout << dbgTag << "1\n";
-    
     iCart->getPose(x0,o0);
     
     cout << dbgTag << "2\n";
