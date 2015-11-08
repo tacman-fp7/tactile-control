@@ -1,6 +1,9 @@
 #include "iCub/plantIdentification/PlantIdentificationModule.h"
 
+#include "iCub/plantIdentification/util/ICubUtil.h"
+
 using iCub::plantIdentification::PlantIdentificationModule;
+using iCub::plantIdentification::ICubUtil;
 
 using std::cout;
 
@@ -47,8 +50,32 @@ bool PlantIdentificationModule::configure(ResourceFinder &rf) {
     portPlantIdentificationRPC.open("/plantIdentification/cmd:i");
     attach(portPlantIdentificationRPC);
 
+
+		// initialize controllers
+	controllersUtil = new ControllersUtil();
+	if (!controllersUtil->init(rf)) {
+        cout << dbgTag << "failed to initialize controllers utility\n";
+        return false;
+    }
+
+	// initialize ports
+	portsUtil = new PortsUtil();
+	if (!portsUtil->init(rf)) {
+        cout << dbgTag << "failed to initialize ports utility\n";
+        return false;
+    }
+
+	// initialize task data
+	taskData = new TaskData(rf,period,controllersUtil);
+
+
+	// initialize events
+	eventsUtil = new EventsUtil(&taskData->commonData);
+	eventsUtil->init();
+ 
+
     /* ******* Threads                                          ******* */
-    taskThread = new TaskThread(20, rf);
+	taskThread = new TaskThread(20, rf,controllersUtil,portsUtil,eventsUtil,taskData);
     if (!taskThread->start()) {
         cout << dbgTag << "Could not start the task thread. \n";
         return false;
@@ -68,8 +95,13 @@ bool PlantIdentificationModule::configure(ResourceFinder &rf) {
 /* ******* Update    module                                                 ********************************************** */   
 bool PlantIdentificationModule::updateModule() { 
 
-	// check events
+	// update module data
+	ICubUtil::updateExternalData(controllersUtil,portsUtil,&taskData->commonData);
 
+	// check events
+	eventsUtil->checkEvents();
+
+	// manage event triggers
 	if (taskThread->eventTriggered(FINGERTIP_PUSHED,3)){ // pinky
 		if (tasksRunning){
 			open();

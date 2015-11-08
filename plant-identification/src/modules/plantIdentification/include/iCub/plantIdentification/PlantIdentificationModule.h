@@ -4,6 +4,9 @@
 #include "iCub/plantIdentification/thread/TaskThread.h"
 #include "iCub/plantIdentification/util/RPCCommandsUtil.h"
 #include "iCub/plantIdentification/data/RPCCommandsData.h"
+#include "iCub/plantIdentification/util/ControllersUtil.h"
+#include "iCub/plantIdentification/util/PortsUtil.h"
+#include "iCub/plantIdentification/util/EventsUtil.h"
 
 #include <string>
 
@@ -32,6 +35,17 @@ namespace iCub {
 				iCub::plantIdentification::RPCCommandsUtil rpcCmdUtil;
 				iCub::plantIdentification::RPCCommandsData rpcCmdData;
 
+				/* ******* Controllers utility                          ******* */
+                iCub::plantIdentification::ControllersUtil *controllersUtil;
+
+				/* ****** Ports utility                                 ****** */
+				iCub::plantIdentification::PortsUtil *portsUtil;
+
+				/* ****** Events utility                                 ****** */
+				iCub::plantIdentification::EventsUtil *eventsUtil;
+
+				/* ****** Task data										****** */
+				iCub::plantIdentification::TaskData *taskData;
 
 				/* ****** Threads			                            ****** */
 				iCub::plantIdentification::TaskThread *taskThread;

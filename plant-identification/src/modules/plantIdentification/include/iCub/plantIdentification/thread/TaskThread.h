@@ -54,7 +54,7 @@ namespace iCub {
 				/* ****** Task data										****** */
 				iCub::plantIdentification::TaskData *taskData;
 
-                TaskThread(const int aPeriod, const yarp::os::ResourceFinder &aRf);
+                TaskThread(const int aPeriod, const yarp::os::ResourceFinder &aRf,iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::EventsUtil *eventsUtil,iCub::plantIdentification::TaskData *taskData);
                 virtual ~TaskThread();
 
                 virtual bool threadInit();

@@ -16,7 +16,6 @@
 #include <cmath>
 
 //TODO TO REMOVE!
-#include "iCub/plantIdentification/util/ICubUtil.h"
 #include <yarp/sig/Vector.h>
 #include <iCub/ctrl/neuralNetworks.h>
 
@@ -31,7 +30,11 @@ using iCub::plantIdentification::RPCTaskCmdArgName;
 using iCub::plantIdentification::TaskName;
 using iCub::plantIdentification::RPCViewCmdArgName;
 using iCub::plantIdentification::RPCCommandsData;
-using iCub::plantIdentification::ICubUtil;
+using iCub::plantIdentification::ControllersUtil;
+using iCub::plantIdentification::PortsUtil;
+using iCub::plantIdentification::EventsUtil;
+using iCub::plantIdentification::TaskData;
+
 
 using yarp::os::RateThread;
 using yarp::os::Value;
@@ -39,10 +42,14 @@ using yarp::os::Value;
 
 /* *********************************************************************************************************************** */
 /* ******* Constructor                                                      ********************************************** */   
-TaskThread::TaskThread(const int period, const yarp::os::ResourceFinder &aRf) 
+TaskThread::TaskThread(const int period, const yarp::os::ResourceFinder &aRf,ControllersUtil *controllersUtil,PortsUtil *portsUtil,EventsUtil *eventsUtil,TaskData *taskData) 
     : RateThread(period) {
 		this->period = period;
         rf = aRf;
+		this->controllersUtil = controllersUtil;
+		this->portsUtil = portsUtil;
+		this->eventsUtil = eventsUtil;
+		this->taskData = taskData;
 		
         dbgTag = "TaskThread: ";
 }
@@ -69,28 +76,6 @@ bool TaskThread::threadInit() {
 
 	currentTaskIndex = 0;
 
-	// initialize controllers
-	controllersUtil = new ControllersUtil();
-	if (!controllersUtil->init(rf)) {
-        cout << dbgTag << "failed to initialize controllers utility\n";
-        return false;
-    }
-
-	// initialize ports
-	portsUtil = new PortsUtil();
-	if (!portsUtil->init(rf)) {
-        cout << dbgTag << "failed to initialize ports utility\n";
-        return false;
-    }
-
-	// initialize task data
-	taskData = new TaskData(rf,period,controllersUtil);
-
-
-	// initialize events
-	eventsUtil = new EventsUtil(&taskData->commonData);
-	eventsUtil->init();
- 
 	// this prevent the run() method to be executed between the taskThread->start() and the taskThread->suspend() calls during the PlantIdentificationModule initialization
 	runEnabled = false;
 
@@ -115,10 +100,6 @@ bool TaskThread::initializeGrasping(){
 /* *********************************************************************************************************************** */
 /* ******* Run thread                                                       ********************************************** */
 void TaskThread::run() {
-	
-	ICubUtil::updateExternalData(controllersUtil,portsUtil,&taskData->commonData);
-
-	eventsUtil->checkEvents();
 
 	if (runEnabled){
 
