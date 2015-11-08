@@ -223,5 +223,5 @@ bool Task::taskIsOver(){
 
 int Task::secondsToCallsNumber(double seconds){
 
-	return static_cast<int>(seconds*1000/commonData->threadRate);
+	return static_cast<int>(seconds*1000/commonData->taskThreadPeriod);
 }

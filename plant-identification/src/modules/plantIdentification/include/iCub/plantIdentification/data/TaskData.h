@@ -83,7 +83,8 @@ namespace iCub {
             */
 			std::vector<yarp::os::Value> tempParameters;
 
-			int threadRate; // milliseconds between two consecutive thread calls
+			int taskThreadPeriod; // milliseconds between two consecutive task thread calls
+			int eventsThreadPeriod; // milliseconds between two consecutive events thread calls
 			int pwmSign;
 			int screenLogStride;
 
@@ -93,8 +94,9 @@ namespace iCub {
 
 			std::string tpStr(int index);
 
-			int getNumOfThreadCallsFromTime(double time); // time in seconds
-			double getTimeFromNumOfThreadCalls(int numOfThreadCalls); // time in seconds
+			// time in seconds
+			int getNumOfThreadCallsFromTime(iCub::plantIdentification::MyThread whichThread,double time);
+			double getTimeFromNumOfThreadCalls(iCub::plantIdentification::MyThread whichThread,int numOfTaskThreadCalls);
 
 		};
 
@@ -162,7 +164,7 @@ namespace iCub {
 				RampTaskData rampData;
 				ApproachTaskData approachData;
 				
-				TaskData(yarp::os::ResourceFinder &rf,int threadRate,iCub::plantIdentification::ControllersUtil *controllersUtil);
+				TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::ControllersUtil *controllersUtil);
 
 				std::string getValueDescription(iCub::plantIdentification::RPCSetCmdArgName cmdName);
 		

@@ -1,4 +1,5 @@
 #include "iCub/plantIdentification/thread/TaskThread.h"
+
 #include "iCub/plantIdentification/task/StepTask.h"
 #include "iCub/plantIdentification/task/ControlTask.h"
 #include "iCub/plantIdentification/task/ApproachTask.h"
@@ -32,7 +33,6 @@ using iCub::plantIdentification::RPCViewCmdArgName;
 using iCub::plantIdentification::RPCCommandsData;
 using iCub::plantIdentification::ControllersUtil;
 using iCub::plantIdentification::PortsUtil;
-using iCub::plantIdentification::EventsUtil;
 using iCub::plantIdentification::TaskData;
 
 
@@ -42,13 +42,12 @@ using yarp::os::Value;
 
 /* *********************************************************************************************************************** */
 /* ******* Constructor                                                      ********************************************** */   
-TaskThread::TaskThread(const int period, const yarp::os::ResourceFinder &aRf,ControllersUtil *controllersUtil,PortsUtil *portsUtil,EventsUtil *eventsUtil,TaskData *taskData) 
+TaskThread::TaskThread(const int period, const yarp::os::ResourceFinder &aRf,ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskData *taskData) 
     : RateThread(period) {
 		this->period = period;
         rf = aRf;
 		this->controllersUtil = controllersUtil;
 		this->portsUtil = portsUtil;
-		this->eventsUtil = eventsUtil;
 		this->taskData = taskData;
 		
         dbgTag = "TaskThread: ";
@@ -425,16 +424,3 @@ void TaskThread::testShowEndEffectors(){
 
 }
 
-bool TaskThread::eventTriggered(EventToTrigger eventToTrigger,int index = 0){
-
-	switch(eventToTrigger){
-
-	case FINGERTIP_PUSHED:
-
-		return eventsUtil->eventFPTriggered(index);
-		break;
-
-	}
-
-	return false;
-}

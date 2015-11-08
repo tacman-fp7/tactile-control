@@ -52,7 +52,7 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	kpNe.resize(jointsList.size());
 	previousError.resize(jointsList.size());
 
-    double threadRateSec = commonData->threadRate/1000.0;
+    double taskThreadPeriodSec = commonData->taskThreadPeriod/1000.0;
 	std::vector<double> ttPeOption,ttNeOption;
 	ttPeOption.resize(jointsList.size());
 	ttNeOption.resize(jointsList.size());
@@ -137,19 +137,19 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 		switch (controlData->controlMode){
 
 			case GAINS_SET_POS_ERR:
-				pid[i] = new parallelPID(threadRateSec,kpPeOptionVect[i],kiPeOptionVect[i],kdPeOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttPeOptionVect[i],satLimMatrix);
+				pid[i] = new parallelPID(taskThreadPeriodSec,kpPeOptionVect[i],kiPeOptionVect[i],kdPeOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttPeOptionVect[i],satLimMatrix);
 				pid[i]->setOptions(pidOptionsPE[i]);
 				currentKp[i] = kpPe[i];
 				break;
 
 			case GAINS_SET_NEG_ERR:
-				pid[i] = new parallelPID(threadRateSec,kpNeOptionVect[i],kiNeOptionVect[i],kdNeOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttNeOptionVect[i],satLimMatrix);
+				pid[i] = new parallelPID(taskThreadPeriodSec,kpNeOptionVect[i],kiNeOptionVect[i],kdNeOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttNeOptionVect[i],satLimMatrix);
 				pid[i]->setOptions(pidOptionsNE[i]);
 				currentKp[i] = kpNe[i];
 				break;
 
 			case BOTH_GAINS_SETS:
-				pid[i] = new parallelPID(threadRateSec,kpPeOptionVect[i],kiPeOptionVect[i],kdPeOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttPeOptionVect[i],satLimMatrix);
+				pid[i] = new parallelPID(taskThreadPeriodSec,kpPeOptionVect[i],kiPeOptionVect[i],kdPeOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttPeOptionVect[i],satLimMatrix);
 				pid[i]->setOptions(pidOptionsPE[i]);
 				currentKp[i] = kpPe[i];
 				break;
@@ -179,7 +179,7 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	addOption(svPidOptions,"Ki",Value(svKi));
 	addOption(svPidOptions,"Kd",Value(svKd));
 	addOption(svPidOptions,"Tt",Value(ttSvOptionVect[0]));
-	svPid = new parallelPID(threadRateSec,kpSvOptionVect,kiSvOptionVect,kdSvOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttSvOptionVect,pvSatLimMatrix);
+	svPid = new parallelPID(taskThreadPeriodSec,kpSvOptionVect,kiSvOptionVect,kdSvOptionVect,wpOptionVect,wiOptionVect,wdOptionVect,nOptionVect,ttSvOptionVect,pvSatLimMatrix);
 	svPid->setOptions(svPidOptions);
 	
 	// create the neural network and configure it
@@ -200,7 +200,7 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	minJerkTrackingModeEnabled = false;
 
 	// initialize the minimum jerk trajectory class 
-	minJerkTrajectory = new minJerkTrajGen(1,commonData->threadRate/1000.0,4); //(dimensions,sample time in seconds, trajectory reference time)
+	minJerkTrajectory = new minJerkTrajGen(1,commonData->taskThreadPeriod/1000.0,4); //(dimensions,sample time in seconds, trajectory reference time)
 
     disablePIDIntegralGain = (commonData->tpInt(40) != 0);
 
@@ -328,14 +328,14 @@ void ControlTask::calculateControlInput(){
 
 			if (commonData->tpInt(18) == 1){
 				double halfStep = commonData->tpDbl(19);
-				int div = (int)((callsNumber*commonData->threadRate/1000.0)/commonData->tpDbl(20));
+				int div = (int)((callsNumber*commonData->taskThreadPeriod/1000.0)/commonData->tpDbl(20));
 				if (div%2 == 1){
 					finalTargetPose = waveMean + halfStep;
 				} else {
 					finalTargetPose = waveMean - halfStep;
 				}
 			} else if (commonData->tpInt(18) == 2){
-				int numCallsPerPeriod = (int)(2*(commonData->tpDbl(20)/(commonData->threadRate/1000.0)));
+				int numCallsPerPeriod = (int)(2*(commonData->tpDbl(20)/(commonData->taskThreadPeriod/1000.0)));
 				int callsNumberMod = callsNumber%numCallsPerPeriod;
 				double ratio = (1.0*callsNumberMod)/numCallsPerPeriod;
 				finalTargetPose = waveMean + commonData->tpDbl(19) * sin(ratio*2*3.14159265);
@@ -358,7 +358,7 @@ void ControlTask::calculateControlInput(){
             double d = fabs(trajectoryFinalPose - trajectoryInitialPose);
             double v = svTrackerVel;
             double a = svTrackerAcc;
-            double t = (callsNumber-trajectoryInitialTime)*commonData->threadRate/1000.0;
+            double t = (callsNumber-trajectoryInitialTime)*commonData->taskThreadPeriod/1000.0;
             double s;
 
             if (d == 0){
@@ -471,14 +471,14 @@ void ControlTask::calculateControlInput(){
 
 			if (commonData->tpInt(22) == 1){
 				double halfStep = commonData->tpDbl(23);
-				int div = (int)((callsNumber*commonData->threadRate/1000.0)/commonData->tpDbl(24));
+				int div = (int)((callsNumber*commonData->taskThreadPeriod/1000.0)/commonData->tpDbl(24));
 				if (div%2 == 1){
 					gripStrength = waveMean + halfStep;
 				} else {
 					gripStrength = waveMean - halfStep;
 				}
 			} else if (commonData->tpInt(22) == 2){
-				int numCallsPerPeriod = (int)(2*(commonData->tpDbl(24)/(commonData->threadRate/1000.0)));
+				int numCallsPerPeriod = (int)(2*(commonData->tpDbl(24)/(commonData->taskThreadPeriod/1000.0)));
 				int callsNumberMod = callsNumber%numCallsPerPeriod;
 				double ratio = (1.0*callsNumberMod)/numCallsPerPeriod;
 				gripStrength = waveMean + commonData->tpDbl(23) * sin(ratio*2*3.14159265);
@@ -531,7 +531,7 @@ void ControlTask::calculateControlInput(){
 	// square wave generator, it overrides what done by the supervisor, if active
 	if (commonData->tpInt(11) != 0){
 		double halfStep = commonData->tpDbl(12);
-		int div = (int)((callsNumber*commonData->threadRate/1000.0)/commonData->tpDbl(13));
+		int div = (int)((callsNumber*commonData->taskThreadPeriod/1000.0)/commonData->tpDbl(13));
 		if (div%2 == 1){
 			pressureTargetValue[0] = gripStrength + halfStep;
 		} else {

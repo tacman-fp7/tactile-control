@@ -1,9 +1,8 @@
 #include "iCub/plantIdentification/PlantIdentificationModule.h"
 
-#include "iCub/plantIdentification/util/ICubUtil.h"
-
 using iCub::plantIdentification::PlantIdentificationModule;
-using iCub::plantIdentification::ICubUtil;
+
+using iCub::plantIdentification::EventsThread;
 
 using std::cout;
 
@@ -30,7 +29,7 @@ PlantIdentificationModule::~PlantIdentificationModule() {}
 
 /* *********************************************************************************************************************** */
 /* ******* Get Period                                                       ********************************************** */   
-double PlantIdentificationModule::getPeriod() { return period; }
+double PlantIdentificationModule::getPeriod() { return moduleThreadPeriod/1000.0; }
 /* *********************************************************************************************************************** */
 
 
@@ -44,7 +43,7 @@ bool PlantIdentificationModule::configure(ResourceFinder &rf) {
 
     /* ****** Configure the Module                            ****** */
     moduleName = rf.check("name", Value("plantIdentification")).asString().c_str();
-    period = rf.check("period", 1.0).asDouble();
+    moduleThreadPeriod = rf.check("moduleThreadPeriod", 1000).asInt();
 
     /* ******* Open ports                                       ******* */
     portPlantIdentificationRPC.open("/plantIdentification/cmd:i");
@@ -66,21 +65,23 @@ bool PlantIdentificationModule::configure(ResourceFinder &rf) {
     }
 
 	// initialize task data
-	taskData = new TaskData(rf,period,controllersUtil);
-
-
-	// initialize events
-	eventsUtil = new EventsUtil(&taskData->commonData);
-	eventsUtil->init();
+	taskData = new TaskData(rf,controllersUtil);
  
 
     /* ******* Threads                                          ******* */
-	taskThread = new TaskThread(20, rf,controllersUtil,portsUtil,eventsUtil,taskData);
+	taskThread = new TaskThread(taskData->commonData.taskThreadPeriod,rf,controllersUtil,portsUtil,taskData);
     if (!taskThread->start()) {
         cout << dbgTag << "Could not start the task thread. \n";
         return false;
     }
     taskThread->suspend();
+
+	eventsThread = new EventsThread(taskData->commonData.eventsThreadPeriod,controllersUtil,portsUtil,&taskData->commonData);
+    if (!eventsThread->start()) {
+        cout << dbgTag << "Could not start the events thread. \n";
+        return false;
+    }
+    //eventsThread->suspend();
 
 	rpcCmdUtil.init(&rpcCmdData);
 
@@ -95,26 +96,22 @@ bool PlantIdentificationModule::configure(ResourceFinder &rf) {
 /* ******* Update    module                                                 ********************************************** */   
 bool PlantIdentificationModule::updateModule() { 
 
-	// update module data
-	ICubUtil::updateExternalData(controllersUtil,portsUtil,&taskData->commonData);
-
-	// check events
-	eventsUtil->checkEvents();
+	
 
 	// manage event triggers
-	if (taskThread->eventTriggered(FINGERTIP_PUSHED,3)){ // pinky
+	if (eventsThread->eventTriggered(FINGERTIP_PUSHED,3)){ // pinky
 		if (tasksRunning){
 			open();
 		} else {
 			grasp();
 		}
 	}
-	if (taskThread->eventTriggered(FINGERTIP_PUSHED,2)){ // ring finger
-		int positionTrackingMode = taskThread->taskData->commonData.tempParameters[18].asInt();
+	if (eventsThread->eventTriggered(FINGERTIP_PUSHED,2)){ // ring finger
+		int positionTrackingMode = taskData->commonData.tempParameters[18].asInt();
 		if (positionTrackingMode == 0){
-			taskThread->taskData->commonData.tempParameters[18] = Value(2);
+			taskData->commonData.tempParameters[18] = Value(2);
 		} else {
-			taskThread->taskData->commonData.tempParameters[18] = Value(0);
+			taskData->commonData.tempParameters[18] = Value(0);
 		}
 	}
 
@@ -188,9 +185,13 @@ bool PlantIdentificationModule::close() {
 	if (taskThread->isRunning()){
 		taskThread->suspend();
 	}
+	if (eventsThread->isRunning()){
+		eventsThread->suspend();
+	}
 
     // Stop thread
     taskThread->stop();
+    eventsThread->stop();
 
     // Close port
     portPlantIdentificationRPC.close();

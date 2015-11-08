@@ -22,7 +22,7 @@ RampTask::RampTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCom
 	internalState.resize(fingersList.size(),DECREASING);
 
 	callsNumberAfterStabilization = 0;
-	maxCallsNumberAfterStabilization = rampData->lifespanAfterStabilization*1000/commonData->threadRate;
+	maxCallsNumberAfterStabilization = rampData->lifespanAfterStabilization*1000/commonData->taskThreadPeriod;
 
 	taskName = RAMP;
 	dbgTag = "RampTask: ";
@@ -50,7 +50,7 @@ void RampTask::calculateControlInput(){
 	
 		case DECREASING:
 
-			inputCommandValue = rampData->intercept + rampData->slope*callsNumber*commonData->threadRate;
+			inputCommandValue = rampData->intercept + rampData->slope*callsNumber*commonData->taskThreadPeriod;
 
 			if (commonData->overallFingerPressureMedian[i] < pressureTargetValue[i]){
 				internalState[i] = STEADY;

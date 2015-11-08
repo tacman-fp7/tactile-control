@@ -1,4 +1,6 @@
-#include "iCub/plantIdentification/util/EventsUtil.h"
+#include "iCub/plantIdentification/thread/EventsThread.h"
+
+#include "iCub/plantIdentification/util/ICubUtil.h"
 
 #include <yarp/os/Network.h>
 #include <yarp/os/Value.h>
@@ -7,21 +9,30 @@ using std::string;
 
 using yarp::os::Value;
 
-using iCub::plantIdentification::EventsUtil;
+using iCub::plantIdentification::EventsThread;
+using iCub::plantIdentification::EventToTrigger;
+using iCub::plantIdentification::ICubUtil;
+using iCub::plantIdentification::ControllersUtil;
+using iCub::plantIdentification::PortsUtil;
 
-EventsUtil::EventsUtil(iCub::plantIdentification::TaskCommonData *commonData){
 
+EventsThread::EventsThread(int period,ControllersUtil *controllersUtil,PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData)
+	: RateThread(period){
+
+	this->period = period;
+	this->controllersUtil = controllersUtil;
+	this->portsUtil = portsUtil;
 	this->commonData = commonData;
 
-	dbgTag = "EventsUtil: ";
+	dbgTag = "EventsThread: ";
 }
 
-bool EventsUtil::init(){
+bool EventsThread::threadInit(){
 
 	// settings
-	fpWindowSize = commonData->getNumOfThreadCallsFromTime(commonData->tpDbl(41));
+	fpWindowSize = commonData->getNumOfThreadCallsFromTime(EVENTS_THREAD,commonData->tpDbl(41));
 	fpFinalCheckThreshold = commonData->tpDbl(42);
-	fpMinTimeBetweenActivations = commonData->getNumOfThreadCallsFromTime(commonData->tpDbl(43));
+	fpMinTimeBetweenActivations = commonData->getNumOfThreadCallsFromTime(EVENTS_THREAD,commonData->tpDbl(43));
 	fpEnabled = commonData->tpInt(44) != 0;
 
 	int nFingers = commonData->overallFingerPressureMedian.size();
@@ -36,9 +47,18 @@ bool EventsUtil::init(){
 	return true;
 }
 
-void EventsUtil::checkEvents(){
+void EventsThread::run(){
 
-	// EVENT FINGER PUSHED
+	// update module data
+	ICubUtil::updateExternalData(controllersUtil,portsUtil,commonData);
+
+	// check events
+	checkEvents();
+}
+
+
+void EventsThread::checkEvents(){
+	// EVENT: FINGER PUSHED
 	double tempPressureDifference;
 	int fpNextWindowIndex = (fpWindowIndex + 1)%fpWindowSize;
 
@@ -60,7 +80,7 @@ void EventsUtil::checkEvents(){
 }
 
 
-bool EventsUtil::eventFPTriggered(int whichFinger){
+bool EventsThread::eventFPTriggered(int whichFinger){
 
 
 	if (fpEventTriggered[whichFinger] == true){
@@ -73,3 +93,22 @@ bool EventsUtil::eventFPTriggered(int whichFinger){
 	return false;
 
 }
+
+bool EventsThread::eventTriggered(EventToTrigger eventToTrigger,int index = 0){
+
+	switch(eventToTrigger){
+
+	case FINGERTIP_PUSHED:
+
+		return eventFPTriggered(index);
+		break;
+
+	}
+
+	return false;
+}
+ 
+EventsThread::~EventsThread() {}
+
+void EventsThread::threadRelease() {}
+

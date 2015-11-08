@@ -104,6 +104,12 @@ namespace iCub {
 			FINGERTIP_PUSHED
 		};
 
+		enum MyThread {
+
+			TASK_THREAD,
+			EVENTS_THREAD
+		};
+
 	}
 }
 

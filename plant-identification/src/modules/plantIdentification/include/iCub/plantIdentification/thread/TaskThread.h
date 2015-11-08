@@ -7,7 +7,6 @@
 #include "iCub/plantIdentification/data/LogData.h"
 #include "iCub/plantIdentification/util/ControllersUtil.h"
 #include "iCub/plantIdentification/util/PortsUtil.h"
-#include "iCub/plantIdentification/util/EventsUtil.h"
 #include "iCub/plantIdentification/PlantIdentificationEnums.h"
 
 #include <yarp/os/RateThread.h>
@@ -42,9 +41,6 @@ namespace iCub {
 				/* ****** Ports utility                                 ****** */
 				iCub::plantIdentification::PortsUtil *portsUtil;
 
-				/* ****** Events utility                                 ****** */
-				iCub::plantIdentification::EventsUtil *eventsUtil;
-
                 /* ****** Debug attributes                              ****** */
                 std::string dbgTag;
 
@@ -54,7 +50,7 @@ namespace iCub {
 				/* ****** Task data										****** */
 				iCub::plantIdentification::TaskData *taskData;
 
-                TaskThread(const int aPeriod, const yarp::os::ResourceFinder &aRf,iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::EventsUtil *eventsUtil,iCub::plantIdentification::TaskData *taskData);
+                TaskThread(const int period, const yarp::os::ResourceFinder &aRf,iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskData *taskData);
                 virtual ~TaskThread();
 
                 virtual bool threadInit();
@@ -72,7 +68,6 @@ namespace iCub {
 				void help(iCub::plantIdentification::RPCCommandsData &rpcCmdData);
 
                 void testShowEndEffectors();
-				bool eventTriggered(EventToTrigger eventToTrigger,int index);
         };
     }
 }

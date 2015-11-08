@@ -10,6 +10,7 @@ using yarp::os::Value;
 
 using iCub::plantIdentification::TaskData;
 using iCub::plantIdentification::TaskCommonData;
+using iCub::plantIdentification::MyThread;
 
 
 int TaskCommonData::tpInt(int index){
@@ -33,23 +34,51 @@ std::string TaskCommonData::tpStr(int index){
 	return "";
 }
 
-int TaskCommonData::getNumOfThreadCallsFromTime(double time){
+int TaskCommonData::getNumOfThreadCallsFromTime(MyThread whichThread,double time){
 
-	return (int)(time*1000.0/threadRate);
+	int threadPeriod;
+
+	switch(whichThread){
+
+	case TASK_THREAD:
+		threadPeriod = taskThreadPeriod;
+		break;
+	case EVENTS_THREAD:
+		threadPeriod = eventsThreadPeriod;
+		break;
+	}
+
+	return (int)(time*1000.0/threadPeriod);
+
 }
-
-double TaskCommonData::getTimeFromNumOfThreadCalls(int numOfThreadExecutions){
+double TaskCommonData::getTimeFromNumOfThreadCalls(MyThread whichThread,int numOfThreadCalls){
 	
-	return numOfThreadExecutions*threadRate/1000.0;
+	int threadPeriod;
+
+	switch(whichThread){
+
+	case TASK_THREAD:
+		threadPeriod = taskThreadPeriod;
+		break;
+	case EVENTS_THREAD:
+		threadPeriod = eventsThreadPeriod;
+		break;
+	}
+
+	return numOfThreadCalls*threadPeriod/1000.0;
+
 }
 
-TaskData::TaskData(yarp::os::ResourceFinder &rf,int threadRate,iCub::plantIdentification::ControllersUtil *controllersUtil) {
+
+
+TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::ControllersUtil *controllersUtil) {
 	using iCub::plantIdentification::ControlTaskOpMode;
 	using yarp::os::Bottle;
 
 	dbgTag = "TaskData: ";
 
-	commonData.threadRate = threadRate;
+	commonData.taskThreadPeriod = rf.check("taskThreadPeriod", 20).asInt();
+	commonData.eventsThreadPeriod = rf.check("eventsThreadPeriod", 15).asInt();
 
 	// load data from resource file
 	commonData.pwmSign = rf.check("pwmSign",Value(1)).asInt();
