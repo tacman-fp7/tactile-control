@@ -73,10 +73,7 @@ bool PlantIdentificationModule::updateModule() {
 		if (tasksRunning){
 			open();
 		} else {
-			task(EMPTY,NONE,Value(0));
-			task(ADD,APPROACH,Value(0));
-			task(ADD,CONTROL,Value(0));
-			start();
+			grasp();
 		}
 	}
 	if (taskThread->eventTriggered(FINGERTIP_PUSHED,2)){ // ring finger
@@ -139,6 +136,9 @@ bool PlantIdentificationModule::respond(const yarp::os::Bottle& command, yarp::o
 		break;
 	case ARM:
 		arm();
+		break;
+	case GRASP:
+		grasp();
 		break;
 	case QUIT:
         quit();
@@ -218,6 +218,20 @@ bool PlantIdentificationModule::start() {
 bool PlantIdentificationModule::arm() {
 
 	return taskThread->setArmInTaskPosition();
+}
+/* *********************************************************************************************************************** */
+
+
+/* *********************************************************************************************************************** */
+/* ******* RPC Execute the grasp task                                       ********************************************** */
+bool PlantIdentificationModule::grasp() {
+
+	task(EMPTY,NONE,Value(0));
+	task(ADD,APPROACH,Value(0));
+	task(ADD,CONTROL,Value(0));
+	start();
+
+	return true;
 }
 /* *********************************************************************************************************************** */
 

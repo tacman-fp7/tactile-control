@@ -14,6 +14,7 @@ namespace iCub {
 			STOP,
 			OPEN,
 			ARM,
+			GRASP,
 			QUIT
 		};
 

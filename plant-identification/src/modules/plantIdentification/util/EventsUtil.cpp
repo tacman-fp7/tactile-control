@@ -22,6 +22,7 @@ bool EventsUtil::init(){
 	fpWindowSize = commonData->getNumOfThreadCallsFromTime(commonData->tpInt(41));
 	fpFinalCheckThreshold = commonData->tpDbl(42);
 	fpMinTimeBetweenActivations = commonData->getNumOfThreadCallsFromTime(commonData->tpInt(43));
+	fpEnabled = commonData->tpInt(44) != 0;
 
 	int nFingers = commonData->overallFingerPressureMedian.size();
 	fpWindowIndex = 0;
@@ -37,6 +38,8 @@ bool EventsUtil::init(){
 
 void EventsUtil::checkEvents(){
 
+
+	// EVENT FINGER PUSHED
 	double tempPressureDifference;
 	int fpNextWindowIndex = (fpWindowIndex + 1)%fpWindowSize;
 
@@ -60,12 +63,14 @@ void EventsUtil::checkEvents(){
 
 bool EventsUtil::eventFPTriggered(int whichFinger){
 
+
 	if (fpEventTriggered[whichFinger] == true){
 		fpEventTriggered[whichFinger] = false;
 		fpTimeFromLastEventReset[whichFinger] = 0;
-		return true;
+		if (fpEnabled){ // if finger pushed event is not enabled, it is triggered anyway, but it cannot be used by any function
+			return true;
+		}
 	}
-
 	return false;
 
 }

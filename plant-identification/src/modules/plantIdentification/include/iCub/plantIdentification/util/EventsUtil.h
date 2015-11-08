@@ -24,6 +24,7 @@ namespace iCub {
 				int fpMinTimeBetweenActivations;
 				std::vector<std::vector<double> > fpPressureMemory;
 				std::vector<bool> fpEventTriggered;
+				bool fpEnabled;
 
                 /* ******* Debug attributes.                ******* */
                 std::string dbgTag;
