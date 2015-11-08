@@ -46,6 +46,7 @@ namespace iCub {
 				double storedPIDIntegralGain;
 
                 bool graspEnabled;
+				bool headEnabled;
 
 				/* ****** Debug attributes                              ****** */
                 std::string dbgTag;

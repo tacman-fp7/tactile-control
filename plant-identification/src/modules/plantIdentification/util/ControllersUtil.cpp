@@ -32,6 +32,7 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
 	
 	string robotName = rf.check("robot", Value("icub"), "The robot name.").asString().c_str();
     string whichHand = rf.check("whichHand", Value("right"), "The hand to be used for the grasping.").asString().c_str();
+	headEnabled = rf.check("headEnabled",Value(0)).asInt() != 0;
 
 	 /* ******* Joint interfaces                     ******* */
     string arm = whichHand + "_arm";
@@ -89,43 +90,44 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
     }
     iPos->setRefSpeeds(&refSpeeds[0]);
 
+	if (headEnabled){
 
-
-	Property gazeCtrlOptions;
-	gazeCtrlOptions.put("device","gazecontrollerclient");
-	gazeCtrlOptions.put("remote","/iKinGazeCtrl");
-	gazeCtrlOptions.put("local","/plantIdentification/gaze");
+		Property gazeCtrlOptions;
+		gazeCtrlOptions.put("device","gazecontrollerclient");
+		gazeCtrlOptions.put("remote","/iKinGazeCtrl");
+		gazeCtrlOptions.put("local","/plantIdentification/gaze");
  
-    if (!clientGazeCtrl.open(gazeCtrlOptions)) {
-        cout << dbgTag << "could not open gaze controller driver\n";
-		return false;
-    }
+		if (!clientGazeCtrl.open(gazeCtrlOptions)) {
+			cout << dbgTag << "could not open gaze controller driver\n";
+			return false;
+		}
 	
-	clientGazeCtrl.view(iGaze);
-    if (!iGaze) {
-		cout << dbgTag << "could not open gaze controller interface\n";
-        return false;
-    }
+		clientGazeCtrl.view(iGaze);
+		if (!iGaze) {
+			cout << dbgTag << "could not open gaze controller interface\n";
+			return false;
+		}
 
-	// store fixation point
-	iGaze->getFixationPoint(storedFixationPoint);
+		// store fixation point
+		iGaze->getFixationPoint(storedFixationPoint);
 
 
 	   
-	Property cartCtrlOptions;
-    cartCtrlOptions.put("device","cartesiancontrollerclient");
-    cartCtrlOptions.put("remote","/" + robotName + "/cartesianController/" + arm);
-    cartCtrlOptions.put("local","/plantIdentification/cartContr/" + arm);
+		Property cartCtrlOptions;
+		cartCtrlOptions.put("device","cartesiancontrollerclient");
+		cartCtrlOptions.put("remote","/" + robotName + "/cartesianController/" + arm);
+		cartCtrlOptions.put("local","/plantIdentification/cartContr/" + arm);
     
-    clientArmCartCtrl.open(cartCtrlOptions);
+		clientArmCartCtrl.open(cartCtrlOptions);
 
-    if (clientArmCartCtrl.isValid()) {
-       clientArmCartCtrl.view(iCart);
-    }
-    if (!iCart) {
-		cout << dbgTag << "could not open cartesian controller interface\n";
-    }
+		if (clientArmCartCtrl.isValid()) {
+		   clientArmCartCtrl.view(iCart);
+		}
+		if (!iCart) {
+			cout << dbgTag << "could not open cartesian controller interface\n";
+		}
 
+	}
 	return true;
 }
 
@@ -773,21 +775,26 @@ bool ControllersUtil::restorePIDIntegralGain(double joint){
 
 bool ControllersUtil::lookAtTheHand(){
 
-	yarp::sig::Vector handPosition,handOrientation;
-    handPosition.resize(3);
-    handOrientation.resize(4);
+	if (iCart && iGaze){
 
-    iCart->getPose(handPosition,handOrientation);
+		yarp::sig::Vector handPosition,handOrientation;
+		handPosition.resize(3);
+		handOrientation.resize(4);
 
-	iGaze->lookAtFixationPoint(handPosition);
-	//iGaze->waitMotionDone();
+		iCart->getPose(handPosition,handOrientation);
 
+		iGaze->lookAtFixationPoint(handPosition);
+		//iGaze->waitMotionDone();
+
+	}
 	return true;
 }
 
 bool ControllersUtil::restoreFixationPoint(){
 
-	iGaze->lookAtFixationPoint(storedFixationPoint);
+	if (iGaze) {
+		iGaze->lookAtFixationPoint(storedFixationPoint);
+	}
 
 	return true;
 }

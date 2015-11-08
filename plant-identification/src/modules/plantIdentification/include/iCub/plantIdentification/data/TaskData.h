@@ -73,6 +73,10 @@ namespace iCub {
 			*	38: approach seconds for movement timeout (valid for stop condition by position)
 			*	39: approach stop-fingers mode off/on [0/1] (fingers are stopped when in contact with the object)
 			*   40: grasp task: disable PID integral gain from joint 8. no/yes [0/1]
+			*   41: finger push event: time window in seconds
+			*   42: finger push event: pressure increase threshold
+			*   43: finger push event: min time (in seconds) between event triggers
+			*   44: head enabled. no/yes [0/1]
             *
 			*   Note: double values have to contain a dot, while strings have to start with '#'
 			*
@@ -88,6 +92,9 @@ namespace iCub {
 			double tpDbl(int index);
 
 			std::string tpStr(int index);
+
+			int getNumOfThreadCallsFromTime(double time); // time in seconds
+			double getTimeFromNumOfThreadCalls(int numOfThreadCalls); // time in seconds
 
 		};
 

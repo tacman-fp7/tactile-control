@@ -22,7 +22,7 @@ namespace iCub {
 				double fpFinalCheckThreshold;
 				std::vector<int> fpTimeFromLastEventReset;
 				int fpMinTimeBetweenActivations;
-				std::vector<std::vector<double>> fpPressureMemory;
+				std::vector<std::vector<double> > fpPressureMemory;
 				std::vector<bool> fpEventTriggered;
 
                 /* ******* Debug attributes.                ******* */

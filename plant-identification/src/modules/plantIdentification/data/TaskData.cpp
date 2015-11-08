@@ -33,6 +33,16 @@ std::string TaskCommonData::tpStr(int index){
 	return "";
 }
 
+int TaskCommonData::getNumOfThreadCallsFromTime(double time){
+
+	return (int)(time*1000.0/threadRate);
+}
+
+double TaskCommonData::getTimeFromNumOfThreadCalls(int numOfThreadExecutions){
+	
+	return numOfThreadExecutions*threadRate/1000.0;
+}
+
 TaskData::TaskData(yarp::os::ResourceFinder &rf,int threadRate,iCub::plantIdentification::ControllersUtil *controllersUtil) {
 	using iCub::plantIdentification::ControlTaskOpMode;
 	using yarp::os::Bottle;
