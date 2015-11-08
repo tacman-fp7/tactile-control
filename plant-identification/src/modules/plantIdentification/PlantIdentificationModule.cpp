@@ -69,6 +69,7 @@ bool PlantIdentificationModule::configure(ResourceFinder &rf) {
 bool PlantIdentificationModule::updateModule() { 
 
 	// check events
+
 	if (taskThread->eventTriggered(FINGERTIP_PUSHED,3)){ // pinky
 		if (tasksRunning){
 			open();
@@ -84,7 +85,6 @@ bool PlantIdentificationModule::updateModule() {
 			taskThread->taskData->commonData.tempParameters[18] = Value(0);
 		}
 	}
-
 
     return !closing; 
 }

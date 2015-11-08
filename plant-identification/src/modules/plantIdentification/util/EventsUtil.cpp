@@ -19,9 +19,9 @@ EventsUtil::EventsUtil(iCub::plantIdentification::TaskCommonData *commonData){
 bool EventsUtil::init(){
 
 	// settings
-	fpWindowSize = commonData->getNumOfThreadCallsFromTime(commonData->tpInt(41));
+	fpWindowSize = commonData->getNumOfThreadCallsFromTime(commonData->tpDbl(41));
 	fpFinalCheckThreshold = commonData->tpDbl(42);
-	fpMinTimeBetweenActivations = commonData->getNumOfThreadCallsFromTime(commonData->tpInt(43));
+	fpMinTimeBetweenActivations = commonData->getNumOfThreadCallsFromTime(commonData->tpDbl(43));
 	fpEnabled = commonData->tpInt(44) != 0;
 
 	int nFingers = commonData->overallFingerPressureMedian.size();
@@ -38,7 +38,6 @@ bool EventsUtil::init(){
 
 void EventsUtil::checkEvents(){
 
-
 	// EVENT FINGER PUSHED
 	double tempPressureDifference;
 	int fpNextWindowIndex = (fpWindowIndex + 1)%fpWindowSize;
@@ -47,7 +46,7 @@ void EventsUtil::checkEvents(){
 			
 		fpPressureMemory[i][fpWindowIndex] = commonData->overallFingerPressureMedian[i];
 		tempPressureDifference = fpPressureMemory[i][fpWindowIndex] - fpPressureMemory[i][fpNextWindowIndex];
-
+        if (i ==3) std::cout << tempPressureDifference << " / " << fpFinalCheckThreshold << "\n";
 		if (fpEventTriggered[i] == false && (fpTimeFromLastEventReset[i] > fpMinTimeBetweenActivations || fpTimeFromLastEventReset[i] == -1) && tempPressureDifference > fpFinalCheckThreshold){
 			fpEventTriggered[i] = true;
 			std::cout << "\n\n\n<<< EVENT TRIGGERED: FINGER " << i << " PUSHED >>>\n\n\n";

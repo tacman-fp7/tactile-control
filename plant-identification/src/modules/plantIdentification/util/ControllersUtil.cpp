@@ -747,12 +747,12 @@ void ControllersUtil::testShowEndEffectors(){
 bool ControllersUtil::resetPIDIntegralGain(double joint){
 
 	yarp::dev::Pid pid;
-	std::cout << "resetting\n";
+	//std::cout << "resetting\n";
 	if (iPid->getPid(joint,&pid)){
 		storedPIDIntegralGain = pid.ki;
-		std::cout << "old ki " << pid.ki << "\n";
+		//std::cout << "old ki " << pid.ki << "\n";
 		pid.setKi(0);
-		std::cout << "new ki " << pid.ki << "\n";
+		//std::cout << "new ki " << pid.ki << "\n";
 		iPid->setPid(joint,pid);
 		return true;
 	}
@@ -762,11 +762,11 @@ bool ControllersUtil::resetPIDIntegralGain(double joint){
 bool ControllersUtil::restorePIDIntegralGain(double joint){
 
 	yarp::dev::Pid pid;
-	std::cout << "restoring\n";
+	//std::cout << "restoring\n";
 	if (iPid->getPid(joint,&pid)){
-		std::cout << "old ki " << pid.ki << "\n";
+		//std::cout << "old ki " << pid.ki << "\n";
 		pid.setKi(storedPIDIntegralGain);
-		std::cout << "stored: " << storedPIDIntegralGain << "  new ki " << pid.ki << "\n";
+		//std::cout << "stored: " << storedPIDIntegralGain << "  new ki " << pid.ki << "\n";
 		iPid->setPid(joint,pid);
 		return true;
 	}
@@ -775,7 +775,7 @@ bool ControllersUtil::restorePIDIntegralGain(double joint){
 
 bool ControllersUtil::lookAtTheHand(){
 
-	if (iCart && iGaze){
+	if (headEnabled){
 
 		yarp::sig::Vector handPosition,handOrientation;
 		handPosition.resize(3);
@@ -792,7 +792,7 @@ bool ControllersUtil::lookAtTheHand(){
 
 bool ControllersUtil::restoreFixationPoint(){
 
-	if (iGaze) {
+	if (headEnabled) {
 		iGaze->lookAtFixationPoint(storedFixationPoint);
 	}
 
