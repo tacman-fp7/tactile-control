@@ -110,8 +110,10 @@ bool PlantIdentificationModule::updateModule() {
 		int positionTrackingMode = taskData->commonData.tempParameters[18].asInt();
 		if (positionTrackingMode == 0){
 			taskData->commonData.tempParameters[18] = Value(2);
+			taskData->commonData.tempParameters[29] = Value(0);
 		} else {
 			taskData->commonData.tempParameters[18] = Value(0);
+			taskData->commonData.tempParameters[29] = Value(1);
 		}
 	}
 

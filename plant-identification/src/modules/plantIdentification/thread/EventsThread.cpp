@@ -33,7 +33,6 @@ bool EventsThread::threadInit(){
 	fpWindowSize = commonData->getNumOfThreadCallsFromTime(EVENTS_THREAD,commonData->tpDbl(41));
 	fpFinalCheckThreshold = commonData->tpDbl(42);
 	fpMinTimeBetweenActivations = commonData->getNumOfThreadCallsFromTime(EVENTS_THREAD,commonData->tpDbl(43));
-	fpEnabled = commonData->tpInt(44) != 0;
 
 	int nFingers = commonData->overallFingerPressureMedian.size();
 	fpWindowIndex = 0;
@@ -66,10 +65,10 @@ void EventsThread::checkEvents(){
 			
 		fpPressureMemory[i][fpWindowIndex] = commonData->overallFingerPressureMedian[i];
 		tempPressureDifference = fpPressureMemory[i][fpWindowIndex] - fpPressureMemory[i][fpNextWindowIndex];
-        if (i ==3) std::cout << tempPressureDifference << " / " << fpFinalCheckThreshold << "\n";
+        //if (i ==3) std::cout << tempPressureDifference << " / " << fpFinalCheckThreshold << "\n";
 		if (fpEventTriggered[i] == false && (fpTimeFromLastEventReset[i] > fpMinTimeBetweenActivations || fpTimeFromLastEventReset[i] == -1) && tempPressureDifference > fpFinalCheckThreshold){
 			fpEventTriggered[i] = true;
-			std::cout << "\n\n\n<<< EVENT TRIGGERED: FINGER " << i << " PUSHED >>>\n\n\n";
+			//std::cout << "\n\n\n<<< EVENT TRIGGERED: FINGER " << i << " PUSHED >>>\n\n\n";
 		} 
 
 		fpTimeFromLastEventReset[i]++;
@@ -82,6 +81,7 @@ void EventsThread::checkEvents(){
 
 bool EventsThread::eventFPTriggered(int whichFinger){
 
+    bool fpEnabled = commonData->tpInt(44) != 0;
 
 	if (fpEventTriggered[whichFinger] == true){
 		fpEventTriggered[whichFinger] = false;

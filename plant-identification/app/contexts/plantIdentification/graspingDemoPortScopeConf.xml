@@ -6,9 +6,9 @@
           vspan="1"
           title="Hand Position"
           size="201"
-          minval="-25"
-          maxval="25"
-          bgcolor="LightGrey">
+          minval="-20"
+          maxval="20"
+          bgcolor="#EEFFEE">
         <graph remote="/plantIdentification/control"
                index="8"
                color="Red"
@@ -30,7 +30,7 @@
           size="201"
           minval="-5"
           maxval="130"
-          bgcolor="LightGrey">
+          bgcolor="#FFEEEE">
         <graph remote="/plantIdentification/control"
                index="4"
                color="Red"
@@ -38,7 +38,7 @@
                type="lines"
                size="1" />
         <graph remote="/plantIdentification/control"
-               index="10"
+               index="5"
                color="Blue"
                title="Actual Grip Strength"
                type="lines"
