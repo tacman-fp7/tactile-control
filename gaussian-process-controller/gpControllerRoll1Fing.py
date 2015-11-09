@@ -8,7 +8,7 @@ import matplotlib.pylab
 import random
 import os
 import sys
-import find_lines as find_lines
+#import  as find_lines
 
 def exitModule(resetProbability):
     randomNum = random.random()
@@ -221,7 +221,7 @@ def main():
         oldVoltage = [0,0]
         realVoltage = [0,0]
         readImage(cameraPort,yarp_image)
-        currentFbAngle = getFeedbackAngle(yarp_image,img_array)
+#        currentFbAngle = getFeedbackAngle(yarp_image,img_array)
         # main loop
         while iterCounter < maxIterations[rolloutsCounter%10] and not exit:
 
@@ -276,16 +276,16 @@ def main():
                 iCubI.openLoopCommand(distalJoint,realVoltage[1])
 
             # get feedback angle
-            previousFbAngle = currentFbAngle
+#            previousFbAngle = currentFbAngle
             beforeTS = time.time()
            # if rolloutsCounter == 0 and iterCounter < 50:
            # matplotlib.image.imsave('images/test_'+ str(rolloutsCounter) + '_' + str(iterCounter) +'.tiff', img_array, format='tiff')
-            currentFbAngle = getFeedbackAngle(yarp_image,img_array)
-            fbAngleDifference = calculateFeedbackAngleDifference(previousFbAngle,currentFbAngle,fbAngleRange)
-            if abs(fbAngleDifference) > maxFbAngleDifference:
-                currentFbAngle = previousFbAngle
-                fbAngleDifference = 0.0
-            print fbAngleDifference
+#            currentFbAngle = getFeedbackAngle(yarp_image,img_array)
+#            fbAngleDifference = calculateFeedbackAngleDifference(previousFbAngle,currentFbAngle,fbAngleRange)
+#            if abs(fbAngleDifference) > maxFbAngleDifference:
+#                currentFbAngle = previousFbAngle
+#                fbAngleDifference = 0.0
+#            print fbAngleDifference
             afterTS = time.time()
             timeToSleep = max(actionDuration-(afterTS-beforeTS),0)
             time.sleep(timeToSleep)
@@ -303,6 +303,7 @@ def main():
             logArray(encodersData,fd)
             logArray(oldVoltage,fd)
             logArray(action,fd)
+            fbAngleDifference = 0; # TODO TO REMOVE
             logArray([fbAngleDifference],fd)
             fd.write("\n")
 
