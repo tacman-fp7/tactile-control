@@ -121,13 +121,11 @@ bool ObjectGraspingModule::updateModule() {
 		
 //        sendCommand("set ki_pe",configData->pidKi);
 
-		sendCommand("task empty");
-		
-        sendCommand("task add appr");
-
-        sendCommand("task add ctrl",configData->targetPressure);
-
-		sendCommand("start");
+		sendCommand("grasp");
+//		sendCommand("task empty");
+//      sendCommand("task add appr");
+//      sendCommand("task add ctrl",configData->targetPressure);
+//		sendCommand("start");
 		
 		taskState = WAIT_FOR_GRASP_THREAD;
 		break;

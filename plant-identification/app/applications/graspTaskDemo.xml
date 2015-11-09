@@ -10,7 +10,7 @@
 
      <module>
          <name>objectGrasping</name>
-         <parameters>--whichHand left</parameters>
+         <parameters>--whichHand left --cartesianMode 1</parameters>
          <node>icub14</node>
          <tag>graspingDemo</tag>
      </module>
