@@ -45,7 +45,7 @@ namespace iCub {
 				//TODO TEMPORARY WORKAROUND
 				double storedPIDIntegralGain;
 
-                bool graspEnabled;
+                std::string whichHand;
 				bool headEnabled;
 
 				/* ****** Debug attributes                              ****** */

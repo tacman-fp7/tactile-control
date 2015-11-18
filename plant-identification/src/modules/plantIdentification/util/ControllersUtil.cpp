@@ -17,8 +17,6 @@ using yarp::os::Property;
 
 ControllersUtil::ControllersUtil(){
 
-    graspEnabled = false;
-
 	dbgTag = "ControllersUtil: ";
 }
 
@@ -31,7 +29,7 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
 	storedHandJointsMaxPwmLimits.resize(8);
 	
 	string robotName = rf.check("robot", Value("icub"), "The robot name.").asString().c_str();
-    string whichHand = rf.check("whichHand", Value("right"), "The hand to be used for the grasping.").asString().c_str();
+    whichHand = rf.check("whichHand", Value("right"), "The hand to be used for the grasping.").asString().c_str();
 	headEnabled = rf.check("headEnabled",Value(0)).asInt() != 0;
 
 	 /* ******* Joint interfaces                     ******* */
@@ -241,50 +239,30 @@ bool ControllersUtil::setArmInTaskPosition() {
     
 	iVel->stop();
 
-    // Set the arm in the starting position
-    if (graspEnabled){
-	    // Arm
-//	    iPos->positionMove(0 ,-30);
-//        iPos->positionMove(1 , 30);
-//        iPos->positionMove(2 , 0);
-//        iPos->positionMove(3 , 45);
-        
-        iPos->positionMove(4 , -14);// 0
-        iPos->positionMove(5 , 3);// 1
-        iPos->positionMove(6 , -20);// 1
-        iPos->positionMove(7 , 14);
-        
-	    // Hand
-        iPos->positionMove(8 , 79);
-        iPos->positionMove(9 , 2);
-        iPos->positionMove(10, 29);
-        iPos->positionMove(11, 0);
-        iPos->positionMove(12, 0);
-        iPos->positionMove(13, 25);
-        iPos->positionMove(14, 15);
-        iPos->positionMove(15, 1);
+    // Arm
+    iPos->positionMove(0 ,-35);
+    iPos->positionMove(1 , 29);
+    iPos->positionMove(2 , 21);
+    iPos->positionMove(3 , 33);
+    
+    iPos->positionMove(4 , -20);// 0
+    iPos->positionMove(5 , 2);// 1
+    iPos->positionMove(6 , -20);// 1
+    iPos->positionMove(7 , 12);
+    
+    // Hand
+    if (whichHand == "right"){
+        iPos->positionMove(8 , 38);    
     } else {
-	    // Arm
-	    iPos->positionMove(0 ,-35);
-        iPos->positionMove(1 , 29);
-        iPos->positionMove(2 , 21);
-        iPos->positionMove(3 , 33);
-        
-        iPos->positionMove(4 , -20);// 0
-        iPos->positionMove(5 , 2);// 1
-        iPos->positionMove(6 , -20);// 1
-        iPos->positionMove(7 , 12);
-        
-	    // Hand
         iPos->positionMove(8 , 72);
-        iPos->positionMove(9 , 3);
-        iPos->positionMove(10, 15);
-        iPos->positionMove(11, 2);
-        iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
-        iPos->positionMove(13, 3);
-        iPos->positionMove(14, 30);
-        iPos->positionMove(15, 1);
     }
+    iPos->positionMove(9 , 3);
+    iPos->positionMove(10, 15);
+    iPos->positionMove(11, 2);
+    iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
+    iPos->positionMove(13, 3);
+    iPos->positionMove(14, 30);
+    iPos->positionMove(15, 1);
 
     // Check motion done
     waitMoveDone(10, 1);
@@ -423,27 +401,18 @@ bool ControllersUtil::openHand() {
     
     iVel->stop();
 
-	// Hand
-    if (graspEnabled){
-        iPos->positionMove(8 , 79);
-        iPos->positionMove(9 , 2);
-        iPos->positionMove(10, 29);
-        iPos->positionMove(11, 0);
-        iPos->positionMove(12, 0);
-        iPos->positionMove(13, 25);
-        iPos->positionMove(14, 15);
-        iPos->positionMove(15, 1);
+    if (whichHand == "right"){
+        iPos->positionMove(8 , 38);    
     } else {
-
         iPos->positionMove(8 , 72);
-        iPos->positionMove(9 , 3);
-        iPos->positionMove(10, 15);
-        iPos->positionMove(11, 2);
-        iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
-        iPos->positionMove(13, 3);
-        iPos->positionMove(14, 30);
-        iPos->positionMove(15, 1);
     }
+    iPos->positionMove(9 , 3);
+    iPos->positionMove(10, 15);
+    iPos->positionMove(11, 2);
+    iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
+    iPos->positionMove(13, 3);
+    iPos->positionMove(14, 30);
+    iPos->positionMove(15, 1);
 
     // Check motion done
     waitMoveDone(10, 1);
