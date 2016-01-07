@@ -82,18 +82,21 @@ void ApproachTask::calculateControlInput(){
 				tactileMaximum[i] = std::max(tactileMaximum[i],commonData->overallFingerPressureMedian[fingersList[i]]);
 			}
 		} else {
-
-			// evaluate contact threshold on each fingertip
+			
 			if (callsNumber == medianWindowSize + callsNumberForAvarage){
 
+                // set the control mode to use to move the fingers during the approach phase
 	            if (controlMode == 0){ // velocity control mode
-		            controllersUtil->saveHandJointsMaxPwmLimits();
 		            controllersUtil->setTaskControlModes(jointsList,VOCAB_CM_VELOCITY);
-		            controllersUtil->setJointsMaxPwmLimit(jointsList,approachData->jointsPwmLimitsList);
+                    if (approachData->jointsPwmLimitsEnabled == true){		            
+                        controllersUtil->setJointsMaxPwmLimit(jointsList,approachData->jointsPwmLimitsList);
+    		            controllersUtil->saveHandJointsMaxPwmLimits();
+                    }
 	            } else { // openloop control mode
 		            controllersUtil->setTaskControlModes(jointsList,VOCAB_CM_OPENLOOP);
 	            }
-
+                
+                // evaluate contact threshold on each fingertip
 				for(size_t i = 0; i < jointsList.size(); i++){
                     std::cout << callsNumberForAvarage << " " << tactileAvarage[i] << "\n";
 					if (callsNumberForAvarage != 0) tactileAvarage[i] /= callsNumberForAvarage;
@@ -297,7 +300,7 @@ void ApproachTask::buildLogData(LogData &logData){
 
 void ApproachTask::release(){
 
-	if (controlMode == 0){ // velocity control mode
+	if (controlMode == 0 && approachData->jointsPwmLimitsEnabled == true){ // velocity control mode
 		controllersUtil->restoreHandJointsMaxPwmLimits();
 	}
 }
