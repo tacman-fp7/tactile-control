@@ -158,7 +158,7 @@ bool ControllersUtil::saveCurrentArmPosition(){
         encodersDataAcquired = iEncs->getEncoders(armStoredPosition.data());
 
 //#ifndef NODEBUG
-        cout << "DEBUG: " << dbgTag << "EncotestShowEndEffectors();    der data is not available yet. \n";
+        cout << "DEBUG: " << dbgTag << "Encoder data is not available yet. \n";
 //#endif
 
 		Time::delay(0.1);
