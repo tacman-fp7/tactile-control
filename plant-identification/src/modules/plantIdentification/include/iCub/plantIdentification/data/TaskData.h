@@ -18,6 +18,7 @@ namespace iCub {
 		
 		public:
 			std::vector<std::vector<double> > fingerTaxelsData;
+			std::vector<std::vector<double> > fingerTaxelsRawData;
 			std::vector<std::vector<double> > previousOverallFingerPressures;
 			std::vector<int> previousPressuresIndex;
 			std::vector<double> overallFingerPressure;
@@ -26,6 +27,7 @@ namespace iCub {
 			std::vector<double> overallFingerPressureMedian;
 			std::vector<double> objDetectPressureThresholds;
 			std::vector<double> armEncodersAngles;
+			std::vector<double> fingerEncodersRawData;
             std::vector<double> realProximalPwm;
             std::vector<double> realDistalPwm;
             std::vector<double> proximalJointAngle;
@@ -77,6 +79,7 @@ namespace iCub {
 			*   42: finger push event: pressure increase threshold
 			*   43: finger push event: min time (in seconds) between event triggers
 			*   44: head enabled. no/yes [0/1]
+			*	45: object recognition log enabled. no/yes [0/1]
             *
 			*   Note: double values have to contain a dot, while strings have to start with '#'
 			*

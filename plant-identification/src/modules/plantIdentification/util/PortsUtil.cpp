@@ -19,16 +19,31 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
 	using yarp::os::Network;
     using std::cout;
 
+	
+
 	string whichHand = rf.check("whichHand", Value("right")).asString().c_str();
+    string moduleSkinRawPortName = "/plantIdentification/skin/" + whichHand + "_hand_raw:i";
     string moduleSkinCompPortName = "/plantIdentification/skin/" + whichHand + "_hand_comp:i";
+    string moduleHandEncodersRawPortName = "/plantIdentification/encoders/" + whichHand + "_hand_raw:i";
+    string icubSkinRawPortName = "/icub/skin/" + whichHand + "_hand";
     string icubSkinCompPortName = "/icub/skin/" + whichHand + "_hand_comp";
+    string icubHandEncodersRawPortName = "/icub/" + whichHand + "_hand/analog:o";
     string logDataPortName = "/plantIdentification/log:o";
     string infoDataPortName = "/plantIdentification/info";
     string controlDataPortName = "/plantIdentification/control";
+    string objectRecognitionDataPortName = "/plantIdentification/object_recognition_log:o";
 
     // opening ports
+	if (!portSkinRawIn.open(moduleSkinRawPortName)){
+        cout << dbgTag << "could not open " << moduleSkinRawPortName << " port \n";
+        return false;
+    }
 	if (!portSkinCompIn.open(moduleSkinCompPortName)){
         cout << dbgTag << "could not open " << moduleSkinCompPortName << " port \n";
+        return false;
+    }
+	if (!portHandEncodersRawIn.open(moduleHandEncodersRawPortName)){
+        cout << dbgTag << "could not open " << moduleHandEncodersRawPortName << " port \n";
         return false;
     }
 	if (!portLogDataOut.open(logDataPortName)){
@@ -43,10 +58,22 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
         cout << dbgTag << "could not open " << controlDataPortName << " port \n";
         return false;
     }
+	if (!portObjRecognDataOut.open(objectRecognitionDataPortName)){
+        cout << dbgTag << "could not open " << objectRecognitionDataPortName << " port \n";
+        return false;
+    }
 
 	// connecting ports
+	if (!Network::connect(icubHandEncodersRawPortName,moduleSkinRawPortName)){
+        cout << dbgTag << "could not connect ports: " << icubSkinRawPortName << " -> " <<  moduleSkinRawPortName << "\n";
+        return false;
+    }
 	if (!Network::connect(icubSkinCompPortName,moduleSkinCompPortName)){
         cout << dbgTag << "could not connect ports: " << icubSkinCompPortName << " -> " <<  moduleSkinCompPortName << "\n";
+        return false;
+    }
+	if (!Network::connect(icubHandEncodersRawPortName,moduleHandEncodersRawPortName)){
+        cout << dbgTag << "could not connect ports: " << icubHandEncodersRawPortName << " -> " <<  moduleHandEncodersRawPortName << "\n";
         return false;
     }
 
@@ -133,6 +160,58 @@ bool PortsUtil::sendControlData(string taskId,string experimentDescription,strin
 	return true;
 }
 
+bool PortsUtil::sendObjectRecognitionData(std::string taskId,std::string objectName,std::string previousExperimentDescription,iCub::plantIdentification::TaskCommonData *commonData){
+
+	using yarp::os::Bottle;
+
+	Bottle& objRecognBottle = portObjRecognDataOut.prepare();
+	objRecognBottle.clear();
+
+	// logging raw tactile data (60)
+	for(size_t i = 0; i < 5; i++){
+		for(size_t j = 0; j < commonData->fingerTaxelsRawData[i].size(); j++){
+			objRecognBottle.addDouble(commonData->fingerTaxelsRawData[i][j]);
+		}
+	}
+	// logging compensated tactile data (60)
+	for(size_t i = 0; i < 5; i++){
+		for(size_t j = 0; j < commonData->fingerTaxelsData[i].size(); j++){
+			objRecognBottle.addDouble(commonData->fingerTaxelsData[i][j]);
+		}
+	}
+	// logging raw encoders (16)
+	for(size_t i = 0; i < commonData->fingerEncodersRawData.size(); i++){
+		objRecognBottle.addDouble(commonData->fingerEncodersRawData[i]);
+	}
+	// logging encoders (16)
+	for(size_t i = 0; i < commonData->armEncodersAngles.size(); i++){
+		objRecognBottle.addDouble(commonData->armEncodersAngles[i]);
+	}
+
+
+	portObjRecognDataOut.write();
+
+	return true;
+}
+
+
+bool PortsUtil::readFingerSkinRawData(std::vector<std::vector<double> > &fingerTaxelsRawData){
+
+	using yarp::sig::Vector;
+
+	Vector *iCubSkinData = portSkinRawIn.read(false);
+    
+	//TODO generalize fingers number
+    if (iCubSkinData) {
+		for(size_t i = 0; i < 5; i++){
+			for (size_t j = 0; j < fingerTaxelsRawData[i].size(); j++){
+				fingerTaxelsRawData[i][j] = (*iCubSkinData)[12*i + j];
+			}
+		}
+	}
+
+	return true;
+}
 
 bool PortsUtil::readFingerSkinCompData(std::vector<std::vector<double> > &fingerTaxelsData){
 
@@ -146,6 +225,21 @@ bool PortsUtil::readFingerSkinCompData(std::vector<std::vector<double> > &finger
 			for (size_t j = 0; j < fingerTaxelsData[i].size(); j++){
 				fingerTaxelsData[i][j] = (*iCubSkinData)[12*i + j];
 			}
+		}
+	}
+
+	return true;
+}
+
+bool PortsUtil::readFingerEncodersRawData(std::vector<double> &fingerEncodersRawData){
+
+	using yarp::sig::Vector;
+
+	Vector *iCubEncRawData = portHandEncodersRawIn.read(false);
+    
+    if (iCubEncRawData) {
+		for (size_t i = 0; i < fingerEncodersRawData.size(); i++){
+			fingerEncodersRawData[i] = (*iCubEncRawData)[i];
 		}
 	}
 

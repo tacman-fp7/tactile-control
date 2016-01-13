@@ -88,6 +88,10 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
 	for(size_t i = 0; i < commonData.fingerTaxelsData.size(); i++){
 		commonData.fingerTaxelsData[i].resize(12,0.0);
 	}
+	commonData.fingerTaxelsRawData.resize(5);
+	for(size_t i = 0; i < commonData.fingerTaxelsRawData.size(); i++){
+		commonData.fingerTaxelsRawData[i].resize(12,0.0);
+	}
 	commonData.previousOverallFingerPressures.resize(5);
 	for(size_t i = 0; i < commonData.previousOverallFingerPressures.size(); i++){
 		commonData.previousOverallFingerPressures[i].resize(rf.check("medianWidth",Value(20)).asInt(),0.0);
@@ -98,6 +102,8 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
 	commonData.overallFingerPressureByWeightedSum.resize(5,0.0);
 	commonData.overallFingerPressureMedian.resize(5,0.0);
 	commonData.armEncodersAngles.resize(controllersUtil->armJointsNum,0.0);      
+	//TODO generalize number of port components
+	commonData.fingerEncodersRawData.resize(16,0.0);      
 
 	controllersUtil->getArmEncodersAngles(commonData.armEncodersAngles,true);
 

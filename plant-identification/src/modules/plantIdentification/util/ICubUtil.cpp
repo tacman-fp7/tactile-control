@@ -223,8 +223,16 @@ void ICubUtil::getNNOptionsForErrorPrediction2Fingers(Bottle& neuralNetworkOptio
 bool ICubUtil::updateExternalData(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData){
 
 	using yarp::sig::Vector;
+	
+	if (!portsUtil->readFingerSkinRawData(commonData->fingerTaxelsRawData)){
+		return false;
+	}
 
 	if (!portsUtil->readFingerSkinCompData(commonData->fingerTaxelsData)){
+		return false;
+	}
+
+	if (!portsUtil->readFingerEncodersRawData(commonData->fingerEncodersRawData)){
 		return false;
 	}
 

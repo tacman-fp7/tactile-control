@@ -31,6 +31,8 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	using yarp::sig::Matrix;
     this->controlData = controlData;
 
+	objectRecognitionEnabled = commonData->tpInt(45) != 0;
+
 	this->portsUtil = portsUtil;
 
 	this->resetErrOnContact = resetErrOnContact;
@@ -610,6 +612,10 @@ void ControlTask::calculateControlInput(){
 	// log control data
 	portsUtil->sendControlData(taskId,commonData->tpStr(16),commonData->tpStr(17),gripStrength,actualGripStrength,commonData->tpDbl(8)+svResultValueScaled,svErr,svCurrentPosition,actualCurrentTargetPose,finalTargetPose,estimatedFinalPose,svKp*commonData->tpDbl(5),svKi*commonData->tpDbl(5),svKd*commonData->tpDbl(5),thumbEnc,indexEnc,middleEnc,enc8,pressureTargetValue,commonData->overallFingerPressure,inputCommandValue,fingersList);
 
+	// log object recognition data
+	if (objectRecognitionEnabled){
+		portsUtil->sendObjectRecognitionData(taskId,commonData->tpStr(16),commonData->tpStr(17),commonData);
+	}
 
 	//TODO TO REMOVE if the suprvisor PID gains change (in the temperary variables), update them (in the PID object)
     if (fabs(svKp - commonData->tpDbl(1)) > 0.0001){
