@@ -80,7 +80,10 @@ namespace iCub {
 			*   43: finger push event: min time (in seconds) between event triggers
 			*   44: head enabled. no/yes [0/1]
 			*	45: object recognition log enabled. no/yes [0/1]
-            *
+            *	46: ID object used (for whatever task)
+			*	47: sub category object used
+			*	48: sub-sub category object used (or alternative sub category)
+			*
 			*   Note: double values have to contain a dot, while strings have to start with '#'
 			*
             */

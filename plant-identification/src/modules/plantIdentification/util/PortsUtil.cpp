@@ -160,25 +160,31 @@ bool PortsUtil::sendControlData(string taskId,string experimentDescription,strin
 	return true;
 }
 
-bool PortsUtil::sendObjectRecognitionData(std::string taskId,std::string objectName,std::string previousExperimentDescription,iCub::plantIdentification::TaskCommonData *commonData){
+bool PortsUtil::sendObjectRecognitionData(std::string taskId,int objectId,int graspZone,int extraCode,std::string objectName,std::string previousExperimentDescription,iCub::plantIdentification::TaskCommonData *commonData){
 
 	using yarp::os::Bottle;
 
 	Bottle& objRecognBottle = portObjRecognDataOut.prepare();
 	objRecognBottle.clear();
 
-	// logging raw tactile data (60)
-	for(size_t i = 0; i < 5; i++){
-		for(size_t j = 0; j < commonData->fingerTaxelsRawData[i].size(); j++){
-			objRecognBottle.addDouble(commonData->fingerTaxelsRawData[i][j]);
-		}
+	// logging raw tactile data (24)
+	for(size_t j = 0; j < commonData->fingerTaxelsRawData[1].size(); j++){
+		objRecognBottle.addDouble(commonData->fingerTaxelsRawData[1][j]);
 	}
-	// logging compensated tactile data (60)
-	for(size_t i = 0; i < 5; i++){
-		for(size_t j = 0; j < commonData->fingerTaxelsData[i].size(); j++){
-			objRecognBottle.addDouble(commonData->fingerTaxelsData[i][j]);
-		}
+	for(size_t j = 0; j < commonData->fingerTaxelsRawData[4].size(); j++){
+		objRecognBottle.addDouble(commonData->fingerTaxelsRawData[4][j]);
 	}
+	// logging compensated tactile data (24)
+	for(size_t j = 0; j < commonData->fingerTaxelsData[1].size(); j++){
+		objRecognBottle.addDouble(commonData->fingerTaxelsData[1][j]);
+	}
+	for(size_t j = 0; j < commonData->fingerTaxelsData[4].size(); j++){
+		objRecognBottle.addDouble(commonData->fingerTaxelsData[4][j]);
+	}
+	// logging processed tactile data (2)
+	objRecognBottle.addDouble(commonData->overallFingerPressureByWeightedSum[1]);
+	objRecognBottle.addDouble(commonData->overallFingerPressureByWeightedSum[4]);
+
 	// logging raw encoders (16)
 	for(size_t i = 0; i < commonData->fingerEncodersRawData.size(); i++){
 		objRecognBottle.addDouble(commonData->fingerEncodersRawData[i]);
