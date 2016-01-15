@@ -30,8 +30,10 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
 	
 	string robotName = rf.check("robot", Value("icub"), "The robot name.").asString().c_str();
     whichHand = rf.check("whichHand", Value("right"), "The hand to be used for the grasping.").asString().c_str();
+    whichICub = rf.check("whichICub", Value("purple"), "The iCub used for the task.").asString().c_str();
+    whichTask = rf.check("whichTask", Value("grasp"), "The code of the task [grasp/objrec]").asString().c_str();
 	headEnabled = rf.check("headEnabled",Value(0)).asInt() != 0;
-
+    std::cout << whichHand << " " << whichICub << " " << whichTask << "\n";
 	 /* ******* Joint interfaces                     ******* */
     string arm = whichHand + "_arm";
     Property options;
@@ -239,30 +241,79 @@ bool ControllersUtil::setArmInTaskPosition() {
     
 	iVel->stop();
 
-    // Arm
-    iPos->positionMove(0 ,-35);
-    iPos->positionMove(1 , 29);
-    iPos->positionMove(2 , 21);
-    iPos->positionMove(3 , 33);
-    
-    iPos->positionMove(4 , -20);// 0
-    iPos->positionMove(5 , 2);// 1
-    iPos->positionMove(6 , -20);// 1
-    iPos->positionMove(7 , 12);
-    
-    // Hand
-    if (whichHand == "right"){
-        iPos->positionMove(8 , 38);    
+    if (whichTask == "grasp"){
+
+        // Arm
+        iPos->positionMove(0 ,-35);
+        iPos->positionMove(1 , 29);
+        iPos->positionMove(2 , 21);
+        iPos->positionMove(3 , 33);
+        
+        iPos->positionMove(4 , -20);// 0
+        iPos->positionMove(5 , 2);// 1
+        iPos->positionMove(6 , -20);// 1
+        iPos->positionMove(7 , 12);
+        
+        // Hand
+        if (whichICub == "black"){
+            if (whichHand == "right"){
+                iPos->positionMove(8 , 72);    
+            } else {
+                iPos->positionMove(8 , 72);
+            }
+        } else {
+            if (whichHand == "right"){
+                iPos->positionMove(8 , 38);    
+            } else {
+                iPos->positionMove(8 , 72);
+            }
+        }
+
+        iPos->positionMove(9 , 3);
+        iPos->positionMove(10, 15);
+        iPos->positionMove(11, 2);
+        iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
+        iPos->positionMove(13, 3);
+        iPos->positionMove(14, 30);
+        iPos->positionMove(15, 1);
+
     } else {
-        iPos->positionMove(8 , 72);
+
+    // Arm
+        iPos->positionMove(0 ,-35);
+        iPos->positionMove(1 , 29);
+        iPos->positionMove(2 , 21);
+        iPos->positionMove(3 , 33);
+        
+        iPos->positionMove(4 , -20);// 0
+        iPos->positionMove(5 , 2);// 1
+        iPos->positionMove(6 , -20);// 1
+        iPos->positionMove(7 , 12);
+        
+        // Hand
+        if (whichICub == "black"){
+            if (whichHand == "right"){
+                iPos->positionMove(8 , 82);    
+            } else {
+                iPos->positionMove(8 , 82);
+            }
+        } else {
+            if (whichHand == "right"){
+                iPos->positionMove(8 , 82);    
+            } else {
+                iPos->positionMove(8 , 82);
+            }
+        }
+
+        iPos->positionMove(9 , 3);
+        iPos->positionMove(10, 0);
+        iPos->positionMove(11, 2);
+        iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
+        iPos->positionMove(13, 3);
+        iPos->positionMove(14, 30);
+        iPos->positionMove(15, 1);
+
     }
-    iPos->positionMove(9 , 3);
-    iPos->positionMove(10, 15);
-    iPos->positionMove(11, 2);
-    iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
-    iPos->positionMove(13, 3);
-    iPos->positionMove(14, 30);
-    iPos->positionMove(15, 1);
 
     // Check motion done
     waitMoveDone(10, 1);
@@ -401,18 +452,58 @@ bool ControllersUtil::openHand() {
     
     iVel->stop();
 
-    if (whichHand == "right"){
-        iPos->positionMove(8 , 38);    
+    if (whichTask == "grasp"){
+
+        // Hand
+        if (whichICub == "black"){
+            if (whichHand == "right"){
+                iPos->positionMove(8 , 72);    
+            } else {
+                iPos->positionMove(8 , 72);
+            }
+        } else {
+            if (whichHand == "right"){
+                iPos->positionMove(8 , 38);    
+            } else {
+                iPos->positionMove(8 , 72);
+            }
+        }
+
+        iPos->positionMove(9 , 3);
+        iPos->positionMove(10, 15);
+        iPos->positionMove(11, 2);
+        iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
+        iPos->positionMove(13, 3);
+        iPos->positionMove(14, 30);
+        iPos->positionMove(15, 1);
+
     } else {
-        iPos->positionMove(8 , 72);
+
+        // Hand
+        if (whichICub == "black"){
+            if (whichHand == "right"){
+                iPos->positionMove(8 , 82);    
+            } else {
+                iPos->positionMove(8 , 82);
+            }
+        } else {
+            if (whichHand == "right"){
+                iPos->positionMove(8 , 82);    
+            } else {
+                iPos->positionMove(8 , 82);
+            }
+        }
+
+        iPos->positionMove(9 , 3);
+        iPos->positionMove(10, 0);
+        iPos->positionMove(11, 2);
+        iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
+        iPos->positionMove(13, 3);
+        iPos->positionMove(14, 30);
+        iPos->positionMove(15, 1);
+
     }
-    iPos->positionMove(9 , 3);
-    iPos->positionMove(10, 15);
-    iPos->positionMove(11, 2);
-    iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
-    iPos->positionMove(13, 3);
-    iPos->positionMove(14, 30);
-    iPos->positionMove(15, 1);
+
 
     // Check motion done
     waitMoveDone(10, 1);

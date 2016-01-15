@@ -46,6 +46,8 @@ namespace iCub {
 				double storedPIDIntegralGain;
 
                 std::string whichHand;
+                std::string whichICub;
+                std::string whichTask;
 				bool headEnabled;
 
 				/* ****** Debug attributes                              ****** */

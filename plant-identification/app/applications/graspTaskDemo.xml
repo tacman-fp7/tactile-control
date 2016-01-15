@@ -3,7 +3,7 @@
 
      <module>
          <name>plantIdentification</name>
-         <parameters>--from confPlantIdentification3Fingers.ini --whichHand left --headEnabled 1</parameters>
+         <parameters>--from confPlantIdentification3Fingers.ini --whichHand left --whichICub purple --whichTask grasp --headEnabled 1</parameters>
          <node>icub14</node>
          <tag>handController</tag>
      </module>
