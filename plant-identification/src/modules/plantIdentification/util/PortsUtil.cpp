@@ -160,22 +160,27 @@ bool PortsUtil::sendControlData(string taskId,string experimentDescription,strin
 	return true;
 }
 
-bool PortsUtil::sendObjectRecognitionData(string taskId,int objectId,int graspZone,int extraCode,string experimentDescription,string previousExperimentDescription,iCub::plantIdentification::TaskCommonData *commonData){
+bool PortsUtil::sendObjectRecognitionData(string taskId,int objectId,ObjectRecognitionTask objRecTask,int extraCode1,int extraCode2,int skipPreviousRepetition,string experimentDescription,string previousExperimentDescription,iCub::plantIdentification::TaskCommonData *commonData){
 
 	using yarp::os::Bottle;
 
 	Bottle& objRecognBottle = portObjRecognDataOut.prepare();
 	objRecognBottle.clear();
 
-    // logging task data (6) (0-5)
-	objRecognBottle.addString(taskId);
-	objRecognBottle.addInt(objectId);
-	objRecognBottle.addInt(graspZone);
-	objRecognBottle.addInt(extraCode);
+    // text data
 	objRecognBottle.addString(experimentDescription);
 	objRecognBottle.addString(previousExperimentDescription);
 
-	// logging raw tactile data (24) (6-29)
+	// no text data
+	// general information (6) (1-6)
+	objRecognBottle.addInt(objectId);
+	objRecognBottle.addInt(objRecTask);
+	objRecognBottle.addInt(extraCode1);
+	objRecognBottle.addInt(extraCode2);
+	objRecognBottle.addString(taskId);
+	objRecognBottle.addInt(skipPreviousRepetition);
+
+	// logging raw tactile data (24) (7-30)
 //    objRecognBottle.addString("midRawTact");
 	for(size_t j = 0; j < commonData->fingerTaxelsRawData[1].size(); j++){
 		objRecognBottle.addDouble(commonData->fingerTaxelsRawData[1][j]);
@@ -184,7 +189,7 @@ bool PortsUtil::sendObjectRecognitionData(string taskId,int objectId,int graspZo
 	for(size_t j = 0; j < commonData->fingerTaxelsRawData[4].size(); j++){
 		objRecognBottle.addDouble(commonData->fingerTaxelsRawData[4][j]);
 	}
-	// logging compensated tactile data (24) (30-53)
+	// logging compensated tactile data (24) (31-54)
 //    objRecognBottle.addString("midCompTact");
 	for(size_t j = 0; j < commonData->fingerTaxelsData[1].size(); j++){
 		objRecognBottle.addDouble(commonData->fingerTaxelsData[1][j]);
@@ -193,19 +198,19 @@ bool PortsUtil::sendObjectRecognitionData(string taskId,int objectId,int graspZo
 	for(size_t j = 0; j < commonData->fingerTaxelsData[4].size(); j++){
 		objRecognBottle.addDouble(commonData->fingerTaxelsData[4][j]);
 	}
-	// logging processed tactile data (2) (54-55)
+	// logging processed tactile data (2) (55-56)
 //    objRecognBottle.addString("overallTactVal");
 	objRecognBottle.addDouble(commonData->overallFingerPressureByWeightedSum[1]);
 	objRecognBottle.addDouble(commonData->overallFingerPressureByWeightedSum[4]);
 
 
-	// logging raw encoders (16) (56-71)
+	// logging raw encoders (16) (57-72)
 //    objRecognBottle.addString("handRawAng");
 	for(size_t i = 0; i < commonData->fingerEncodersRawData.size(); i++){
 		objRecognBottle.addInt(commonData->fingerEncodersRawData[i]);
 	}
 //    objRecognBottle.addString("armAng");
-	// logging encoders (16) (72-87)
+	// logging encoders (16) (73-88)
 	for(size_t i = 0; i < commonData->armEncodersAngles.size(); i++){
 		objRecognBottle.addDouble(commonData->armEncodersAngles[i]);
 	}

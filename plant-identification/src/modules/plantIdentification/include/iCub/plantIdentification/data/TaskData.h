@@ -79,10 +79,12 @@ namespace iCub {
 			*   42: finger push event: pressure increase threshold
 			*   43: finger push event: min time (in seconds) between event triggers
 			*   44: head enabled. no/yes [0/1]
-			*	45: object recognition log enabled. no/yes [0/1]
-            *	46: ID object used (for whatever task)
-			*	47: sub category object used
-			*	48: sub-sub category object used (or alternative sub category)
+			*	45: object recognition enabled. no/yes [0/1]
+            *	46: object recognition: ID object used (for whatever task)
+			*   47: object recognition: ID kind of task (for example squeezing)
+			*	48: object recognition: extra info (abouth the object or the task)
+			*	49: object recognition: extra info (abouth the object or the task)
+			*	50: skip previous repetition [0/1]. Like property 17, it is reset to zero at the end of the control task
 			*
 			*   Note: double values have to contain a dot, while strings have to start with '#'
 			*

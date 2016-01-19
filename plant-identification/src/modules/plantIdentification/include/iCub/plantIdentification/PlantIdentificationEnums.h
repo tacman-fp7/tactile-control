@@ -110,6 +110,11 @@ namespace iCub {
 			EVENTS_THREAD
 		};
 
+		enum ObjectRecognitionTask {
+
+			SQUEEZING = 0
+		};
+
 	}
 }
 

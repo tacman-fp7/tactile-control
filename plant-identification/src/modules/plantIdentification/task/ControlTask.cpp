@@ -614,7 +614,7 @@ void ControlTask::calculateControlInput(){
 
 	// log object recognition data
 	if (objectRecognitionEnabled){
-		portsUtil->sendObjectRecognitionData(taskId,commonData->tpInt(46),commonData->tpInt(47),commonData->tpInt(48),commonData->tpStr(16),commonData->tpStr(17),commonData);
+		portsUtil->sendObjectRecognitionData(taskId,commonData->tpInt(46),static_cast<iCub::plantIdentification::ObjectRecognitionTask>(commonData->tpInt(47)),commonData->tpInt(48),commonData->tpInt(49),commonData->tpInt(50),commonData->tpStr(16),commonData->tpStr(17),commonData);
 	}
 
 	//TODO TO REMOVE if the suprvisor PID gains change (in the temperary variables), update them (in the PID object)
