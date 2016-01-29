@@ -674,6 +674,7 @@ void ControlTask::release(){
 
 	// TODO TO REMOVE serve solo in fase di test
 	commonData->tempParameters[17] = Value("#");
+	commonData->tempParameters[50] = Value(0);
 
     // TODO WORKAROUND TO REMOVE
     if (disablePIDIntegralGain) controllersUtil->restorePIDIntegralGain(8);

@@ -89,8 +89,8 @@ void ApproachTask::calculateControlInput(){
 	            if (controlMode == 0){ // velocity control mode
 		            controllersUtil->setTaskControlModes(jointsList,VOCAB_CM_VELOCITY);
                     if (approachData->jointsPwmLimitsEnabled == true){		            
-                        controllersUtil->setJointsMaxPwmLimit(jointsList,approachData->jointsPwmLimitsList);
     		            controllersUtil->saveHandJointsMaxPwmLimits();
+                        controllersUtil->setJointsMaxPwmLimit(jointsList,approachData->jointsPwmLimitsList);
                     }
 	            } else { // openloop control mode
 		            controllersUtil->setTaskControlModes(jointsList,VOCAB_CM_OPENLOOP);
