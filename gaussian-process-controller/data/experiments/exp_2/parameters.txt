@@ -1,9 +1,0 @@
-proximalJointMaxVoltage 250.0
-distalJointMaxVoltage 400.0
-slopeAtMaxVoltage 1.0
-actionDuration 0.1
-pauseDuration 0.0
-finger 1
-jointActuated 13 14
-jointStartingPositions 40 0
-resetProbabilty 0.01
