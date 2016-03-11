@@ -25,6 +25,7 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
     string moduleSkinRawPortName = "/plantIdentification/skin/" + whichHand + "_hand_raw:i";
     string moduleSkinCompPortName = "/plantIdentification/skin/" + whichHand + "_hand_comp:i";
     string moduleHandEncodersRawPortName = "/plantIdentification/encoders/" + whichHand + "_hand_raw:i";
+    string policyActionsPortName = "/plantIdentification/policyActions:i";
     string icubSkinRawPortName = "/icub/skin/" + whichHand + "_hand";
     string icubSkinCompPortName = "/icub/skin/" + whichHand + "_hand_comp";
     string icubHandEncodersRawPortName = "/icub/" + whichHand + "_hand/analog:o";
@@ -44,6 +45,10 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
     }
 	if (!portHandEncodersRawIn.open(moduleHandEncodersRawPortName)){
         cout << dbgTag << "could not open " << moduleHandEncodersRawPortName << " port \n";
+        return false;
+    }
+	if (!portPolicyActionsIn.open(policyActionsPortName)){
+        cout << dbgTag << "could not open " << policyActionsPortName << " port \n";
         return false;
     }
 	if (!portLogDataOut.open(logDataPortName)){
@@ -160,7 +165,7 @@ bool PortsUtil::sendControlData(string taskId,string experimentDescription,strin
 	return true;
 }
 
-bool PortsUtil::sendObjectRecognitionData(string taskId,int objectId,ObjectRecognitionTask objRecTask,int extraCode1,int extraCode2,int skipPreviousRepetition,string experimentDescription,string previousExperimentDescription,iCub::plantIdentification::TaskCommonData *commonData){
+bool PortsUtil::sendObjectRecognitionData(string taskId,int objectId,iCub::plantIdentification::ObjectRecognitionTask objRecTask,int extraCode1,int extraCode2,int skipPreviousRepetition,string experimentDescription,string previousExperimentDescription,iCub::plantIdentification::TaskCommonData *commonData){
 
 	using yarp::os::Bottle;
 
@@ -270,6 +275,22 @@ bool PortsUtil::readFingerEncodersRawData(std::vector<double> &fingerEncodersRaw
 	}
 
 	return true;
+}
+
+bool PortsUtil::readPolicyActionsData(std::vector<double> &policyActionsData){
+
+	using yarp::sig::Vector;
+
+	Vector *iCubPolicyActionsData = portPolicyActionsIn.read(false);
+    
+    if (iCubPolicyActionsData) {
+		for (size_t i = 0; i < policyActionsData.size(); i++){
+			policyActionsData[i] = (*iCubPolicyActionsData)[i];
+		}
+		return true;
+	} else {
+		return false;
+	}
 }
 
 bool PortsUtil::release(){

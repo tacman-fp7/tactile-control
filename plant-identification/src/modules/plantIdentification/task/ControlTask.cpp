@@ -38,6 +38,10 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	this->resetErrOnContact = resetErrOnContact;
 	fingerIsInContact.resize(commonData->objDetectPressureThresholds.size(),false);
 
+	policyActionsData.resize(4);
+	indMidPressureBalance = commonData->tpDbl(9);
+	policyState = 0;
+
 	pressureTargetValue.resize(fingersList.size());
     initialPressureTargetValue.resize(fingersList.size());
 	for(size_t i = 0; i < pressureTargetValue.size(); i++){
@@ -262,6 +266,8 @@ void ControlTask::calculateControlInput(){
 	double thumbEnc,indexEnc,middleEnc,interMiddleEnc,enc8,handPosition;
 	double svTrackerVel = commonData->tpDbl(27);
 	double svTrackerAcc = commonData->tpDbl(28);
+	bool policyLearningEnabled = commonData->tpInt(51);
+	bool newValuesPL;
 	double gripStrength;
 	if (supervisorControlMode){
 		thumbEnc = commonData->armEncodersAngles[9];
@@ -346,6 +352,37 @@ void ControlTask::calculateControlInput(){
 			finalTargetPose = estimatedFinalPose;
 		}
 
+		// set the thumb adduction joint angle and the hand position. The hand position overrides the neural network and (if enabled) the wave generator
+		if (policyLearningEnabled){
+
+
+			newValuesPL = portsUtil->readPolicyActionsData(policyActionsData);
+
+			if (newValuesPL){
+				int policyNewState = (int)(policyActionsData[0]);
+				if (policyNewState != policyState){
+					if (policyNewState == 1){
+						commonData->tempParameters[29] = 1;
+					} else if (policyNewState == 2){
+						commonData->tempParameters[29] = 0;
+					}
+					policyState = policyNewState;
+				}
+				finalTargetPose = policyActionsData[2];
+				//controllersUtil->setJointAngle(8,policyActionsData[1]); //2A
+				indMidPressureBalance = commonData->tpDbl(9); // 1-2A
+				//indMidPressureBalance = policyActionsData[3]; // 3A
+			}
+
+			if (callsNumber%commonData->screenLogStride == 0){			
+				std::stringstream printLog("");
+				printLog << "[NewV: " << newValuesPL << "][Stat: " << policyState << "][Track: " << commonData->tpInt(29) << "][adduct: " << policyActionsData[1] << "][handP: " << policyActionsData[2] << "][indMid: " << indMidPressureBalance << "]";
+				optionalLogString.append(printLog.str());
+			}
+
+		} else {
+			indMidPressureBalance = commonData->tpDbl(9);
+		}
 
 		// TRACKING MODE
 		// if tracking mode is activated, trajectoryInitialPose is initialized, if tracking mode is disabled, trackingModeEnabled is set to false so that next time trajectoryInitialPose will be initialized again
@@ -364,7 +401,7 @@ void ControlTask::calculateControlInput(){
             double s;
 
             if (d == 0){
-                actualCurrentTargetPose = trajectoryFinalPose;    
+                actualCurrentTargetPose = trajectoryFinalPose;
             } else {
                 if (0.5*v*v/a < 0.5*d){
                     if (t < v/a){
@@ -453,16 +490,12 @@ void ControlTask::calculateControlInput(){
 				balanceFactor = diff;
 		}
 
-
 		// 2 dita: valore POSITIVO se il MEDIO deve INCREMENTARE l'angolo 
 		// 3 dita: valore POSITIVO sempre
 		svResultValueScaled = commonData->tpDbl(5)*balanceFactor;
 		
 
-
-
-
-		// if the grip strength wave generatore is not active, I get the grip strength from the temp params 
+		// if the grip strength wave generatore is not active, the grip strength is read from the temp params 
 		gripStrength = commonData->tpDbl(7);
 
 		// grip strength square wave / sinusoid generator
@@ -513,8 +546,8 @@ void ControlTask::calculateControlInput(){
 //			pressureTargetValue[2] = (1+commonData->tpDbl(9))*0.5*gripStrength*(1 + (commonData->tpDbl(8)+svResultValueScaled));
 			
 			pressureTargetValue[0] = gripStrength - (commonData->tpDbl(8)+svResultValueScaled)/3.0;
-			pressureTargetValue[1] = (1-commonData->tpDbl(9))*0.5*(gripStrength + 2.0*(commonData->tpDbl(8)+svResultValueScaled)/3.0);
-			pressureTargetValue[2] = (1+commonData->tpDbl(9))*0.5*(gripStrength + 2.0*(commonData->tpDbl(8)+svResultValueScaled)/3.0);
+			pressureTargetValue[1] = (1-(indMidPressureBalance/100.0))*0.5*(gripStrength + 2.0*(commonData->tpDbl(8)+svResultValueScaled)/3.0);
+			pressureTargetValue[2] = (1+(indMidPressureBalance/100.0))*0.5*(gripStrength + 2.0*(commonData->tpDbl(8)+svResultValueScaled)/3.0);
 		}
 
     	if (callsNumber%commonData->screenLogStride == 0){
@@ -524,7 +557,7 @@ void ControlTask::calculateControlInput(){
 			} else {
 				printLog << " [P " << pressureTargetValue[0] << " - " << pressureTargetValue[1] << " - " << pressureTargetValue[2] << "]" << " [J " << thumbEnc << " - " << indexEnc << " - " << middleEnc << " err " << svErr << " u " << commonData->tpDbl(8)+svResultValueScaled << "]" ;
 			}
-			optionalLogString.append(printLog.str());
+			//optionalLogString.append(printLog.str());
 	    }
 		
 	}

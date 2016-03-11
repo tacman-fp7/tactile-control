@@ -28,8 +28,6 @@ namespace iCub {
                 std::vector<double> overallFingerPressure;
                 std::vector<double> overallFingerPressureMedian;
                 std::vector<double> pwm;
-//              std::vector<double> realProximalPwm;
-//              std::vector<double> realDistalPwm;
                 std::vector<double> proximalJointAngle;
                 std::vector<double> distalJointAngle;
                 std::vector<double> pidKpf;

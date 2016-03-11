@@ -52,6 +52,11 @@ namespace iCub {
 
 				bool objectRecognitionEnabled;
 
+				/* variables used for the policy learning mode */
+				std::vector<double> policyActionsData;
+				double indMidPressureBalance;
+				int policyState; // 0: not active | 1: rest | 1: action
+
 				// neural network
 				iCub::ctrl::ff2LayNN_tansig_purelin neuralNetwork;
 

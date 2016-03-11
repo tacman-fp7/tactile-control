@@ -858,3 +858,10 @@ bool ControllersUtil::restoreFixationPoint(){
 
 	return true;
 }
+
+bool ControllersUtil::setJointAngle(int joint,double angle){
+
+	iPos->positionMove(joint,angle);
+
+	return true;
+}

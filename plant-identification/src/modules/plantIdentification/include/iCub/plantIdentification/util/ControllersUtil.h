@@ -104,6 +104,8 @@ namespace iCub {
 
 				bool restoreFixationPoint();
 
+				bool setJointAngle(int joint,double angle);
+
 
 			private:
 

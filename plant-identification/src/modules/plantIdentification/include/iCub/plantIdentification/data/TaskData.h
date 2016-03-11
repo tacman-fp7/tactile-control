@@ -85,6 +85,8 @@ namespace iCub {
 			*	48: object recognition: extra info (abouth the object or the task)
 			*	49: object recognition: extra info (abouth the object or the task)
 			*	50: skip previous repetition [0/1]. Like property 17, it is reset to zero at the end of the control task
+			*	51: policy learning enabled. no/yes [0/1]
+			*   
 			*
 			*   Note: double values have to contain a dot, while strings have to start with '#'
 			*

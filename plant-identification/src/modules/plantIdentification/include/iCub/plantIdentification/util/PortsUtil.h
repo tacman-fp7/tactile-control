@@ -24,6 +24,7 @@ namespace iCub {
                 yarp::os::BufferedPort<yarp::sig::Vector> portSkinRawIn;
                 yarp::os::BufferedPort<yarp::sig::Vector> portSkinCompIn;
                 yarp::os::BufferedPort<yarp::sig::Vector> portHandEncodersRawIn;
+                yarp::os::BufferedPort<yarp::sig::Vector> portPolicyActionsIn;
 
 				yarp::os::BufferedPort<yarp::os::Bottle> portLogDataOut;
 				yarp::os::BufferedPort<yarp::os::Bottle> portInfoDataOut;
@@ -52,6 +53,8 @@ namespace iCub {
 				bool readFingerSkinCompData(std::vector<std::vector<double> > &fingerTaxelsData);
 
 				bool readFingerEncodersRawData(std::vector<double> &fingerEncodersRawData);
+
+				bool readPolicyActionsData(std::vector<double> &policyActionsData);
 
 				bool release();
         };
