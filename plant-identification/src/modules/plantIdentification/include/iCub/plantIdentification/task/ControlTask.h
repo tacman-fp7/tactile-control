@@ -56,6 +56,7 @@ namespace iCub {
 				std::vector<double> policyActionsData;
 				double indMidPressureBalance;
 				int policyState; // 0: not active | 1: rest | 1: action
+				double currentActionFinalTargetPose;
 
 				// neural network
 				iCub::ctrl::ff2LayNN_tansig_purelin neuralNetwork;

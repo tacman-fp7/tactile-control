@@ -266,7 +266,7 @@ void ControlTask::calculateControlInput(){
 	double thumbEnc,indexEnc,middleEnc,interMiddleEnc,enc8,handPosition;
 	double svTrackerVel = commonData->tpDbl(27);
 	double svTrackerAcc = commonData->tpDbl(28);
-	bool policyLearningEnabled = commonData->tpInt(51);
+    bool policyLearningEnabled = commonData->tpInt(51) != 0;
 	bool newValuesPL;
 	double gripStrength;
 	if (supervisorControlMode){
@@ -355,6 +355,9 @@ void ControlTask::calculateControlInput(){
 		// set the thumb adduction joint angle and the hand position. The hand position overrides the neural network and (if enabled) the wave generator
 		if (policyLearningEnabled){
 
+            if (policyState == 0){
+                currentActionFinalTargetPose = finalTargetPose;
+            }
 
 			newValuesPL = portsUtil->readPolicyActionsData(policyActionsData);
 
@@ -364,15 +367,17 @@ void ControlTask::calculateControlInput(){
 					if (policyNewState == 1){
 						commonData->tempParameters[29] = 1;
 					} else if (policyNewState == 2){
-						commonData->tempParameters[29] = 0;
+                        commonData->tempParameters[29] = 1;
 					}
 					policyState = policyNewState;
-				}
-				finalTargetPose = policyActionsData[2];
+				} 
+                currentActionFinalTargetPose = policyActionsData[2];
 				//controllersUtil->setJointAngle(8,policyActionsData[1]); //2A
 				indMidPressureBalance = commonData->tpDbl(9); // 1-2A
 				//indMidPressureBalance = policyActionsData[3]; // 3A
-			}
+            }
+
+            finalTargetPose = currentActionFinalTargetPose;
 
 			if (callsNumber%commonData->screenLogStride == 0){			
 				std::stringstream printLog("");
