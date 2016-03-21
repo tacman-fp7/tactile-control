@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<portscope rows="1" columns="2" carrier="mcast">
+    <plot gridx="0"
+          gridy="0"
+          hspan="2"
+          vspan="1"
+          title="Force control"
+          size="201"
+          minval="0"
+          maxval="100"
+          bgcolor="#EEFFEE">
+        <graph remote="/plantIdentification/log:o"
+               index="4"
+               color="Red"
+               title="Target Force"
+               type="lines"
+               size="1" />
+        <graph remote="/plantIdentification/log:o"
+               index="17"
+               color="Blue"
+               title="Actual Force"
+               type="lines"
+               size="1" />
+    </plot>
+</portscope>

@@ -14,7 +14,7 @@ LogData::LogData(int fingersNum) {
     this->fingersNum = fingersNum;
     targetValue.resize(fingersNum,0);
     fingerTaxelValues.resize(fingersNum);
-    for(size_t i; i < fingerTaxelValues.size(); i++){
+    for(size_t i = 0; i < fingerTaxelValues.size(); i++){
         fingerTaxelValues[i].resize(12,0);
     }
     overallFingerPressure.resize(fingersNum,0);
@@ -46,7 +46,7 @@ void LogData::toBottle(Bottle &bottle){
 	bottle.addInt(taskType); // #4
 	bottle.addInt(taskOperationMode); // #5
     bottle.addInt(fingersNum);
-    for(size_t i; i < fingersNum; i++){
+    for(size_t i = 0; i < fingersNum; i++){
         bottle.addDouble(targetValue[i]); // #6
         for(int j = 0; j < fingerTaxelValues[i].size(); j++){
             bottle.addDouble(fingerTaxelValues[i][j]); // #7-18

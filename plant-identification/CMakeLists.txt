@@ -13,7 +13,7 @@ project(${PROJECTNAME})
 # Check build type
 if(NOT CMAKE_BUILD_TYPE)
     MESSAGE(STATUS "No build type specified. Defaulting to Release.")
-    set(CMAKE_BUILD_TYPE Release)
+    set(CMAKE_BUILD_TYPE Debug)
 endif(NOT CMAKE_BUILD_TYPE)
 # Add flags
 MESSAGE(STATUS "Compiling in ${CMAKE_BUILD_TYPE} mode.")

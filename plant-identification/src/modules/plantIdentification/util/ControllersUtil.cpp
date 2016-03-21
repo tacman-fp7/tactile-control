@@ -257,7 +257,7 @@ bool ControllersUtil::setArmInTaskPosition() {
         // Hand
         if (whichICub == "black"){
             if (whichHand == "right"){
-                iPos->positionMove(8 , 72);    
+                iPos->positionMove(8 , 46);
             } else {
                 iPos->positionMove(8 , 72);
             }
@@ -452,12 +452,14 @@ bool ControllersUtil::openHand() {
     
     iVel->stop();
 
+    cout << dbgTag << whichICub << " " << whichHand << "\n";
+
     if (whichTask == "grasp"){
 
         // Hand
         if (whichICub == "black"){
             if (whichHand == "right"){
-                iPos->positionMove(8 , 72);    
+                iPos->positionMove(8 , 46);
             } else {
                 iPos->positionMove(8 , 72);
             }

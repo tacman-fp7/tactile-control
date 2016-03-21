@@ -573,10 +573,10 @@ void ControlTask::calculateControlInput(){
 		double halfStep = commonData->tpDbl(12);
 		int div = (int)((callsNumber*commonData->taskThreadPeriod/1000.0)/commonData->tpDbl(13));
 		if (div%2 == 1){
-			pressureTargetValue[0] = gripStrength + halfStep;
+            pressureTargetValue[0] = gripStrength + halfStep;
 		} else {
-			pressureTargetValue[0] = gripStrength - halfStep;
-		}
+            pressureTargetValue[0] = gripStrength - halfStep;
+        }
 	}
 
 	for(size_t i = 0; i < jointsList.size(); i++){
