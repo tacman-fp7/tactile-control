@@ -258,24 +258,45 @@ bool ControllersUtil::setArmInTaskPosition() {
         if (whichICub == "black"){
             if (whichHand == "right"){
                 iPos->positionMove(8 , 46);
+                iPos->positionMove(9 , 3);
+                iPos->positionMove(10, 37);
+                iPos->positionMove(11, 2);
+                iPos->positionMove(12, 52);// 0 if two fingers, 30 if three fingers
+                iPos->positionMove(13, 3);
+                iPos->positionMove(14, 43);
+                iPos->positionMove(15, 1);
             } else {
                 iPos->positionMove(8 , 72);
+                iPos->positionMove(9 , 3);
+                iPos->positionMove(10, 15);
+                iPos->positionMove(11, 2);
+                iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
+                iPos->positionMove(13, 3);
+                iPos->positionMove(14, 30);
+                iPos->positionMove(15, 1);
             }
         } else {
             if (whichHand == "right"){
                 iPos->positionMove(8 , 38);    
+                iPos->positionMove(9 , 3);
+                iPos->positionMove(10, 15);
+                iPos->positionMove(11, 2);
+                iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
+                iPos->positionMove(13, 3);
+                iPos->positionMove(14, 30);
+                iPos->positionMove(15, 1);
             } else {
                 iPos->positionMove(8 , 72);
+                iPos->positionMove(9 , 3);
+                iPos->positionMove(10, 15);
+                iPos->positionMove(11, 2);
+                iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
+                iPos->positionMove(13, 3);
+                iPos->positionMove(14, 30);
+                iPos->positionMove(15, 1);
             }
         }
 
-        iPos->positionMove(9 , 3);
-        iPos->positionMove(10, 15);
-        iPos->positionMove(11, 2);
-        iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
-        iPos->positionMove(13, 3);
-        iPos->positionMove(14, 30);
-        iPos->positionMove(15, 1);
 
     } else {
 
@@ -294,24 +315,45 @@ bool ControllersUtil::setArmInTaskPosition() {
         if (whichICub == "black"){
             if (whichHand == "right"){
                 iPos->positionMove(8 , 82);    
+                iPos->positionMove(9 , 3);
+                iPos->positionMove(10, 0);
+                iPos->positionMove(11, 2);
+                iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
+                iPos->positionMove(13, 3);
+                iPos->positionMove(14, 30);
+                iPos->positionMove(15, 1);
             } else {
                 iPos->positionMove(8 , 82);
+                iPos->positionMove(9 , 3);
+                iPos->positionMove(10, 0);
+                iPos->positionMove(11, 2);
+                iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
+                iPos->positionMove(13, 3);
+                iPos->positionMove(14, 30);
+                iPos->positionMove(15, 1);
             }
         } else {
             if (whichHand == "right"){
                 iPos->positionMove(8 , 82);    
+                iPos->positionMove(9 , 3);
+                iPos->positionMove(10, 0);
+                iPos->positionMove(11, 2);
+                iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
+                iPos->positionMove(13, 3);
+                iPos->positionMove(14, 30);
+                iPos->positionMove(15, 1);
             } else {
                 iPos->positionMove(8 , 82);
+                iPos->positionMove(9 , 3);
+                iPos->positionMove(10, 0);
+                iPos->positionMove(11, 2);
+                iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
+                iPos->positionMove(13, 3);
+                iPos->positionMove(14, 30);
+                iPos->positionMove(15, 1);
             }
         }
 
-        iPos->positionMove(9 , 3);
-        iPos->positionMove(10, 0);
-        iPos->positionMove(11, 2);
-        iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
-        iPos->positionMove(13, 3);
-        iPos->positionMove(14, 30);
-        iPos->positionMove(15, 1);
 
     }
 
@@ -460,24 +502,45 @@ bool ControllersUtil::openHand() {
         if (whichICub == "black"){
             if (whichHand == "right"){
                 iPos->positionMove(8 , 46);
+                iPos->positionMove(9 , 3);
+                iPos->positionMove(10, 37);
+                iPos->positionMove(11, 2);
+                iPos->positionMove(12, 52);// 0 if two fingers, 30 if three fingers
+                iPos->positionMove(13, 3);
+                iPos->positionMove(14, 43);
+                iPos->positionMove(15, 1);
             } else {
                 iPos->positionMove(8 , 72);
+                iPos->positionMove(9 , 3);
+                iPos->positionMove(10, 15);
+                iPos->positionMove(11, 2);
+                iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
+                iPos->positionMove(13, 3);
+                iPos->positionMove(14, 30);
+                iPos->positionMove(15, 1);
             }
         } else {
             if (whichHand == "right"){
                 iPos->positionMove(8 , 38);    
+                iPos->positionMove(9 , 3);
+                iPos->positionMove(10, 15);
+                iPos->positionMove(11, 2);
+                iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
+                iPos->positionMove(13, 3);
+                iPos->positionMove(14, 30);
+                iPos->positionMove(15, 1);
             } else {
                 iPos->positionMove(8 , 72);
+                iPos->positionMove(9 , 3);
+                iPos->positionMove(10, 15);
+                iPos->positionMove(11, 2);
+                iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
+                iPos->positionMove(13, 3);
+                iPos->positionMove(14, 30);
+                iPos->positionMove(15, 1);
             }
         }
 
-        iPos->positionMove(9 , 3);
-        iPos->positionMove(10, 15);
-        iPos->positionMove(11, 2);
-        iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
-        iPos->positionMove(13, 3);
-        iPos->positionMove(14, 30);
-        iPos->positionMove(15, 1);
 
     } else {
 
@@ -485,24 +548,45 @@ bool ControllersUtil::openHand() {
         if (whichICub == "black"){
             if (whichHand == "right"){
                 iPos->positionMove(8 , 82);    
+                iPos->positionMove(9 , 3);
+                iPos->positionMove(10, 0);
+                iPos->positionMove(11, 2);
+                iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
+                iPos->positionMove(13, 3);
+                iPos->positionMove(14, 30);
+                iPos->positionMove(15, 1);
             } else {
                 iPos->positionMove(8 , 82);
+                iPos->positionMove(9 , 3);
+                iPos->positionMove(10, 0);
+                iPos->positionMove(11, 2);
+                iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
+                iPos->positionMove(13, 3);
+                iPos->positionMove(14, 30);
+                iPos->positionMove(15, 1);
             }
         } else {
             if (whichHand == "right"){
                 iPos->positionMove(8 , 82);    
+                iPos->positionMove(9 , 3);
+                iPos->positionMove(10, 0);
+                iPos->positionMove(11, 2);
+                iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
+                iPos->positionMove(13, 3);
+                iPos->positionMove(14, 30);
+                iPos->positionMove(15, 1);
             } else {
                 iPos->positionMove(8 , 82);
+                iPos->positionMove(9 , 3);
+                iPos->positionMove(10, 0);
+                iPos->positionMove(11, 2);
+                iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
+                iPos->positionMove(13, 3);
+                iPos->positionMove(14, 30);
+                iPos->positionMove(15, 1);
             }
         }
 
-        iPos->positionMove(9 , 3);
-        iPos->positionMove(10, 0);
-        iPos->positionMove(11, 2);
-        iPos->positionMove(12, 30);// 0 if two fingers, 30 if three fingers
-        iPos->positionMove(13, 3);
-        iPos->positionMove(14, 30);
-        iPos->positionMove(15, 1);
 
     }
 
