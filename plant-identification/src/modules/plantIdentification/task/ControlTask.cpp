@@ -268,7 +268,8 @@ void ControlTask::calculateControlInput(){
 	double svTrackerAcc = commonData->tpDbl(28);
     bool policyLearningEnabled = commonData->tpInt(51) != 0;
 	bool newValuesPL;
-	double gripStrength;
+	// if the grip strength wave generator is not active, the grip strength is read from the temp params 
+	double gripStrength = commonData->tpDbl(7);
 	if (supervisorControlMode){
 		thumbEnc = commonData->armEncodersAngles[9];
 		indexEnc = commonData->armEncodersAngles[11];
@@ -499,9 +500,6 @@ void ControlTask::calculateControlInput(){
 		// 3 dita: valore POSITIVO sempre
 		svResultValueScaled = commonData->tpDbl(5)*balanceFactor;
 		
-
-		// if the grip strength wave generatore is not active, the grip strength is read from the temp params 
-		gripStrength = commonData->tpDbl(7);
 
 		// grip strength square wave / sinusoid generator
 		if (commonData->tpInt(22) != 0){
