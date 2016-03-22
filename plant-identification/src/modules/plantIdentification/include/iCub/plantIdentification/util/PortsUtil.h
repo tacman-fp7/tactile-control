@@ -48,9 +48,9 @@ namespace iCub {
 
 				bool sendObjectRecognitionData(std::string taskId,int objectId,iCub::plantIdentification::ObjectRecognitionTask objRecTask,int extraCode1,int extraCode2,int skipPreviousRepetition,std::string experimentDescription,std::string previousExperimentDescription,iCub::plantIdentification::TaskCommonData *commonData);
 
-				bool readFingerSkinRawData(std::vector<std::vector<double> > &fingerTaxelsRawData);
+				bool readFingerSkinRawData(std::vector<std::vector<double> > &fingerTaxelsRawData,std::vector<double> &fingersSensitivityScale);
 
-				bool readFingerSkinCompData(std::vector<std::vector<double> > &fingerTaxelsData);
+				bool readFingerSkinCompData(std::vector<std::vector<double> > &fingerTaxelsData,std::vector<double> &fingersSensitivityScale);
 
 				bool readFingerEncodersRawData(std::vector<double> &fingerEncodersRawData);
 

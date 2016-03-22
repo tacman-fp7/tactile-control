@@ -226,7 +226,7 @@ bool PortsUtil::sendObjectRecognitionData(string taskId,int objectId,iCub::plant
 }
 
 
-bool PortsUtil::readFingerSkinRawData(std::vector<std::vector<double> > &fingerTaxelsRawData){
+bool PortsUtil::readFingerSkinRawData(std::vector<std::vector<double> > &fingerTaxelsRawData,std::vector<double> &fingersSensitivityScale){
 
 	using yarp::sig::Vector;
 
@@ -236,7 +236,7 @@ bool PortsUtil::readFingerSkinRawData(std::vector<std::vector<double> > &fingerT
     if (iCubSkinData) {
 		for(size_t i = 0; i < 5; i++){
 			for (size_t j = 0; j < fingerTaxelsRawData[i].size(); j++){
-				fingerTaxelsRawData[i][j] = (*iCubSkinData)[12*i + j];
+				fingerTaxelsRawData[i][j] = fingersSensitivityScale[i] * (*iCubSkinData)[12*i + j];
 			}
 		}
 	}
@@ -244,7 +244,7 @@ bool PortsUtil::readFingerSkinRawData(std::vector<std::vector<double> > &fingerT
 	return true;
 }
 
-bool PortsUtil::readFingerSkinCompData(std::vector<std::vector<double> > &fingerTaxelsData){
+bool PortsUtil::readFingerSkinCompData(std::vector<std::vector<double> > &fingerTaxelsData,std::vector<double> &fingersSensitivityScale){
 
 	using yarp::sig::Vector;
 
@@ -254,7 +254,7 @@ bool PortsUtil::readFingerSkinCompData(std::vector<std::vector<double> > &finger
     if (iCubSkinData) {
 		for(size_t i = 0; i < 5; i++){
 			for (size_t j = 0; j < fingerTaxelsData[i].size(); j++){
-				fingerTaxelsData[i][j] = (*iCubSkinData)[12*i + j];
+				fingerTaxelsData[i][j] = fingersSensitivityScale[i] * (*iCubSkinData)[12*i + j];
 			}
 		}
 	}

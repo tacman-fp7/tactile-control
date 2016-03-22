@@ -80,6 +80,10 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
 	commonData.taskThreadPeriod = rf.check("taskThreadPeriod", 20).asInt();
 	commonData.eventsThreadPeriod = rf.check("eventsThreadPeriod", 15).asInt();
 
+	std::string whichHand = rf.check("whichHand", Value("right"), "The hand to be used for the grasping.").asString().c_str();
+    std::string whichICub = rf.check("whichICub", Value("purple"), "The iCub used for the task.").asString().c_str();
+    std::string whichTask = rf.check("whichTask", Value("grasp"), "The code of the task [grasp/objrec]").asString().c_str();
+
 	// load data from resource file
 	commonData.pwmSign = rf.check("pwmSign",Value(1)).asInt();
 	commonData.screenLogStride = rf.check("screenLogStride",Value(10)).asInt();
@@ -123,6 +127,24 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
 	for(int i = 0; i < tempParameters->size(); i++){
 		commonData.tempParameters[i] = tempParameters->get(i);
 	}
+
+	// temp parameters updated according to the hand and/or the robot
+	if (whichICub == "black"){
+        if (whichHand == "right"){
+			// default values	
+        } else {
+			commonData.tempParameters[52] = 1.0;
+			commonData.tempParameters[53] = 0.5;
+			commonData.tempParameters[54] = 2.0;
+        }
+    } else {
+        if (whichHand == "right"){
+			// default values
+        } else {
+			// default values
+        }
+    }
+
 
 	Bottle* stepTaskJoints = rf.find("stepTaskJoints").asList();
 	stepData.jointsList.resize(stepTaskJoints->size(),0);

@@ -32,6 +32,8 @@ namespace iCub {
             std::vector<double> realDistalPwm;
             std::vector<double> proximalJointAngle;
             std::vector<double> distalJointAngle;
+			std::vector<double> fingersSensitivityScale;
+
             
             /*  TEMP PARAMETERS USED DURING CONTROL TASKS (EXCEPT THE 15th, USED DURING STEP TASKS)
             *   0: supervisor mode off/on [0/1]
@@ -86,6 +88,9 @@ namespace iCub {
 			*	49: object recognition: extra info (abouth the object or the task)
 			*	50: skip previous repetition [0/1]. Like property 17, it is reset to zero at the end of the control task
 			*	51: policy learning enabled. no/yes [0/1]
+			*	52: thumb sensitivity scale
+			*	53: index finger sensitivity scale
+			*	54: middle finger sensitivity scale
 			*   
 			*
 			*   Note: double values have to contain a dot, while strings have to start with '#'

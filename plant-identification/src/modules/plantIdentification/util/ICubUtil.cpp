@@ -224,11 +224,17 @@ bool ICubUtil::updateExternalData(ControllersUtil *controllersUtil,PortsUtil *po
 
 	using yarp::sig::Vector;
 	
-	if (!portsUtil->readFingerSkinRawData(commonData->fingerTaxelsRawData)){
+	std::vector<double> fingersSensitivityScale(5,1.0);
+	fingersSensitivityScale[4] = commonData->tpDbl(52); // thumb
+	fingersSensitivityScale[0] = commonData->tpDbl(53); // index finger
+	fingersSensitivityScale[1] = commonData->tpDbl(54); // middle finger
+
+
+	if (!portsUtil->readFingerSkinRawData(commonData->fingerTaxelsRawData,fingersSensitivityScale)){
 		return false;
 	}
 
-	if (!portsUtil->readFingerSkinCompData(commonData->fingerTaxelsData)){
+	if (!portsUtil->readFingerSkinCompData(commonData->fingerTaxelsData,fingersSensitivityScale)){
 		return false;
 	}
 
