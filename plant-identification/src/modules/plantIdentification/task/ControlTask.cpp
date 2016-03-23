@@ -383,7 +383,7 @@ void ControlTask::calculateControlInput(){
 			if (callsNumber%commonData->screenLogStride == 0){			
 				std::stringstream printLog("");
 				printLog << "[NewV: " << newValuesPL << "][Stat: " << policyState << "][Track: " << commonData->tpInt(29) << "][adduct: " << policyActionsData[1] << "][handP: " << policyActionsData[2] << "][indMid: " << indMidPressureBalance << "]";
-				optionalLogString.append(printLog.str());
+				//optionalLogString.append(printLog.str());
 			}
 
 		} else {
@@ -560,7 +560,7 @@ void ControlTask::calculateControlInput(){
 			} else {
 				printLog << " [P " << pressureTargetValue[0] << " - " << pressureTargetValue[1] << " - " << pressureTargetValue[2] << "]" << " [J " << thumbEnc << " - " << indexEnc << " - " << middleEnc << " err " << svErr << " u " << commonData->tpDbl(8)+svResultValueScaled << "]" ;
 			}
-			//optionalLogString.append(printLog.str());
+			optionalLogString.append(printLog.str());
 	    }
 		
 	}
