@@ -48,6 +48,7 @@ namespace iCub {
                 std::string whichHand;
                 std::string whichICub;
                 std::string whichTask;
+                int numFingers;
 				bool headEnabled;
 
 				/* ****** Debug attributes                              ****** */
