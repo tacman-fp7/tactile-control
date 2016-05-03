@@ -19,8 +19,6 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
 	using yarp::os::Network;
     using std::cout;
 
-	
-
 	string whichHand = rf.check("whichHand", Value("right")).asString().c_str();
     string moduleSkinRawPortName = "/plantIdentification/skin/" + whichHand + "_hand_raw:i";
     string moduleSkinCompPortName = "/plantIdentification/skin/" + whichHand + "_hand_comp:i";
@@ -32,6 +30,7 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
     string logDataPortName = "/plantIdentification/log:o";
     string infoDataPortName = "/plantIdentification/info";
     string controlDataPortName = "/plantIdentification/control";
+    string gmmDataPortName = "/plantIdentification/gmm:o";
     string objectRecognitionDataPortName = "/plantIdentification/object_recognition_log:o";
 
     // opening ports
@@ -61,6 +60,10 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
     }
 	if (!portControlDataOut.open(controlDataPortName)){
         cout << dbgTag << "could not open " << controlDataPortName << " port \n";
+        return false;
+    }
+	if (!portGMMDataOut.open(gmmDataPortName)){
+        cout << dbgTag << "could not open " << gmmDataPortName << " port \n";
         return false;
     }
 	if (!portObjRecognDataOut.open(objectRecognitionDataPortName)){
@@ -107,10 +110,10 @@ bool PortsUtil::sendInfoData(iCub::plantIdentification::TaskCommonData *commonDa
 	Bottle& infoBottle = portInfoDataOut.prepare();
 	infoBottle.clear();
 
-	for(size_t i; i < commonData->overallFingerPressureByWeightedSum.size(); i++){
+	for(size_t i = 0; i < commonData->overallFingerPressureByWeightedSum.size(); i++){
 		infoBottle.add(commonData->overallFingerPressureByWeightedSum[i]);
 	}
-	for(size_t i; i < commonData->overallFingerPressureBySimpleSum.size(); i++){
+	for(size_t i = 0; i < commonData->overallFingerPressureBySimpleSum.size(); i++){
 		infoBottle.add(commonData->overallFingerPressureBySimpleSum[i]);
 	}
 
@@ -164,6 +167,44 @@ bool PortsUtil::sendControlData(string taskId,string experimentDescription,strin
 
 	return true;
 }
+
+bool PortsUtil::sendGMMData(double gripStrength, double indexMiddleFingerPressureBalance, iCub::plantIdentification::TaskCommonData *commonData){
+
+	using yarp::os::Bottle;
+
+	Bottle& objGMMBottle = portGMMDataOut.prepare();
+	objGMMBottle.clear();
+
+
+    // grip strength (1) (1)
+	objGMMBottle.addDouble(gripStrength);
+
+	// index / midle finger pressure balance (1) (2)
+	objGMMBottle.addDouble(indexMiddleFingerPressureBalance);
+
+	// compensated taxels feedback (60) (3-62)
+	for(size_t i = 0; i < commonData->fingerTaxelsData.size(); i++){
+		for(size_t j = 0; j < commonData->fingerTaxelsData[i].size(); j++){
+			objGMMBottle.addDouble(commonData->fingerTaxelsData[i][j]);
+		}
+	}
+
+	// fingers overall pressure (5) (63-67)
+	for(size_t i = 0; i < commonData->overallFingerPressureByWeightedSum.size(); i++){
+		objGMMBottle.addDouble(commonData->overallFingerPressureByWeightedSum[i]);
+	}
+
+	// arm encoders (16) (68-83)
+	for(size_t i = 0; i < commonData->armEncodersAngles.size(); i++){
+		objGMMBottle.addDouble(commonData->armEncodersAngles[i]);
+	}
+
+	portGMMDataOut.write();
+
+	return true;
+
+}
+
 
 bool PortsUtil::sendObjectRecognitionData(string taskId,int objectId,iCub::plantIdentification::ObjectRecognitionTask objRecTask,int extraCode1,int extraCode2,int skipPreviousRepetition,string experimentDescription,string previousExperimentDescription,iCub::plantIdentification::TaskCommonData *commonData){
 

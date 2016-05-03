@@ -193,6 +193,7 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
 	controlData.controlMode = static_cast<ControlTaskOpMode>(rf.check("controlMode",Value(2)).asInt());
 	controlData.pidResetEnabled = rf.check("pidResetEnabled",Value(0)).asInt() != 0;
 	controlData.lifespan = rf.check("controlTaskLifespan",Value(10)).asInt();
+	controlData.gmmData = new GMMData();
 
 	Bottle* rampTaskJoints = rf.find("rampTaskJoints").asList();
 	rampData.jointsList.resize(rampTaskJoints->size(),0);
@@ -241,7 +242,8 @@ int TaskData::getFingerFromJoint(int joint){
 	if (joint == 11 || joint == 12) return 0;
 	if (joint == 13 || joint == 14) return 1;
 	if (joint == 15) return 2;
-
+	
+	return -1;
 }
 
 std::string TaskData::getValueDescription(iCub::plantIdentification::RPCSetCmdArgName cmdName){

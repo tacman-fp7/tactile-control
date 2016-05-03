@@ -270,7 +270,7 @@ bool ICubUtil::updateExternalData(ControllersUtil *controllersUtil,PortsUtil *po
     controllersUtil->getEncoderAngle(9,&commonData->proximalJointAngle[4]);
     controllersUtil->getEncoderAngle(10,&commonData->distalJointAngle[4]);
 
-
+	return true;
 }
 
 void ICubUtil::processTactileData(TaskCommonData *commonData){
@@ -445,4 +445,20 @@ void ICubUtil::addOption(Bottle &bottle,const char *paramName,Value paramValueLi
 }
 
 
-static void addOption(yarp::os::Bottle &bottle,const char *paramName,double paramValueList[],double numElem);
+void ICubUtil::putDataIntoVector(const double *dataIn,int size,yarp::sig::Vector &dataOut){
+
+	dataOut.resize(size);
+	for(size_t i = 0; i < size; i++){
+		dataOut[i] = dataIn[i];
+	}
+}
+
+void ICubUtil::putDataIntoMatrix(const double *dataIn,int rows,int columns,yarp::sig::Matrix &dataOut){
+
+	dataOut.resize(rows,columns);
+	for(size_t i = 0; i < rows; i++){
+		for(size_t j = 0; j < columns; j++){
+			dataOut[i][j] = dataIn[columns*i + j];
+		}
+	}
+}

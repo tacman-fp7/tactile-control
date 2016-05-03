@@ -22,6 +22,7 @@ set(INC_HEADERS
     include/iCub/plantIdentification/task/ApproachTask.h
 
     include/iCub/plantIdentification/data/LogData.h
+    include/iCub/plantIdentification/data/GMMData.h
     include/iCub/plantIdentification/data/TaskData.h
     include/iCub/plantIdentification/data/RPCCommandsData.h
 
@@ -48,6 +49,7 @@ set(INC_SOURCES
     task/ApproachTask.cpp
 
     data/LogData.cpp
+    data/GMMData.cpp
     data/TaskData.cpp
     data/RPCCommandsData.cpp
 

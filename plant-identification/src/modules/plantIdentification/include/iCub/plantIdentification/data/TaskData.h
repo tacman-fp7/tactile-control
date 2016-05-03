@@ -3,6 +3,7 @@
 
 #include "iCub/plantIdentification/PlantIdentificationEnums.h"
 #include "iCub/plantIdentification/util/ControllersUtil.h"
+#include "iCub/plantIdentification/data/GMMData.h"
 
 #include <yarp/os/BufferedPort.h>
 #include <yarp/os/ResourceFinder.h>
@@ -44,7 +45,7 @@ namespace iCub {
             *   5: supervisor gains scale factor
             *   6: if != 0, set all voltages to 0 (maximum priority)
             *   7: grip strength
-            *   8: starting grasp balance factor
+            *   8: initial grasp balance factor
             *   9: index/middle fingers balance factor
             *   10: if set > 0, scales low level PID gains and returns to 0
             *   11: square wave mode off/on [0/1] (to test LOW level PID)
@@ -91,7 +92,8 @@ namespace iCub {
 			*	52: thumb sensitivity scale
 			*	53: index finger sensitivity scale
 			*	54: middle finger sensitivity scale
-			*   
+			*   55: if set != 0, log current gmm data (one shot) and returns to 0
+			*   56: best pose estimator [0: neural network / 1: gaussian mixture model]
 			*
 			*   Note: double values have to contain a dot, while strings have to start with '#'
 			*
@@ -140,6 +142,7 @@ namespace iCub {
 			iCub::plantIdentification::ControlTaskOpMode controlMode;
 			bool pidResetEnabled;
 			int lifespan;
+			iCub::plantIdentification::GMMData* gmmData;
 		};
 
 		class RampTaskData {

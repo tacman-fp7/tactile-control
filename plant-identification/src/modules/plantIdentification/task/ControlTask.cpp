@@ -264,12 +264,16 @@ void ControlTask::calculateControlInput(){
 	double finalTargetPose; // pose equal to either estimatedFinalPose or the pose coming out from the wave generator, depending on which mode is activated
 	double actualCurrentTargetPose; // actual pose used as target in the supervising controller, it can be either finalTargetPose or the filtered pose coming out from the pose tracking 
 	double thumbEnc,indexEnc,middleEnc,interMiddleEnc,enc8,handPosition;
+	std::vector<double> distalJoints;
+	double abductionJoint;
 	double svTrackerVel = commonData->tpDbl(27);
 	double svTrackerAcc = commonData->tpDbl(28);
     bool policyLearningEnabled = commonData->tpInt(51) != 0;
 	bool newValuesPL;
+	int bestPoseEstimatorMethod = commonData->tpInt(56);
 	// if the grip strength wave generator is not active, the grip strength is read from the temp params 
 	double gripStrength = commonData->tpDbl(7);
+	double indMidPressureBalanceBestPose = commonData->tpDbl(9);
 	if (supervisorControlMode){
 		thumbEnc = commonData->armEncodersAngles[9];
 		indexEnc = commonData->armEncodersAngles[11];
@@ -282,22 +286,35 @@ void ControlTask::calculateControlInput(){
 
 			// using the "simple" method
 			//svErrOld = (1.417*thumbEnc - 12.22) - middleEnc;
-			
-			// using the neural network
-			std::vector<double> actualAngles(2);
-			std::vector<double> rotatedAngles;
-			actualAngles[0] = thumbEnc;
-			actualAngles[1] = middleEnc;
-			ICubUtil::rotateFingersData(actualAngles,rotatedAngles);
-			Vector rotatedAnglesVector;
-			rotatedAnglesVector.resize(2);
-			rotatedAnglesVector[0] = rotatedAngles[0];
-			rotatedAnglesVector[1] = rotatedAngles[1];
-			Vector estimatedBestPositionNNVector = neuralNetwork.predict(rotatedAnglesVector);
-			estimatedFinalPose = estimatedBestPositionNNVector[0];
 
 			// handPosition = middleEnc - thumbEnc;
 			handPosition = (middleEnc - thumbEnc)/2;
+
+			// using the neural network
+			if (bestPoseEstimatorMethod == 0){
+				std::vector<double> actualAngles(2);
+				std::vector<double> rotatedAngles;
+				actualAngles[0] = thumbEnc;
+				actualAngles[1] = middleEnc;
+				ICubUtil::rotateFingersData(actualAngles,rotatedAngles);
+				Vector rotatedAnglesVector;
+				rotatedAnglesVector.resize(2);
+				rotatedAnglesVector[0] = rotatedAngles[0];
+				rotatedAnglesVector[1] = rotatedAngles[1];
+				Vector estimatedBestPositionNNVector = neuralNetwork.predict(rotatedAnglesVector);
+				estimatedFinalPose = estimatedBestPositionNNVector[0];
+			} else {
+			// using the gaussian mixture model
+
+				// TODO 
+				estimatedFinalPose = 0;
+				distalJoints[0] = 15;
+				distalJoints[1] = 15;
+				distalJoints[2] = 15;
+				abductionJoint = 60;
+				indMidPressureBalanceBestPose = 0;
+				gripStrength = 70;
+			}
 
 		} else {
 
@@ -308,26 +325,60 @@ void ControlTask::calculateControlInput(){
 			// si applica la formula della distanza tenendo conto che la differenza per i giunti di pollice e indice e' nulla. In teoria si sarebbe potuta evitare la divisione per due, perche' a noi interessa l'errore a meno di una costante
 			//svErrOld = (interMiddleEnc - middleEnc)/2;
 
-			// using the neural network
-			std::vector<double> actualAngles(3);
-			std::vector<double> rotatedAngles;
-			actualAngles[0] = thumbEnc;
-			actualAngles[1] = indexEnc;
-			actualAngles[2] = middleEnc;
-			ICubUtil::rotateFingersData(actualAngles,rotatedAngles);
-			Vector rotatedAnglesVector;
-			rotatedAnglesVector.resize(3);
-			rotatedAnglesVector[0] = rotatedAngles[0];
-			rotatedAnglesVector[1] = rotatedAngles[1];
-			rotatedAnglesVector[2] = rotatedAngles[2];
-			Vector estimatedBestPositionNNVector = neuralNetwork.predict(rotatedAnglesVector);
-			estimatedFinalPose = estimatedBestPositionNNVector[0];
-
 			// handPosition = (middleEnc + indexEnc)/2 - thumbEnc;
 			handPosition = ((middleEnc + indexEnc)/2 - thumbEnc)/2;
+
+
+			// using the neural network
+			if (bestPoseEstimatorMethod == 0){
+				std::vector<double> actualAngles(3);
+				std::vector<double> rotatedAngles;
+				actualAngles[0] = thumbEnc;
+				actualAngles[1] = indexEnc;
+				actualAngles[2] = middleEnc;
+				ICubUtil::rotateFingersData(actualAngles,rotatedAngles);
+				Vector rotatedAnglesVector;
+				rotatedAnglesVector.resize(3);
+				rotatedAnglesVector[0] = rotatedAngles[0];
+				rotatedAnglesVector[1] = rotatedAngles[1];
+				rotatedAnglesVector[2] = rotatedAngles[2];
+				Vector estimatedBestPositionNNVector = neuralNetwork.predict(rotatedAnglesVector);
+				estimatedFinalPose = estimatedBestPositionNNVector[0];
+			} else {
+			// using the gaussian mixture model
+
+				// Query: <aperture(1),indMidPosDiff(1)> Output: <estimatedFinalPose(1),distalJoints(3),abductJoint(1),indMidPresDiff(1),gripStrength(1)>
+				yarp::sig::Vector queryPoint,output;
+				
+				queryPoint.resize(2);
+				
+				double aperture = 180 - (middleEnc + indexEnc)/2 - thumbEnc;
+				double indMidPosDiff = middleEnc - indexEnc;
+				queryPoint[0] = aperture;
+				queryPoint[1] = indMidPosDiff;
+
+				controlData->gmmData->runGaussianMixtureRegression(queryPoint,output);
+
+				// TODO 
+				estimatedFinalPose = output[0];
+				distalJoints[0] = output[1]; // thumb
+				distalJoints[1] = output[2]; // index finger
+				distalJoints[2] = output[3]; // middle finger
+				abductionJoint = output[4];
+				indMidPressureBalanceBestPose = output[5];
+				gripStrength = output[6];
+
+				// move joints in position
+				controllersUtil->setJointAngle(8,abductionJoint);
+				controllersUtil->setJointAngle(10,distalJoints[0]); // thumb
+				controllersUtil->setJointAngle(12,distalJoints[1]); // index finger
+				controllersUtil->setJointAngle(14,distalJoints[2]); // middle finger
+
+			}
 		}
 
 		svCurrentPosition = handPosition;
+
 		svErr = estimatedFinalPose - svCurrentPosition;
 
 		// hand pose square wave / sinusoid generator
@@ -374,7 +425,7 @@ void ControlTask::calculateControlInput(){
 				} 
                 currentActionFinalTargetPose = policyActionsData[2];
 				//controllersUtil->setJointAngle(8,policyActionsData[1]); //2A
-				indMidPressureBalance = commonData->tpDbl(9); // 1-2A
+				indMidPressureBalance = indMidPressureBalanceBestPose; // 1-2A
 				//indMidPressureBalance = policyActionsData[3]; // 3A
             }
 
@@ -387,7 +438,7 @@ void ControlTask::calculateControlInput(){
 			}
 
 		} else {
-			indMidPressureBalance = commonData->tpDbl(9);
+			indMidPressureBalance = indMidPressureBalanceBestPose;
 		}
 
 		// TRACKING MODE
@@ -647,6 +698,12 @@ void ControlTask::calculateControlInput(){
 
 	// log control data
 	portsUtil->sendControlData(taskId,commonData->tpStr(16),commonData->tpStr(17),gripStrength,actualGripStrength,commonData->tpDbl(8)+svResultValueScaled,svErr,svCurrentPosition,actualCurrentTargetPose,finalTargetPose,estimatedFinalPose,svKp*commonData->tpDbl(5),svKi*commonData->tpDbl(5),svKd*commonData->tpDbl(5),thumbEnc,indexEnc,middleEnc,enc8,pressureTargetValue,commonData->overallFingerPressure,inputCommandValue,fingersList);
+
+	// log gaussian mixture model data
+	if (commonData->tpInt(55) != 0){
+		portsUtil->sendGMMData(gripStrength,indMidPressureBalance,commonData);
+		commonData->tempParameters[55] = Value(0);
+	}
 
 	// log object recognition data
 	if (objectRecognitionEnabled){

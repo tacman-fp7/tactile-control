@@ -8,6 +8,9 @@
 
 #include <yarp/os/Bottle.h>
 #include <yarp/os/Value.h>
+#include <yarp/sig/Vector.h>
+#include <yarp/sig/Matrix.h>
+
 
 #include <vector>
 
@@ -26,6 +29,9 @@ namespace iCub {
 
 				static bool updateExternalData(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData);
 
+				static void putDataIntoVector(const double *dataIn,int size,yarp::sig::Vector &dataOut);
+				static void putDataIntoMatrix(const double *dataIn,int rows,int columns,yarp::sig::Matrix &dataOut);
+
 		private:
 
 				static void processTactileData(iCub::plantIdentification::TaskCommonData *commonData);
@@ -36,7 +42,7 @@ namespace iCub {
 				static void getUnitVector(int index,std::vector<double>& unitVector);
 
 				static double getForceByLearntMapping(std::vector<double>& tactileData);
-				
+
 				static void addOption(yarp::os::Bottle &bottle,const char *paramName,yarp::os::Value paramValue);
 
 				static void addOption(yarp::os::Bottle &bottle,const char *paramName,yarp::os::Value paramValue1,yarp::os::Value paramValue2);
