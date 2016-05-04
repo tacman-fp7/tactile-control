@@ -134,14 +134,16 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
 			// default values	
         } else {
 			commonData.tempParameters[52] = 1.0;
-            commonData.tempParameters[53] = 0.3;
+            		commonData.tempParameters[53] = 0.3;
 			commonData.tempParameters[54] = 2.0;
         }
     } else {
         if (whichHand == "right"){
 			// default values
         } else {
-			// default values
+			commonData.tempParameters[52] = 0.5;
+            		commonData.tempParameters[53] = 1.0;
+			commonData.tempParameters[54] = 1.0;
         }
     }
 

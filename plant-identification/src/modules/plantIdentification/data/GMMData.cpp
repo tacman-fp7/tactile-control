@@ -3,6 +3,7 @@
 #include "iCub/plantIdentification/util/ICubUtil.h"
 
 #include <yarp/math/Math.h>
+#include <math.h>
 
 using iCub::plantIdentification::GMMData;
 
