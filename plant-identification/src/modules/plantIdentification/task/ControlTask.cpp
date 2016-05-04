@@ -361,18 +361,18 @@ void ControlTask::calculateControlInput(){
 
 				// TODO 
 				estimatedFinalPose = output[0];
-				distalJoints[0] = output[1]; // thumb
-				distalJoints[1] = output[2]; // index finger
-				distalJoints[2] = output[3]; // middle finger
-				abductionJoint = output[4];
-				indMidPressureBalanceBestPose = output[5];
-				gripStrength = output[6];
+				//distalJoints[0] = output[1]; // thumb
+				//distalJoints[1] = output[2]; // index finger
+				//distalJoints[2] = output[3]; // middle finger
+				//abductionJoint = output[4];
+				//indMidPressureBalanceBestPose = output[5];
+				//gripStrength = output[6];
 
 				// move joints in position
-				controllersUtil->setJointAngle(8,abductionJoint);
-				controllersUtil->setJointAngle(10,distalJoints[0]); // thumb
-				controllersUtil->setJointAngle(12,distalJoints[1]); // index finger
-				controllersUtil->setJointAngle(14,distalJoints[2]); // middle finger
+				//controllersUtil->setJointAngle(8,abductionJoint);
+				//controllersUtil->setJointAngle(10,distalJoints[0]); // thumb
+				//controllersUtil->setJointAngle(12,distalJoints[1]); // index finger
+				//controllersUtil->setJointAngle(14,distalJoints[2]); // middle finger
 
 			}
 		}

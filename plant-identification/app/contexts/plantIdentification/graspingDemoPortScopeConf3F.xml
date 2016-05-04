@@ -16,6 +16,12 @@
                type="lines"
                size="1" />
         <graph remote="/plantIdentification/control"
+               index="9"
+               color="Black"
+               title="Predicted Hand Position"
+               type="lines"
+               size="1" />
+        <graph remote="/plantIdentification/control"
                index="10"
                color="Blue"
                title="Actual Hand Position"
