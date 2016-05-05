@@ -266,6 +266,9 @@ void ControlTask::calculateControlInput(){
 	double thumbEnc,indexEnc,middleEnc,interMiddleEnc,enc8,handPosition;
 	std::vector<double> distalJoints;
 	double abductionJoint;
+	double handAperture;
+	double indMidPosDiff;
+	double targetThumbDistalJoint,targetIndexDistalJoint,targetMiddleDistalJoint,targetThumbAbductionJoint;
 	double svTrackerVel = commonData->tpDbl(27);
 	double svTrackerAcc = commonData->tpDbl(28);
     bool policyLearningEnabled = commonData->tpInt(51) != 0;
@@ -352,27 +355,27 @@ void ControlTask::calculateControlInput(){
 				
 				queryPoint.resize(2);
 				
-				double aperture = 180 - (middleEnc + indexEnc)/2 - thumbEnc;
-				double indMidPosDiff = middleEnc - indexEnc;
-				queryPoint[0] = aperture;
+				handAperture = 180 - (middleEnc + indexEnc)/2 - thumbEnc;
+				indMidPosDiff = middleEnc - indexEnc;
+				queryPoint[0] = handAperture;
 				queryPoint[1] = indMidPosDiff;
 
 				controlData->gmmData->runGaussianMixtureRegression(queryPoint,output);
 
 				// TODO 
 				estimatedFinalPose = output[0];
-				//distalJoints[0] = output[1]; // thumb
-				//distalJoints[1] = output[2]; // index finger
-				//distalJoints[2] = output[3]; // middle finger
-				//abductionJoint = output[4];
-				//indMidPressureBalanceBestPose = output[5];
+				distalJoints[0] = targetThumbDistalJoint = output[1]; // thumb
+				distalJoints[1] = targetIndexDistalJoint = output[2]; // index finger
+				distalJoints[2] = targetMiddleDistalJoint = output[3]; // middle finger
+				abductionJoint = targetThumbAbductionJoint = output[4];
+				indMidPressureBalanceBestPose = output[5];
 				//gripStrength = output[6];
 
 				// move joints in position
-				//controllersUtil->setJointAngle(8,abductionJoint);
-				//controllersUtil->setJointAngle(10,distalJoints[0]); // thumb
-				//controllersUtil->setJointAngle(12,distalJoints[1]); // index finger
-				//controllersUtil->setJointAngle(14,distalJoints[2]); // middle finger
+				controllersUtil->setJointAngle(8,abductionJoint);
+				controllersUtil->setJointAngle(10,distalJoints[0]); // thumb
+				controllersUtil->setJointAngle(12,distalJoints[1]); // index finger
+				controllersUtil->setJointAngle(14,distalJoints[2]); // middle finger
 
 			}
 		}
@@ -699,7 +702,12 @@ void ControlTask::calculateControlInput(){
 	// log control data
 	portsUtil->sendControlData(taskId,commonData->tpStr(16),commonData->tpStr(17),gripStrength,actualGripStrength,commonData->tpDbl(8)+svResultValueScaled,svErr,svCurrentPosition,actualCurrentTargetPose,finalTargetPose,estimatedFinalPose,svKp*commonData->tpDbl(5),svKi*commonData->tpDbl(5),svKd*commonData->tpDbl(5),thumbEnc,indexEnc,middleEnc,enc8,pressureTargetValue,commonData->overallFingerPressure,inputCommandValue,fingersList);
 
-	// log gaussian mixture model data
+	// log gaussian mixture model regression data
+	if (bestPoseEstimatorMethod == 0){
+		portsUtil->sendGMMRegressionData(handAperture,indMidPosDiff,estimatedFinalPose,handPosition,targetThumbDistalJoint,targetIndexDistalJoint,targetMiddleDistalJoint,targetThumbAbductionJoint,indMidPressureBalance,0,gripStrength,actualGripStrength,commonData);
+	}
+
+	// log best pose (for the gaussian mixture model)
 	if (commonData->tpInt(55) != 0){
 		portsUtil->sendGMMData(gripStrength,indMidPressureBalance,commonData);
 		commonData->tempParameters[55] = Value(0);

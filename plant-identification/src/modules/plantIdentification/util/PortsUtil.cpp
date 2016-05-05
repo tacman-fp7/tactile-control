@@ -31,6 +31,7 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
     string infoDataPortName = "/plantIdentification/info";
     string controlDataPortName = "/plantIdentification/control";
     string gmmDataPortName = "/plantIdentification/gmm:o";
+    string gmmRegressionDataPortName = "/plantIdentification/gmmRegression:o";
     string objectRecognitionDataPortName = "/plantIdentification/object_recognition_log:o";
 
     // opening ports
@@ -64,6 +65,10 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
     }
 	if (!portGMMDataOut.open(gmmDataPortName)){
         cout << dbgTag << "could not open " << gmmDataPortName << " port \n";
+        return false;
+    }
+	if (!portGMMRegressionDataOut.open(gmmRegressionDataPortName)){
+        cout << dbgTag << "could not open " << gmmRegressionDataPortName << " port \n";
         return false;
     }
 	if (!portObjRecognDataOut.open(objectRecognitionDataPortName)){
@@ -198,6 +203,67 @@ bool PortsUtil::sendGMMData(double gripStrength, double indexMiddleFingerPressur
 	for(size_t i = 0; i < commonData->armEncodersAngles.size(); i++){
 		objGMMBottle.addDouble(commonData->armEncodersAngles[i]);
 	}
+
+	portGMMDataOut.write();
+
+	return true;
+
+}
+
+bool PortsUtil::sendGMMRegressionData(double handAperture,double indMidPosDiff,double targetHandPosition,double actualHandPosition,double targetThumbDistalJoint,double targetIndexDistalJoint,double targetMiddleDistalJoint,double targetThumbAbductionJoint, double targetIndMidForceBalance, double actualIndMidForceBalance,double targetGripStrength,double actualGripStrength,iCub::plantIdentification::TaskCommonData *commonData){
+
+
+	using yarp::os::Bottle;
+
+	Bottle& objGMMRegressionBottle = portGMMRegressionDataOut.prepare();
+	objGMMRegressionBottle.clear();
+
+
+    // hand aperture (query variable)
+	objGMMRegressionBottle.addDouble(handAperture);
+
+    // index/middle finger position difference (query variable)
+	objGMMRegressionBottle.addDouble(indMidPosDiff);
+
+    // target hand position (output variable)
+	objGMMRegressionBottle.addDouble(targetHandPosition);
+    // actual hand position
+	objGMMRegressionBottle.addDouble(actualHandPosition);
+
+    // target hand position (output variable)
+	objGMMRegressionBottle.addDouble(targetHandPosition);
+    // actual hand position
+	objGMMRegressionBottle.addDouble(actualHandPosition);
+
+    // target thumb distal joint (output variable)
+	objGMMRegressionBottle.addDouble(targetThumbDistalJoint);
+    // actual thumb distal joint
+	objGMMRegressionBottle.addDouble(commonData->armEncodersAngles[10]);
+
+    // target index distal joint (output variable)
+	objGMMRegressionBottle.addDouble(targetIndexDistalJoint);
+    // actual index distal joint
+	objGMMRegressionBottle.addDouble(commonData->armEncodersAngles[12]);
+
+    // target middle distal joint (output variable)
+	objGMMRegressionBottle.addDouble(targetMiddleDistalJoint);
+    // actual middle distal joint
+	objGMMRegressionBottle.addDouble(commonData->armEncodersAngles[14]);
+
+    // target thumb abduction joint (output variable)
+	objGMMRegressionBottle.addDouble(targetThumbAbductionJoint);
+    // actual thumb abduction joint
+	objGMMRegressionBottle.addDouble(commonData->armEncodersAngles[8]);
+
+    // target index/middle force balance (output variable)
+	objGMMRegressionBottle.addDouble(targetIndMidForceBalance);
+    // actual index/middle force balance
+	objGMMRegressionBottle.addDouble(actualIndMidForceBalance);
+
+    // target grip strength (output variable)
+	objGMMRegressionBottle.addDouble(targetGripStrength);
+    // actual grip strength
+	objGMMRegressionBottle.addDouble(actualGripStrength);
 
 	portGMMDataOut.write();
 

@@ -30,6 +30,7 @@ namespace iCub {
 				yarp::os::BufferedPort<yarp::os::Bottle> portInfoDataOut;
 				yarp::os::BufferedPort<yarp::os::Bottle> portControlDataOut;
 				yarp::os::BufferedPort<yarp::os::Bottle> portGMMDataOut;
+				yarp::os::BufferedPort<yarp::os::Bottle> portGMMRegressionDataOut;
 				yarp::os::BufferedPort<yarp::os::Bottle> portObjRecognDataOut;
 
                 /* ******* Debug attributes.                ******* */
@@ -50,6 +51,8 @@ namespace iCub {
 				bool sendObjectRecognitionData(std::string taskId,int objectId,iCub::plantIdentification::ObjectRecognitionTask objRecTask,int extraCode1,int extraCode2,int skipPreviousRepetition,std::string experimentDescription,std::string previousExperimentDescription,iCub::plantIdentification::TaskCommonData *commonData);
 
 				bool sendGMMData(double gripStrength, double indexMiddleFingerPressureBalance, iCub::plantIdentification::TaskCommonData *commonData);
+
+				bool sendGMMRegressionData(double handAperture,double indMidPosDiff,double targetHandPosition,double actualHandPosition,double targetThumbDistalJoint,double targetIndexDistalJoint,double targetMiddleDistalJoint,double targetThumbAbductionJoint, double targetIndMidForceBalance, double actualIndMidForceBalance,double targetGripStrength,double actualGripStrength,iCub::plantIdentification::TaskCommonData *commonData);
 
 				bool readFingerSkinRawData(std::vector<std::vector<double> > &fingerTaxelsRawData,std::vector<double> &fingersSensitivityScale);
 
