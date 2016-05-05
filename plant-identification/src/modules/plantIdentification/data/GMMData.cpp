@@ -161,13 +161,12 @@ void GMMData::runGaussianMixtureRegression(yarp::sig::Vector &queryPoint,yarp::s
 		h[i] = hNumerator[i]/hDenominator;
 	}
 
-
+	
 	output.resize(muR[0].length(),0.0);
 
 	for (size_t i = 0; i < numGMComponents; i++){
 
 		output = output + h[i] * (muR[i] + (sigmaRQ[i] * (sigmaQQInv[i] * (queryPoint - muQ[i]))));
 	}
-
 
 }

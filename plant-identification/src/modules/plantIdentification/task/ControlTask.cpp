@@ -265,6 +265,7 @@ void ControlTask::calculateControlInput(){
 	double actualCurrentTargetPose; // actual pose used as target in the supervising controller, it can be either finalTargetPose or the filtered pose coming out from the pose tracking 
 	double thumbEnc,indexEnc,middleEnc,interMiddleEnc,enc8,handPosition;
 	std::vector<double> distalJoints;
+	distalJoints.resize(3);
 	double abductionJoint;
 	double handAperture;
 	double indMidPosDiff;
@@ -361,14 +362,21 @@ void ControlTask::calculateControlInput(){
 				queryPoint[1] = indMidPosDiff;
 
 				controlData->gmmData->runGaussianMixtureRegression(queryPoint,output);
+				
 
 				// TODO 
 				estimatedFinalPose = output[0];
+
 				distalJoints[0] = targetThumbDistalJoint = output[1]; // thumb
+
 				distalJoints[1] = targetIndexDistalJoint = output[2]; // index finger
+
 				distalJoints[2] = targetMiddleDistalJoint = output[3]; // middle finger
+
 				abductionJoint = targetThumbAbductionJoint = output[4];
+
 				indMidPressureBalanceBestPose = output[5];
+
 				//gripStrength = output[6];
 
 				// move joints in position
@@ -703,7 +711,7 @@ void ControlTask::calculateControlInput(){
 	portsUtil->sendControlData(taskId,commonData->tpStr(16),commonData->tpStr(17),gripStrength,actualGripStrength,commonData->tpDbl(8)+svResultValueScaled,svErr,svCurrentPosition,actualCurrentTargetPose,finalTargetPose,estimatedFinalPose,svKp*commonData->tpDbl(5),svKi*commonData->tpDbl(5),svKd*commonData->tpDbl(5),thumbEnc,indexEnc,middleEnc,enc8,pressureTargetValue,commonData->overallFingerPressure,inputCommandValue,fingersList);
 
 	// log gaussian mixture model regression data
-	if (bestPoseEstimatorMethod == 0){
+	if (bestPoseEstimatorMethod == 1){
 		portsUtil->sendGMMRegressionData(handAperture,indMidPosDiff,estimatedFinalPose,handPosition,targetThumbDistalJoint,targetIndexDistalJoint,targetMiddleDistalJoint,targetThumbAbductionJoint,indMidPressureBalance,0,gripStrength,actualGripStrength,commonData);
 	}
 

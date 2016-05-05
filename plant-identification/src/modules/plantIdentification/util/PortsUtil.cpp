@@ -219,53 +219,48 @@ bool PortsUtil::sendGMMRegressionData(double handAperture,double indMidPosDiff,d
 	objGMMRegressionBottle.clear();
 
 
-    // hand aperture (query variable)
+    // hand aperture (query variable) (1)
 	objGMMRegressionBottle.addDouble(handAperture);
 
-    // index/middle finger position difference (query variable)
+    // index/middle finger position difference (query variable) (2)
 	objGMMRegressionBottle.addDouble(indMidPosDiff);
 
-    // target hand position (output variable)
+    // target hand position (output variable) (3)
 	objGMMRegressionBottle.addDouble(targetHandPosition);
-    // actual hand position
+    // actual hand position (4)
 	objGMMRegressionBottle.addDouble(actualHandPosition);
 
-    // target hand position (output variable)
-	objGMMRegressionBottle.addDouble(targetHandPosition);
-    // actual hand position
-	objGMMRegressionBottle.addDouble(actualHandPosition);
-
-    // target thumb distal joint (output variable)
+    // target thumb distal joint (output variable) (5)
 	objGMMRegressionBottle.addDouble(targetThumbDistalJoint);
-    // actual thumb distal joint
+    // actual thumb distal joint (6)
 	objGMMRegressionBottle.addDouble(commonData->armEncodersAngles[10]);
 
-    // target index distal joint (output variable)
+    // target index distal joint (output variable) (7)
 	objGMMRegressionBottle.addDouble(targetIndexDistalJoint);
-    // actual index distal joint
+    // actual index distal joint (8)
 	objGMMRegressionBottle.addDouble(commonData->armEncodersAngles[12]);
 
-    // target middle distal joint (output variable)
+    // target middle distal joint (output variable) (9)
 	objGMMRegressionBottle.addDouble(targetMiddleDistalJoint);
-    // actual middle distal joint
+    // actual middle distal joint (10)
 	objGMMRegressionBottle.addDouble(commonData->armEncodersAngles[14]);
 
-    // target thumb abduction joint (output variable)
+    // target thumb abduction joint (output variable) (11)
 	objGMMRegressionBottle.addDouble(targetThumbAbductionJoint);
-    // actual thumb abduction joint
+    // actual thumb abduction joint (12)
 	objGMMRegressionBottle.addDouble(commonData->armEncodersAngles[8]);
 
-    // target index/middle force balance (output variable)
+    // target index/middle force balance (output variable) (13)
 	objGMMRegressionBottle.addDouble(targetIndMidForceBalance);
-    // actual index/middle force balance
+    // actual index/middle force balance (14)
 	objGMMRegressionBottle.addDouble(actualIndMidForceBalance);
 
-    // target grip strength (output variable)
+    // target grip strength (output variable) (15)
 	objGMMRegressionBottle.addDouble(targetGripStrength);
-    // actual grip strength
+    // actual grip strength (16)
 	objGMMRegressionBottle.addDouble(actualGripStrength);
 
-	portGMMDataOut.write();
+	portGMMRegressionDataOut.write();
 
 	return true;
 
