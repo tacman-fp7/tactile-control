@@ -7,6 +7,7 @@
 #include <yarp/dev/IEncoders.h>
 #include <yarp/dev/GazeControl.h>
 #include <yarp/dev/CartesianControl.h>
+#include <yarp/dev/IPositionDirect.h>
 #include <yarp/dev/ControlBoardInterfaces.h>
 #include <yarp/os/ResourceFinder.h>
 #include <yarp/sig/Vector.h>
@@ -32,6 +33,7 @@ namespace iCub {
 				yarp::dev::IControlMode2 *iCtrl;
 				yarp::dev::IPositionControl *iPos;
 				yarp::dev::IVelocityControl *iVel;
+				yarp::dev::IPositionDirect *iPosDir;
 				yarp::dev::IPidControl *iPid;
 				yarp::dev::IGazeControl *iGaze;
                 yarp::dev::ICartesianControl *iCart;
@@ -106,6 +108,8 @@ namespace iCub {
 				bool restoreFixationPoint();
 
 				bool setJointAngle(int joint,double angle);
+
+				bool setJointAnglePositionDirect(int joint,double angle);
 
 
 			private:

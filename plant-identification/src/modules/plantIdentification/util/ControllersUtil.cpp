@@ -75,6 +75,11 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
 		cout << dbgTag << "could not open velocity interface\n";
         return false;
     }
+	clientArm.view(iPosDir);
+    if (!iPosDir) {
+		cout << dbgTag << "could not open position direct interface\n";
+        return false;
+    }
 	clientArm.view(iPid);
     if (!iPid) {
 		cout << dbgTag << "could not open pid interface\n";
@@ -949,6 +954,13 @@ bool ControllersUtil::restoreFixationPoint(){
 bool ControllersUtil::setJointAngle(int joint,double angle){
 
 	iPos->positionMove(joint,angle);
+
+	return true;
+}
+
+bool ControllersUtil::setJointAnglePositionDirect(int joint,double angle){
+
+	iPosDir->setPosition(joint,angle);
 
 	return true;
 }

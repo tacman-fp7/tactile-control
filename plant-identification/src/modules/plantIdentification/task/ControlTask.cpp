@@ -230,6 +230,13 @@ void ControlTask::init(){
     // TODO WORKAROUND TO REMOVE
     if (disablePIDIntegralGain) controllersUtil->resetPIDIntegralGain(8);
 
+	if (commonData->tpInt(56) == 1){
+		controllersUtil->setControlMode(8,VOCAB_CM_POSITION_DIRECT,false);
+		controllersUtil->setControlMode(10,VOCAB_CM_POSITION_DIRECT,false);
+		controllersUtil->setControlMode(12,VOCAB_CM_POSITION_DIRECT,false);
+		controllersUtil->setControlMode(14,VOCAB_CM_POSITION_DIRECT,false);
+	}
+
 	cout << "\n\n" << dbgTag << "TASK STARTED - Target: ";
 	for(size_t i = 0; i < pressureTargetValue.size(); i++){
 		cout << pressureTargetValue[i] << " ";
@@ -380,10 +387,10 @@ void ControlTask::calculateControlInput(){
 				//gripStrength = output[6];
 
 				// move joints in position
-				controllersUtil->setJointAngle(8,abductionJoint);
-				controllersUtil->setJointAngle(10,distalJoints[0]); // thumb
-				controllersUtil->setJointAngle(12,distalJoints[1]); // index finger
-				controllersUtil->setJointAngle(14,distalJoints[2]); // middle finger
+				controllersUtil->setJointAnglePositionDirect(8,abductionJoint);
+				controllersUtil->setJointAnglePositionDirect(10,distalJoints[0]); // thumb
+				controllersUtil->setJointAnglePositionDirect(12,distalJoints[1]); // index finger
+				controllersUtil->setJointAnglePositionDirect(14,distalJoints[2]); // middle finger
 
 			}
 		}
@@ -787,6 +794,14 @@ void ControlTask::release(){
 
     // TODO WORKAROUND TO REMOVE
     if (disablePIDIntegralGain) controllersUtil->restorePIDIntegralGain(8);
+
+	if (commonData->tpInt(56) == 1){
+		controllersUtil->setControlMode(8,VOCAB_CM_POSITION,false);
+		controllersUtil->setControlMode(10,VOCAB_CM_POSITION,false);
+		controllersUtil->setControlMode(12,VOCAB_CM_POSITION,false);
+		controllersUtil->setControlMode(14,VOCAB_CM_POSITION,false);
+	}
+
 }
 
 void ControlTask::addOption(Bottle &bottle,const char *paramName,Value paramValue){
