@@ -199,7 +199,7 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 		ICubUtil::getNNOptionsForErrorPrediction3Fingers(nnConfBottle);
 	}
 
-	nnConfProperty.fromString(nnConfBottle.toString());
+    nnConfProperty.fromString(nnConfBottle.toString());
 	neuralNetwork.configure(nnConfProperty);
 	
 	trackingModeEnabled = false;
@@ -371,16 +371,16 @@ void ControlTask::calculateControlInput(){
 				controlData->gmmData->runGaussianMixtureRegression(queryPoint,output);
 				
 
-				// TODO 
-				estimatedFinalPose = output[0];
+                estimatedFinalPose = output[0];
 
-				distalJoints[0] = targetThumbDistalJoint = output[1]; // thumb
+                // TODO  manual corrections to be removed!
+                distalJoints[0] = targetThumbDistalJoint = output[1] + 20; // thumb
 
-				distalJoints[1] = targetIndexDistalJoint = output[2]; // index finger
+                distalJoints[1] = targetIndexDistalJoint = output[2] + 20; // index finger
 
-				distalJoints[2] = targetMiddleDistalJoint = output[3]; // middle finger
+                distalJoints[2] = targetMiddleDistalJoint = output[3] + 20; // middle finger
 
-				abductionJoint = targetThumbAbductionJoint = output[4];
+                abductionJoint = targetThumbAbductionJoint = output[4] - 26;
 
 				indMidPressureBalanceBestPose = output[5];
 
