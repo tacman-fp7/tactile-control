@@ -133,9 +133,11 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
         if (whichHand == "right"){
 			// default values	
         } else {
-			commonData.tempParameters[52] = 1.0;
-            		commonData.tempParameters[53] = 0.3;
-			commonData.tempParameters[54] = 2.0;
+
+            //TODO commented out just to use the lumix icub!!!
+            //commonData.tempParameters[52] = 1.0;
+            //commonData.tempParameters[53] = 0.3;
+            //commonData.tempParameters[54] = 2.0;
         }
     } else {
         if (whichHand == "right"){

@@ -374,11 +374,11 @@ void ControlTask::calculateControlInput(){
                 estimatedFinalPose = output[0];
 
                 // TODO  manual corrections to be removed!
-                distalJoints[0] = targetThumbDistalJoint = output[1] + 20; // thumb
+                distalJoints[0] = targetThumbDistalJoint = output[1];// + 20; // thumb
 
-                distalJoints[1] = targetIndexDistalJoint = output[2] + 20; // index finger
+                distalJoints[1] = targetIndexDistalJoint = output[2];// + 20; // index finger
 
-                distalJoints[2] = targetMiddleDistalJoint = output[3] + 20; // middle finger
+                distalJoints[2] = targetMiddleDistalJoint = output[3];// + 20; // middle finger
 
                 abductionJoint = targetThumbAbductionJoint = output[4] - 26;
 
