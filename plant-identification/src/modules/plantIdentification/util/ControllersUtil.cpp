@@ -85,6 +85,11 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
 		cout << dbgTag << "could not open pid interface\n";
         return false;
     }
+	clientArm.view(iLim);
+    if (!iLim) {
+		cout << dbgTag << "could not open joint limits interface\n";
+        return false;
+    }
 
 	iPos->getAxes(&armJointsNum);
 	
@@ -95,6 +100,8 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
         refSpeeds[i] = 50;
     }
     iPos->setRefSpeeds(&refSpeeds[0]);
+
+	jointLimits.push_back(iLim);
 
 	if (headEnabled){
 
@@ -963,4 +970,9 @@ bool ControllersUtil::setJointAnglePositionDirect(int joint,double angle){
 	iPosDir->setPosition(joint,angle);
 
 	return true;
+}
+
+std::deque<yarp::dev::IControlLimits*> ControllersUtil::getArmJointLimits(){
+
+	return jointLimits;
 }

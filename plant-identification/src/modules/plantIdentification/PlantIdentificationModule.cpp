@@ -76,7 +76,7 @@ bool PlantIdentificationModule::configure(ResourceFinder &rf) {
     }
     taskThread->suspend();
 
-	eventsThread = new EventsThread(taskData->commonData.eventsThreadPeriod,controllersUtil,portsUtil,&taskData->commonData);
+	eventsThread = new EventsThread(rf,taskData->commonData.eventsThreadPeriod,controllersUtil,portsUtil,&taskData->commonData);
     if (!eventsThread->start()) {
         cout << dbgTag << "Could not start the events thread. \n";
         return false;

@@ -13,6 +13,7 @@
 #include <yarp/sig/Vector.h>
 
 #include <vector>
+#include <deque>
 
 namespace iCub {
     namespace plantIdentification {
@@ -37,6 +38,8 @@ namespace iCub {
 				yarp::dev::IPidControl *iPid;
 				yarp::dev::IGazeControl *iGaze;
                 yarp::dev::ICartesianControl *iCart;
+				yarp::dev::IControlLimits *iLim;
+				std::deque<yarp::dev::IControlLimits*> jointLimits;
 
 				yarp::sig::Vector armStoredPosition;
 				yarp::sig::Vector storedFixationPoint;
@@ -110,6 +113,8 @@ namespace iCub {
 				bool setJointAngle(int joint,double angle);
 
 				bool setJointAnglePositionDirect(int joint,double angle);
+
+				std::deque<yarp::dev::IControlLimits*> getArmJointLimits();
 
 
 			private:

@@ -16,13 +16,17 @@ using iCub::plantIdentification::ControllersUtil;
 using iCub::plantIdentification::PortsUtil;
 
 
-EventsThread::EventsThread(int period,ControllersUtil *controllersUtil,PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData)
+EventsThread::EventsThread(yarp::os::ResourceFinder &rf,int period,ControllersUtil *controllersUtil,PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData)
 	: RateThread(period){
 
 	this->period = period;
 	this->controllersUtil = controllersUtil;
 	this->portsUtil = portsUtil;
 	this->commonData = commonData;
+
+	xyzCoordEnabled = rf.check("xyzCoordEnabled",Value(0)).asInt() != 0;
+
+	counter = 0;
 
 	dbgTag = "EventsThread: ";
 }
@@ -49,10 +53,17 @@ bool EventsThread::threadInit(){
 void EventsThread::run(){
 
 	// update module data
-	ICubUtil::updateExternalData(controllersUtil,portsUtil,commonData);
+	ICubUtil::updateExternalData(controllersUtil,portsUtil,commonData,xyzCoordEnabled);
 
 	// check events
 	checkEvents();
+
+	if (counter%10 == 0){
+		// log various data
+		logData();
+	}
+
+	counter++;
 }
 
 
@@ -75,6 +86,20 @@ void EventsThread::checkEvents(){
 	}
 
 	fpWindowIndex = fpNextWindowIndex;
+
+}
+
+void EventsThread::logData(){
+
+
+
+	bool xyzCoordLoggingEnabled = commonData->tpInt(57) != 0;
+
+	if (xyzCoordLoggingEnabled){
+
+		std::cout << "XYZ | Th - Ind - Mid : " << commonData->thumbXYZ[0] << "  " << commonData->thumbXYZ[1] << "  " << commonData->thumbXYZ[2] << "   -  " << commonData->indexXYZ[0] << "  " << commonData->indexXYZ[1] << "  " << commonData->indexXYZ[2] << "   -  " << commonData->middleXYZ[0] << "  " << commonData->middleXYZ[1] << "  " << commonData->middleXYZ[2] << "\n";
+
+	}
 
 }
 

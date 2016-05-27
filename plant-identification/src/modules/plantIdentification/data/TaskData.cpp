@@ -149,6 +149,12 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
         }
     }
 
+	commonData.iCubThumb = new iCub::iKin::iCubFinger(whichHand + "_thumb");
+	commonData.iCubIndexFinger = new iCub::iKin::iCubFinger(whichHand + "_index");
+	commonData.iCubMiddleFinger = new iCub::iKin::iCubFinger(whichHand + "_middle");
+	commonData.iCubThumb->alignJointsBounds(controllersUtil->getArmJointLimits());
+	commonData.iCubIndexFinger->alignJointsBounds(controllersUtil->getArmJointLimits());
+	commonData.iCubMiddleFinger->alignJointsBounds(controllersUtil->getArmJointLimits());
 
 	Bottle* stepTaskJoints = rf.find("stepTaskJoints").asList();
 	stepData.jointsList.resize(stepTaskJoints->size(),0);

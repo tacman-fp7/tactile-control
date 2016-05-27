@@ -5,6 +5,7 @@
 #include "iCub/plantIdentification/util/ControllersUtil.h"
 #include "iCub/plantIdentification/data/GMMData.h"
 
+#include <iCub/iKin/iKinFwd.h>
 #include <yarp/os/BufferedPort.h>
 #include <yarp/os/ResourceFinder.h>
 #include <yarp/sig/Vector.h>
@@ -28,12 +29,20 @@ namespace iCub {
 			std::vector<double> overallFingerPressureMedian;
 			std::vector<double> objDetectPressureThresholds;
 			std::vector<double> armEncodersAngles;
+
 			std::vector<double> fingerEncodersRawData;
             std::vector<double> realProximalPwm;
             std::vector<double> realDistalPwm;
             std::vector<double> proximalJointAngle;
             std::vector<double> distalJointAngle;
 			std::vector<double> fingersSensitivityScale;
+			yarp::sig::Vector thumbXYZ;
+			yarp::sig::Vector indexXYZ;
+			yarp::sig::Vector middleXYZ;
+			
+			iCub::iKin::iCubFinger* iCubThumb;
+			iCub::iKin::iCubFinger* iCubIndexFinger;
+			iCub::iKin::iCubFinger* iCubMiddleFinger;
 
             
             /*  TEMP PARAMETERS USED DURING CONTROL TASKS (EXCEPT THE 15th, USED DURING STEP TASKS)
@@ -94,6 +103,7 @@ namespace iCub {
 			*	54: middle finger sensitivity scale
 			*   55: if set != 0, log current gmm data (one shot) and returns to 0
 			*   56: best pose estimator [0: neural network / 1: gaussian mixture model]
+			*	57: enable XYZ finger coordinates logging
 			*
 			*   Note: double values have to contain a dot, while strings have to start with '#'
 			*

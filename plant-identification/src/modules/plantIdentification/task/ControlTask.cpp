@@ -271,6 +271,7 @@ void ControlTask::calculateControlInput(){
 	double finalTargetPose; // pose equal to either estimatedFinalPose or the pose coming out from the wave generator, depending on which mode is activated
 	double actualCurrentTargetPose; // actual pose used as target in the supervising controller, it can be either finalTargetPose or the filtered pose coming out from the pose tracking 
 	double thumbEnc,indexEnc,middleEnc,interMiddleEnc,enc8,handPosition;
+	std:
 	std::vector<double> distalJoints;
 	distalJoints.resize(3);
 	double abductionJoint;
@@ -292,6 +293,7 @@ void ControlTask::calculateControlInput(){
 		enc8 = commonData->armEncodersAngles[8];
 		Vector svRef;
 		Vector svFb;
+
 
 		if (jointsList.size() == 2){
 

@@ -6,6 +6,7 @@
 #include "iCub/plantIdentification/util/PortsUtil.h"
 #include "iCub/plantIdentification/PlantIdentificationEnums.h"
 
+#include <yarp/os/ResourceFinder.h>
 #include <yarp/os/RateThread.h>
 
 #include <vector>
@@ -21,6 +22,8 @@ namespace iCub {
 
 				/* ****** Thread attributes                             ****** */
                 int period;
+
+				unsigned long counter;
 
 				iCub::plantIdentification::TaskCommonData *commonData;
 
@@ -40,13 +43,15 @@ namespace iCub {
 				/* ****** Ports utility                                 ****** */
 				iCub::plantIdentification::PortsUtil *portsUtil;
 
+				bool xyzCoordEnabled;
+
                 /* ****** Debug attributes                              ****** */
                 std::string dbgTag;
 
 			
 			public:
 
-				EventsThread(const int period,iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData);
+				EventsThread(yarp::os::ResourceFinder &rf,const int period,iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData);
 				virtual ~EventsThread();
 
                 virtual bool threadInit();
@@ -54,6 +59,8 @@ namespace iCub {
                 virtual void threadRelease();
 
 				void checkEvents();
+
+				void logData();
 
 				bool eventTriggered(iCub::plantIdentification::EventToTrigger eventToTrigger,int index);
 			

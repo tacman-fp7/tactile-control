@@ -220,7 +220,7 @@ void ICubUtil::getNNOptionsForErrorPrediction2Fingers(Bottle& neuralNetworkOptio
 
 }
 
-bool ICubUtil::updateExternalData(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData){
+bool ICubUtil::updateExternalData(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,bool xyzCoordEnabled){
 
 	using yarp::sig::Vector;
 	
@@ -269,6 +269,41 @@ bool ICubUtil::updateExternalData(ControllersUtil *controllersUtil,PortsUtil *po
     // thumb
     controllersUtil->getEncoderAngle(9,&commonData->proximalJointAngle[4]);
     controllersUtil->getEncoderAngle(10,&commonData->distalJointAngle[4]);
+
+
+	if (xyzCoordEnabled){
+		/* calculate the cartesian position of the fingertips respect to the palm */
+		Vector thumbJoints;
+		Vector indexJoints;
+		Vector middleJoints;
+		
+		// std::vector<double> to yarp::sig::Vector
+		Vector armEncoders(commonData->armEncodersAngles.size());
+		for (size_t i = 0; i < armEncoders.size(); i++){
+			armEncoders[i] = commonData->armEncodersAngles[i];
+		}
+		
+		commonData->iCubThumb->getChainJoints(armEncoders,thumbJoints);
+		commonData->iCubIndexFinger->getChainJoints(armEncoders,indexJoints);
+		commonData->iCubMiddleFinger->getChainJoints(armEncoders,middleJoints);
+		
+		// angle correction. When the fingers are pushing against an object, the angle of the first underactuated joint is always zero
+		thumbJoints[thumbJoints.size()-1] = thumbJoints[thumbJoints.size()-1] + thumbJoints[thumbJoints.size()-2];
+		thumbJoints[thumbJoints.size()-2] = 0;
+		indexJoints[indexJoints.size()-1] = indexJoints[indexJoints.size()-1] + indexJoints[indexJoints.size()-2];
+		indexJoints[indexJoints.size()-2] = 0;
+		middleJoints[middleJoints.size()-1] = middleJoints[middleJoints.size()-1] + middleJoints[middleJoints.size()-2];
+		middleJoints[middleJoints.size()-2] = 0;
+		
+		yarp::sig::Matrix thumbTipFrame = commonData->iCubThumb->getH(thumbJoints);
+		yarp::sig::Matrix indexFingertipFrame = commonData->iCubIndexFinger->getH(thumbJoints);
+		yarp::sig::Matrix middleFingertipFrame = commonData->iCubMiddleFinger->getH(middleJoints);
+
+		commonData->thumbXYZ = thumbTipFrame.getCol(3).subVector(0,2);
+		commonData->indexXYZ = indexFingertipFrame.getCol(3).subVector(0,2);
+		commonData->middleXYZ = middleFingertipFrame.getCol(3).subVector(0,2);
+	}
+
 
 	return true;
 }
