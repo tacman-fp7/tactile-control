@@ -282,11 +282,14 @@ bool ICubUtil::updateExternalData(ControllersUtil *controllersUtil,PortsUtil *po
 		for (size_t i = 0; i < armEncoders.size(); i++){
 			armEncoders[i] = commonData->armEncodersAngles[i];
 		}
-		
+
+
 		commonData->iCubThumb->getChainJoints(armEncoders,thumbJoints);
 		commonData->iCubIndexFinger->getChainJoints(armEncoders,indexJoints);
 		commonData->iCubMiddleFinger->getChainJoints(armEncoders,middleJoints);
 		
+
+
 		// angle correction. When the fingers are pushing against an object, the angle of the first underactuated joint is always zero
 		thumbJoints[thumbJoints.size()-1] = thumbJoints[thumbJoints.size()-1] + thumbJoints[thumbJoints.size()-2];
 		thumbJoints[thumbJoints.size()-2] = 0;
@@ -295,9 +298,20 @@ bool ICubUtil::updateExternalData(ControllersUtil *controllersUtil,PortsUtil *po
 		middleJoints[middleJoints.size()-1] = middleJoints[middleJoints.size()-1] + middleJoints[middleJoints.size()-2];
 		middleJoints[middleJoints.size()-2] = 0;
 		
+
 		yarp::sig::Matrix thumbTipFrame = commonData->iCubThumb->getH(thumbJoints);
-		yarp::sig::Matrix indexFingertipFrame = commonData->iCubIndexFinger->getH(thumbJoints);
+        yarp::sig::Matrix indexFingertipFrame = commonData->iCubIndexFinger->getH(indexJoints);
 		yarp::sig::Matrix middleFingertipFrame = commonData->iCubMiddleFinger->getH(middleJoints);
+
+        std::cout << indexFingertipFrame.toString();
+        //for (size_t i = 0; i < indexJoints.size(); i++){
+        //    std::cout << indexJoints[i] << " \t";
+        //}
+        std::cout << "\n";
+        std::cout << "\n";
+        std::cout << "\n";
+
+
 
 		commonData->thumbXYZ = thumbTipFrame.getCol(3).subVector(0,2);
 		commonData->indexXYZ = indexFingertipFrame.getCol(3).subVector(0,2);
