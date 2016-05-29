@@ -267,7 +267,7 @@ void ControlTask::calculateControlInput(){
 	double svResultValueScaled;
 	double svErr;
 	double svCurrentPosition;
-    double estimatedFinalPose; // best pose estimated either by neural networks or by plane fitting
+    double estimatedFinalPose; // best pose estimated either by neural networks or by plane fitting or by gmm regression
 	double finalTargetPose; // pose equal to either estimatedFinalPose or the pose coming out from the wave generator, depending on which mode is activated
 	double actualCurrentTargetPose; // actual pose used as target in the supervising controller, it can be either finalTargetPose or the filtered pose coming out from the pose tracking 
 	double thumbEnc,indexEnc,middleEnc,interMiddleEnc,enc8,handPosition;
@@ -539,8 +539,8 @@ void ControlTask::calculateControlInput(){
 
 		svRef.resize(1,actualCurrentTargetPose);
 		svFb.resize(1,svCurrentPosition);
-		
-		Vector svResult = svPid->compute(svRef,svFb);
+
+        Vector svResult = svPid->compute(svRef,svFb);
 	
 		if (commonData->tpInt(4) != 0){
 			svPid->reset(svResult);
@@ -721,7 +721,7 @@ void ControlTask::calculateControlInput(){
 
 	// log gaussian mixture model regression data
 	if (bestPoseEstimatorMethod == 1){
-		portsUtil->sendGMMRegressionData(handAperture,indMidPosDiff,estimatedFinalPose,handPosition,targetThumbDistalJoint,targetIndexDistalJoint,targetMiddleDistalJoint,targetThumbAbductionJoint,indMidPressureBalance,0,gripStrength,actualGripStrength,commonData);
+        portsUtil->sendGMMRegressionData(handAperture,indMidPosDiff,estimatedFinalPose,handPosition,targetThumbDistalJoint,targetIndexDistalJoint,targetMiddleDistalJoint,targetThumbAbductionJoint,indMidPressureBalanceBestPose,indMidPressureBalance,gripStrength,actualGripStrength,commonData);
 	}
 
 	// log best pose (for the gaussian mixture model)

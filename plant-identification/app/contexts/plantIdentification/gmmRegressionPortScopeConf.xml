@@ -57,8 +57,8 @@
           title="Distal Joints"
           size="201"
           minval="0"
-          maxval="25"
-          bgcolor="#FFEEEE">
+          maxval="50"
+          bgcolor="#EEFFEE">
         <graph remote="/plantIdentification/gmmRegression:o"
                index="5"
                color="Black"
