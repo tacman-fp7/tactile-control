@@ -204,6 +204,13 @@ bool PortsUtil::sendGMMData(double gripStrength, double indexMiddleFingerPressur
 		objGMMBottle.addDouble(commonData->armEncodersAngles[i]);
 	}
 
+	// compensated taxels feedback (60) (84-143)
+	for(size_t i = 0; i < commonData->fingerTaxelsRawData.size(); i++){
+		for(size_t j = 0; j < commonData->fingerTaxelsRawData[i].size(); j++){
+			objGMMBottle.addDouble(commonData->fingerTaxelsRawData[i][j]);
+		}
+	}
+
 	portGMMDataOut.write();
 
 	return true;
