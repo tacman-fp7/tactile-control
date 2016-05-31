@@ -58,10 +58,15 @@ void EventsThread::run(){
 	// check events
 	checkEvents();
 
+
+	executeWaveAction();
+
+
 	if (counter%10 == 0){
-		// log various data
+	// log various data
 		logData();
 	}
+
 
 	counter++;
 }
@@ -132,7 +137,19 @@ bool EventsThread::eventTriggered(EventToTrigger eventToTrigger,int index = 0){
 
 	return false;
 }
- 
+
+void EventsThread::setWaveAction(int actionDuration,double joint,double period,double amplitude,iCub::plantIdentification::Wave waveType){
+
+	waveAction.init(controllersUtil,actionDuration,joint,period,amplitude,waveType,period);
+}
+
+void EventsThread::executeWaveAction(){
+
+	if (waveAction.isEnabled()){
+		waveAction.executeNextStep();
+	}
+}
+
 EventsThread::~EventsThread() {}
 
 void EventsThread::threadRelease() {}

@@ -48,6 +48,8 @@ void RPCCommandsUtil::processCommand(const Bottle &rpcCmdBottle){
 		break;
 	case GRASP: // do nothing
 		break;
+	case WAVE: // do nothing
+		break;
 	case QUIT: // do nothing
 		break;
 

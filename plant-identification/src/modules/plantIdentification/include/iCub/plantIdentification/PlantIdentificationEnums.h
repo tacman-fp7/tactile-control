@@ -15,6 +15,7 @@ namespace iCub {
 			OPEN,
 			ARM,
 			GRASP,
+			WAVE,
 			QUIT
 		};
 
@@ -113,6 +114,12 @@ namespace iCub {
 		enum ObjectRecognitionTask {
 
 			SQUEEZING = 0
+		};
+
+		enum Wave {
+
+			SINE = 0,
+			SQUARE = 1
 		};
 
 	}

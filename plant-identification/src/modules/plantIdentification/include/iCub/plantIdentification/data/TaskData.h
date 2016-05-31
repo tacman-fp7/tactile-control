@@ -104,6 +104,19 @@ namespace iCub {
 			*   55: if set != 0, log current gmm data (one shot) and returns to 0
 			*   56: best pose estimator [0: neural network / 1: gaussian mixture model]
 			*	57: enable XYZ finger coordinates logging
+			*	58: enable <not defined yet> logging
+			*	59: enable <not defined yet> logging
+			*   60: wave action. wave type [0:sine / 1:square]
+			*   61: wave action. amplitude
+			*   62: wave action. period
+			*   63: wave action. arm joint number
+			*   64: wave action. action duration (sec)
+			*	65: <not used yet>
+			*	66: <not used yet>
+			*	67: <not used yet>
+			*	68: <not used yet>
+			*	69: <not used yet>
+			*	70: <not used yet>
 			*
 			*   Note: double values have to contain a dot, while strings have to start with '#'
 			*

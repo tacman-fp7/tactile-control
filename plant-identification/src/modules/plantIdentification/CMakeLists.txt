@@ -31,6 +31,8 @@ set(INC_HEADERS
     include/iCub/plantIdentification/util/RPCCommandsUtil.h
     include/iCub/plantIdentification/util/ICubUtil.h
 
+    include/iCub/plantIdentification/action/WaveAction.h
+
 )
 
 set(INC_SOURCES
@@ -57,6 +59,8 @@ set(INC_SOURCES
     util/PortsUtil.cpp
     util/RPCCommandsUtil.cpp
     util/ICubUtil.cpp
+
+    action/WaveAction.cpp
 
 )
 

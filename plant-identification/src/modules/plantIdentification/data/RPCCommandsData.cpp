@@ -36,6 +36,7 @@ RPCCommandsData::RPCCommandsData(){
 	add("open",OPEN,"STOP TASKS AND OPEN HAND");
 	add("arm",ARM,"set ARM IN TASK POSITION");
 	add("grasp",GRASP,"EXECUTE GRASP TASK");
+	add("wave",WAVE,"EXECUTE WAVE ACTION");
 	add("quit",QUIT,"QUIT MODULE");
 
 	// SET <?>

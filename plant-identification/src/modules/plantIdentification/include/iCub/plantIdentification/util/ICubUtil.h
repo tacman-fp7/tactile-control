@@ -53,7 +53,6 @@ namespace iCub {
 
 				static void addOption(yarp::os::Bottle &bottle,const char *paramName,yarp::os::Value paramValueList[],int numElem);
 
-
 };
     } //namespace plantIdentification
 } //namespace iCub

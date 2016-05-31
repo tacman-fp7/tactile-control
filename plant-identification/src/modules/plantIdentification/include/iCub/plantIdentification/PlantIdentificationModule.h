@@ -70,6 +70,7 @@ namespace iCub {
 				bool open();
 				bool arm();
 				bool grasp();
+				bool wave();
 				bool quit();
 				void set(iCub::plantIdentification::RPCSetCmdArgName paramName,yarp::os::Value paramValue);
 				void task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,yarp::os::Value paramValue);

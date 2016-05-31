@@ -1,6 +1,7 @@
 #ifndef __ICUB_PLANTIDENTIFICATION_EVENTSTHREAD_H__
 #define __ICUB_PLANTIDENTIFICATION_EVENTSTHREAD_H__
 
+#include "iCub/plantIdentification/action/WaveAction.h"
 #include "iCub/plantIdentification/data/TaskData.h"
 #include "iCub/plantIdentification/util/ControllersUtil.h"
 #include "iCub/plantIdentification/util/PortsUtil.h"
@@ -37,6 +38,8 @@ namespace iCub {
 				std::vector<std::vector<double> > fpPressureMemory;
 				std::vector<bool> fpEventTriggered;
 
+				iCub::plantIdentification::WaveAction waveAction;
+
 				/* ******* Controllers utility                          ******* */
                 iCub::plantIdentification::ControllersUtil *controllersUtil;
 
@@ -58,13 +61,17 @@ namespace iCub {
                 virtual void run();
                 virtual void threadRelease();
 
+				bool eventTriggered(iCub::plantIdentification::EventToTrigger eventToTrigger,int index);
+
+				void setWaveAction(int actionDuration,double joint,double period,double amplitude,iCub::plantIdentification::Wave waveType);
+			
+			private:
+
 				void checkEvents();
 
 				void logData();
 
-				bool eventTriggered(iCub::plantIdentification::EventToTrigger eventToTrigger,int index);
-			
-			private:
+				void executeWaveAction();
 
 				bool eventFPTriggered(int whichFinger);
 

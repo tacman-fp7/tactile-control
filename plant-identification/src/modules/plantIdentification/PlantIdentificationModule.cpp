@@ -96,7 +96,6 @@ bool PlantIdentificationModule::configure(ResourceFinder &rf) {
 /* ******* Update    module                                                 ********************************************** */   
 bool PlantIdentificationModule::updateModule() { 
 
-	
 
 	// manage event triggers
 	if (eventsThread->eventTriggered(FINGERTIP_PUSHED,3)){ // pinky
@@ -170,6 +169,9 @@ bool PlantIdentificationModule::respond(const yarp::os::Bottle& command, yarp::o
 		break;
 	case GRASP:
 		grasp();
+		break;
+	case WAVE:
+		wave();
 		break;
 	case QUIT:
         quit();
@@ -265,6 +267,23 @@ bool PlantIdentificationModule::grasp() {
 	task(ADD,APPROACH,Value(0));
 	task(ADD,CONTROL,Value(0));
 	start();
+
+	return true;
+}
+/* *********************************************************************************************************************** */
+
+/* ******* RPC Execute the wave action                                       ********************************************** */
+bool PlantIdentificationModule::wave() {
+	using iCub::plantIdentification::Wave;
+
+	// TODO read parameters from keyboard
+	Wave waveType = static_cast<Wave>(taskData->commonData.tpInt(60));
+	double waveAmplitude = taskData->commonData.tpDbl(61);
+	double wavePeriod = taskData->commonData.tpDbl(62);
+	int armJoint = taskData->commonData.tpInt(63);
+	double actionDuration = taskData->commonData.tpDbl(64);
+
+	eventsThread->setWaveAction(actionDuration,armJoint,wavePeriod,waveAmplitude,waveType);
 
 	return true;
 }
