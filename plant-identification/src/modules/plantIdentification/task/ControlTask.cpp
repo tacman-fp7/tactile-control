@@ -280,6 +280,7 @@ void ControlTask::calculateControlInput(){
 	double targetThumbDistalJoint,targetIndexDistalJoint,targetMiddleDistalJoint,targetThumbAbductionJoint;
 	double svTrackerVel = commonData->tpDbl(27);
 	double svTrackerAcc = commonData->tpDbl(28);
+	bool wavePositionTrackingIsActive = commonData->tpInt(18) != 0;
     bool policyLearningEnabled = commonData->tpInt(51) != 0;
 	bool newValuesPL;
 	int bestPoseEstimatorMethod = commonData->tpInt(56);
@@ -316,17 +317,33 @@ void ControlTask::calculateControlInput(){
 				rotatedAnglesVector[1] = rotatedAngles[1];
 				Vector estimatedBestPositionNNVector = neuralNetwork.predict(rotatedAnglesVector);
 				estimatedFinalPose = estimatedBestPositionNNVector[0];
-			} else {
+			} else if (bestPoseEstimatorMethod == 1){
 			// using the gaussian mixture model
 
 				// TODO 
 				estimatedFinalPose = 0;
-				distalJoints[0] = 15;
-				distalJoints[1] = 15;
-				distalJoints[2] = 15;
-				abductionJoint = 60;
-				indMidPressureBalanceBestPose = 0;
-				gripStrength = 70;
+
+				if (!wavePositionTrackingIsActive){
+					distalJoints[0] = 15;
+					distalJoints[1] = 15;
+					distalJoints[2] = 15;
+					abductionJoint = 60;
+					indMidPressureBalanceBestPose = 0;
+					gripStrength = 70;
+				}
+			} else {
+
+				// TODO 
+				estimatedFinalPose = 0;
+
+				if (!wavePositionTrackingIsActive){
+					distalJoints[0] = 15;
+					distalJoints[1] = 15;
+					distalJoints[2] = 15;
+					abductionJoint = 60;
+					indMidPressureBalanceBestPose = 0;
+					gripStrength = 70;
+				}
 			}
 
 		} else {
@@ -357,8 +374,16 @@ void ControlTask::calculateControlInput(){
 				rotatedAnglesVector[2] = rotatedAngles[2];
 				Vector estimatedBestPositionNNVector = neuralNetwork.predict(rotatedAnglesVector);
 				estimatedFinalPose = estimatedBestPositionNNVector[0];
-			} else {
+			} else if (bestPoseEstimatorMethod == 1){
 			// using the gaussian mixture model
+
+				std::vector<int> qIndexes(2);
+				qIndexes[0] = 0; qIndexes[1] = 1;
+
+				std::vector<int> rIndexes(6);
+				rIndexes[0] = 2; rIndexes[1] = 3; rIndexes[2] = 4; rIndexes[3] = 5; rIndexes[4] = 6; rIndexes[5] = 7;
+
+				controlData->gmmData->buildQRStructures(qIndexes,rIndexes);
 
 				// Query: <aperture(1),indMidPosDiff(1)> Output: <estimatedFinalPose(1),distalJoints(3),abductJoint(1),indMidPresDiff(1),gripStrength(1)>
 				yarp::sig::Vector queryPoint,output;
@@ -373,20 +398,65 @@ void ControlTask::calculateControlInput(){
 				controlData->gmmData->runGaussianMixtureRegression(queryPoint,output);
 				
 
-                estimatedFinalPose = output[0];
+				estimatedFinalPose = output[0];
 
-                // TODO  manual corrections to be removed!
-                distalJoints[0] = targetThumbDistalJoint = output[1];// + 20; // thumb
+				if (!wavePositionTrackingIsActive){
+					// TODO  manual corrections to be removed!
+					distalJoints[0] = targetThumbDistalJoint = output[1];// + 20; // thumb
 
-                distalJoints[1] = targetIndexDistalJoint = output[2];// + 20; // index finger
+					distalJoints[1] = targetIndexDistalJoint = output[2];// + 20; // index finger
 
-                distalJoints[2] = targetMiddleDistalJoint = output[3];// + 20; // middle finger
+					distalJoints[2] = targetMiddleDistalJoint = output[3];// + 20; // middle finger
 
-                abductionJoint = targetThumbAbductionJoint = output[4];// - 26;
+					abductionJoint = targetThumbAbductionJoint = output[4];// - 26;
 
-				indMidPressureBalanceBestPose = output[5];
+					indMidPressureBalanceBestPose = output[5];
 
-				//gripStrength = output[6];
+					//gripStrength = output[6];
+
+					// move joints in position
+					controllersUtil->setJointAnglePositionDirect(8,abductionJoint);
+					controllersUtil->setJointAnglePositionDirect(10,distalJoints[0]); // thumb
+					controllersUtil->setJointAnglePositionDirect(12,distalJoints[1]); // index finger
+					controllersUtil->setJointAnglePositionDirect(14,distalJoints[2]); // middle finger
+				}
+			} else {
+
+				std::vector<int> qIndexes(3);
+				qIndexes[0] = 0; qIndexes[1] = 1; qIndexes[2] = 2;
+
+				std::vector<int> rIndexes(5);
+				rIndexes[0] = 3; rIndexes[1] = 4; rIndexes[2] = 5; rIndexes[3] = 6; rIndexes[4] = 7;
+
+				controlData->gmmData->buildQRStructures(qIndexes,rIndexes);
+
+				// Query: <aperture(1),indMidPosDiff(1)> Output: <estimatedFinalPose(1),distalJoints(3),abductJoint(1),indMidPresDiff(1),gripStrength(1)>
+				yarp::sig::Vector queryPoint,output;
+				
+				queryPoint.resize(3);
+				
+				handAperture = 180 - (middleEnc + indexEnc)/2 - thumbEnc;
+				indMidPosDiff = middleEnc - indexEnc;
+				queryPoint[0] = handAperture;
+				queryPoint[1] = indMidPosDiff;
+				queryPoint[2] = handPosition;
+
+				controlData->gmmData->runGaussianMixtureRegression(queryPoint,output);
+				
+
+				estimatedFinalPose = handPosition;
+
+				// TODO  manual corrections to be removed!
+				distalJoints[0] = targetThumbDistalJoint = output[0];// + 20; // thumb
+
+				distalJoints[1] = targetIndexDistalJoint = output[1];// + 20; // index finger
+
+				distalJoints[2] = targetMiddleDistalJoint = output[2];// + 20; // middle finger
+
+				abductionJoint = targetThumbAbductionJoint = output[3];// - 26;
+
+				indMidPressureBalanceBestPose = output[4];
+
 
 				// move joints in position
 				controllersUtil->setJointAnglePositionDirect(8,abductionJoint);
@@ -395,6 +465,7 @@ void ControlTask::calculateControlInput(){
 				controllersUtil->setJointAnglePositionDirect(14,distalJoints[2]); // middle finger
 
 			}
+
 		}
 
 		svCurrentPosition = handPosition;
@@ -402,7 +473,7 @@ void ControlTask::calculateControlInput(){
 		svErr = estimatedFinalPose - svCurrentPosition;
 
 		// hand pose square wave / sinusoid generator
-		if (commonData->tpInt(18) != 0){
+		if (wavePositionTrackingIsActive){
 			
 			double waveMean = commonData->tpInt(21);
 

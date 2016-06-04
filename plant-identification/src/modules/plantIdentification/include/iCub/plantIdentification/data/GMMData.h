@@ -18,6 +18,11 @@ namespace iCub {
                 std::string dbgTag;
 
 				/* ******* Module attributes.               ******* */
+				int numComponents;
+
+				std::vector<yarp::sig::Vector> mu;
+				std::vector<yarp::sig::Matrix> sigma;
+
 				std::vector<yarp::sig::Vector> muQ;
 				std::vector<yarp::sig::Vector> muR;
 				std::vector<yarp::sig::Matrix> sigmaQQ;
@@ -36,7 +41,8 @@ namespace iCub {
                 GMMData();
 
 				void runGaussianMixtureRegression(yarp::sig::Vector &queryPoint,yarp::sig::Vector &output);
-
+				
+				void buildQRStructures(std::vector<int> &qIndexes,std::vector<int> &rIndexes);
                 
 
         };

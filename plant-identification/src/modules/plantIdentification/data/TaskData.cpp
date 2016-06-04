@@ -204,6 +204,18 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
 	controlData.pidResetEnabled = rf.check("pidResetEnabled",Value(0)).asInt() != 0;
 	controlData.lifespan = rf.check("controlTaskLifespan",Value(10)).asInt();
 	controlData.gmmData = new GMMData();
+	{std::vector<int> qIndexes(2);
+	qIndexes[0] = 0; qIndexes[1] = 1;
+	std::vector<int> rIndexes(6);
+	rIndexes[0] = 2; rIndexes[1] = 3; rIndexes[2] = 4; rIndexes[3] = 5; rIndexes[4] = 6; rIndexes[5] = 7;
+	controlData.gmmData->buildQRStructures(qIndexes,rIndexes);
+	}
+	{std::vector<int> qIndexes(3);
+	qIndexes[0] = 0; qIndexes[1] = 1; qIndexes[2] = 2;
+	std::vector<int> rIndexes(5);
+	rIndexes[0] = 3; rIndexes[1] = 4; rIndexes[2] = 5; rIndexes[3] = 6; rIndexes[4] = 7;
+	controlData.gmmData->buildQRStructures(qIndexes,rIndexes);
+	}
 
 	Bottle* rampTaskJoints = rf.find("rampTaskJoints").asList();
 	rampData.jointsList.resize(rampTaskJoints->size(),0);

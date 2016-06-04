@@ -497,6 +497,7 @@ void ICubUtil::addOption(Bottle &bottle,const char *paramName,Value paramValueLi
 void ICubUtil::putDataIntoVector(const double *dataIn,int size,yarp::sig::Vector &dataOut){
 
 	dataOut.resize(size);
+
 	for(size_t i = 0; i < size; i++){
 		dataOut[i] = dataIn[i];
 	}
@@ -505,9 +506,31 @@ void ICubUtil::putDataIntoVector(const double *dataIn,int size,yarp::sig::Vector
 void ICubUtil::putDataIntoMatrix(const double *dataIn,int rows,int columns,yarp::sig::Matrix &dataOut){
 
 	dataOut.resize(rows,columns);
+
 	for(size_t i = 0; i < rows; i++){
 		for(size_t j = 0; j < columns; j++){
 			dataOut[i][j] = dataIn[columns*i + j];
+		}
+	}
+}
+
+
+void ICubUtil::putSelectedElementsIntoVector(const yarp::sig::Vector &dataIn,const std::vector<int> &selectedIndexes,yarp::sig::Vector &dataOut){
+
+	dataOut.resize(selectedIndexes.size());
+
+	for(size_t i = 0; i < dataOut.size(); i++){
+		dataOut[i] = dataIn[selectedIndexes[i]];
+	}
+}
+
+void ICubUtil::putSelectedElementsIntoMatrix(const yarp::sig::Matrix &dataIn,const std::vector<int> &selectedRowIndexes,const std::vector<int> &selectedColumnIndexes,yarp::sig::Matrix &dataOut){
+
+	dataOut.resize(selectedRowIndexes.size(),selectedColumnIndexes.size());
+
+	for(size_t i = 0; i < dataOut.rows(); i++){
+		for(size_t j = 0; j < dataOut.cols(); j++){
+			dataOut[i][j] = dataIn[selectedRowIndexes[i]][selectedColumnIndexes[j]];
 		}
 	}
 }

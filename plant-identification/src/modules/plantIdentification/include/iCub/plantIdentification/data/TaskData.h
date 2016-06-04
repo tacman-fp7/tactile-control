@@ -102,7 +102,7 @@ namespace iCub {
 			*	53: index finger sensitivity scale
 			*	54: middle finger sensitivity scale
 			*   55: if set != 0, log current gmm data (one shot) and returns to 0
-			*   56: best pose estimator [0: neural network / 1: gaussian mixture model]
+			*   56: best pose estimator [0: neural network / 1: gaussian mixture model / 2: gaussian mixture model without hand position regression]
 			*	57: enable XYZ finger coordinates logging
 			*	58: enable <not defined yet> logging
 			*	59: enable <not defined yet> logging
