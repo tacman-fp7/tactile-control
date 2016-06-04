@@ -28,7 +28,7 @@ namespace iCub {
 				double waveMean;
 				double wavePeriod;
 				double waveAmplitude;
-				double threadPeriod; // milliseconds
+                double threadPeriod; // milliseconds
 				iCub::plantIdentification::Wave waveType;
                 
                 iCub::plantIdentification::ControllersUtil *controllersUtil;

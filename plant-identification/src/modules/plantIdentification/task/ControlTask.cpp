@@ -230,7 +230,7 @@ void ControlTask::init(){
     // TODO WORKAROUND TO REMOVE
     if (disablePIDIntegralGain) controllersUtil->resetPIDIntegralGain(8);
 
-	if (commonData->tpInt(56) == 1){
+    if (commonData->tpInt(56) > 1){
 		controllersUtil->setControlMode(8,VOCAB_CM_POSITION_DIRECT,false);
 		controllersUtil->setControlMode(10,VOCAB_CM_POSITION_DIRECT,false);
 		controllersUtil->setControlMode(12,VOCAB_CM_POSITION_DIRECT,false);
@@ -791,7 +791,7 @@ void ControlTask::calculateControlInput(){
 	portsUtil->sendControlData(taskId,commonData->tpStr(16),commonData->tpStr(17),gripStrength,actualGripStrength,commonData->tpDbl(8)+svResultValueScaled,svErr,svCurrentPosition,actualCurrentTargetPose,finalTargetPose,estimatedFinalPose,svKp*commonData->tpDbl(5),svKi*commonData->tpDbl(5),svKd*commonData->tpDbl(5),thumbEnc,indexEnc,middleEnc,enc8,pressureTargetValue,commonData->overallFingerPressure,inputCommandValue,fingersList);
 
 	// log gaussian mixture model regression data
-	if (bestPoseEstimatorMethod == 1){
+    if (bestPoseEstimatorMethod > 1){
         portsUtil->sendGMMRegressionData(handAperture,indMidPosDiff,estimatedFinalPose,handPosition,targetThumbDistalJoint,targetIndexDistalJoint,targetMiddleDistalJoint,targetThumbAbductionJoint,indMidPressureBalanceBestPose,indMidPressureBalance,gripStrength,actualGripStrength,commonData);
 	}
 
@@ -868,7 +868,7 @@ void ControlTask::release(){
     // TODO WORKAROUND TO REMOVE
     if (disablePIDIntegralGain) controllersUtil->restorePIDIntegralGain(8);
 
-	if (commonData->tpInt(56) == 1){
+    if (commonData->tpInt(56) > 1){
 		controllersUtil->setControlMode(8,VOCAB_CM_POSITION,false);
 		controllersUtil->setControlMode(10,VOCAB_CM_POSITION,false);
 		controllersUtil->setControlMode(12,VOCAB_CM_POSITION,false);

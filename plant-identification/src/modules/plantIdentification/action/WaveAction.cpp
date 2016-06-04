@@ -4,6 +4,7 @@ using iCub::plantIdentification::WaveAction;
 
 using yarp::os::Bottle;
 
+#include <cmath>
 
 WaveAction::WaveAction(){
 
@@ -15,10 +16,11 @@ void WaveAction::init(iCub::plantIdentification::ControllersUtil *controllersUti
 	this->controllersUtil = controllersUtil;
 	this->actionDuration = actionDuration;
 	this->joint = joint;
-	this->wavePeriod = wavePeriod;
-	this->waveAmplitude = waveAmplitude;
+    this->wavePeriod = period;
+    this->waveAmplitude = amplitude;
 	this->waveType = waveType;
 	this->threadPeriod = threadPeriod;
+
 
 	counter = 0;
 	enabled = true;
@@ -45,14 +47,12 @@ void WaveAction::executeNextStep(){
 	// calculate the joint target position
 	double jointTargetPosition;
 
-	if (waveType == Wave::SINE){
-
+    if (waveType == SINE){
 		int numCallsPerPeriod = (int)(wavePeriod/(threadPeriod/1000.0));
-		int callsNumberMod = counter%numCallsPerPeriod;
-		double ratio = (1.0*callsNumberMod)/numCallsPerPeriod;
-		jointTargetPosition = waveMean + waveAmplitude * sin(ratio*2*3.14159265);
-
-	} else 	if (waveType == Wave::SQUARE){
+        int callsNumberMod = counter%numCallsPerPeriod;
+        double ratio = (1.0*callsNumberMod)/numCallsPerPeriod;
+        jointTargetPosition = waveMean + waveAmplitude * sin(ratio*2*3.14159265);
+    } else 	if (waveType == SQUARE){
 
 		int div = (int)((counter*threadPeriod/1000.0)/(wavePeriod/2));
 		if (div%2 == 1){
@@ -69,15 +69,15 @@ void WaveAction::executeNextStep(){
 	counter++;
 
 	// check if action is out of time
-	if (counter < (int)(actionDuration/(threadPeriod/1000.0))){
+    if (counter >= (int)(actionDuration/(threadPeriod/1000.0))){
 		enabled = false;
+        release();
 	}
 }
 
 void WaveAction::release(){
 
-	enabled = false;
-	controllersUtil->setControlMode(8,VOCAB_CM_POSITION,false);
+    controllersUtil->setControlMode(joint,VOCAB_CM_POSITION,false);
 	controllersUtil->setJointAngle(joint,waveMean);
 }
 
