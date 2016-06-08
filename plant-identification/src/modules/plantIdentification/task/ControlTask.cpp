@@ -230,7 +230,7 @@ void ControlTask::init(){
     // TODO WORKAROUND TO REMOVE
     if (disablePIDIntegralGain) controllersUtil->resetPIDIntegralGain(8);
 
-    if (commonData->tpInt(56) > 1){
+    if (commonData->tpInt(56) >= 1){
 		controllersUtil->setControlMode(8,VOCAB_CM_POSITION_DIRECT,false);
 		controllersUtil->setControlMode(10,VOCAB_CM_POSITION_DIRECT,false);
 		controllersUtil->setControlMode(12,VOCAB_CM_POSITION_DIRECT,false);
@@ -868,7 +868,7 @@ void ControlTask::release(){
     // TODO WORKAROUND TO REMOVE
     if (disablePIDIntegralGain) controllersUtil->restorePIDIntegralGain(8);
 
-    if (commonData->tpInt(56) > 1){
+    if (commonData->tpInt(56) >= 1){
 		controllersUtil->setControlMode(8,VOCAB_CM_POSITION,false);
 		controllersUtil->setControlMode(10,VOCAB_CM_POSITION,false);
 		controllersUtil->setControlMode(12,VOCAB_CM_POSITION,false);

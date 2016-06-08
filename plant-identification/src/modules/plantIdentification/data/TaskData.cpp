@@ -131,12 +131,14 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
 	// temp parameters updated according to the hand and/or the robot
 	if (whichICub == "black"){
         if (whichHand == "right"){
-			// default values	
+            commonData.tempParameters[52] = 1.0;
+            commonData.tempParameters[53] = 0.6;
+            commonData.tempParameters[54] = 1.5;
         } else {
 
             commonData.tempParameters[52] = 1.0;
             commonData.tempParameters[53] = 0.3;
-            commonData.tempParameters[54] = 2.0;
+            commonData.tempParameters[54] = 1.5;
         }
     } else {
         if (whichHand == "right"){

@@ -138,7 +138,7 @@ bool EventsThread::eventTriggered(EventToTrigger eventToTrigger,int index = 0){
 	return false;
 }
 
-void EventsThread::setWaveAction(int actionDuration,double joint,double period,double amplitude,iCub::plantIdentification::Wave waveType){
+void EventsThread::setWaveAction(double actionDuration,double joint,double period,double amplitude,iCub::plantIdentification::Wave waveType){
 
     waveAction.init(controllersUtil,actionDuration,joint,period,amplitude,waveType,this->period);
 }

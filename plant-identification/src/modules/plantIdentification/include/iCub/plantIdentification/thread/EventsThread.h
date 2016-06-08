@@ -63,7 +63,7 @@ namespace iCub {
 
 				bool eventTriggered(iCub::plantIdentification::EventToTrigger eventToTrigger,int index);
 
-                void setWaveAction(int actionDuration,double joint,double period,double amplitude,iCub::plantIdentification::Wave waveType);
+                void setWaveAction(double actionDuration,double joint,double period,double amplitude,iCub::plantIdentification::Wave waveType);
 			
 			private:
 

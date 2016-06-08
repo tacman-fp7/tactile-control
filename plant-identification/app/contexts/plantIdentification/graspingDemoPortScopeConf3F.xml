@@ -15,12 +15,12 @@
                title="Target Hand Position"
                type="lines"
                size="1" />
-        <graph remote="/plantIdentification/control"
+ <!--       <graph remote="/plantIdentification/control"
                index="9"
                color="Black"
                title="Predicted Hand Position"
                type="lines"
-               size="1" />
+               size="1" /> -->
         <graph remote="/plantIdentification/control"
                index="10"
                color="Blue"
