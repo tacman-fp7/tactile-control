@@ -67,6 +67,8 @@ namespace iCub {
 				std::vector<double> kpNe;
 				std::vector<double> previousError;
 
+				bool gmmCtrlModeIsSet;
+
             public:
 
                 ControlTask(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,iCub::plantIdentification::ControlTaskData *controlData,std::vector<double> &targetList,bool resetErrOnContact = false);
@@ -98,6 +100,8 @@ namespace iCub {
 				void replaceBottle(yarp::os::Bottle &oldBottle,yarp::os::Bottle &newBottle,std::string gainName,double newGainValue);
 
 				double calculateTt(double kp,double ki,double kd);
+
+				void setGMMJointsControlMode(int controlMode);
 
         };
     } //namespace plantIdentification

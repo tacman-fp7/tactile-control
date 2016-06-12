@@ -33,6 +33,8 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 
 	objectRecognitionEnabled = commonData->tpInt(45) != 0;
 
+	gmmCtrlModeIsSet = false;
+
 	this->portsUtil = portsUtil;
 
 	this->resetErrOnContact = resetErrOnContact;
@@ -230,11 +232,8 @@ void ControlTask::init(){
     // TODO WORKAROUND TO REMOVE
     if (disablePIDIntegralGain) controllersUtil->resetPIDIntegralGain(8);
 
-    if (commonData->tpInt(56) >= 1){
-		controllersUtil->setControlMode(8,VOCAB_CM_POSITION_DIRECT,false);
-		controllersUtil->setControlMode(10,VOCAB_CM_POSITION_DIRECT,false);
-		controllersUtil->setControlMode(12,VOCAB_CM_POSITION_DIRECT,false);
-		controllersUtil->setControlMode(14,VOCAB_CM_POSITION_DIRECT,false);
+    if (commonData->tpInt(56) >= 1 && commonData->tpInt(18) == 0){
+		setGMMJointsControlMode(VOCAB_CM_POSITION_DIRECT);
 	}
 
 	cout << "\n\n" << dbgTag << "TASK STARTED - Target: ";
@@ -295,6 +294,12 @@ void ControlTask::calculateControlInput(){
 		Vector svRef;
 		Vector svFb;
 
+		// if the kind of task (gmm regression or simple controller / neural network) is changed while the task is being executed, control modes need to be changed.
+		if (commonData->tpInt(56) >= 1 && commonData->tpInt(18) == 0){
+			if (!gmmCtrlModeIsSet) setGMMJointsControlMode(VOCAB_CM_POSITION_DIRECT);
+		} else {
+			if (gmmCtrlModeIsSet) setGMMJointsControlMode(VOCAB_CM_POSITION);
+		}
 
 		if (jointsList.size() == 2){
 
@@ -868,11 +873,8 @@ void ControlTask::release(){
     // TODO WORKAROUND TO REMOVE
     if (disablePIDIntegralGain) controllersUtil->restorePIDIntegralGain(8);
 
-    if (commonData->tpInt(56) >= 1){
-		controllersUtil->setControlMode(8,VOCAB_CM_POSITION,false);
-		controllersUtil->setControlMode(10,VOCAB_CM_POSITION,false);
-		controllersUtil->setControlMode(12,VOCAB_CM_POSITION,false);
-		controllersUtil->setControlMode(14,VOCAB_CM_POSITION,false);
+    if (commonData->tpInt(56) >= 1 && commonData->tpInt(18) == 0){
+		setGMMJointsControlMode(VOCAB_CM_POSITION);
 	}
 
 }
@@ -1018,5 +1020,20 @@ void ControlTask::setTargetListRealTime(std::vector<double> &targetList){
 	for(size_t i = 0; i < pressureTargetValue.size(); i++){
 		pressureTargetValue[i] = (i >= targetList.size() ? targetList[targetList.size()-1] : targetList[i]);
 	}
+
+}
+
+void ControlTask::setGMMJointsControlMode(int controlMode){
+
+		controllersUtil->setControlMode(8,controlMode,false);
+		controllersUtil->setControlMode(10,controlMode,false);
+		controllersUtil->setControlMode(12,controlMode,false);
+		controllersUtil->setControlMode(14,controlMode,false);
+
+		if (controlMode == VOCAB_CM_POSITION_DIRECT){
+			gmmCtrlModeIsSet = true;
+		} else {
+			gmmCtrlModeIsSet = false;
+		}
 
 }

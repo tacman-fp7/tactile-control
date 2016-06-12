@@ -287,10 +287,4 @@ void GMMData::buildQRStructures(std::vector<int> &qIndexes,std::vector<int> &rIn
 		sigmaQQDet[i] = yarp::math::det(sigmaQQ[i]);
 	}
 
-//	for(size_t i = 0; i < numComponents; i++){
-//       std::cout << "COMPONENT: " << i << "\n\n";
-//        std::cout << mu[i].toString() << "\n\n" << muQ[i].toString() << "\n\n" << muR[i].toString() << "\n\n";
-//        std::cout << "\n\n";
-//        std::cout << sigma[i].toString() << "\n\n" << sigmaQQ[i].toString() << "\n\n" << sigmaRQ[i].toString() << "\n\n" << sigmaRR[i].toString() << "\n\n";
-//	}
 }

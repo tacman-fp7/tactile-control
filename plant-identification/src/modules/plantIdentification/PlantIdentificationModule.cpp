@@ -96,7 +96,6 @@ bool PlantIdentificationModule::configure(ResourceFinder &rf) {
 /* ******* Update    module                                                 ********************************************** */   
 bool PlantIdentificationModule::updateModule() { 
 
-
 	// manage event triggers
 	if (eventsThread->eventTriggered(FINGERTIP_PUSHED,3)){ // pinky
 		if (tasksRunning){
