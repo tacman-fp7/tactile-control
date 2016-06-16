@@ -331,7 +331,8 @@ void ICubUtil::processTactileData(TaskCommonData *commonData){
 		commonData->overallFingerPressureBySimpleSum[i] = ICubUtil::getForce(commonData->fingerTaxelsData[i],SIMPLE_SUM);
 		commonData->overallFingerPressureByWeightedSum[i] = ICubUtil::getForce(commonData->fingerTaxelsData[i],WEIGHTED_SUM);
 		
-		commonData->overallFingerPressure[i] = commonData->overallFingerPressureByWeightedSum[i];
+        commonData->overallFingerPressure[i] = commonData->overallFingerPressureByWeightedSum[i];
+        //commonData->overallFingerPressure[i] = commonData->overallFingerPressureBySimpleSum[i];
 
 		commonData->previousOverallFingerPressures[i][commonData->previousPressuresIndex[i]] = commonData->overallFingerPressure[i];
 		commonData->previousPressuresIndex[i] = (commonData->previousPressuresIndex[i] + 1)%commonData->previousOverallFingerPressures[i].size();

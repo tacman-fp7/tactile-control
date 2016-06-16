@@ -137,7 +137,7 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
         } else {
 
             commonData.tempParameters[52] = 1.0;
-            commonData.tempParameters[53] = 0.3;
+            commonData.tempParameters[53] = 0.5;
             commonData.tempParameters[54] = 1.5;
         }
     } else {

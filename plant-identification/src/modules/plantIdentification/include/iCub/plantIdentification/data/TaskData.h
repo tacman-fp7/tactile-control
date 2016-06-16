@@ -104,7 +104,7 @@ namespace iCub {
 			*   55: if set != 0, log current gmm data (one shot) and returns to 0
 			*   56: best pose estimator [0: neural network / 1: gaussian mixture model / 2: gaussian mixture model without hand position regression]
 			*	57: enable XYZ finger coordinates logging
-			*	58: enable <not defined yet> logging
+            *	58: enable tactile data logging
 			*	59: enable <not defined yet> logging
 			*   60: wave action. wave type [0:sine / 1:square]
 			*   61: wave action. amplitude

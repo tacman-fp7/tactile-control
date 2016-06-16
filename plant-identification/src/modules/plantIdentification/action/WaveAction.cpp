@@ -73,12 +73,14 @@ void WaveAction::executeNextStep(){
 		enabled = false;
         release();
 	}
+
 }
 
 void WaveAction::release(){
 
     controllersUtil->setControlMode(joint,VOCAB_CM_POSITION,false);
 	controllersUtil->setJointAngle(joint,waveMean);
+
 }
 
 

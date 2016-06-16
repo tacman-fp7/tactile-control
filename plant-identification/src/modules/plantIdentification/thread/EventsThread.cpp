@@ -4,6 +4,9 @@
 
 #include <yarp/os/Network.h>
 #include <yarp/os/Value.h>
+#include <yarp/os/Time.h>
+
+#include <ctime>
 
 using std::string;
 
@@ -52,6 +55,7 @@ bool EventsThread::threadInit(){
 
 void EventsThread::run(){
 
+
 	// update module data
 	ICubUtil::updateExternalData(controllersUtil,portsUtil,commonData,xyzCoordEnabled);
 
@@ -61,10 +65,11 @@ void EventsThread::run(){
 
 	executeWaveAction();
 
+    logData();
 
 	if (counter%10 == 0){
 	// log various data
-		logData();
+        printData();
 	}
 
 
@@ -97,14 +102,37 @@ void EventsThread::checkEvents(){
 void EventsThread::logData(){
 
 
+    bool gripStrengthDataPortLoggingEnabled = commonData->tpInt(59) != 0;
 
-	bool xyzCoordLoggingEnabled = commonData->tpInt(57) != 0;
+    if (gripStrengthDataPortLoggingEnabled){
+        portsUtil->sendGripStrengthData(commonData->tpStr(16),commonData->tpStr(17),commonData->tpDbl(7),commonData);
+    }
 
-	if (xyzCoordLoggingEnabled){
+}
 
-		std::cout << "XYZ | Th - Ind - Mid : " << commonData->thumbXYZ[0] << "  " << commonData->thumbXYZ[1] << "  " << commonData->thumbXYZ[2] << "   -  " << commonData->indexXYZ[0] << "  " << commonData->indexXYZ[1] << "  " << commonData->indexXYZ[2] << "   -  " << commonData->middleXYZ[0] << "  " << commonData->middleXYZ[1] << "  " << commonData->middleXYZ[2] << "\n";
+void EventsThread::printData(){
 
-	}
+
+
+    bool xyzCoordLoggingEnabled = commonData->tpInt(57) != 0;
+    bool tactileDataLoggingEnabled = commonData->tpInt(58) != 0;
+
+    if (xyzCoordLoggingEnabled){
+
+        std::cout << "XYZ | Th - Ind - Mid : " << commonData->thumbXYZ[0] << "  " << commonData->thumbXYZ[1] << "  " << commonData->thumbXYZ[2] << "   -  " << commonData->indexXYZ[0] << "  " << commonData->indexXYZ[1] << "  " << commonData->indexXYZ[2] << "   -  " << commonData->middleXYZ[0] << "  " << commonData->middleXYZ[1] << "  " << commonData->middleXYZ[2] << "\n";
+
+    }
+    if (tactileDataLoggingEnabled){
+
+        std::cout << "Force (In Mi Ri Pi Th): ";
+
+        for(size_t i = 0; i < commonData->overallFingerPressure.size(); i++){
+            std::cout << "\t" << commonData->overallFingerPressure[i];
+        }
+
+        std::cout << "\n";
+    }
+
 
 }
 

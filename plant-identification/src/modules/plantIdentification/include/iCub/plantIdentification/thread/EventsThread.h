@@ -69,9 +69,11 @@ namespace iCub {
 
 				void checkEvents();
 
-				void logData();
+                void logData();
 
-				void executeWaveAction();
+                void printData();
+
+                void executeWaveAction();
 
 				bool eventFPTriggered(int whichFinger);
 
