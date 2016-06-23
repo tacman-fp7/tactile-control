@@ -205,10 +205,15 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	neuralNetwork.configure(nnConfProperty);
 	
 	trackingModeEnabled = false;
-	minJerkTrackingModeEnabled = false;
+    minJerkTrackingModeEnabled = false;
+    gmmJointsMinJerkTrackingModeEnabled = false;
 
 	// initialize the minimum jerk trajectory class 
-	minJerkTrajectory = new minJerkTrajGen(1,commonData->taskThreadPeriod/1000.0,4); //(dimensions,sample time in seconds, trajectory reference time)
+    minJerkTrajectory = new minJerkTrajGen(1,commonData->taskThreadPeriod/1000.0,2); //(dimensions,sample time in seconds, trajectory reference time)
+    thAbdMinJerkTrajectory = new minJerkTrajGen(1,commonData->taskThreadPeriod/1000.0,4);
+    thDistMinJerkTrajectory = new minJerkTrajGen(1,commonData->taskThreadPeriod/1000.0,4);
+    indDistMinJerkTrajectory = new minJerkTrajGen(1,commonData->taskThreadPeriod/1000.0,4);
+    midDistMinJerkTrajectory = new minJerkTrajGen(1,commonData->taskThreadPeriod/1000.0,4);
 
     disablePIDIntegralGain = (commonData->tpInt(40) != 0);
 
@@ -407,7 +412,7 @@ void ControlTask::calculateControlInput(){
 
 				if (!wavePositionTrackingIsActive){
 					// TODO  manual corrections to be removed!
-					distalJoints[0] = targetThumbDistalJoint = output[1];// + 20; // thumb
+                    distalJoints[0] = targetThumbDistalJoint = output[1] + 6;// + 20; // thumb
 
 					distalJoints[1] = targetIndexDistalJoint = output[2];// + 20; // index finger
 
@@ -419,11 +424,61 @@ void ControlTask::calculateControlInput(){
 
 					//gripStrength = output[6];
 
+                    // MIN JERK TRACKING
+                    // if gmmJointsMinJerkTracking mode is activated, gmmJointsMinJerkTrackingModeEnabled is initialized, if gmmJointsMinJerkTracking mode is disabled, gmmJointsMinJerkTrackingModeEnabled is set to false so that next time initPosition will be initialized again
+                    if (commonData->tpInt(65) != 0){
+                        if (gmmJointsMinJerkTrackingModeEnabled == false){
+
+                            Vector thAbdInitPosition(1,commonData->armEncodersAngles[8]);
+                            Vector thDistInitPosition(1,commonData->armEncodersAngles[10]);
+                            Vector indDistInitPosition(1,commonData->armEncodersAngles[12]);
+                            Vector midDistInitPosition(1,commonData->armEncodersAngles[14]);
+
+                            thAbdMinJerkTrajectory->init(thAbdInitPosition);
+                            thDistMinJerkTrajectory->init(thDistInitPosition);
+                            indDistMinJerkTrajectory->init(indDistInitPosition);
+                            midDistMinJerkTrajectory->init(midDistInitPosition);
+
+                            thAbdMinJerkTrajectory->setT(commonData->tpDbl(66));
+                            thDistMinJerkTrajectory->setT(commonData->tpDbl(66));
+                            indDistMinJerkTrajectory->setT(commonData->tpDbl(66));
+                            midDistMinJerkTrajectory->setT(commonData->tpDbl(66));
+
+                            gmmJointsMinJerkTrackingModeEnabled = true;
+                        }
+
+                        Vector thAbdTargetPosition(1,abductionJoint);
+                        Vector thDistTargetPosition(1,distalJoints[0]);
+                        Vector indDistTargetPosition(1,distalJoints[1]);
+                        Vector midDistTargetPosition(1,distalJoints[2]);
+
+                        thAbdMinJerkTrajectory->computeNextValues(thAbdTargetPosition);
+                        thDistMinJerkTrajectory->computeNextValues(thDistTargetPosition);
+                        indDistMinJerkTrajectory->computeNextValues(indDistTargetPosition);
+                        midDistMinJerkTrajectory->computeNextValues(midDistTargetPosition);
+
+                        Vector thAbdFilteredPosition = thAbdMinJerkTrajectory->getPos();
+                        Vector thDistFilteredPosition = thDistMinJerkTrajectory->getPos();
+                        Vector indDistFilteredPosition = indDistMinJerkTrajectory->getPos();
+                        Vector midDistFilteredPosition = midDistMinJerkTrajectory->getPos();
+
+                        abductionJoint = thAbdFilteredPosition[0];
+                        distalJoints[0] = thDistFilteredPosition[0];
+                        distalJoints[1] = indDistFilteredPosition[0];
+                        distalJoints[2] = midDistFilteredPosition[0];
+
+
+                    } else {
+                        if (gmmJointsMinJerkTrackingModeEnabled == true){
+                            gmmJointsMinJerkTrackingModeEnabled = false;
+                        }
+                    }
+
 					// move joints in position
 					controllersUtil->setJointAnglePositionDirect(8,abductionJoint);
 					controllersUtil->setJointAnglePositionDirect(10,distalJoints[0]); // thumb
 					controllersUtil->setJointAnglePositionDirect(12,distalJoints[1]); // index finger
-					controllersUtil->setJointAnglePositionDirect(14,distalJoints[2]); // middle finger
+                    controllersUtil->setJointAnglePositionDirect(14,distalJoints[2]); // middle finger
 				}
 			} else {
 
@@ -864,9 +919,13 @@ void ControlTask::release(){
 		delete(pid[i]);
 	}
 
-	delete(minJerkTrajectory);
+    delete(minJerkTrajectory);
+    delete(thAbdMinJerkTrajectory);
+    delete(thDistMinJerkTrajectory);
+    delete(indDistMinJerkTrajectory);
+    delete(midDistMinJerkTrajectory);
 
-	// TODO TO REMOVE serve solo in fase di test
+
 	commonData->tempParameters[17] = Value("#");
 	commonData->tempParameters[50] = Value(0);
 
@@ -1025,15 +1084,15 @@ void ControlTask::setTargetListRealTime(std::vector<double> &targetList){
 
 void ControlTask::setGMMJointsControlMode(int controlMode){
 
-		controllersUtil->setControlMode(8,controlMode,false);
-		controllersUtil->setControlMode(10,controlMode,false);
-		controllersUtil->setControlMode(12,controlMode,false);
-		controllersUtil->setControlMode(14,controlMode,false);
+        controllersUtil->setControlMode(8,controlMode,false);
+        controllersUtil->setControlMode(10,controlMode,false);
+        controllersUtil->setControlMode(12,controlMode,false);
+        controllersUtil->setControlMode(14,controlMode,false);
 
-		if (controlMode == VOCAB_CM_POSITION_DIRECT){
-			gmmCtrlModeIsSet = true;
-		} else {
-			gmmCtrlModeIsSet = false;
-		}
+        if (controlMode == VOCAB_CM_POSITION_DIRECT){
+            gmmCtrlModeIsSet = true;
+        } else {
+            gmmCtrlModeIsSet = false;
+        }
 
 }

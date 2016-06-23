@@ -111,8 +111,8 @@ namespace iCub {
 			*   62: wave action. period
 			*   63: wave action. arm joint number
 			*   64: wave action. action duration (sec)
-			*	65: <not used yet>
-			*	66: <not used yet>
+            *   65: gmm joints minimum jerk tracking mode off/on [0/1]
+            *   66: gmm joints minimum jerk trajectory reference time (90% of steady-state value in this time, transient estinguished after 150%) (restart minJerk to take effect)
 			*	67: <not used yet>
 			*	68: <not used yet>
 			*	69: <not used yet>

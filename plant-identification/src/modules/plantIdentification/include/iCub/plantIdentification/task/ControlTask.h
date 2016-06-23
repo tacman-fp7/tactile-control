@@ -45,7 +45,12 @@ namespace iCub {
 				double trajectoryInitialPose;
 				bool trackingModeEnabled;
 				bool minJerkTrackingModeEnabled;
-				iCub::ctrl::minJerkTrajGen* minJerkTrajectory;
+                bool gmmJointsMinJerkTrackingModeEnabled;
+                iCub::ctrl::minJerkTrajGen* minJerkTrajectory;
+                iCub::ctrl::minJerkTrajGen* thAbdMinJerkTrajectory;
+                iCub::ctrl::minJerkTrajGen* thDistMinJerkTrajectory;
+                iCub::ctrl::minJerkTrajGen* indDistMinJerkTrajectory;
+                iCub::ctrl::minJerkTrajGen* midDistMinJerkTrajectory;
 
                 // TODO TEMPORARY WORKAROUND, variable used to disable the PID integral gain of the joint 8 while the hand grasps the object
                 bool disablePIDIntegralGain;

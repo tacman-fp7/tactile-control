@@ -96,7 +96,7 @@ void Task::sendCommands(){
 
 	for(size_t i = 0; i < inputCommandValue.size(); i++){
 		controllersUtil->sendPwm(jointsList[i],commonData->pwmSign*inputCommandValue[i]);
-	}
+    }
 }
 
 bool Task::loadICubData(){
