@@ -113,9 +113,9 @@ namespace iCub {
 			*   64: wave action. action duration (sec)
             *   65: gmm joints minimum jerk tracking mode off/on [0/1]
             *   66: gmm joints minimum jerk trajectory reference time (90% of steady-state value in this time, transient estinguished after 150%) (restart minJerk to take effect)
-			*	67: <not used yet>
-			*	68: <not used yet>
-			*	69: <not used yet>
+			*	67: hand freeze enabled [0/1]. If enabled, as soon as the hand grasp the object, the hand doesn't move
+			*	68: hand freeze automation enabled [0/1]. if enabled, it automatically set property 67 (that we can ignore) in order to freeze the hand the first x seconds, where x is specified by property 69
+			*	69: hand freeze duration (sec). Check property 68 for the description
 			*	70: <not used yet>
 			*
 			*   Note: double values have to contain a dot, while strings have to start with '#'

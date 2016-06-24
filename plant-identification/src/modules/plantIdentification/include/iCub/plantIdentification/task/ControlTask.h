@@ -60,7 +60,7 @@ namespace iCub {
 				/* variables used for the policy learning mode */
 				std::vector<double> policyActionsData;
 				double indMidPressureBalance;
-				int policyState; // 0: not active | 1: rest | 1: action
+				int policyState; // 0: not active | 1: rest | 2: action
 				double currentActionFinalTargetPose;
 
 				// neural network
@@ -73,6 +73,9 @@ namespace iCub {
 				std::vector<double> previousError;
 
 				bool gmmCtrlModeIsSet;
+
+				bool handPositionSet;
+				double initialHandPosition;
 
             public:
 

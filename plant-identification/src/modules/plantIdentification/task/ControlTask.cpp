@@ -33,6 +33,8 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 
 	objectRecognitionEnabled = commonData->tpInt(45) != 0;
 
+	handPositionSet = false;
+
 	gmmCtrlModeIsSet = false;
 
 	this->portsUtil = portsUtil;
@@ -275,16 +277,25 @@ void ControlTask::calculateControlInput(){
 	double finalTargetPose; // pose equal to either estimatedFinalPose or the pose coming out from the wave generator, depending on which mode is activated
 	double actualCurrentTargetPose; // actual pose used as target in the supervising controller, it can be either finalTargetPose or the filtered pose coming out from the pose tracking 
 	double thumbEnc,indexEnc,middleEnc,interMiddleEnc,enc8,handPosition;
-	std:
 	std::vector<double> distalJoints;
 	distalJoints.resize(3);
 	double abductionJoint;
 	double handAperture;
 	double indMidPosDiff;
 	double targetThumbDistalJoint,targetIndexDistalJoint,targetMiddleDistalJoint,targetThumbAbductionJoint;
+	double filteredThumbDistalJoint = 0, filteredIndexDistalJoint = 0, filteredMiddleDistalJoint = 0, filteredThumbAbductionJoint = 0;
 	double svTrackerVel = commonData->tpDbl(27);
 	double svTrackerAcc = commonData->tpDbl(28);
 	bool wavePositionTrackingIsActive = commonData->tpInt(18) != 0;
+	
+	bool handFreezeAutoEnabled = commonData->tpInt(68) != 0;
+	if (handFreezeAutoEnabled && callsNumber <= secondsToCallsNumber(commonData->tpDbl(69))){
+		commonData->tempParameters[67] = Value(1);
+	} else {
+		commonData->tempParameters[67] = Value(0);
+	}
+
+	bool handFreezeEnabled = commonData->tpInt(67) != 0;
     bool policyLearningEnabled = commonData->tpInt(51) != 0;
 	bool newValuesPL;
 	int bestPoseEstimatorMethod = commonData->tpInt(56);
@@ -313,46 +324,55 @@ void ControlTask::calculateControlInput(){
 
 			// handPosition = middleEnc - thumbEnc;
 			handPosition = (middleEnc - thumbEnc)/2;
+			if (handPositionSet == false){
+				initialHandPosition = handPosition;
+				handPositionSet = true;
+			}
 
-			// using the neural network
-			if (bestPoseEstimatorMethod == 0){
-				std::vector<double> actualAngles(2);
-				std::vector<double> rotatedAngles;
-				actualAngles[0] = thumbEnc;
-				actualAngles[1] = middleEnc;
-				ICubUtil::rotateFingersData(actualAngles,rotatedAngles);
-				Vector rotatedAnglesVector;
-				rotatedAnglesVector.resize(2);
-				rotatedAnglesVector[0] = rotatedAngles[0];
-				rotatedAnglesVector[1] = rotatedAngles[1];
-				Vector estimatedBestPositionNNVector = neuralNetwork.predict(rotatedAnglesVector);
-				estimatedFinalPose = estimatedBestPositionNNVector[0];
-			} else if (bestPoseEstimatorMethod == 1){
-			// using the gaussian mixture model
-
-				// TODO 
-				estimatedFinalPose = 0;
-
-				if (!wavePositionTrackingIsActive){
-					distalJoints[0] = 15;
-					distalJoints[1] = 15;
-					distalJoints[2] = 15;
-					abductionJoint = 60;
-					indMidPressureBalanceBestPose = 0;
-					gripStrength = 70;
-				}
+			if (handFreezeEnabled){
+				estimatedFinalPose = initialHandPosition;
 			} else {
 
-				// TODO 
-				estimatedFinalPose = 0;
+				// using the neural network
+				if (bestPoseEstimatorMethod == 0){
+					std::vector<double> actualAngles(2);
+					std::vector<double> rotatedAngles;
+					actualAngles[0] = thumbEnc;
+					actualAngles[1] = middleEnc;
+					ICubUtil::rotateFingersData(actualAngles,rotatedAngles);
+					Vector rotatedAnglesVector;
+					rotatedAnglesVector.resize(2);
+					rotatedAnglesVector[0] = rotatedAngles[0];
+					rotatedAnglesVector[1] = rotatedAngles[1];
+					Vector estimatedBestPositionNNVector = neuralNetwork.predict(rotatedAnglesVector);
+					estimatedFinalPose = estimatedBestPositionNNVector[0];
+				} else if (bestPoseEstimatorMethod == 1){
+				// using the gaussian mixture model
 
-				if (!wavePositionTrackingIsActive){
-					distalJoints[0] = 15;
-					distalJoints[1] = 15;
-					distalJoints[2] = 15;
-					abductionJoint = 60;
-					indMidPressureBalanceBestPose = 0;
-					gripStrength = 70;
+					// TODO 
+					estimatedFinalPose = 0;
+
+					if (!wavePositionTrackingIsActive){
+						distalJoints[0] = 15;
+						distalJoints[1] = 15;
+						distalJoints[2] = 15;
+						abductionJoint = 60;
+						indMidPressureBalanceBestPose = 0;
+						gripStrength = 70;
+					}
+				} else {
+
+					// TODO 
+					estimatedFinalPose = 0;
+
+					if (!wavePositionTrackingIsActive){
+						distalJoints[0] = 15;
+						distalJoints[1] = 15;
+						distalJoints[2] = 15;
+						abductionJoint = 60;
+						indMidPressureBalanceBestPose = 0;
+						gripStrength = 70;
+					}
 				}
 			}
 
@@ -367,165 +387,174 @@ void ControlTask::calculateControlInput(){
 
 			// handPosition = (middleEnc + indexEnc)/2 - thumbEnc;
 			handPosition = ((middleEnc + indexEnc)/2 - thumbEnc)/2;
+			if (handPositionSet == false){
+				initialHandPosition = handPosition;
+				handPositionSet = true;
+			}
 
+			if (handFreezeEnabled){
+				estimatedFinalPose = initialHandPosition;
+			} else {
 
-			// using the neural network
-			if (bestPoseEstimatorMethod == 0){
-				std::vector<double> actualAngles(3);
-				std::vector<double> rotatedAngles;
-				actualAngles[0] = thumbEnc;
-				actualAngles[1] = indexEnc;
-				actualAngles[2] = middleEnc;
-				ICubUtil::rotateFingersData(actualAngles,rotatedAngles);
-				Vector rotatedAnglesVector;
-				rotatedAnglesVector.resize(3);
-				rotatedAnglesVector[0] = rotatedAngles[0];
-				rotatedAnglesVector[1] = rotatedAngles[1];
-				rotatedAnglesVector[2] = rotatedAngles[2];
-				Vector estimatedBestPositionNNVector = neuralNetwork.predict(rotatedAnglesVector);
-				estimatedFinalPose = estimatedBestPositionNNVector[0];
-			} else if (bestPoseEstimatorMethod == 1){
-			// using the gaussian mixture model
+				// using the neural network
+				if (bestPoseEstimatorMethod == 0){
+					std::vector<double> actualAngles(3);
+					std::vector<double> rotatedAngles;
+					actualAngles[0] = thumbEnc;
+					actualAngles[1] = indexEnc;
+					actualAngles[2] = middleEnc;
+					ICubUtil::rotateFingersData(actualAngles,rotatedAngles);
+					Vector rotatedAnglesVector;
+					rotatedAnglesVector.resize(3);
+					rotatedAnglesVector[0] = rotatedAngles[0];
+					rotatedAnglesVector[1] = rotatedAngles[1];
+					rotatedAnglesVector[2] = rotatedAngles[2];
+					Vector estimatedBestPositionNNVector = neuralNetwork.predict(rotatedAnglesVector);
+					estimatedFinalPose = estimatedBestPositionNNVector[0];
 
-				std::vector<int> qIndexes(2);
-				qIndexes[0] = 0; qIndexes[1] = 1;
+				} else if (bestPoseEstimatorMethod == 1){
 
-				std::vector<int> rIndexes(6);
-				rIndexes[0] = 2; rIndexes[1] = 3; rIndexes[2] = 4; rIndexes[3] = 5; rIndexes[4] = 6; rIndexes[5] = 7;
+				// using the gaussian mixture model
 
-				controlData->gmmData->buildQRStructures(qIndexes,rIndexes);
+					std::vector<int> qIndexes(2);
+					qIndexes[0] = 0; qIndexes[1] = 1;
 
-				// Query: <aperture(1),indMidPosDiff(1)> Output: <estimatedFinalPose(1),distalJoints(3),abductJoint(1),indMidPresDiff(1),gripStrength(1)>
-				yarp::sig::Vector queryPoint,output;
+					std::vector<int> rIndexes(6);
+					rIndexes[0] = 2; rIndexes[1] = 3; rIndexes[2] = 4; rIndexes[3] = 5; rIndexes[4] = 6; rIndexes[5] = 7;
+
+					controlData->gmmData->buildQRStructures(qIndexes,rIndexes);
+
+					// Query: <aperture(1),indMidPosDiff(1)> Output: <estimatedFinalPose(1),distalJoints(3),abductJoint(1),indMidPresDiff(1),gripStrength(1)>
+					yarp::sig::Vector queryPoint,output;
 				
-				queryPoint.resize(2);
+					queryPoint.resize(2);
 				
-				handAperture = 180 - (middleEnc + indexEnc)/2 - thumbEnc;
-				indMidPosDiff = middleEnc - indexEnc;
-				queryPoint[0] = handAperture;
-				queryPoint[1] = indMidPosDiff;
+					handAperture = 180 - (middleEnc + indexEnc)/2 - thumbEnc;
+					indMidPosDiff = middleEnc - indexEnc;
+					queryPoint[0] = handAperture;
+					queryPoint[1] = indMidPosDiff;
 
-				controlData->gmmData->runGaussianMixtureRegression(queryPoint,output);
+					controlData->gmmData->runGaussianMixtureRegression(queryPoint,output);
 				
 
-				estimatedFinalPose = output[0];
+					estimatedFinalPose = output[0];
 
-				if (!wavePositionTrackingIsActive){
+					if (!wavePositionTrackingIsActive){
+						// TODO  manual corrections to be removed!
+						distalJoints[0] = targetThumbDistalJoint = output[1] + 6;// + 20; // thumb
+
+						distalJoints[1] = targetIndexDistalJoint = output[2];// + 20; // index finger
+
+						distalJoints[2] = targetMiddleDistalJoint = output[3];// + 20; // middle finger
+
+						abductionJoint = targetThumbAbductionJoint = output[4];// - 26;
+
+						indMidPressureBalanceBestPose = output[5];
+
+						//gripStrength = output[6];
+
+						// MIN JERK TRACKING
+						// if gmmJointsMinJerkTracking mode is activated, gmmJointsMinJerkTrackingModeEnabled is initialized, if gmmJointsMinJerkTracking mode is disabled, gmmJointsMinJerkTrackingModeEnabled is set to false so that next time initPosition will be initialized again
+						if (commonData->tpInt(65) != 0){
+							if (gmmJointsMinJerkTrackingModeEnabled == false){
+
+								Vector thAbdInitPosition(1,commonData->armEncodersAngles[8]);
+								Vector thDistInitPosition(1,commonData->armEncodersAngles[10]);
+								Vector indDistInitPosition(1,commonData->armEncodersAngles[12]);
+								Vector midDistInitPosition(1,commonData->armEncodersAngles[14]);
+
+								thAbdMinJerkTrajectory->init(thAbdInitPosition);
+								thDistMinJerkTrajectory->init(thDistInitPosition);
+								indDistMinJerkTrajectory->init(indDistInitPosition);
+								midDistMinJerkTrajectory->init(midDistInitPosition);
+
+								thAbdMinJerkTrajectory->setT(commonData->tpDbl(66));
+								thDistMinJerkTrajectory->setT(commonData->tpDbl(66));
+								indDistMinJerkTrajectory->setT(commonData->tpDbl(66));
+								midDistMinJerkTrajectory->setT(commonData->tpDbl(66));
+
+								gmmJointsMinJerkTrackingModeEnabled = true;
+							}
+
+							Vector thAbdTargetPosition(1,abductionJoint);
+							Vector thDistTargetPosition(1,distalJoints[0]);
+							Vector indDistTargetPosition(1,distalJoints[1]);
+							Vector midDistTargetPosition(1,distalJoints[2]);
+
+							thAbdMinJerkTrajectory->computeNextValues(thAbdTargetPosition);
+							thDistMinJerkTrajectory->computeNextValues(thDistTargetPosition);
+							indDistMinJerkTrajectory->computeNextValues(indDistTargetPosition);
+							midDistMinJerkTrajectory->computeNextValues(midDistTargetPosition);
+
+							Vector thAbdFilteredPosition = thAbdMinJerkTrajectory->getPos();
+							Vector thDistFilteredPosition = thDistMinJerkTrajectory->getPos();
+							Vector indDistFilteredPosition = indDistMinJerkTrajectory->getPos();
+							Vector midDistFilteredPosition = midDistMinJerkTrajectory->getPos();
+
+							abductionJoint = filteredThumbAbductionJoint = thAbdFilteredPosition[0];
+							distalJoints[0] = filteredThumbDistalJoint = thDistFilteredPosition[0];
+							distalJoints[1] = filteredIndexDistalJoint = indDistFilteredPosition[0];
+							distalJoints[2] = filteredMiddleDistalJoint = midDistFilteredPosition[0];
+
+
+						} else {
+							if (gmmJointsMinJerkTrackingModeEnabled == true){
+								gmmJointsMinJerkTrackingModeEnabled = false;
+							}
+						}
+
+						// move joints in position
+						controllersUtil->setJointAnglePositionDirect(8,abductionJoint);
+						controllersUtil->setJointAnglePositionDirect(10,distalJoints[0]); // thumb
+						controllersUtil->setJointAnglePositionDirect(12,distalJoints[1]); // index finger
+						controllersUtil->setJointAnglePositionDirect(14,distalJoints[2]); // middle finger
+					}
+				} else {
+
+					std::vector<int> qIndexes(3);
+					qIndexes[0] = 0; qIndexes[1] = 1; qIndexes[2] = 2;
+
+					std::vector<int> rIndexes(5);
+					rIndexes[0] = 3; rIndexes[1] = 4; rIndexes[2] = 5; rIndexes[3] = 6; rIndexes[4] = 7;
+
+					controlData->gmmData->buildQRStructures(qIndexes,rIndexes);
+
+					// Query: <aperture(1),indMidPosDiff(1)> Output: <estimatedFinalPose(1),distalJoints(3),abductJoint(1),indMidPresDiff(1),gripStrength(1)>
+					yarp::sig::Vector queryPoint,output;
+				
+					queryPoint.resize(3);
+				
+					handAperture = 180 - (middleEnc + indexEnc)/2 - thumbEnc;
+					indMidPosDiff = middleEnc - indexEnc;
+					queryPoint[0] = handAperture;
+					queryPoint[1] = indMidPosDiff;
+					queryPoint[2] = handPosition;
+
+					controlData->gmmData->runGaussianMixtureRegression(queryPoint,output);
+				
+
+					estimatedFinalPose = handPosition;
+
 					// TODO  manual corrections to be removed!
-                    distalJoints[0] = targetThumbDistalJoint = output[1] + 6;// + 20; // thumb
+					distalJoints[0] = targetThumbDistalJoint = output[0];// + 20; // thumb
 
-					distalJoints[1] = targetIndexDistalJoint = output[2];// + 20; // index finger
+					distalJoints[1] = targetIndexDistalJoint = output[1];// + 20; // index finger
 
-					distalJoints[2] = targetMiddleDistalJoint = output[3];// + 20; // middle finger
+					distalJoints[2] = targetMiddleDistalJoint = output[2];// + 20; // middle finger
 
-					abductionJoint = targetThumbAbductionJoint = output[4];// - 26;
+					abductionJoint = targetThumbAbductionJoint = output[3];// - 26;
 
-					indMidPressureBalanceBestPose = output[5];
+					indMidPressureBalanceBestPose = output[4];
 
-					//gripStrength = output[6];
-
-                    // MIN JERK TRACKING
-                    // if gmmJointsMinJerkTracking mode is activated, gmmJointsMinJerkTrackingModeEnabled is initialized, if gmmJointsMinJerkTracking mode is disabled, gmmJointsMinJerkTrackingModeEnabled is set to false so that next time initPosition will be initialized again
-                    if (commonData->tpInt(65) != 0){
-                        if (gmmJointsMinJerkTrackingModeEnabled == false){
-
-                            Vector thAbdInitPosition(1,commonData->armEncodersAngles[8]);
-                            Vector thDistInitPosition(1,commonData->armEncodersAngles[10]);
-                            Vector indDistInitPosition(1,commonData->armEncodersAngles[12]);
-                            Vector midDistInitPosition(1,commonData->armEncodersAngles[14]);
-
-                            thAbdMinJerkTrajectory->init(thAbdInitPosition);
-                            thDistMinJerkTrajectory->init(thDistInitPosition);
-                            indDistMinJerkTrajectory->init(indDistInitPosition);
-                            midDistMinJerkTrajectory->init(midDistInitPosition);
-
-                            thAbdMinJerkTrajectory->setT(commonData->tpDbl(66));
-                            thDistMinJerkTrajectory->setT(commonData->tpDbl(66));
-                            indDistMinJerkTrajectory->setT(commonData->tpDbl(66));
-                            midDistMinJerkTrajectory->setT(commonData->tpDbl(66));
-
-                            gmmJointsMinJerkTrackingModeEnabled = true;
-                        }
-
-                        Vector thAbdTargetPosition(1,abductionJoint);
-                        Vector thDistTargetPosition(1,distalJoints[0]);
-                        Vector indDistTargetPosition(1,distalJoints[1]);
-                        Vector midDistTargetPosition(1,distalJoints[2]);
-
-                        thAbdMinJerkTrajectory->computeNextValues(thAbdTargetPosition);
-                        thDistMinJerkTrajectory->computeNextValues(thDistTargetPosition);
-                        indDistMinJerkTrajectory->computeNextValues(indDistTargetPosition);
-                        midDistMinJerkTrajectory->computeNextValues(midDistTargetPosition);
-
-                        Vector thAbdFilteredPosition = thAbdMinJerkTrajectory->getPos();
-                        Vector thDistFilteredPosition = thDistMinJerkTrajectory->getPos();
-                        Vector indDistFilteredPosition = indDistMinJerkTrajectory->getPos();
-                        Vector midDistFilteredPosition = midDistMinJerkTrajectory->getPos();
-
-                        abductionJoint = thAbdFilteredPosition[0];
-                        distalJoints[0] = thDistFilteredPosition[0];
-                        distalJoints[1] = indDistFilteredPosition[0];
-                        distalJoints[2] = midDistFilteredPosition[0];
-
-
-                    } else {
-                        if (gmmJointsMinJerkTrackingModeEnabled == true){
-                            gmmJointsMinJerkTrackingModeEnabled = false;
-                        }
-                    }
 
 					// move joints in position
 					controllersUtil->setJointAnglePositionDirect(8,abductionJoint);
 					controllersUtil->setJointAnglePositionDirect(10,distalJoints[0]); // thumb
 					controllersUtil->setJointAnglePositionDirect(12,distalJoints[1]); // index finger
-                    controllersUtil->setJointAnglePositionDirect(14,distalJoints[2]); // middle finger
+					controllersUtil->setJointAnglePositionDirect(14,distalJoints[2]); // middle finger
+
 				}
-			} else {
-
-				std::vector<int> qIndexes(3);
-				qIndexes[0] = 0; qIndexes[1] = 1; qIndexes[2] = 2;
-
-				std::vector<int> rIndexes(5);
-				rIndexes[0] = 3; rIndexes[1] = 4; rIndexes[2] = 5; rIndexes[3] = 6; rIndexes[4] = 7;
-
-				controlData->gmmData->buildQRStructures(qIndexes,rIndexes);
-
-				// Query: <aperture(1),indMidPosDiff(1)> Output: <estimatedFinalPose(1),distalJoints(3),abductJoint(1),indMidPresDiff(1),gripStrength(1)>
-				yarp::sig::Vector queryPoint,output;
-				
-				queryPoint.resize(3);
-				
-				handAperture = 180 - (middleEnc + indexEnc)/2 - thumbEnc;
-				indMidPosDiff = middleEnc - indexEnc;
-				queryPoint[0] = handAperture;
-				queryPoint[1] = indMidPosDiff;
-				queryPoint[2] = handPosition;
-
-				controlData->gmmData->runGaussianMixtureRegression(queryPoint,output);
-				
-
-				estimatedFinalPose = handPosition;
-
-				// TODO  manual corrections to be removed!
-				distalJoints[0] = targetThumbDistalJoint = output[0];// + 20; // thumb
-
-				distalJoints[1] = targetIndexDistalJoint = output[1];// + 20; // index finger
-
-				distalJoints[2] = targetMiddleDistalJoint = output[2];// + 20; // middle finger
-
-				abductionJoint = targetThumbAbductionJoint = output[3];// - 26;
-
-				indMidPressureBalanceBestPose = output[4];
-
-
-				// move joints in position
-				controllersUtil->setJointAnglePositionDirect(8,abductionJoint);
-				controllersUtil->setJointAnglePositionDirect(10,distalJoints[0]); // thumb
-				controllersUtil->setJointAnglePositionDirect(12,distalJoints[1]); // index finger
-				controllersUtil->setJointAnglePositionDirect(14,distalJoints[2]); // middle finger
-
 			}
-
 		}
 
 		svCurrentPosition = handPosition;
@@ -852,7 +881,7 @@ void ControlTask::calculateControlInput(){
 
 	// log gaussian mixture model regression data
     if (bestPoseEstimatorMethod > 1){
-        portsUtil->sendGMMRegressionData(handAperture,indMidPosDiff,estimatedFinalPose,handPosition,targetThumbDistalJoint,targetIndexDistalJoint,targetMiddleDistalJoint,targetThumbAbductionJoint,indMidPressureBalanceBestPose,indMidPressureBalance,gripStrength,actualGripStrength,commonData);
+        portsUtil->sendGMMRegressionData(handAperture,indMidPosDiff,estimatedFinalPose,handPosition,actualCurrentTargetPose,targetThumbDistalJoint,filteredThumbDistalJoint,targetIndexDistalJoint,filteredIndexDistalJoint,targetMiddleDistalJoint,filteredMiddleDistalJoint,targetThumbAbductionJoint,filteredThumbAbductionJoint,indMidPressureBalanceBestPose,indMidPressureBalance,gripStrength,actualGripStrength,commonData);
 	}
 
 	// log best pose (for the gaussian mixture model)

@@ -247,7 +247,7 @@ bool PortsUtil::sendGMMData(double gripStrength, double indexMiddleFingerPressur
 		objGMMBottle.addDouble(commonData->armEncodersAngles[i]);
 	}
 
-	// compensated taxels feedback (60) (84-143)
+	// raw taxels feedback (60) (84-143)
 	for(size_t i = 0; i < commonData->fingerTaxelsRawData.size(); i++){
 		for(size_t j = 0; j < commonData->fingerTaxelsRawData[i].size(); j++){
 			objGMMBottle.addDouble(commonData->fingerTaxelsRawData[i][j]);
@@ -260,7 +260,7 @@ bool PortsUtil::sendGMMData(double gripStrength, double indexMiddleFingerPressur
 
 }
 
-bool PortsUtil::sendGMMRegressionData(double handAperture,double indMidPosDiff,double targetHandPosition,double actualHandPosition,double targetThumbDistalJoint,double targetIndexDistalJoint,double targetMiddleDistalJoint,double targetThumbAbductionJoint, double targetIndMidForceBalance, double actualIndMidForceBalance,double targetGripStrength,double actualGripStrength,iCub::plantIdentification::TaskCommonData *commonData){
+bool PortsUtil::sendGMMRegressionData(double handAperture,double indMidPosDiff,double targetHandPosition,double actualHandPosition,double filteredHandPosition,double targetThumbDistalJoint,double filteredThumbDistalJoint,double targetIndexDistalJoint,double filteredIndexDistalJoint,double targetMiddleDistalJoint,double filteredMiddleDistalJoint,double targetThumbAbductionJoint,double filteredThumbAbductionJoint, double targetIndMidForceBalance, double actualIndMidForceBalance,double targetGripStrength,double actualGripStrength,iCub::plantIdentification::TaskCommonData *commonData){
 
 
 	using yarp::os::Bottle;
@@ -268,47 +268,85 @@ bool PortsUtil::sendGMMRegressionData(double handAperture,double indMidPosDiff,d
 	Bottle& objGMMRegressionBottle = portGMMRegressionDataOut.prepare();
 	objGMMRegressionBottle.clear();
 
+	// experiment description (1)
+	objGMMRegressionBottle.addString(commonData->tpStr(16));
+	// previous experiment description (2)
+	objGMMRegressionBottle.addString(commonData->tpStr(17));
 
-    // hand aperture (query variable) (1)
+    // hand aperture (query variable) (3)
 	objGMMRegressionBottle.addDouble(handAperture);
 
-    // index/middle finger position difference (query variable) (2)
+    // index/middle finger position difference (query variable) (4)
 	objGMMRegressionBottle.addDouble(indMidPosDiff);
 
-    // target hand position (output variable) (3)
+    // target hand position (output variable) (5)
 	objGMMRegressionBottle.addDouble(targetHandPosition);
-    // actual hand position (4)
+	// filtered hand position (6)
+	objGMMRegressionBottle.addDouble(filteredHandPosition);
+    // actual hand position (7)
 	objGMMRegressionBottle.addDouble(actualHandPosition);
 
-    // target thumb distal joint (output variable) (5)
+    // target thumb distal joint (output variable) (8)
 	objGMMRegressionBottle.addDouble(targetThumbDistalJoint);
-    // actual thumb distal joint (6)
+	// filtered thumb distal joint (9)
+	objGMMRegressionBottle.addDouble(filteredThumbDistalJoint);
+    // actual thumb distal joint (10)
 	objGMMRegressionBottle.addDouble(commonData->armEncodersAngles[10]);
 
-    // target index distal joint (output variable) (7)
+    // target index distal joint (output variable) (11)
 	objGMMRegressionBottle.addDouble(targetIndexDistalJoint);
-    // actual index distal joint (8)
+	// filtered index distal joint (12)
+	objGMMRegressionBottle.addDouble(filteredIndexDistalJoint);
+    // actual index distal joint (13)
 	objGMMRegressionBottle.addDouble(commonData->armEncodersAngles[12]);
 
-    // target middle distal joint (output variable) (9)
+    // target middle distal joint (output variable) (14)
 	objGMMRegressionBottle.addDouble(targetMiddleDistalJoint);
-    // actual middle distal joint (10)
+	// filtered middle distal joint (15)
+	objGMMRegressionBottle.addDouble(filteredMiddleDistalJoint);
+    // actual middle distal joint (16)
 	objGMMRegressionBottle.addDouble(commonData->armEncodersAngles[14]);
 
-    // target thumb abduction joint (output variable) (11)
+    // target thumb abduction joint (output variable) (17)
 	objGMMRegressionBottle.addDouble(targetThumbAbductionJoint);
-    // actual thumb abduction joint (12)
+	// filtered thumb abduction joint (18)
+	objGMMRegressionBottle.addDouble(filteredThumbAbductionJoint);
+    // actual thumb abduction joint (19)
 	objGMMRegressionBottle.addDouble(commonData->armEncodersAngles[8]);
 
-    // target index/middle force balance (output variable) (13)
+    // target index/middle force balance (output variable) (20)
 	objGMMRegressionBottle.addDouble(targetIndMidForceBalance);
-    // actual index/middle force balance (14)
+    // actual index/middle force balance (21)
 	objGMMRegressionBottle.addDouble(actualIndMidForceBalance);
 
-    // target grip strength (output variable) (15)
+	// target grip strength (output variable) (22)
 	objGMMRegressionBottle.addDouble(targetGripStrength);
-    // actual grip strength (16)
+    // actual grip strength (23)
 	objGMMRegressionBottle.addDouble(actualGripStrength);
+
+	// arm encoders [16] (24-39)
+	for(size_t i = 0; i < commonData->armEncodersAngles.size(); i++){
+		objGMMRegressionBottle.addDouble(commonData->armEncodersAngles[i]);
+	}
+
+	// fingers overall pressure [5] (40-44)
+    for(size_t i = 0; i < commonData->overallFingerPressureByWeightedSum.size(); i++){
+        objGMMRegressionBottle.addDouble(commonData->overallFingerPressureByWeightedSum[i]);
+	}
+
+	// compensated taxels feedback [60] (45-104)
+	for(size_t i = 0; i < commonData->fingerTaxelsData.size(); i++){
+		for(size_t j = 0; j < commonData->fingerTaxelsData[i].size(); j++){
+			objGMMRegressionBottle.addDouble(commonData->fingerTaxelsData[i][j]);
+		}
+	}
+	
+	// compensated taxels feedback [60] (105-164)
+	//for(size_t i = 0; i < commonData->fingerTaxelsRawData.size(); i++){
+	//	for(size_t j = 0; j < commonData->fingerTaxelsRawData[i].size(); j++){
+	//		objGMMRegressionBottle.addDouble(commonData->fingerTaxelsRawData[i][j]);
+	//	}
+	//}
 
 	portGMMRegressionDataOut.write();
 
