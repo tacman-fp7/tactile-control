@@ -38,6 +38,12 @@
                type="lines"
                size="1" />
         <graph remote="/plantIdentification/gmmRegression:o"
+               index="17"
+               color="Black"
+               title="Filtered thumb abduction Joint"
+               type="lines"
+               size="1" />
+        <graph remote="/plantIdentification/gmmRegression:o"
                index="16"
                color="Red"
                title="Target thumb abduction Joint"

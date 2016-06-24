@@ -76,6 +76,7 @@ namespace iCub {
 
 				bool handPositionSet;
 				double initialHandPosition;
+                double initialThAbdJointAngle;
 
             public:
 

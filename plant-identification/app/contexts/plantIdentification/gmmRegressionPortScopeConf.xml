@@ -7,7 +7,7 @@
           title="Hand Position"
           size="201"
           minval="-20"
-          maxval="20"
+          maxval="40"
           bgcolor="#EEFFEE">
         <graph remote="/plantIdentification/control"
                index="8"

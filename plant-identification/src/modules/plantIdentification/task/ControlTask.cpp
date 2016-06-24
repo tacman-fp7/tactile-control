@@ -177,8 +177,8 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	Vector kdSvOptionVect(1,svKd);
 	Vector ttSvOptionVect(1,calculateTt(svKp,svKi,svKd));
 	Matrix pvSatLimMatrix(1,2);
-	pvSatLimMatrix[0][0] = -1000.0;
-	pvSatLimMatrix[0][1] = 1000.0;
+    pvSatLimMatrix[0][0] = -1333.0;
+    pvSatLimMatrix[0][1] = 1333.0;
 	Bottle svPidOptions;
 	addOption(svPidOptions,"Wp",Value(controlData->pidWp));
 	addOption(svPidOptions,"Wi",Value(controlData->pidWi));
@@ -248,6 +248,8 @@ void ControlTask::init(){
 		cout << pressureTargetValue[i] << " ";
 	}
 	cout << "\n\n";
+
+    initialThAbdJointAngle = commonData->armEncodersAngles[8];
 }
 
 void ControlTask::calculateControlInput(){
@@ -289,11 +291,13 @@ void ControlTask::calculateControlInput(){
 	bool wavePositionTrackingIsActive = commonData->tpInt(18) != 0;
 	
 	bool handFreezeAutoEnabled = commonData->tpInt(68) != 0;
-	if (handFreezeAutoEnabled && callsNumber <= secondsToCallsNumber(commonData->tpDbl(69))){
-		commonData->tempParameters[67] = Value(1);
-	} else {
-		commonData->tempParameters[67] = Value(0);
-	}
+    if (handFreezeAutoEnabled){
+        if (callsNumber <= secondsToCallsNumber(commonData->tpDbl(69))){
+            commonData->tempParameters[67] = Value(1);
+        } else {
+            commonData->tempParameters[67] = Value(0);
+        }
+    }
 
 	bool handFreezeEnabled = commonData->tpInt(67) != 0;
     bool policyLearningEnabled = commonData->tpInt(51) != 0;
@@ -457,9 +461,9 @@ void ControlTask::calculateControlInput(){
 						// if gmmJointsMinJerkTracking mode is activated, gmmJointsMinJerkTrackingModeEnabled is initialized, if gmmJointsMinJerkTracking mode is disabled, gmmJointsMinJerkTrackingModeEnabled is set to false so that next time initPosition will be initialized again
 						if (commonData->tpInt(65) != 0){
 							if (gmmJointsMinJerkTrackingModeEnabled == false){
-
-								Vector thAbdInitPosition(1,commonData->armEncodersAngles[8]);
-								Vector thDistInitPosition(1,commonData->armEncodersAngles[10]);
+                                //Vector thAbdInitPosition(1,commonData->armEncodersAngles[8]);
+                                Vector thAbdInitPosition(1,initialThAbdJointAngle);
+                                Vector thDistInitPosition(1,commonData->armEncodersAngles[10]);
 								Vector indDistInitPosition(1,commonData->armEncodersAngles[12]);
 								Vector midDistInitPosition(1,commonData->armEncodersAngles[14]);
 
@@ -880,7 +884,7 @@ void ControlTask::calculateControlInput(){
 	portsUtil->sendControlData(taskId,commonData->tpStr(16),commonData->tpStr(17),gripStrength,actualGripStrength,commonData->tpDbl(8)+svResultValueScaled,svErr,svCurrentPosition,actualCurrentTargetPose,finalTargetPose,estimatedFinalPose,svKp*commonData->tpDbl(5),svKi*commonData->tpDbl(5),svKd*commonData->tpDbl(5),thumbEnc,indexEnc,middleEnc,enc8,pressureTargetValue,commonData->overallFingerPressure,inputCommandValue,fingersList);
 
 	// log gaussian mixture model regression data
-    if (bestPoseEstimatorMethod > 1){
+    if (bestPoseEstimatorMethod >= 1){
         portsUtil->sendGMMRegressionData(handAperture,indMidPosDiff,estimatedFinalPose,handPosition,actualCurrentTargetPose,targetThumbDistalJoint,filteredThumbDistalJoint,targetIndexDistalJoint,filteredIndexDistalJoint,targetMiddleDistalJoint,filteredMiddleDistalJoint,targetThumbAbductionJoint,filteredThumbAbductionJoint,indMidPressureBalanceBestPose,indMidPressureBalance,gripStrength,actualGripStrength,commonData);
 	}
 
