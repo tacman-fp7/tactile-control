@@ -884,9 +884,9 @@ void ControlTask::calculateControlInput(){
 	portsUtil->sendControlData(taskId,commonData->tpStr(16),commonData->tpStr(17),gripStrength,actualGripStrength,commonData->tpDbl(8)+svResultValueScaled,svErr,svCurrentPosition,actualCurrentTargetPose,finalTargetPose,estimatedFinalPose,svKp*commonData->tpDbl(5),svKi*commonData->tpDbl(5),svKd*commonData->tpDbl(5),thumbEnc,indexEnc,middleEnc,enc8,pressureTargetValue,commonData->overallFingerPressure,inputCommandValue,fingersList);
 
 	// log gaussian mixture model regression data
-    if (bestPoseEstimatorMethod >= 1){
+//    if (bestPoseEstimatorMethod >= 1){
         portsUtil->sendGMMRegressionData(handAperture,indMidPosDiff,estimatedFinalPose,handPosition,actualCurrentTargetPose,targetThumbDistalJoint,filteredThumbDistalJoint,targetIndexDistalJoint,filteredIndexDistalJoint,targetMiddleDistalJoint,filteredMiddleDistalJoint,targetThumbAbductionJoint,filteredThumbAbductionJoint,indMidPressureBalanceBestPose,indMidPressureBalance,gripStrength,actualGripStrength,commonData);
-	}
+//	}
 
 	// log best pose (for the gaussian mixture model)
 	if (commonData->tpInt(55) != 0){
