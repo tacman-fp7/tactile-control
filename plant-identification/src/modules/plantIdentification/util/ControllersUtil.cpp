@@ -290,7 +290,7 @@ bool ControllersUtil::setArmInTaskPosition() {
             }
         } else {
             if (whichHand == "right"){
-                iPos->positionMove(8 , 38);    
+                iPos->positionMove(8 , 50);    
                 iPos->positionMove(9 , 3);
                 iPos->positionMove(10, 15);
                 iPos->positionMove(11, 2);
