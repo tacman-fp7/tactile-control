@@ -303,7 +303,7 @@ void ControlTask::calculateControlInput(){
     bool policyLearningEnabled = commonData->tpInt(51) != 0;
 	bool newValuesPL;
 	int bestPoseEstimatorMethod = commonData->tpInt(56);
-	// if the grip strength wave generator is not active, the grip strength is read from the temp params 
+	// if the grip strength wave generator is not active, the grip strength is read from the temp params
 	double gripStrength = commonData->tpDbl(7);
 	double indMidPressureBalanceBestPose = commonData->tpDbl(9);
 	if (supervisorControlMode){
