@@ -133,7 +133,7 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
         if (whichHand == "right"){
             commonData.tempParameters[52] = 1.0;
             commonData.tempParameters[53] = 0.6;
-            commonData.tempParameters[54] = 1.5;
+            commonData.tempParameters[54] = 1.0;
         } else {
 
             commonData.tempParameters[52] = 1.0;

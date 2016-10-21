@@ -759,7 +759,8 @@ void ControlTask::calculateControlInput(){
 		}
 
 
-
+                // TODO temporary workaround
+                indMidPressureBalance = 0.0;
 
 		if (jointsList.size() == 2){
 
