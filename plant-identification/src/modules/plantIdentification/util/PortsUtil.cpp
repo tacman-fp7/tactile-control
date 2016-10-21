@@ -34,6 +34,7 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
     string gmmRegressionDataPortName = "/plantIdentification/gmmRegression:o";
     string objectRecognitionDataPortName = "/plantIdentification/object_recognition_log:o";
     string gripStrengthDataPortName = "/plantIdentification/grip_strength:o";
+    string forceSensorPortName = "/plantIdentification/force_sensor:i";
 
     // opening ports
 	if (!portSkinRawIn.open(moduleSkinRawPortName)){
@@ -80,6 +81,13 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
         cout << dbgTag << "could not open " << gripStrengthDataPortName << " port \n";
         return false;
     }
+	if (!portForceSensorIn.open(forceSensorPortName)){
+        cout << dbgTag << "could not open " << forceSensorPortName << " port \n";
+        return false;
+    }
+
+		
+
 
 	// connecting ports
 	if (!Network::connect(icubSkinRawPortName,moduleSkinRawPortName)){
@@ -476,6 +484,22 @@ bool PortsUtil::readPolicyActionsData(std::vector<double> &policyActionsData){
     if (iCubPolicyActionsData) {
 		for (size_t i = 0; i < policyActionsData.size(); i++){
 			policyActionsData[i] = (*iCubPolicyActionsData)[i];
+		}
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool PortsUtil::readForceSensorData(std::vector<double> &forceSensorData){
+
+	using yarp::sig::Vector;
+
+	Vector *portData = portForceSensorIn.read(false);
+    
+    if (portData) {
+		for (size_t i = 0; i < forceSensorData.size(); i++){
+			forceSensorData[i] = (*portData)[i];
 		}
 		return true;
 	} else {

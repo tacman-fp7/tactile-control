@@ -65,5 +65,11 @@
 		<protocol>tcp</protocol>
 	</connection>
 	
+	<connection>
+		<from>/NIDAQmxReader/data/real:o</from>
+		<to>/plantIdentification/force_sensor:i</to>
+		<protocol>tcp</protocol>
+	</connection>
+	
 	
 </application>

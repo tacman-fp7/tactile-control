@@ -228,6 +228,7 @@ bool ICubUtil::updateExternalData(ControllersUtil *controllersUtil,PortsUtil *po
 	fingersSensitivityScale[4] = commonData->tpDbl(52); // thumb
 	fingersSensitivityScale[0] = commonData->tpDbl(53); // index finger
 	fingersSensitivityScale[1] = commonData->tpDbl(54); // middle finger
+	bool forceSensorReadingEnabled = commonData->tpInt(70) != 0;
 
 
 	if (!portsUtil->readFingerSkinRawData(commonData->fingerTaxelsRawData,fingersSensitivityScale)){
@@ -318,6 +319,15 @@ bool ICubUtil::updateExternalData(ControllersUtil *controllersUtil,PortsUtil *po
 		commonData->middleXYZ = middleFingertipFrame.getCol(3).subVector(0,2);
 	}
 
+	// reading force sensor data
+	if (forceSensorReadingEnabled){
+
+		if (!portsUtil->readForceSensorData(commonData->forceSensorData)){
+			return false;
+		}
+		processForceSensorData(commonData);
+
+	}
 
 	return true;
 }
@@ -345,6 +355,23 @@ void ICubUtil::processTactileData(TaskCommonData *commonData){
 	}
 
 }
+
+void ICubUtil::processForceSensorData(TaskCommonData *commonData){
+
+	double fX,fY,fZ,tX,tY,tZ;
+
+	fX = commonData->forceSensorData[0];
+	fY = commonData->forceSensorData[1];
+	fZ = commonData->forceSensorData[2];
+	tX = commonData->forceSensorData[3];
+	tY = commonData->forceSensorData[4];
+	tZ = commonData->forceSensorData[5];
+
+	commonData->procForceSensorData[0] = sqrt(fX*fX + fY*fY + fZ*fZ);
+	commonData->procForceSensorData[1] = sqrt(tX*tX + tY*tY + tZ*tZ);
+	
+}
+
 
 void ICubUtil::getNNOptionsForErrorPrediction3Fingers(Bottle& neuralNetworkOptions){
 

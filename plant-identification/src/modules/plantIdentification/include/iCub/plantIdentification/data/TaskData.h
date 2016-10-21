@@ -44,6 +44,9 @@ namespace iCub {
 			iCub::iKin::iCubFinger* iCubIndexFinger;
 			iCub::iKin::iCubFinger* iCubMiddleFinger;
 
+			std::vector<double> forceSensorData;
+			std::vector<double> procForceSensorData;
+
             
             /*  TEMP PARAMETERS USED DURING CONTROL TASKS (EXCEPT THE 15th, USED DURING STEP TASKS)
             *   0: supervisor mode off/on [0/1]
@@ -116,7 +119,7 @@ namespace iCub {
 			*	67: hand freeze enabled [0/1]. If enabled, as soon as the hand grasps the object, the hand doesn't move
 			*	68: hand freeze automation enabled [0/1]. if enabled, it automatically set property 67 (that we can ignore) in order to freeze the hand the first x seconds, where x is specified by property 69
 			*	69: hand freeze duration (sec). Check property 68 for the description
-			*	70: <not used yet>
+			*	70: force sensor reading enabled. no/yes [0/1]
 			*
 			*   Note: double values have to contain a dot, while strings have to start with '#'
 			*

@@ -39,6 +39,8 @@ namespace iCub {
 
 				static void processTactileData(iCub::plantIdentification::TaskCommonData *commonData);
 
+				static void processForceSensorData(iCub::plantIdentification::TaskCommonData *commonData);
+
 				static double getForceBySimpleSum(std::vector<double>& tactileData);
 
 				static double getForceByWeightedSum(std::vector<double>& tactileData);

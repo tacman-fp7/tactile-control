@@ -306,6 +306,7 @@ void ControlTask::calculateControlInput(){
 	// if the grip strength wave generator is not active, the grip strength is read from the temp params
 	double gripStrength = commonData->tpDbl(7);
 	double indMidPressureBalanceBestPose = commonData->tpDbl(9);
+	bool forceSensorReadingEnabled = commonData->tpInt(70) != 0;
 	if (supervisorControlMode){
 		thumbEnc = commonData->armEncodersAngles[9];
 		indexEnc = commonData->armEncodersAngles[11];
@@ -801,6 +802,15 @@ void ControlTask::calculateControlInput(){
 		
 	}
 	/*** END OF CODE RELATED TO SUPERVISOR MODE ***/
+
+	// if forceSensorReading is enabled, log the processed values
+    if (forceSensorReadingEnabled == true){
+		if (callsNumber%commonData->screenLogStride == 0){
+    		std::stringstream printLog("");
+			printLog << " [Force " << commonData->procForceSensorData[0] << " - " << commonData->procForceSensorData[1] << "]";
+			optionalLogString.append(printLog.str());
+		}
+	}
 
 	// square wave generator, it overrides what done by the supervisor, if active
 	if (commonData->tpInt(11) != 0){

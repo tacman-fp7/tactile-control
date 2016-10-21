@@ -41,8 +41,20 @@ void StepTask::init(){
 
 void StepTask::calculateControlInput(){
 
+	bool forceSensorReadingEnabled = commonData->tpInt(70) != 0;
+
+
 	for(size_t i = 0; i < constantPwm.size(); i++){
 		inputCommandValue[i] = constantPwm[i];
+	}
+
+	// if forceSensorReading is enabled, log the processed values
+    if (forceSensorReadingEnabled == true){
+		if (callsNumber%commonData->screenLogStride == 0){
+    		std::stringstream printLog("");
+			printLog << " [Force " << commonData->procForceSensorData[0] << " - " << commonData->procForceSensorData[1] << "]";
+			optionalLogString.append(printLog.str());
+		}
 	}
 
 	//TODO TO BE REMOVED!
