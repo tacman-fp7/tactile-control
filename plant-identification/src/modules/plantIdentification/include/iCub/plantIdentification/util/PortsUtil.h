@@ -66,7 +66,7 @@ namespace iCub {
 
 				bool readPolicyActionsData(std::vector<double> &policyActionsData);
 
-				bool readForceSensorData(std::vector<double> &forceSensorData);
+				bool readForceSensorData(std::vector<double> &forceSensorData,std::vector<double> &forceSensorBias);
 
 				bool release();
         };

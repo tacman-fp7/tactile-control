@@ -491,7 +491,7 @@ bool PortsUtil::readPolicyActionsData(std::vector<double> &policyActionsData){
 	}
 }
 
-bool PortsUtil::readForceSensorData(std::vector<double> &forceSensorData){
+bool PortsUtil::readForceSensorData(std::vector<double> &forceSensorData,std::vector<double> &forceSensorBias){
 
 	using yarp::sig::Vector;
 
@@ -499,7 +499,7 @@ bool PortsUtil::readForceSensorData(std::vector<double> &forceSensorData){
     
     if (portData) {
 		for (size_t i = 0; i < forceSensorData.size(); i++){
-			forceSensorData[i] = (*portData)[i];
+			forceSensorData[i] = (*portData)[i] - forceSensorBias[i];
 		}
 		return true;
 	} else {

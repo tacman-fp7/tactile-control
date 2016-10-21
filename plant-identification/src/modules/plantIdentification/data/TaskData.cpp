@@ -158,7 +158,8 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
 	commonData.iCubMiddleFinger->alignJointsBounds(controllersUtil->getArmJointLimits());
 
 	commonData.forceSensorData.resize(6,0.0);      
-	commonData.procForceSensorData.resize(2,0.0);      
+	commonData.forceSensorBias.resize(6,0.0);      
+	commonData.procForceSensorData.resize(5,0.0);      
 
 
 	Bottle* stepTaskJoints = rf.find("stepTaskJoints").asList();

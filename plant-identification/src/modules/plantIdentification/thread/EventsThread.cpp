@@ -50,6 +50,9 @@ bool EventsThread::threadInit(){
 		fpPressureMemory[i].resize(fpWindowSize,0);
 	}
 
+	forceSensorBiasCounter = -1;
+	forceSensorBiasPartial.resize(6,0.0);
+
 	return true;
 }
 
@@ -57,11 +60,10 @@ void EventsThread::run(){
 
 
 	// update module data
-	ICubUtil::updateExternalData(controllersUtil,portsUtil,commonData,xyzCoordEnabled);
+	ICubUtil::updateExternalData(controllersUtil,portsUtil,commonData,xyzCoordEnabled,forceSensorBiasCounter,forceSensorBiasPartial);
 
 	// check events
 	checkEvents();
-
 
 	executeWaveAction();
 

@@ -46,7 +46,10 @@ namespace iCub {
 				/* ****** Ports utility                                 ****** */
 				iCub::plantIdentification::PortsUtil *portsUtil;
 
+				// TODO these variables represent the state of the external data update process and should be grouped in a separate class
 				bool xyzCoordEnabled;
+				int forceSensorBiasCounter;
+				std::vector<double> forceSensorBiasPartial;
 
                 /* ****** Debug attributes                              ****** */
                 std::string dbgTag;

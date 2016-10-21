@@ -220,7 +220,7 @@ void ICubUtil::getNNOptionsForErrorPrediction2Fingers(Bottle& neuralNetworkOptio
 
 }
 
-bool ICubUtil::updateExternalData(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,bool xyzCoordEnabled){
+bool ICubUtil::updateExternalData(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,bool xyzCoordEnabled,int forceSensorBiasCounter,std::vector<double> &forceSensorBiasPartial){
 
 	using yarp::sig::Vector;
 	
@@ -322,10 +322,10 @@ bool ICubUtil::updateExternalData(ControllersUtil *controllersUtil,PortsUtil *po
 	// reading force sensor data
 	if (forceSensorReadingEnabled){
 
-		if (!portsUtil->readForceSensorData(commonData->forceSensorData)){
+		if (!portsUtil->readForceSensorData(commonData->forceSensorData,commonData->forceSensorBias)){
 			return false;
 		}
-		processForceSensorData(commonData);
+		processForceSensorData(commonData,forceSensorBiasCounter,forceSensorBiasPartial);
 
 	}
 
@@ -356,9 +356,13 @@ void ICubUtil::processTactileData(TaskCommonData *commonData){
 
 }
 
-void ICubUtil::processForceSensorData(TaskCommonData *commonData){
+void ICubUtil::processForceSensorData(TaskCommonData *commonData,int forceSensorBiasCounter,std::vector<double> &forceSensorBiasPartial){
 
 	double fX,fY,fZ,tX,tY,tZ;
+	double forceSensorDiscountRate = commonData->tpDbl(71);
+	int fingerToConsider = commonData->tpInt(72);
+	bool forceSensorCalibrationTriggered = commonData->tpInt(73) != 0;
+	int numStepsForAverage = commonData->tpInt(74);
 
 	fX = commonData->forceSensorData[0];
 	fY = commonData->forceSensorData[1];
@@ -367,9 +371,34 @@ void ICubUtil::processForceSensorData(TaskCommonData *commonData){
 	tY = commonData->forceSensorData[4];
 	tZ = commonData->forceSensorData[5];
 
-	commonData->procForceSensorData[0] = sqrt(fX*fX + fY*fY + fZ*fZ);
-	commonData->procForceSensorData[1] = sqrt(tX*tX + tY*tY + tZ*tZ);
-	
+	commonData->procForceSensorData[0] = -fZ;
+	commonData->procForceSensorData[1] = forceSensorDiscountRate*commonData->procForceSensorData[0] + (1-forceSensorDiscountRate)*commonData->procForceSensorData[1];
+	commonData->procForceSensorData[2] = tZ;
+	commonData->procForceSensorData[3] = forceSensorDiscountRate*commonData->procForceSensorData[2] + (1-forceSensorDiscountRate)*commonData->procForceSensorData[3];
+	if (abs(commonData->procForceSensorData[0]) > 0.1){
+		commonData->procForceSensorData[4] = commonData->overallFingerPressure[fingerToConsider] / commonData->procForceSensorData[0];
+		commonData->procForceSensorData[5] = forceSensorDiscountRate*commonData->procForceSensorData[4] + (1-forceSensorDiscountRate)*commonData->procForceSensorData[5];
+	} else {
+		commonData->procForceSensorData[4] = commonData->procForceSensorData[5] = 0.0;
+	}
+
+	// check if the force calibration has been triggered
+	if (forceSensorCalibrationTriggered){
+		forceSensorBiasCounter = numStepsForAverage;
+		commonData->tempParameters[73] = 0;
+	}
+	if (forceSensorBiasCounter > 0){
+		forceSensorBiasCounter--;
+		for(size_t i = 0; i < forceSensorBiasPartial.size(); i++){
+			forceSensorBiasPartial[i] += commonData->forceSensorData[i];
+		}
+	} else if (forceSensorBiasCounter == 0){
+		for(size_t i = 0; i < commonData->forceSensorBias.size(); i++){
+			commonData->forceSensorBias[i] = forceSensorBiasPartial[i]/numStepsForAverage;
+		}
+		forceSensorBiasCounter = -1;
+		forceSensorBiasPartial.resize(6,0);
+	}
 }
 
 

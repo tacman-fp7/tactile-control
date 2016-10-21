@@ -45,6 +45,7 @@ namespace iCub {
 			iCub::iKin::iCubFinger* iCubMiddleFinger;
 
 			std::vector<double> forceSensorData;
+			std::vector<double> forceSensorBias;
 			std::vector<double> procForceSensorData;
 
             
@@ -119,7 +120,27 @@ namespace iCub {
 			*	67: hand freeze enabled [0/1]. If enabled, as soon as the hand grasps the object, the hand doesn't move
 			*	68: hand freeze automation enabled [0/1]. if enabled, it automatically set property 67 (that we can ignore) in order to freeze the hand the first x seconds, where x is specified by property 69
 			*	69: hand freeze duration (sec). Check property 68 for the description
-			*	70: force sensor reading enabled. no/yes [0/1]
+			*	70: force sensors: reading enabled. no/yes [0/1]
+			*	71: force sensors: discount rate (in [0 1]), it regulates the moving average of all the printed values
+			*	72: force sensors: finger to consider
+			*	73: force sensors: if set != 0, calibration starts and it returns to 0.
+			*	74: force sensors: number of steps for the calibration (in order to calculate the average)
+			*	75: not used yet
+			*	76: not used yet
+			*	77: not used yet
+			*	78: not used yet
+			*	79: not used yet
+			*	80: not used yet
+			*	81: not used yet
+			*	82: not used yet
+			*	83: not used yet
+			*	84: not used yet
+			*	85: not used yet
+			*	86: not used yet
+			*	87: not used yet
+			*	88: not used yet
+			*	89: not used yet
+			*	90: not used yet
 			*
 			*   Note: double values have to contain a dot, while strings have to start with '#'
 			*

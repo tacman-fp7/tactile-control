@@ -27,7 +27,7 @@ namespace iCub {
 				static void getNNOptionsForErrorPrediction3Fingers(yarp::os::Bottle& bottle);
 				static void rotateFingersData(std::vector<double>& fingersAngles,std::vector<double>& rotatedFingersAngles);
 
-				static bool updateExternalData(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,bool xyzCoordEnabled);
+				static bool updateExternalData(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,bool xyzCoordEnabled,int forceSensorBiasCounter,std::vector<double> &forceSensorBiasPartial);
 
 				static void putDataIntoVector(const double *dataIn,int size,yarp::sig::Vector &dataOut);
 				static void putDataIntoMatrix(const double *dataIn,int rows,int columns,yarp::sig::Matrix &dataOut);
@@ -39,7 +39,7 @@ namespace iCub {
 
 				static void processTactileData(iCub::plantIdentification::TaskCommonData *commonData);
 
-				static void processForceSensorData(iCub::plantIdentification::TaskCommonData *commonData);
+				static void processForceSensorData(iCub::plantIdentification::TaskCommonData *commonData,int forceSensorBiasCounter,std::vector<double> &forceSensorBiasPartial);
 
 				static double getForceBySimpleSum(std::vector<double>& tactileData);
 
