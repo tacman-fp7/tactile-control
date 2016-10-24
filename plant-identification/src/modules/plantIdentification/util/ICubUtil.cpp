@@ -220,7 +220,7 @@ void ICubUtil::getNNOptionsForErrorPrediction2Fingers(Bottle& neuralNetworkOptio
 
 }
 
-bool ICubUtil::updateExternalData(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,bool xyzCoordEnabled,int forceSensorBiasCounter,std::vector<double> &forceSensorBiasPartial){
+bool ICubUtil::updateExternalData(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,bool xyzCoordEnabled,int &forceSensorBiasCounter,std::vector<double> &forceSensorBiasPartial){
 
 	using yarp::sig::Vector;
 	
@@ -356,7 +356,7 @@ void ICubUtil::processTactileData(TaskCommonData *commonData){
 
 }
 
-void ICubUtil::processForceSensorData(TaskCommonData *commonData,int forceSensorBiasCounter,std::vector<double> &forceSensorBiasPartial){
+void ICubUtil::processForceSensorData(TaskCommonData *commonData,int &forceSensorBiasCounter,std::vector<double> &forceSensorBiasPartial){
 
 	double fX,fY,fZ,tX,tY,tZ;
 	double forceSensorDiscountRate = commonData->tpDbl(71);
@@ -386,16 +386,19 @@ void ICubUtil::processForceSensorData(TaskCommonData *commonData,int forceSensor
 	if (forceSensorCalibrationTriggered){
 		forceSensorBiasCounter = numStepsForAverage;
 		commonData->tempParameters[73] = 0;
+                std::cout << "ACTIVATED\n";
 	}
 	if (forceSensorBiasCounter > 0){
 		forceSensorBiasCounter--;
 		for(size_t i = 0; i < forceSensorBiasPartial.size(); i++){
 			forceSensorBiasPartial[i] += commonData->forceSensorData[i];
 		}
+                std::cout << "partial " << forceSensorBiasPartial[2] << "\n";
 	} else if (forceSensorBiasCounter == 0){
 		for(size_t i = 0; i < commonData->forceSensorBias.size(); i++){
 			commonData->forceSensorBias[i] = forceSensorBiasPartial[i]/numStepsForAverage;
 		}
+                std::cout << "DONE!! " << commonData->forceSensorBias[2] << "\n";
 		forceSensorBiasCounter = -1;
 		forceSensorBiasPartial.resize(6,0);
 	}

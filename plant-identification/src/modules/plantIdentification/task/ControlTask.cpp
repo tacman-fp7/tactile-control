@@ -807,7 +807,7 @@ void ControlTask::calculateControlInput(){
     if (forceSensorReadingEnabled == true){
 		if (callsNumber%commonData->screenLogStride == 0){
     		std::stringstream printLog("");
-			printLog << " [Force " << commonData->procForceSensorData[0] << " - " << commonData->procForceSensorData[1] << " - " << commonData->procForceSensorData[2] << " - " << commonData->procForceSensorData[3] << " - " << commonData->procForceSensorData[4] << " - " << commonData->procForceSensorData[5] << "]";
+			printLog << " [F " << commonData->procForceSensorData[0] << " - " << commonData->procForceSensorData[1] << " - " << commonData->procForceSensorData[2] << " - " << commonData->procForceSensorData[3] << " - " << commonData->procForceSensorData[4] << " - " << commonData->procForceSensorData[5] << "]";
 			optionalLogString.append(printLog.str());
 		}
 	}
