@@ -452,7 +452,7 @@ void ControlTask::calculateControlInput(){
 
 						distalJoints[2] = targetMiddleDistalJoint = output[3];// + 20; // middle finger
 
-						abductionJoint = targetThumbAbductionJoint = output[4];// - 26;
+						abductionJoint = targetThumbAbductionJoint = output[4] + commonData->tpDbl(75);// - 26;
 
 						indMidPressureBalanceBestPose = output[5];
 

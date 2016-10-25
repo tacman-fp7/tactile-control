@@ -131,13 +131,13 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
 	// temp parameters updated according to the hand and/or the robot
 	if (whichICub == "black"){
         if (whichHand == "right"){
-//            commonData.tempParameters[52] = 1.0;
-//            commonData.tempParameters[53] = 0.6;
-//            commonData.tempParameters[54] = 1.0;
+            commonData.tempParameters[52] = 1.0;
+            commonData.tempParameters[53] = 0.6;
+            commonData.tempParameters[54] = 1.0;
             // found using the force sensors
-            commonData.tempParameters[52] = 1.0/13;
-            commonData.tempParameters[53] = 1.0/45;
-            commonData.tempParameters[54] = 1.0/20;
+            //commonData.tempParameters[52] = 1.0/13;
+            //commonData.tempParameters[53] = 1.0/45;
+            //commonData.tempParameters[54] = 1.0/20;
         } else {
 
             commonData.tempParameters[52] = 1.0;

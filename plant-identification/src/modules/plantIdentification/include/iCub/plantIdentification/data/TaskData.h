@@ -125,7 +125,7 @@ namespace iCub {
 			*	72: force sensors: finger to consider
 			*	73: force sensors: if set != 0, calibration starts and it returns to 0.
 			*	74: force sensors: number of steps for the calibration (in order to calculate the average)
-			*	75: not used yet
+			*	75: thumb abduction joint offset, applied when GMM regression is used
 			*	76: not used yet
 			*	77: not used yet
 			*	78: not used yet
