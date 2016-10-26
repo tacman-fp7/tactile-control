@@ -26,6 +26,9 @@ namespace iCub {
                 yarp::os::BufferedPort<yarp::sig::Vector> portHandEncodersRawIn;
                 yarp::os::BufferedPort<yarp::sig::Vector> portPolicyActionsIn;
                 yarp::os::BufferedPort<yarp::sig::Vector> portForceSensorIn;
+                yarp::os::BufferedPort<yarp::sig::Vector> portThumbRealForceIn;
+                yarp::os::BufferedPort<yarp::sig::Vector> portIndexFingerRealForceIn;
+                yarp::os::BufferedPort<yarp::sig::Vector> portMiddleFingerRealForceIn;
 
 				yarp::os::BufferedPort<yarp::os::Bottle> portLogDataOut;
 				yarp::os::BufferedPort<yarp::os::Bottle> portInfoDataOut;
@@ -67,6 +70,8 @@ namespace iCub {
 				bool readPolicyActionsData(std::vector<double> &policyActionsData);
 
 				bool readForceSensorData(std::vector<double> &forceSensorData,std::vector<double> &forceSensorBias);
+
+				bool readRealForceData(std::vector<double> &realForceData);
 
 				bool release();
         };

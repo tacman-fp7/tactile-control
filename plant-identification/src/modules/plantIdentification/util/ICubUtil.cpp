@@ -229,6 +229,14 @@ bool ICubUtil::updateExternalData(ControllersUtil *controllersUtil,PortsUtil *po
 	fingersSensitivityScale[0] = commonData->tpDbl(53); // index finger
 	fingersSensitivityScale[1] = commonData->tpDbl(54); // middle finger
 	bool forceSensorReadingEnabled = commonData->tpInt(70) != 0;
+	bool realForceMappingEnabled = commonData->tpInt(76) != 0;
+
+
+	if (realForceMappingEnabled){
+		if (!portsUtil->readRealForceData(commonData->realForceData)){
+			return false;
+		}
+	}
 
 
 	if (!portsUtil->readFingerSkinRawData(commonData->fingerTaxelsRawData,fingersSensitivityScale)){
@@ -245,7 +253,7 @@ bool ICubUtil::updateExternalData(ControllersUtil *controllersUtil,PortsUtil *po
 
 	controllersUtil->getArmEncodersAngles(commonData->armEncodersAngles);
 
-	processTactileData(commonData);
+	processTactileData(commonData,realForceMappingEnabled);
 	
     // index finger
     controllersUtil->getEncoderAngle(11,&commonData->proximalJointAngle[0]);
@@ -332,17 +340,28 @@ bool ICubUtil::updateExternalData(ControllersUtil *controllersUtil,PortsUtil *po
 	return true;
 }
 
-void ICubUtil::processTactileData(TaskCommonData *commonData){
+void ICubUtil::processTactileData(TaskCommonData *commonData,bool realForceMappingEnabled){
 
 	double partialOverallFingerPressure;
-
+	
 	for(size_t i = 0; i < commonData->fingerTaxelsData.size(); i++){
 		
 		commonData->overallFingerPressureBySimpleSum[i] = ICubUtil::getForce(commonData->fingerTaxelsData[i],SIMPLE_SUM);
 		commonData->overallFingerPressureByWeightedSum[i] = ICubUtil::getForce(commonData->fingerTaxelsData[i],WEIGHTED_SUM);
 		
-        commonData->overallFingerPressure[i] = commonData->overallFingerPressureByWeightedSum[i];
-        //commonData->overallFingerPressure[i] = commonData->overallFingerPressureBySimpleSum[i];
+		if (realForceMappingEnabled){
+
+			commonData->overallFingerPressure[0] = commonData->realForceData[0];
+			commonData->overallFingerPressure[1] = commonData->realForceData[1];
+			commonData->overallFingerPressure[2] = commonData->overallFingerPressureByWeightedSum[2];
+			commonData->overallFingerPressure[3] = commonData->overallFingerPressureByWeightedSum[3];
+			commonData->overallFingerPressure[4] = commonData->realForceData[4];
+
+		} else {
+
+			commonData->overallFingerPressure[i] = commonData->overallFingerPressureByWeightedSum[i];
+			//commonData->overallFingerPressure[i] = commonData->overallFingerPressureBySimpleSum[i];
+		}
 
 		commonData->previousOverallFingerPressures[i][commonData->previousPressuresIndex[i]] = commonData->overallFingerPressure[i];
 		commonData->previousPressuresIndex[i] = (commonData->previousPressuresIndex[i] + 1)%commonData->previousOverallFingerPressures[i].size();

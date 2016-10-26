@@ -47,6 +47,8 @@ namespace iCub {
 			std::vector<double> forceSensorData;
 			std::vector<double> forceSensorBias;
 			std::vector<double> procForceSensorData;
+			
+			std::vector<double> realForceData;
 
             
             /*  TEMP PARAMETERS USED DURING CONTROL TASKS (EXCEPT THE 15th, USED DURING STEP TASKS)
@@ -126,7 +128,7 @@ namespace iCub {
 			*	73: force sensors: if set != 0, calibration starts and it returns to 0.
 			*	74: force sensors: number of steps for the calibration (in order to calculate the average)
 			*	75: thumb abduction joint offset, applied when GMM regression is used
-			*	76: not used yet
+			*	76: real forces enabled (tactile data is ignored and only real force mapping is used). no/yes [0/1]
 			*	77: not used yet
 			*	78: not used yet
 			*	79: not used yet

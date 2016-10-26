@@ -18,32 +18,32 @@
 <!--
 	 <module>
          <name>yarpscope</name>
-         <parameters>--remote /plantIdentification/control --index "(4 5)"</parameters>
+         <parameters>--remote /stableGrasp/control --index "(4 5)"</parameters>
          <node>icub10</node>
          <tag>yarpscope_gripStrength</tag>
 		 <dependencies>
-            <port timeout="5.0">/plantIdentification/control</port>
+            <port timeout="5.0">/stableGrasp/control</port>
          </dependencies>
      </module>
 
 	 <module>
          <name>yarpscope</name>
-         <parameters>--remote /plantIdentification/control --index "(8 9 10)"</parameters>
+         <parameters>--remote /stableGrasp/control --index "(8 9 10)"</parameters>
          <node>icub10</node>
          <tag>yarpscope_position</tag>
 		 <dependencies>
-            <port timeout="5.0">/plantIdentification/control</port>
+            <port timeout="5.0">/stableGrasp/control</port>
          </dependencies>
      </module>
 -->
 	 
 	 <module>
          <name>yarpscope</name>
-         <parameters>--context plantIdentification --xml graspingDemoPortScopeConf.xml</parameters>
+         <parameters>--context stableGrasp --xml graspingDemoPortScopeConf.xml</parameters>
          <node>icub10</node>
          <tag>demo_port_scope</tag>
 		 <dependencies>
-            <port timeout="5.0">/plantIdentification/control</port>
+            <port timeout="5.0">/stableGrasp/control</port>
          </dependencies>
      </module>
 
@@ -61,13 +61,33 @@
 -->
 	<connection>
 		<from>/objectGrasping/graspTaskCmd:o</from>
-		<to>/plantIdentification/cmd:i</to>
+		<to>/stableGrasp/cmd:i</to>
 		<protocol>tcp</protocol>
 	</connection>
 	
 	<connection>
 		<from>/NIDAQmxReader/data/real:o</from>
-		<to>/plantIdentification/force_sensor:i</to>
+		<to>/stableGrasp/force_sensor:i</to>
+		<protocol>tcp</protocol>
+	</connection>
+
+	
+		
+	<connection>
+		<from> </from>
+		<to>/stableGrasp/real_force/thumb:i</to>
+		<protocol>tcp</protocol>
+	</connection>
+	
+	<connection>
+		<from> </from>
+		<to>/stableGrasp/real_force/index_finger:i</to>
+		<protocol>tcp</protocol>
+	</connection>
+	
+	<connection>
+		<from> </from>
+		<to>/stableGrasp/real_force/middle_finger:i</to>
 		<protocol>tcp</protocol>
 	</connection>
 	

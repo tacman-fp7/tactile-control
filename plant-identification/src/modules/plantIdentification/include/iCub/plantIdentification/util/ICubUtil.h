@@ -37,7 +37,7 @@ namespace iCub {
 
 		private:
 
-				static void processTactileData(iCub::plantIdentification::TaskCommonData *commonData);
+				static void processTactileData(iCub::plantIdentification::TaskCommonData *commonData,bool realForceMappingEnabled);
 
 				static void processForceSensorData(iCub::plantIdentification::TaskCommonData *commonData,int &forceSensorBiasCounter,std::vector<double> &forceSensorBiasPartial);
 

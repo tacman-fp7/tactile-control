@@ -165,6 +165,7 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
 	commonData.forceSensorBias.resize(6,0.0);      
 	commonData.procForceSensorData.resize(5,0.0);      
 
+	commonData.realForceData.resize(5,0.0);
 
 	Bottle* stepTaskJoints = rf.find("stepTaskJoints").asList();
 	stepData.jointsList.resize(stepTaskJoints->size(),0);

@@ -19,22 +19,28 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
 	using yarp::os::Network;
     using std::cout;
 
+	string moduleName = "stableGrasp";
 	string whichHand = rf.check("whichHand", Value("right")).asString().c_str();
-    string moduleSkinRawPortName = "/plantIdentification/skin/" + whichHand + "_hand_raw:i";
-    string moduleSkinCompPortName = "/plantIdentification/skin/" + whichHand + "_hand_comp:i";
-    string moduleHandEncodersRawPortName = "/plantIdentification/encoders/" + whichHand + "_hand_raw:i";
-    string policyActionsPortName = "/plantIdentification/policyActions:i";
+    string moduleSkinRawPortName = "/" + moduleName + "/skin/" + whichHand + "_hand_raw:i";
+    string moduleSkinCompPortName = "/" + moduleName + "/skin/" + whichHand + "_hand_comp:i";
+    string moduleHandEncodersRawPortName = "/" + moduleName + "/encoders/" + whichHand + "_hand_raw:i";
+    string policyActionsPortName = "/" + moduleName + "/policyActions:i";
     string icubSkinRawPortName = "/icub/skin/" + whichHand + "_hand";
     string icubSkinCompPortName = "/icub/skin/" + whichHand + "_hand_comp";
     string icubHandEncodersRawPortName = "/icub/" + whichHand + "_hand/analog:o";
-    string logDataPortName = "/plantIdentification/log:o";
-    string infoDataPortName = "/plantIdentification/info";
-    string controlDataPortName = "/plantIdentification/control";
-    string gmmDataPortName = "/plantIdentification/gmm:o";
-    string gmmRegressionDataPortName = "/plantIdentification/gmmRegression:o";
-    string objectRecognitionDataPortName = "/plantIdentification/object_recognition_log:o";
-    string gripStrengthDataPortName = "/plantIdentification/grip_strength:o";
-    string forceSensorPortName = "/plantIdentification/force_sensor:i";
+    string logDataPortName = "/" + moduleName + "/log:o";
+    string infoDataPortName = "/" + moduleName + "/info";
+    string controlDataPortName = "/" + moduleName + "/control";
+    string gmmDataPortName = "/" + moduleName + "/gmm:o";
+    string gmmRegressionDataPortName = "/" + moduleName + "/gmmRegression:o";
+    string objectRecognitionDataPortName = "/" + moduleName + "/object_recognition_log:o";
+    string gripStrengthDataPortName = "/" + moduleName + "/grip_strength:o";
+    string forceSensorPortName = "/" + moduleName + "/force_sensor:i";
+	string thumbRealForcePortName = "/" + moduleName + "/real_force/thumb:i";
+	string indexFingerRealForcePortName = "/" + moduleName + "/real_force/index_finger:i";
+	string middleFingerRealForcePortName = "/" + moduleName + "/real_force/middle_finger:i";
+
+
 
     // opening ports
 	if (!portSkinRawIn.open(moduleSkinRawPortName)){
@@ -85,8 +91,19 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
         cout << dbgTag << "could not open " << forceSensorPortName << " port \n";
         return false;
     }
+	if (!portThumbRealForceIn.open(thumbRealForcePortName)){
+        cout << dbgTag << "could not open " << thumbRealForcePortName << " port \n";
+        return false;
+    }
+	if (!portIndexFingerRealForceIn.open(indexFingerRealForcePortName)){
+        cout << dbgTag << "could not open " << indexFingerRealForcePortName << " port \n";
+        return false;
+    }
+	if (!portMiddleFingerRealForceIn.open(middleFingerRealForcePortName)){
+        cout << dbgTag << "could not open " << middleFingerRealForcePortName << " port \n";
+        return false;
+    }
 
-		
 
 
 	// connecting ports
@@ -506,6 +523,38 @@ bool PortsUtil::readForceSensorData(std::vector<double> &forceSensorData,std::ve
 		return false;
 	}
 }
+
+bool PortsUtil::readRealForceData(std::vector<double> &realForceData){
+
+	using yarp::sig::Vector;
+
+	Vector *portData =  portThumbRealForceIn.read(false);
+
+	portData =  portIndexFingerRealForceIn.read(false);
+    
+    if (portData) {
+		realForceData[0] = (*portData)[0];
+	} else {
+		return false;
+	}
+
+	portData =  portMiddleFingerRealForceIn.read(false);
+    
+    if (portData) {
+		realForceData[1] = (*portData)[0];
+	} else {
+		return false;
+	}
+
+    if (portData) {
+		realForceData[4] = (*portData)[0];
+	} else {
+		return false;
+	}
+
+	return true;
+}
+
 
 bool PortsUtil::release(){
 
