@@ -129,12 +129,12 @@ namespace iCub {
 			*	74: force sensors: number of steps for the calibration (in order to calculate the average)
 			*	75: thumb abduction joint offset, applied when GMM regression is used
 			*	76: real forces enabled (tactile data is ignored and only real force mapping is used). no/yes [0/1]
-			*	77: not used yet
-			*	78: not used yet
-			*	79: not used yet
-			*	80: not used yet
-			*	81: not used yet
-			*	82: not used yet
+			*	77: hysteresis: force threshold enabled (when the force reference goes below a given threshold, the force reference becomes the threshold itself). no/yes [0/1]
+			*	78: hysteresis: thumb threshold
+			*	79: hysteresis: index finger threshold
+			*	80: hysteresis: middle finger threshold
+			*	81: hysteresis: threshold tollerance (percentage of tollerance, so if 10 is specified, the threshold will be 110% of the one specified in 78-80)
+			*	82: hysteresis: automatic threshold storing enabled (threshold are stored after the "open" command). no/yes [0/1]
 			*	83: not used yet
 			*	84: not used yet
 			*	85: not used yet

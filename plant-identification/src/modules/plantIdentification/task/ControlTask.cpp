@@ -307,6 +307,10 @@ void ControlTask::calculateControlInput(){
 	double gripStrength = commonData->tpDbl(7);
 	double indMidPressureBalanceBestPose = commonData->tpDbl(9);
 	bool forceSensorReadingEnabled = commonData->tpInt(70) != 0;
+	bool hysteresisThresholdEnabled = commonData->tpInt(77) != 0;
+	double thumbHysteresisThreshold = commonData->tpDbl(78);
+	double indexFingerHysteresisThreshold = commonData->tpDbl(79);
+	double middleFingerHysteresisThreshold = commonData->tpDbl(80);
 	if (supervisorControlMode){
 		thumbEnc = commonData->armEncodersAngles[9];
 		indexEnc = commonData->armEncodersAngles[11];
@@ -771,6 +775,11 @@ void ControlTask::calculateControlInput(){
 			pressureTargetValue[0] = gripStrength - (commonData->tpDbl(8)+svResultValueScaled)/2.0;
 			pressureTargetValue[1] = gripStrength + (commonData->tpDbl(8)+svResultValueScaled)/2.0;
 
+			if (hysteresisThresholdEnabled){
+				pressureTargetValue[0] = std::max(pressureTargetValue[0],thumbHysteresisThreshold);
+				pressureTargetValue[1] = std::max(pressureTargetValue[1],middleFingerHysteresisThreshold);
+			}
+
 			//// se il valore e' positivo e quindi devo muovere il medio, devo aumentare la pressione richiesta al giunto 13, che si trova in posizione uno, altrimenti al giunto 9, in posizione 0
 			//if (svResultValueScaled >= 0){
 			//	pressureTargetValue[0] = initialPressureTargetValue[0] - svResultValueScaled/2.0;
@@ -788,6 +797,12 @@ void ControlTask::calculateControlInput(){
 			pressureTargetValue[0] = gripStrength - (commonData->tpDbl(8)+svResultValueScaled)/3.0;
 			pressureTargetValue[1] = (1-(indMidPressureBalance/100.0))*0.5*(gripStrength + 2.0*(commonData->tpDbl(8)+svResultValueScaled)/3.0);
 			pressureTargetValue[2] = (1+(indMidPressureBalance/100.0))*0.5*(gripStrength + 2.0*(commonData->tpDbl(8)+svResultValueScaled)/3.0);
+
+			if (hysteresisThresholdEnabled){
+				pressureTargetValue[0] = std::max(pressureTargetValue[0],thumbHysteresisThreshold);
+				pressureTargetValue[1] = std::max(pressureTargetValue[1],indexFingerHysteresisThreshold);
+				pressureTargetValue[2] = std::max(pressureTargetValue[2],middleFingerHysteresisThreshold);
+			}
 		}
 
     	if (callsNumber%commonData->screenLogStride == 0){

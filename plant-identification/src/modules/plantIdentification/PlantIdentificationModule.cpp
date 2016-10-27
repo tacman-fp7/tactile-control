@@ -1,5 +1,7 @@
 #include "iCub/plantIdentification/PlantIdentificationModule.h"
 
+#include <yarp/os/Time.h>
+
 using iCub::plantIdentification::PlantIdentificationModule;
 
 using iCub::plantIdentification::EventsThread;
@@ -8,6 +10,7 @@ using std::cout;
 
 using yarp::os::ResourceFinder;
 using yarp::os::Value;
+
 
 /* *********************************************************************************************************************** */
 /* ******* Constructor                                                      ********************************************** */   
@@ -224,11 +227,26 @@ bool PlantIdentificationModule::stop() {
 /* ******* RPC Stop task execution and open the hand                        ********************************************** */
 bool PlantIdentificationModule::open() {
     
+	using yarp::os::Time;
+
+	bool hysteresisThresholdsStorageEnabled = taskData->commonData.tpInt(82) != 0;
+
 	tasksRunning = false;
 
 	taskThread->suspend();
 
 	taskThread->afterRun(true);
+
+	if (hysteresisThresholdsStorageEnabled){
+
+		std::cout << "Setting hysteresis thresholds...\n"; 
+		double rate = 1.0 + taskData->commonData.tpDbl(81)/100.0;
+		Time::delay(1);
+		taskData->commonData.tempParameters[78] = rate*taskData->commonData.overallFingerPressureMedian[4]; // thumb
+		taskData->commonData.tempParameters[79] = rate*taskData->commonData.overallFingerPressureMedian[0]; // index finger
+		taskData->commonData.tempParameters[80] = rate*taskData->commonData.overallFingerPressureMedian[1]; // middle finger
+		std::cout << "Done.\n"; 
+	}
 
 	return true;
 }
