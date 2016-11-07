@@ -279,7 +279,7 @@ bool ControllersUtil::setArmInTaskPosition() {
                 iPos->positionMove(14, 30);
                 iPos->positionMove(15, 1);
             } else {
-                iPos->positionMove(8 , 46);
+                iPos->positionMove(8 , 33);
                 iPos->positionMove(9 , 3);
                 iPos->positionMove(10, 15);
                 iPos->positionMove(11, 2);
@@ -523,7 +523,7 @@ bool ControllersUtil::openHand() {
                 iPos->positionMove(14, 30);
                 iPos->positionMove(15, 1);
             } else {
-                iPos->positionMove(8 , 46);
+                iPos->positionMove(8 , 33);
                 iPos->positionMove(9 , 3);
                 iPos->positionMove(10, 15);
                 iPos->positionMove(11, 2);
