@@ -61,13 +61,13 @@
 -->
 	<connection>
 		<from>/objectGrasping/graspTaskCmd:o</from>
-		<to>/stableGrasp/cmd:i</to>
+		<to>/plantIdentification/cmd:i</to>
 		<protocol>tcp</protocol>
 	</connection>
 	
 	<connection>
 		<from>/NIDAQmxReader/data/real:o</from>
-		<to>/stableGrasp/force_sensor:i</to>
+		<to>/plantIdentification/force_sensor:i</to>
 		<protocol>tcp</protocol>
 	</connection>
 
@@ -75,19 +75,19 @@
 		
 	<connection>
 		<from> </from>
-		<to>/stableGrasp/real_force/thumb:i</to>
+		<to>/plantIdentification/real_force/thumb:i</to>
 		<protocol>tcp</protocol>
 	</connection>
 	
 	<connection>
 		<from> </from>
-		<to>/stableGrasp/real_force/index_finger:i</to>
+		<to>/plantIdentification/real_force/index_finger:i</to>
 		<protocol>tcp</protocol>
 	</connection>
 	
 	<connection>
 		<from> </from>
-		<to>/stableGrasp/real_force/middle_finger:i</to>
+		<to>/plantIdentification/real_force/middle_finger:i</to>
 		<protocol>tcp</protocol>
 	</connection>
 	

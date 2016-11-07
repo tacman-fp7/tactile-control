@@ -233,9 +233,7 @@ bool ICubUtil::updateExternalData(ControllersUtil *controllersUtil,PortsUtil *po
 
 
 	if (realForceMappingEnabled){
-		if (!portsUtil->readRealForceData(commonData->realForceData)){
-			return false;
-		}
+	        portsUtil->readRealForceData(commonData->realForceData);
 	}
 
 
@@ -351,17 +349,21 @@ void ICubUtil::processTactileData(TaskCommonData *commonData,bool realForceMappi
 		
 		if (realForceMappingEnabled){
 
-			commonData->overallFingerPressure[0] = commonData->realForceData[0];
-			commonData->overallFingerPressure[1] = commonData->realForceData[1];
-			commonData->overallFingerPressure[2] = commonData->overallFingerPressureByWeightedSum[2];
-			commonData->overallFingerPressure[3] = commonData->overallFingerPressureByWeightedSum[3];
-			commonData->overallFingerPressure[4] = commonData->realForceData[4];
+                        //if (i == 2 || i == 3){ // either ring or little finger
+                        //        commonData->overallFingerPressure[i] = commonData->overallFingerPressureByWeightedSum[i];
+                        //} else {
+                        //        commonData->overallFingerPressure[i] = commonData->realForceData[i];
+                        //}
+                        commonData->overallFingerPressure[i] = commonData->realForceData[i];
 
 		} else {
 
 			commonData->overallFingerPressure[i] = commonData->overallFingerPressureByWeightedSum[i];
 			//commonData->overallFingerPressure[i] = commonData->overallFingerPressureBySimpleSum[i];
 		}
+
+                // force cannot be negative
+                commonData->overallFingerPressure[i] = std::max(0.0,commonData->overallFingerPressure[i]);
 
 		commonData->previousOverallFingerPressures[i][commonData->previousPressuresIndex[i]] = commonData->overallFingerPressure[i];
 		commonData->previousPressuresIndex[i] = (commonData->previousPressuresIndex[i] + 1)%commonData->previousOverallFingerPressures[i].size();

@@ -19,7 +19,7 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
 	using yarp::os::Network;
     using std::cout;
 
-	string moduleName = "stableGrasp";
+	string moduleName = "plantIdentification";
 	string whichHand = rf.check("whichHand", Value("right")).asString().c_str();
     string moduleSkinRawPortName = "/" + moduleName + "/skin/" + whichHand + "_hand_raw:i";
     string moduleSkinCompPortName = "/" + moduleName + "/skin/" + whichHand + "_hand_comp:i";
@@ -40,6 +40,9 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
 	string indexFingerRealForcePortName = "/" + moduleName + "/real_force/index_finger:i";
 	string middleFingerRealForcePortName = "/" + moduleName + "/real_force/middle_finger:i";
 
+//	string middleFingerRealForcePortName = "/" + moduleName + "/real_force/thumb:i";
+//	string indexFingerRealForcePortName = "/" + moduleName + "/real_force/index_finger:i";
+//	string thumbRealForcePortName = "/" + moduleName + "/real_force/middle_finger:i";
 
 
     // opening ports
@@ -528,7 +531,16 @@ bool PortsUtil::readRealForceData(std::vector<double> &realForceData){
 
 	using yarp::sig::Vector;
 
-	Vector *portData =  portThumbRealForceIn.read(false);
+	Vector *portData;// =  portThumbRealForceIn.read(false);
+
+
+	portData =  portThumbRealForceIn.read(false);
+
+    if (portData) {
+		realForceData[4] = (*portData)[0];
+	} else {
+		return false;
+	}
 
 	portData =  portIndexFingerRealForceIn.read(false);
     
@@ -542,12 +554,6 @@ bool PortsUtil::readRealForceData(std::vector<double> &realForceData){
     
     if (portData) {
 		realForceData[1] = (*portData)[0];
-	} else {
-		return false;
-	}
-
-    if (portData) {
-		realForceData[4] = (*portData)[0];
 	} else {
 		return false;
 	}
