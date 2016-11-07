@@ -265,27 +265,27 @@ bool ControllersUtil::setArmInTaskPosition() {
         iPos->positionMove(4 , -20);// 0
         iPos->positionMove(5 , 2);// 1
         iPos->positionMove(6 , -20);// 1
-        iPos->positionMove(7 , 12);
+        iPos->positionMove(7 , 30);
         
         // Hand
         if (whichICub == "black"){
             if (whichHand == "right"){
-                iPos->positionMove(8 , 33);
+                iPos->positionMove(8 , 43);
                 iPos->positionMove(9 , 3);
-                iPos->positionMove(10, 20);
+                iPos->positionMove(10, 33);
                 iPos->positionMove(11, 2);
-                iPos->positionMove(12, numFingers == 2? 0 : 30);
+                iPos->positionMove(12, numFingers == 2? 0 : 35);
                 iPos->positionMove(13, 3);
-                iPos->positionMove(14, 30);
+                iPos->positionMove(14, 35);
                 iPos->positionMove(15, 1);
             } else {
-                iPos->positionMove(8 , 33);
+                iPos->positionMove(8 , 43);
                 iPos->positionMove(9 , 3);
-                iPos->positionMove(10, 15);
+                iPos->positionMove(10, 33);
                 iPos->positionMove(11, 2);
-                iPos->positionMove(12, numFingers == 2? 0 : 30);
+                iPos->positionMove(12, numFingers == 2? 0 : 35);
                 iPos->positionMove(13, 3);
-                iPos->positionMove(14, 30);
+                iPos->positionMove(14, 35);
                 iPos->positionMove(15, 1);
             }
         } else {
@@ -514,22 +514,22 @@ bool ControllersUtil::openHand() {
         // Hand
         if (whichICub == "black"){
             if (whichHand == "right"){
-                iPos->positionMove(8 , 33);
+                iPos->positionMove(8 , 43);
                 iPos->positionMove(9 , 3);
-                iPos->positionMove(10, 20);
+                iPos->positionMove(10, 33);
                 iPos->positionMove(11, 2);
-                iPos->positionMove(12, numFingers == 2? 0 : 30);
+                iPos->positionMove(12, numFingers == 2? 0 : 35);
                 iPos->positionMove(13, 3);
-                iPos->positionMove(14, 30);
+                iPos->positionMove(14, 35);
                 iPos->positionMove(15, 1);
             } else {
-                iPos->positionMove(8 , 33);
+                iPos->positionMove(8 , 43);
                 iPos->positionMove(9 , 3);
-                iPos->positionMove(10, 15);
+                iPos->positionMove(10, 33);
                 iPos->positionMove(11, 2);
-                iPos->positionMove(12, numFingers == 2? 0 : 30);
+                iPos->positionMove(12, numFingers == 2? 0 : 35);
                 iPos->positionMove(13, 3);
-                iPos->positionMove(14, 30);
+                iPos->positionMove(14, 35);
                 iPos->positionMove(15, 1);
             }
         } else {

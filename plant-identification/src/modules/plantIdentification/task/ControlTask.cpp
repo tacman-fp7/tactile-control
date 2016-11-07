@@ -240,7 +240,7 @@ void ControlTask::init(){
     if (disablePIDIntegralGain) controllersUtil->resetPIDIntegralGain(8);
 
     if (commonData->tpInt(56) >= 1 && commonData->tpInt(18) == 0){
-		setGMMJointsControlMode(VOCAB_CM_POSITION_DIRECT);
+//		setGMMJointsControlMode(VOCAB_CM_POSITION_DIRECT);
 	}
 
 	cout << "\n\n" << dbgTag << "TASK STARTED - Target: ";
@@ -321,9 +321,9 @@ void ControlTask::calculateControlInput(){
 
 		// if the kind of task (gmm regression or simple controller / neural network) is changed while the task is being executed, control modes need to be changed.
 		if (commonData->tpInt(56) >= 1 && commonData->tpInt(18) == 0){
-			if (!gmmCtrlModeIsSet) setGMMJointsControlMode(VOCAB_CM_POSITION_DIRECT);
+			//if (!gmmCtrlModeIsSet) setGMMJointsControlMode(VOCAB_CM_POSITION_DIRECT);
 		} else {
-			if (gmmCtrlModeIsSet) setGMMJointsControlMode(VOCAB_CM_POSITION);
+			//if (gmmCtrlModeIsSet) setGMMJointsControlMode(VOCAB_CM_POSITION);
 		}
 
 		if (jointsList.size() == 2){
@@ -513,10 +513,10 @@ void ControlTask::calculateControlInput(){
 						}
 
 						// move joints in position
-						controllersUtil->setJointAnglePositionDirect(8,abductionJoint);
-						controllersUtil->setJointAnglePositionDirect(10,distalJoints[0]); // thumb
-						controllersUtil->setJointAnglePositionDirect(12,distalJoints[1]); // index finger
-						controllersUtil->setJointAnglePositionDirect(14,distalJoints[2]); // middle finger
+						//controllersUtil->setJointAnglePositionDirect(8,abductionJoint);
+						//controllersUtil->setJointAnglePositionDirect(10,distalJoints[0]); // thumb
+						//controllersUtil->setJointAnglePositionDirect(12,distalJoints[1]); // index finger
+						//controllersUtil->setJointAnglePositionDirect(14,distalJoints[2]); // middle finger
 					}
 				} else {
 
@@ -557,10 +557,10 @@ void ControlTask::calculateControlInput(){
 
 
 					// move joints in position
-					controllersUtil->setJointAnglePositionDirect(8,abductionJoint);
-					controllersUtil->setJointAnglePositionDirect(10,distalJoints[0]); // thumb
-					controllersUtil->setJointAnglePositionDirect(12,distalJoints[1]); // index finger
-					controllersUtil->setJointAnglePositionDirect(14,distalJoints[2]); // middle finger
+					//controllersUtil->setJointAnglePositionDirect(8,abductionJoint);
+					//controllersUtil->setJointAnglePositionDirect(10,distalJoints[0]); // thumb
+					//controllersUtil->setJointAnglePositionDirect(12,distalJoints[1]); // index finger
+					//controllersUtil->setJointAnglePositionDirect(14,distalJoints[2]); // middle finger
 
 				}
 			}
@@ -915,6 +915,7 @@ void ControlTask::calculateControlInput(){
 //	}
 
 	// log best pose (for the gaussian mixture model)
+
 	if (commonData->tpInt(55) != 0){
 		portsUtil->sendGMMData(gripStrength,indMidPressureBalance,commonData);
 		commonData->tempParameters[55] = Value(0);
@@ -992,7 +993,7 @@ void ControlTask::release(){
     if (disablePIDIntegralGain) controllersUtil->restorePIDIntegralGain(8);
 
     if (commonData->tpInt(56) >= 1 && commonData->tpInt(18) == 0){
-		setGMMJointsControlMode(VOCAB_CM_POSITION);
+//		setGMMJointsControlMode(VOCAB_CM_POSITION);
 	}
 
 }
