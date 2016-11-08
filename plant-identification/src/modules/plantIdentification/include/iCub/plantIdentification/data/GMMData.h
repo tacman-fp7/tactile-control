@@ -1,6 +1,8 @@
 #ifndef __ICUB_PLANTIDENTIFICATION_GMMDATA_H__
 #define __ICUB_PLANTIDENTIFICATION_GMMDATA_H__
 
+#include "iCub/plantIdentification/PlantIdentificationEnums.h"
+
 #include <string>
 #include <vector>
 
@@ -38,7 +40,7 @@ namespace iCub {
 
             public:
 
-                GMMData();
+				GMMData(iCub::plantIdentification::GMM gmmType);
 
 				void runGaussianMixtureRegression(yarp::sig::Vector &queryPoint,yarp::sig::Vector &output);
 				

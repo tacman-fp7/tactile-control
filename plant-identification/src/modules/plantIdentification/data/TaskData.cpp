@@ -224,7 +224,9 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
 	controlData.controlMode = static_cast<ControlTaskOpMode>(rf.check("controlMode",Value(2)).asInt());
 	controlData.pidResetEnabled = rf.check("pidResetEnabled",Value(0)).asInt() != 0;
 	controlData.lifespan = rf.check("controlTaskLifespan",Value(10)).asInt();
-	controlData.gmmData = new GMMData();
+	controlData.gmmDataStandard = new GMMData(GMM::STANDARD);
+	controlData.gmmDataObjectInclinedThumbDown = new GMMData(GMM::INCLINED_THUMB_DOWN);
+	controlData.gmmDataObjectInclinedThumbUp = new GMMData(GMM::INCLINED_THUMB_UP);
 
 	Bottle* rampTaskJoints = rf.find("rampTaskJoints").asList();
 	rampData.jointsList.resize(rampTaskJoints->size(),0);

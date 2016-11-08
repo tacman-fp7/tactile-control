@@ -191,7 +191,9 @@ namespace iCub {
 			iCub::plantIdentification::ControlTaskOpMode controlMode;
 			bool pidResetEnabled;
 			int lifespan;
-			iCub::plantIdentification::GMMData* gmmData;
+			iCub::plantIdentification::GMMData* gmmDataStandard;
+			iCub::plantIdentification::GMMData* gmmDataObjectInclinedThumbUp;
+			iCub::plantIdentification::GMMData* gmmDataObjectInclinedThumbDown;
 		};
 
 		class RampTaskData {

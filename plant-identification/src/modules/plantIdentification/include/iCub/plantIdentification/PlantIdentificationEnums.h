@@ -122,6 +122,13 @@ namespace iCub {
 			SQUARE = 1
 		};
 
+		enum GMM {
+
+			STANDARD = 0,
+			INCLINED_THUMB_DOWN = 1,
+			INCLINED_THUMB_UP = 2
+		};
+
 	}
 }
 
