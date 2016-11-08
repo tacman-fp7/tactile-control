@@ -224,9 +224,45 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
 	controlData.controlMode = static_cast<ControlTaskOpMode>(rf.check("controlMode",Value(2)).asInt());
 	controlData.pidResetEnabled = rf.check("pidResetEnabled",Value(0)).asInt() != 0;
 	controlData.lifespan = rf.check("controlTaskLifespan",Value(10)).asInt();
-	controlData.gmmDataStandard = new GMMData(GMM::STANDARD);
-	controlData.gmmDataObjectInclinedThumbDown = new GMMData(GMM::INCLINED_THUMB_DOWN);
-	controlData.gmmDataObjectInclinedThumbUp = new GMMData(GMM::INCLINED_THUMB_UP);
+	controlData.gmmDataStandard = new GMMData(STANDARD);
+	controlData.gmmDataObjectInclinedThumbDown = new GMMData(INCLINED_THUMB_DOWN);
+	controlData.gmmDataObjectInclinedThumbUp = new GMMData(INCLINED_THUMB_UP);
+
+
+
+        //TO COMMENT OUT IF GMM HAS TO BE TESTED - START
+        std::vector<int> qIndexes(1);
+        qIndexes[0] = 0;
+
+        std::vector<int> rIndexes(2);
+        rIndexes[0] = 1; rIndexes[1] = 2;
+
+        controlData.gmmDataObjectInclinedThumbDown->buildQRStructures(qIndexes,rIndexes);
+
+
+        yarp::sig::Vector queryPoint,output;
+
+        queryPoint.resize(1);
+
+        for (size_t i = 70; i < 124;i = i + 1){
+
+                queryPoint[0] = i*1.0;
+                controlData.gmmDataObjectInclinedThumbDown->runGaussianMixtureRegression(queryPoint,output);
+                std::cout << i << "  " << output[0] << "  " << output[1] << "\n";
+        }
+
+ 
+        //TO COMMENT OUT IF GMM HAS TO BE TESTED - END
+
+
+
+
+
+
+
+
+
+
 
 	Bottle* rampTaskJoints = rf.find("rampTaskJoints").asList();
 	rampData.jointsList.resize(rampTaskJoints->size(),0);

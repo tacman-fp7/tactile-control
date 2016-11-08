@@ -46,7 +46,7 @@ GMMData::GMMData(iCub::plantIdentification::GMM gmmType) {
 	sigmaRR.resize(numComponents);
 	componentsPrior.resize(numComponents);
 	
-	if (gmmType == GMM::STANDARD){
+	if (gmmType == STANDARD){
 
 
 		double muArray_0[] = {			145.3093,2.3186,7.1824,16.4359,37.2166,37.7803,54.502,-3.5809				};
@@ -66,7 +66,7 @@ GMMData::GMMData(iCub::plantIdentification::GMM gmmType) {
 		componentsPrior[0] = 0.4707;
 		componentsPrior[1] = 0.5293;
 	
-	} else if (gmmType == GMM::INCLINED_THUMB_DOWN){
+	} else if (gmmType == INCLINED_THUMB_DOWN){
 
 		double muArray_0[] = {			100.2648,13.1487,88.7499				};
 		double muArray_1[] = {			79.4299,16.7391,65.7666				};
@@ -82,10 +82,10 @@ GMMData::GMMData(iCub::plantIdentification::GMM gmmType) {
 		ICubUtil::putDataIntoMatrix(sigmaArray_0,numDimensions,numDimensions,sigma[0]);
 		ICubUtil::putDataIntoMatrix(sigmaArray_1,numDimensions,numDimensions,sigma[1]);
 
-		componentsPrior[0] = 0.4707;
-		componentsPrior[1] = 0.5293;
+		componentsPrior[0] = 0.4;
+		componentsPrior[1] = 0.6;
 
-	} else if (gmmType == GMM::INCLINED_THUMB_UP){
+	} else if (gmmType == INCLINED_THUMB_UP){
 
 
 		double muArray_0[] = {			145.3093,2.3186,7.1824,16.4359,37.2166,37.7803,54.502,-3.5809				};

@@ -597,7 +597,7 @@ void ControlTask::calculateControlInput(){
 
 					if (!wavePositionTrackingIsActive){
 
-						abductionJoint = targetThumbAbductionJoint = output[0];
+						abductionJoint = targetThumbAbductionJoint = output[1];
 
 						// MIN JERK TRACKING
 						// if gmmJointsMinJerkTracking mode is activated, gmmJointsMinJerkTrackingModeEnabled is initialized, if gmmJointsMinJerkTracking mode is disabled, gmmJointsMinJerkTrackingModeEnabled is set to false so that next time initPosition will be initialized again
