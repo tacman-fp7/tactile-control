@@ -68,11 +68,11 @@ GMMData::GMMData(iCub::plantIdentification::GMM gmmType) {
 	
 	} else if (gmmType == INCLINED_THUMB_DOWN){
 
-		double muArray_0[] = {			100.2648,13.1487,88.7499				};
-		double muArray_1[] = {			79.4299,16.7391,65.7666				};
+		double muArray_0[] = {			109.102,11.8307,89.0007				};
+		double muArray_1[] = {			80.6587,16.5258,68.6805				};
 
-		double sigmaArray_0[] = {		224.533,-34.8953,6.567,-34.8953,5.5779,-1.0752,6.567,-1.0752,0.43767				};
-		double sigmaArray_1[] = {		41.5729,-6.3201,25.0426,-6.3201,1.1273,-4.5087,25.0426,-4.5087,49.3697				};
+		double sigmaArray_0[] = {		109.7763,-15.148,4.7692,-15.148,2.1286,-0.737,4.7692,-0.737,0.4002				};
+		double sigmaArray_1[] = {		53.2341,-8.3103,64.4038,-8.3103,1.4407,-10.4235,64.4038,-10.4235,103.8932				};
 
 
 		ICubUtil::putDataIntoVector(muArray_0,numDimensions,mu[0]);
@@ -82,8 +82,8 @@ GMMData::GMMData(iCub::plantIdentification::GMM gmmType) {
 		ICubUtil::putDataIntoMatrix(sigmaArray_0,numDimensions,numDimensions,sigma[0]);
 		ICubUtil::putDataIntoMatrix(sigmaArray_1,numDimensions,numDimensions,sigma[1]);
 
-		componentsPrior[0] = 0.4;
-		componentsPrior[1] = 0.6;
+		componentsPrior[0] = 0.25;
+		componentsPrior[1] = 0.75;
 
 	} else if (gmmType == INCLINED_THUMB_UP){
 
