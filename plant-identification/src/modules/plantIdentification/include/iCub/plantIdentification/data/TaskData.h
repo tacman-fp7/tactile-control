@@ -29,6 +29,7 @@ namespace iCub {
 			std::vector<double> overallFingerPressureMedian;
 			std::vector<double> objDetectPressureThresholds;
 			std::vector<double> armEncodersAngles;
+			std::vector<double> armEncodersAnglesReferences;
 
 			std::vector<double> fingerEncodersRawData;
             std::vector<double> realProximalPwm;

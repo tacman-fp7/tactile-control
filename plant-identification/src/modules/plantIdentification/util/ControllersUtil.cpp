@@ -70,6 +70,11 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
 		cout << dbgTag << "could not open position interface\n";
         return false;
     }
+	clientArm.view(iPosCtrl);
+    if (!iPosCtrl) {
+		cout << dbgTag << "could not open position control interface\n";
+        return false;
+    }
 	clientArm.view(iVel);
     if (!iVel) {
 		cout << dbgTag << "could not open velocity interface\n";
@@ -92,6 +97,7 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
     }
 
 	iPos->getAxes(&armJointsNum);
+	iPosCtrl->getAxes(&armJointsNum);
 	
 	// Set reference speeds
     vector<double> refSpeeds(armJointsNum, 0);
@@ -199,7 +205,7 @@ bool ControllersUtil::getArmEncodersAngles(std::vector<double> &armEncodersAngle
     armEncodersAnglesVector.resize(armJointsNum);
 
 	bool encodersDataAcquired = false;
-
+	
 	encodersDataAcquired = iEncs->getEncoders(armEncodersAnglesVector.data());
 
 	while(wait && !encodersDataAcquired) {
@@ -221,6 +227,37 @@ bool ControllersUtil::getArmEncodersAngles(std::vector<double> &armEncodersAngle
 
 	return false;
 }
+
+bool ControllersUtil::getArmEncodersAnglesReferences(std::vector<double> &armEncodersAnglesReferences,bool wait){
+	using yarp::os::Time;
+	
+	yarp::sig::Vector armEncodersAnglesReferencesVector;
+    armEncodersAnglesReferencesVector.resize(armJointsNum);
+
+	bool encodersDataAcquired = false;
+	
+	encodersDataAcquired = iPosCtrl->getTargetPositions(armEncodersAnglesReferencesVector.data());
+
+	while(wait && !encodersDataAcquired) {
+
+		cout << "DEBUG: " << dbgTag << "Encoder data is not available yet. \n";
+		Time::delay(0.1);
+
+		encodersDataAcquired = iEncs->getEncoders(armEncodersAnglesReferencesVector.data());
+    
+	}
+
+	if (encodersDataAcquired){
+		for(size_t i = 0; i < armEncodersAnglesReferences.size(); i++){
+			armEncodersAnglesReferences[i] = armEncodersAnglesReferencesVector[i];
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
 
 
 bool ControllersUtil::saveCurrentControlMode(){

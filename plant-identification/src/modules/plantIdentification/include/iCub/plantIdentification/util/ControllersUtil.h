@@ -35,6 +35,7 @@ namespace iCub {
 				yarp::dev::IPositionControl *iPos;
 				yarp::dev::IVelocityControl *iVel;
 				yarp::dev::IPositionDirect *iPosDir;
+				yarp::dev::IPositionControl2 *iPosCtrl;
 				yarp::dev::IPidControl *iPid;
 				yarp::dev::IGazeControl *iGaze;
                 yarp::dev::ICartesianControl *iCart;
@@ -72,6 +73,8 @@ namespace iCub {
 				bool saveCurrentArmPosition();
 
 				bool getArmEncodersAngles(std::vector<double> &armEncodersAngles,bool wait = false);
+
+				bool getArmEncodersAnglesReferences(std::vector<double> &armEncodersAnglesReferences,bool wait = false);
 
 				bool saveCurrentControlMode();
 

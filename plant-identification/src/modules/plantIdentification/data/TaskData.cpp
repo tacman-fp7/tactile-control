@@ -106,10 +106,12 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
 	commonData.overallFingerPressureByWeightedSum.resize(5,0.0);
 	commonData.overallFingerPressureMedian.resize(5,0.0);
 	commonData.armEncodersAngles.resize(controllersUtil->armJointsNum,0.0);      
+	commonData.armEncodersAnglesReferences.resize(controllersUtil->armJointsNum,0.0);      
 	//TODO generalize number of port components
 	commonData.fingerEncodersRawData.resize(16,0.0);      
 
 	controllersUtil->getArmEncodersAngles(commonData.armEncodersAngles,true);
+	controllersUtil->getArmEncodersAnglesReferences(commonData.armEncodersAnglesReferences,true);
 
 	Bottle* objDetectPressureThresholds = rf.find("objDetectPressureThresholds").asList();
 	commonData.objDetectPressureThresholds.resize(objDetectPressureThresholds->size(),0);
