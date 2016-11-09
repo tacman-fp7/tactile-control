@@ -517,8 +517,8 @@ void ControlTask::calculateControlInput(){
 						}
 
 						// move joints in position
-						controllersUtil->setJointAnglePositionDirect(8,abductionJoint);
-						commonData->currentThAbdJointAngleSetpoint = abductionJoint;
+				//		controllersUtil->setJointAnglePositionDirect(8,abductionJoint);
+				//		commonData->currentThAbdJointAngleSetpoint = abductionJoint;
 						//controllersUtil->setJointAnglePositionDirect(10,distalJoints[0]); // thumb
 						//controllersUtil->setJointAnglePositionDirect(12,distalJoints[1]); // index finger
 						//controllersUtil->setJointAnglePositionDirect(14,distalJoints[2]); // middle finger
@@ -564,8 +564,8 @@ void ControlTask::calculateControlInput(){
 
 
 					// move joints in position
-					controllersUtil->setJointAnglePositionDirect(8,abductionJoint);
-					commonData->currentThAbdJointAngleSetpoint = abductionJoint;
+				//	controllersUtil->setJointAnglePositionDirect(8,abductionJoint);
+				//	commonData->currentThAbdJointAngleSetpoint = abductionJoint;
 					//controllersUtil->setJointAnglePositionDirect(10,distalJoints[0]); // thumb
 					//controllersUtil->setJointAnglePositionDirect(12,distalJoints[1]); // index finger
 					//controllersUtil->setJointAnglePositionDirect(14,distalJoints[2]); // middle finger
@@ -630,8 +630,8 @@ void ControlTask::calculateControlInput(){
 						}
 
 						// move joints in position
-						controllersUtil->setJointAnglePositionDirect(8,abductionJoint);
-						commonData->currentThAbdJointAngleSetpoint = abductionJoint;
+					//	controllersUtil->setJointAnglePositionDirect(8,abductionJoint);
+					//	commonData->currentThAbdJointAngleSetpoint = abductionJoint;
 					}
 				}
 
@@ -1216,7 +1216,7 @@ void ControlTask::setTargetListRealTime(std::vector<double> &targetList){
 
 void ControlTask::setGMMJointsControlMode(int controlMode){
 
-        controllersUtil->setControlMode(8,controlMode,false);
+//        controllersUtil->setControlMode(8,controlMode,false);
         //controllersUtil->setControlMode(10,controlMode,false);
         //controllersUtil->setControlMode(12,controlMode,false);
         //controllersUtil->setControlMode(14,controlMode,false);
