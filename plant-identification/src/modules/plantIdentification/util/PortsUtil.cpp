@@ -272,10 +272,9 @@ bool PortsUtil::sendGMMData(double gripStrength, double indexMiddleFingerPressur
         objGMMBottle.addDouble(commonData->overallFingerPressureByWeightedSum[i]);
 	}
 
-
 	// arm encoders (16) (68-83)
 	for(size_t i = 0; i < commonData->armEncodersAngles.size(); i++){
-		if (thAbdRefEnabled){
+		if (i == 8 && thAbdRefEnabled){
 			objGMMBottle.addDouble(commonData->armEncodersAnglesReferences[i]);
 		} else {
 			objGMMBottle.addDouble(commonData->armEncodersAngles[i]);
