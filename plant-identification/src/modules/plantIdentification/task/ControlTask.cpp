@@ -221,7 +221,7 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
     disablePIDIntegralGain = (commonData->tpInt(40) != 0);
 
 	// at this point it is assumed that the actual value of the thumb abduction joint angle is equal to its setpoint
-	currentThAbdJointAngleSetpoint = commonData->armEncodersAngles[8];
+	commonData->currentThAbdJointAngleSetpoint = commonData->armEncodersAngles[8];
 	
 	/*** END OF CODE RELATED TO SUPERVISOR MODE ***/
 
@@ -471,7 +471,7 @@ void ControlTask::calculateControlInput(){
 						if (commonData->tpInt(65) != 0){
 							if (gmmJointsMinJerkTrackingModeEnabled == false){
                                 //Vector thAbdInitPosition(1,commonData->armEncodersAngles[8]);
-                                Vector thAbdInitPosition(1,currentThAbdJointAngleSetpoint);
+                                Vector thAbdInitPosition(1,commonData->currentThAbdJointAngleSetpoint);
                                 Vector thDistInitPosition(1,commonData->armEncodersAngles[10]);
 								Vector indDistInitPosition(1,commonData->armEncodersAngles[12]);
 								Vector midDistInitPosition(1,commonData->armEncodersAngles[14]);
@@ -518,7 +518,7 @@ void ControlTask::calculateControlInput(){
 
 						// move joints in position
 						controllersUtil->setJointAnglePositionDirect(8,abductionJoint);
-						currentThAbdJointAngleSetpoint = abductionJoint;
+						commonData->currentThAbdJointAngleSetpoint = abductionJoint;
 						//controllersUtil->setJointAnglePositionDirect(10,distalJoints[0]); // thumb
 						//controllersUtil->setJointAnglePositionDirect(12,distalJoints[1]); // index finger
 						//controllersUtil->setJointAnglePositionDirect(14,distalJoints[2]); // middle finger
@@ -565,7 +565,7 @@ void ControlTask::calculateControlInput(){
 
 					// move joints in position
 					controllersUtil->setJointAnglePositionDirect(8,abductionJoint);
-					currentThAbdJointAngleSetpoint = abductionJoint;
+					commonData->currentThAbdJointAngleSetpoint = abductionJoint;
 					//controllersUtil->setJointAnglePositionDirect(10,distalJoints[0]); // thumb
 					//controllersUtil->setJointAnglePositionDirect(12,distalJoints[1]); // index finger
 					//controllersUtil->setJointAnglePositionDirect(14,distalJoints[2]); // middle finger
@@ -605,7 +605,7 @@ void ControlTask::calculateControlInput(){
 
 							if (gmmJointsMinJerkTrackingModeEnabled == false){
                                 //Vector thAbdInitPosition(1,commonData->armEncodersAngles[8]);
-                                Vector thAbdInitPosition(1,currentThAbdJointAngleSetpoint);
+                                Vector thAbdInitPosition(1,commonData->currentThAbdJointAngleSetpoint);
 
 								thAbdMinJerkTrajectory->init(thAbdInitPosition);
 
@@ -631,7 +631,7 @@ void ControlTask::calculateControlInput(){
 
 						// move joints in position
 						controllersUtil->setJointAnglePositionDirect(8,abductionJoint);
-						currentThAbdJointAngleSetpoint = abductionJoint;
+						commonData->currentThAbdJointAngleSetpoint = abductionJoint;
 					}
 				}
 

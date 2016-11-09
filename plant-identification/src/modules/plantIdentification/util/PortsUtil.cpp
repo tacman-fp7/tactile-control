@@ -248,6 +248,8 @@ bool PortsUtil::sendGMMData(double gripStrength, double indexMiddleFingerPressur
 
 	using yarp::os::Bottle;
 
+	bool thAbdRefEnabled = commonData->tpInt(83) != 0;
+
 	Bottle& objGMMBottle = portGMMDataOut.prepare();
 	objGMMBottle.clear();
 
@@ -272,7 +274,11 @@ bool PortsUtil::sendGMMData(double gripStrength, double indexMiddleFingerPressur
 
 	// arm encoders (16) (68-83)
 	for(size_t i = 0; i < commonData->armEncodersAngles.size(); i++){
-		objGMMBottle.addDouble(commonData->armEncodersAngles[i]);
+		if (i == 8 && thAbdRefEnabled){
+			objGMMBottle.addDouble(commonData->currentThAbdJointAngleSetpoint);
+		} else {
+			objGMMBottle.addDouble(commonData->armEncodersAngles[i]);
+		}
 	}
 
 	// raw taxels feedback (60) (84-143)

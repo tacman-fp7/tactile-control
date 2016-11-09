@@ -50,6 +50,8 @@ namespace iCub {
 			
 			std::vector<double> realForceData;
 
+			double currentThAbdJointAngleSetpoint;
+
             
             /*  TEMP PARAMETERS USED DURING CONTROL TASKS (EXCEPT THE 15th, USED DURING STEP TASKS)
             *   0: supervisor mode off/on [0/1]
@@ -135,7 +137,7 @@ namespace iCub {
 			*	80: hysteresis: middle finger threshold
 			*	81: hysteresis: threshold tollerance (percentage of tollerance, so if 10 is specified, the threshold will be 110% of the one specified in 78-80)
 			*	82: hysteresis: automatic threshold storing enabled (threshold are stored after the "open" command). no/yes [0/1]
-			*	83: not used yet
+			*	83: if set == 1, when the current gmm data is logged (through #55) for the thumb abduction joint angle is used the setpoint and not the actual value
 			*	84: not used yet
 			*	85: not used yet
 			*	86: not used yet
