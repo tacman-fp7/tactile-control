@@ -76,6 +76,10 @@ class ICubInterface():
         if self.iPos is None:
             print 'Cannot view position interface!'
             sys.exit()
+        self.iPosDir = self.driver.viewIPositionDirect()
+        if self.iPosDir is None:
+            print 'Cannot view position direct interface!'
+            sys.exit()
         self.iEnc = self.driver.viewIEncoders()
         if self.iEnc is None:
             print 'Cannot view encoders interface!'
@@ -84,7 +88,7 @@ class ICubInterface():
         if self.iVel is None:
             print 'Cannot view velocity interface!'
             sys.exit()
-        self.iCtrl = self.driver.viewIControlMode()
+        self.iCtrl = self.driver.viewIControlMode2()
         if self.iCtrl is None:
             print 'Cannot view control mode interface!'
             sys.exit()
@@ -208,13 +212,17 @@ class ICubInterface():
 		for i in range(len(jointList)):
 			self.iCtrl.setOpenLoopMode(jointList[i])
 
+    def setControlMode(self,jointList,controlMode):
+		for i in range(len(jointList)):
+			self.iCtrl.setControlMode(jointList[i],controlMode)
+
     def setRefAcceleration(self,jointList,refAcceleration):
 		for i in range(len(jointList)):
 			self.iVel.setRefAcceleration(jointList[i],refAcceleration)
 
     def setRefVelocity(self,jointList,refVelocity):
 		for i in range(len(jointList)):
-			self.iPos.setRefAcceleration(jointList[i],refVelocity)
+			self.iPos.setRefVelocity(jointList[i],refVelocity)
 
     def setArmPosition(self,encodersList):
         for i in range(len(encodersList)):
@@ -245,6 +253,9 @@ class ICubInterface():
             yarp.Time_delay(0.1)
             done = self.iPos.checkMotionDone()
         print "target position reached"
+        
+    def setJointPositionDirect(self,joint,position):
+        self.iPosDir.setPosition(joint,position)
         
     def setHeadJointPosition(self,joint,position):
         self.iPosHead.positionMove(joint,position)
