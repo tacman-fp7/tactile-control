@@ -23,11 +23,11 @@ GMMData::GMMData(iCub::plantIdentification::GMM gmmType) {
 		break;
 	case INCLINED_THUMB_DOWN:
 		numComponents = 2;
-		numDimensions = 8;
+		numDimensions = 3;
 		break;
 	case INCLINED_THUMB_UP:
 		numComponents = 2;
-		numDimensions = 8;
+		numDimensions = 3;
 		break;
 
 	default:
@@ -325,11 +325,13 @@ void GMMData::runGaussianMixtureRegression(yarp::sig::Vector &queryPoint,yarp::s
 	}
 	std::cout << "hDenominator: " << hDenominator << "\n";
 
+        std::cout << "h[i]: ";
 	for (size_t i = 0; i < numGMComponents; i++){
 	
 		h[i] = hNumerator[i]/hDenominator;
+                std::cout << h[i] << " ";
 	}
-
+        std::cout << "\n";
 	
 	output.resize(muR[0].length(),0.0);
 
@@ -382,8 +384,26 @@ void GMMData::buildQRStructures(std::vector<int> &qIndexes,std::vector<int> &rIn
 	int dimQ = qIndexes.size();
 	int dimR = rIndexes.size();
 
+
+
+		std::cout << "qIndexes: ";
+		for(size_t j = 0; j < dimQ; j++){
+			std::cout << qIndexes[j] << " ";
+		}
+		std::cout << "\n";
+
+		std::cout << "rIndexes: ";
+		for(size_t j = 0; j < dimR; j++){
+			std::cout << rIndexes[j] << " ";
+		}
+		std::cout << "\n";
+
+
 	for(size_t i = 0; i < numComponents; i++){
 		
+
+std::cout << "COMP: " << i << "\n";
+
 		ICubUtil::putSelectedElementsIntoVector(mu[i],qIndexes,muQ[i]);
 		ICubUtil::putSelectedElementsIntoVector(mu[i],rIndexes,muR[i]);
 
@@ -393,6 +413,44 @@ void GMMData::buildQRStructures(std::vector<int> &qIndexes,std::vector<int> &rIn
 
 		sigmaQQInv[i] = yarp::math::luinv(sigmaQQ[i]);
 		sigmaQQDet[i] = yarp::math::det(sigmaQQ[i]);
+
+
+
+
+	std::cout << "sigma[i]: ";
+	for(size_t j = 0; j < sigma[i].rows(); j++){
+		for(size_t k = 0; k < sigma[i].cols(); k++){
+			std::cout << sigma[i][j][k] << " ";
+		}
+		std::cout << "\n";
 	}
+
+	std::cout << "sigmaQQ[i]: ";
+	for(size_t j = 0; j < sigmaQQ[i].rows(); j++){
+		for(size_t k = 0; k < sigmaQQ[i].cols(); k++){
+			std::cout << sigmaQQ[i][j][k] << " ";
+		}
+		std::cout << "\n";
+	}
+	std::cout << "sigmaRQ[i]: ";
+	for(size_t j = 0; j < sigmaRQ[i].rows(); j++){
+		for(size_t k = 0; k < sigmaRQ[i].cols(); k++){
+			std::cout << sigmaRQ[i][j][k] << " ";
+		}
+		std::cout << "\n";
+	}
+	std::cout << "sigmaRR[i]: ";
+	for(size_t j = 0; j < sigmaRR[i].rows(); j++){
+		for(size_t k = 0; k < sigmaRR[i].cols(); k++){
+			std::cout << sigmaRR[i][j][k] << " ";
+		}
+		std::cout << "\n";
+	}
+std::cout << "adssdafdsfafds\n\n\n\n\n";
+
+	}
+
+
+
 
 }
