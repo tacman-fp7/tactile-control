@@ -18,7 +18,7 @@ PlantIdentificationModule::PlantIdentificationModule()
     : RFModule() {
         closing = false;
 		tasksRunning = false;
-
+std::cout << "\n\n\n\n\n\n\n              " << VOCAB_CM_POSITION_DIRECT << "\n\n\n\n\n\n";
         dbgTag = "PlantIdentificationModule: ";
 }
 /* *********************************************************************************************************************** */

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<portscope rows="1" columns="3" carrier="mcast">
+    <plot gridx="0"
+          gridy="0"
+          hspan="1"
+          vspan="1"
+          title="Hand position"
+          size="201"
+          minval="-20"
+          maxval="40"
+          bgcolor="#EEFFEE">
+        <graph remote="/plantIdentification/control"
+               index="8"
+               color="Red"
+               title="Target Hand Position"
+               type="lines"
+               size="1" />
+        <graph remote="/plantIdentification/control"
+               index="9"
+               color="Black"
+               title="Predicted Hand Position"
+               type="lines"
+               size="1" />
+        <graph remote="/plantIdentification/control"
+               index="10"
+               color="Blue"
+               title="Actual Hand Position"
+               type="lines"
+               size="1" />
+    </plot>
+	<plot gridx="1"
+          gridy="0"
+          hspan="1"
+          vspan="1"
+          title="Thumb abduction"
+          size="201"
+          minval="20"
+          maxval="90"
+          bgcolor="#EEFFEE">
+        <graph remote="/plantIdentification/gmmRegression:o"
+               index="18"
+               color="Blue"
+               title="Thumb abduction joint"
+               type="lines"
+               size="1" />
+        <graph remote="/plantIdentification/gmmRegression:o"
+               index="17"
+               color="Black"
+               title="Filtered thumb abduction Joint"
+               type="lines"
+               size="1" />
+        <graph remote="/plantIdentification/gmmRegression:o"
+               index="16"
+               color="Red"
+               title="Target thumb abduction Joint"
+               type="lines"
+               size="1" />
+    </plot>
+	<plot gridx="2"
+          gridy="0"
+          hspan="1"
+          vspan="1"
+          title="Hand aperture"
+          size="201"
+          minval="70"
+          maxval="120"
+          bgcolor="#EEFFEE">
+        <graph remote="/plantIdentification/gmmRegression:o"
+               index="2"
+               color="Black"
+               title="Hand aperture"
+               type="lines"
+               size="1" />
+
+    </plot>
+</portscope>
