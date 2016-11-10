@@ -304,16 +304,26 @@ void GMMData::runGaussianMixtureRegression(yarp::sig::Vector &queryPoint,yarp::s
 	h.resize(numGMComponents);
 	hNumerator.resize(numGMComponents);
 
+	std::cout << "queryPoint: ";
+	for (size_t i = 0; i < queryPoint.size(); i++){
+		std::cout << queryPoint[i] << " ";
+	}
+	std::cout << "\n";
+
+	std::cout << "hNumerator[i]: ";
 	for (size_t i = 0; i < numGMComponents; i++){
 
 		hNumerator[i] = componentsPrior[i] * calculateGMProbability(queryPoint,i);
+		std::cout << hNumerator[i] << " ";
 	}
+	std::cout << "\n";
 
 	double hDenominator = 0;
 	for (size_t i = 0; i < numGMComponents; i++){
 
 		hDenominator = hDenominator + hNumerator[i];
 	}
+	std::cout << "hDenominator: " << hDenominator << "\n";
 
 	for (size_t i = 0; i < numGMComponents; i++){
 	
@@ -323,10 +333,45 @@ void GMMData::runGaussianMixtureRegression(yarp::sig::Vector &queryPoint,yarp::s
 	
 	output.resize(muR[0].length(),0.0);
 
+	std::cout << "eval[i]: \n";
 	for (size_t i = 0; i < numGMComponents; i++){
+		std::cout << "\n\n\nCOMP " << i << ":\n";
 
-		output = output + h[i] * (muR[i] + (sigmaRQ[i] * (sigmaQQInv[i] * (queryPoint - muQ[i]))));
+		yarp::sig::Vector compEvaluation = (muR[i] + (sigmaRQ[i] * (sigmaQQInv[i] * (queryPoint - muQ[i]))));
+		output = output + h[i] * compEvaluation;
+		std::cout << "muQ[i]: ";
+		for(size_t j = 0; j < muQ[i].size(); j++){
+			std::cout << muQ[i][j] << " ";
+		}
+		std::cout << "\n";
+		std::cout << "muR[i]: ";
+		for(size_t j = 0; j < muR[i].size(); j++){
+			std::cout << muR[i][j] << " ";
+		}
+		std::cout << "\n";
+		std::cout << "sigmaRQ[i]: ";
+		for(size_t j = 0; j < sigmaRQ[i].rows(); j++){
+			for(size_t k = 0; k < sigmaRQ[i].cols(); k++){
+				std::cout << sigmaRQ[i][j][k] << " ";
+			}
+			std::cout << "\n";
+		}
+
+		std::cout << "sigmaQQInv[i]: ";
+		for(size_t j = 0; j < sigmaQQInv[i].rows(); j++){
+			for(size_t k = 0; k < sigmaQQInv[i].cols(); k++){
+				std::cout << sigmaQQInv[i][j][k] << " ";
+			}
+			std::cout << "\n";
+		}
+
+		std::cout << "\n\n";
+		for(size_t j = 0; j < compEvaluation.size(); j++){
+			std::cout << compEvaluation[j] << " ";
+		}
+		std::cout << "]";
 	}
+	std::cout << "\n";
 
 }
 
