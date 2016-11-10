@@ -232,7 +232,8 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
 
 
 
-        //TO COMMENT OUT IF GMM HAS TO BE TESTED - START
+        //TO UNCOMMENT IF GMM HAS TO BE TESTED - START
+/*
         std::vector<int> qIndexes(1);
         qIndexes[0] = 0;
 
@@ -246,15 +247,14 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
 
         queryPoint.resize(1);
 
-        for (size_t i = 70; i < 85;i = i + 10){
+        //for (size_t i = 70; i < 130;i = i + 1){
 
                 queryPoint[0] = i*1.0;
                 controlData.gmmDataObjectInclinedThumbDown->runGaussianMixtureRegression(queryPoint,output);
-                std::cout << "TEST NUMBER <<< " << i << " >>> : " << output[0] << "  " << output[1] << "\n";
+                std::cout << i << ": " << output[0] << "  " << output[1] << "\n";
         }
-
  
-        //TO COMMENT OUT IF GMM HAS TO BE TESTED - END
+*/
 
 
 
