@@ -246,11 +246,11 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
 
         queryPoint.resize(1);
 
-        for (size_t i = 70; i < 124;i = i + 1){
+        for (size_t i = 70; i < 85;i = i + 10){
 
                 queryPoint[0] = i*1.0;
                 controlData.gmmDataObjectInclinedThumbDown->runGaussianMixtureRegression(queryPoint,output);
-                std::cout << i << "  " << output[0] << "  " << output[1] << "\n";
+                std::cout << "TEST NUMBER <<< " << i << " >>> : " << output[0] << "  " << output[1] << "\n";
         }
 
  
