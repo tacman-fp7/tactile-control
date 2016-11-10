@@ -304,76 +304,29 @@ void GMMData::runGaussianMixtureRegression(yarp::sig::Vector &queryPoint,yarp::s
 	h.resize(numGMComponents);
 	hNumerator.resize(numGMComponents);
 
-	std::cout << "queryPoint: ";
-	for (size_t i = 0; i < queryPoint.size(); i++){
-		std::cout << queryPoint[i] << " ";
-	}
-	std::cout << "\n";
-
-	std::cout << "hNumerator[i]: ";
 	for (size_t i = 0; i < numGMComponents; i++){
 
 		hNumerator[i] = componentsPrior[i] * calculateGMProbability(queryPoint,i);
-		std::cout << hNumerator[i] << " ";
 	}
-	std::cout << "\n";
 
 	double hDenominator = 0;
 	for (size_t i = 0; i < numGMComponents; i++){
 
 		hDenominator = hDenominator + hNumerator[i];
 	}
-	std::cout << "hDenominator: " << hDenominator << "\n";
 
-        std::cout << "h[i]: ";
 	for (size_t i = 0; i < numGMComponents; i++){
 	
 		h[i] = hNumerator[i]/hDenominator;
-                std::cout << h[i] << " ";
 	}
-        std::cout << "\n";
+
 	
 	output.resize(muR[0].length(),0.0);
 
-	std::cout << "eval[i]: \n";
 	for (size_t i = 0; i < numGMComponents; i++){
-		std::cout << "\n\n\nCOMP " << i << ":\n";
 
-		yarp::sig::Vector compEvaluation = (muR[i] + (sigmaRQ[i] * (sigmaQQInv[i] * (queryPoint - muQ[i]))));
-		output = output + h[i] * compEvaluation;
-		std::cout << "muQ[i]: ";
-		for(size_t j = 0; j < muQ[i].size(); j++){
-			std::cout << muQ[i][j] << " ";
-		}
-		std::cout << "\n";
-		std::cout << "muR[i]: ";
-		for(size_t j = 0; j < muR[i].size(); j++){
-			std::cout << muR[i][j] << " ";
-		}
-		std::cout << "\n";
-		std::cout << "sigmaRQ[i]: ";
-		for(size_t j = 0; j < sigmaRQ[i].rows(); j++){
-			for(size_t k = 0; k < sigmaRQ[i].cols(); k++){
-				std::cout << sigmaRQ[i][j][k] << " ";
-			}
-			std::cout << "\n";
-		}
-
-		std::cout << "sigmaQQInv[i]: ";
-		for(size_t j = 0; j < sigmaQQInv[i].rows(); j++){
-			for(size_t k = 0; k < sigmaQQInv[i].cols(); k++){
-				std::cout << sigmaQQInv[i][j][k] << " ";
-			}
-			std::cout << "\n";
-		}
-
-		std::cout << "\n\n";
-		for(size_t j = 0; j < compEvaluation.size(); j++){
-			std::cout << compEvaluation[j] << " ";
-		}
-		std::cout << "]";
+		output = output + h[i] * (muR[i] + (sigmaRQ[i] * (sigmaQQInv[i] * (queryPoint - muQ[i]))));
 	}
-	std::cout << "\n";
 
 }
 
@@ -384,26 +337,8 @@ void GMMData::buildQRStructures(std::vector<int> &qIndexes,std::vector<int> &rIn
 	int dimQ = qIndexes.size();
 	int dimR = rIndexes.size();
 
-
-
-		std::cout << "qIndexes: ";
-		for(size_t j = 0; j < dimQ; j++){
-			std::cout << qIndexes[j] << " ";
-		}
-		std::cout << "\n";
-
-		std::cout << "rIndexes: ";
-		for(size_t j = 0; j < dimR; j++){
-			std::cout << rIndexes[j] << " ";
-		}
-		std::cout << "\n";
-
-
 	for(size_t i = 0; i < numComponents; i++){
 		
-
-std::cout << "COMP: " << i << "\n";
-
 		ICubUtil::putSelectedElementsIntoVector(mu[i],qIndexes,muQ[i]);
 		ICubUtil::putSelectedElementsIntoVector(mu[i],rIndexes,muR[i]);
 
@@ -413,44 +348,6 @@ std::cout << "COMP: " << i << "\n";
 
 		sigmaQQInv[i] = yarp::math::luinv(sigmaQQ[i]);
 		sigmaQQDet[i] = yarp::math::det(sigmaQQ[i]);
-
-
-
-
-	std::cout << "sigma[i]: ";
-	for(size_t j = 0; j < sigma[i].rows(); j++){
-		for(size_t k = 0; k < sigma[i].cols(); k++){
-			std::cout << sigma[i][j][k] << " ";
-		}
-		std::cout << "\n";
 	}
-
-	std::cout << "sigmaQQ[i]: ";
-	for(size_t j = 0; j < sigmaQQ[i].rows(); j++){
-		for(size_t k = 0; k < sigmaQQ[i].cols(); k++){
-			std::cout << sigmaQQ[i][j][k] << " ";
-		}
-		std::cout << "\n";
-	}
-	std::cout << "sigmaRQ[i]: ";
-	for(size_t j = 0; j < sigmaRQ[i].rows(); j++){
-		for(size_t k = 0; k < sigmaRQ[i].cols(); k++){
-			std::cout << sigmaRQ[i][j][k] << " ";
-		}
-		std::cout << "\n";
-	}
-	std::cout << "sigmaRR[i]: ";
-	for(size_t j = 0; j < sigmaRR[i].rows(); j++){
-		for(size_t k = 0; k < sigmaRR[i].cols(); k++){
-			std::cout << sigmaRR[i][j][k] << " ";
-		}
-		std::cout << "\n";
-	}
-std::cout << "adssdafdsfafds\n\n\n\n\n";
-
-	}
-
-
-
 
 }

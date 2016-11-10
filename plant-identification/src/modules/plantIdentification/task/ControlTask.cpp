@@ -593,7 +593,7 @@ void ControlTask::calculateControlInput(){
 					controlData->gmmDataObjectInclinedThumbDown->runGaussianMixtureRegression(queryPoint,output);
 				
 
-					estimatedFinalPose = 9.0; //output[0];
+					estimatedFinalPose = output[0];
 
 					if (!wavePositionTrackingIsActive){
 
