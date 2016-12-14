@@ -101,7 +101,7 @@ void ApproachTask::calculateControlInput(){
                     std::cout << callsNumberForAvarage << " " << tactileAvarage[i] << "\n";
 					if (callsNumberForAvarage != 0) tactileAvarage[i] /= callsNumberForAvarage;
                     std::cout << tactileAvarage[i] << " " << tactileMaximum[i] << "\n";
-					tactileThreshold[i] = std::max(tactileAvarage[i] + (tactileMaximum[i]-tactileAvarage[i])*thresholdScaleFactor,tactileMaximum[i] + 10);
+					tactileThreshold[i] = std::max(tactileAvarage[i] + (tactileMaximum[i]-tactileAvarage[i])*thresholdScaleFactor,tactileMaximum[i]*1.2);
 				}
 
 				// valid if stop condition is position

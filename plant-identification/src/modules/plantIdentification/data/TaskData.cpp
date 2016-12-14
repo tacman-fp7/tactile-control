@@ -156,13 +156,21 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
             commonData.tempParameters[53] = 0.6;
             commonData.tempParameters[54] = 0.6;
         }
-    } else {
+    } else if (whichICub == "purple"){
         if (whichHand == "right"){
 			// default values
         } else {
 			commonData.tempParameters[52] = 0.5;
             		commonData.tempParameters[53] = 1.0;
 			commonData.tempParameters[54] = 1.0;
+        }
+    } else {
+        if (whichHand == "right"){
+			// default values
+        } else {
+			commonData.tempParameters[52] = 0.6;
+            		commonData.tempParameters[53] = 0.6;
+			commonData.tempParameters[54] = 0.6;
         }
     }
 
@@ -255,14 +263,6 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
         }
  
 */
-
-
-
-
-
-
-
-
 
 
 
