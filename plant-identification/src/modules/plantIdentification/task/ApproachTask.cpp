@@ -318,5 +318,9 @@ bool ApproachTask::eachFingerIsInContact(){
 		eachFingerIsInContact = eachFingerIsInContact && fingerIsInContact[i];
 	}
 
+    if (eachFingerIsInContact){
+        std::cout << "APPROACH SUCCESSFULL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
+    }
+
 	return eachFingerIsInContact;
 }

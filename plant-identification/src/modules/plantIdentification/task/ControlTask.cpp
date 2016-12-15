@@ -315,10 +315,10 @@ void ControlTask::calculateControlInput(){
 	double thumbHysteresisThreshold = commonData->tpDbl(78);
 	double indexFingerHysteresisThreshold = commonData->tpDbl(79);
 	double middleFingerHysteresisThreshold = commonData->tpDbl(80);
-	if (supervisorControlMode){
-		thumbEnc = commonData->armEncodersAngles[9];
-		indexEnc = commonData->armEncodersAngles[11];
-		middleEnc = commonData->armEncodersAngles[13];
+    if (supervisorControlMode){
+        thumbEnc = commonData->armEncodersAngles[9];
+        indexEnc = commonData->armEncodersAngles[11];
+        middleEnc = commonData->armEncodersAngles[13];
 		enc8 = commonData->armEncodersAngles[8];
 		Vector svRef;
 		Vector svFb;
