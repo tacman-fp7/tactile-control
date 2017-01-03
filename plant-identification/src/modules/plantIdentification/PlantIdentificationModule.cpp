@@ -45,11 +45,20 @@ bool PlantIdentificationModule::configure(ResourceFinder &rf) {
     cout << dbgTag << "Starting. \n";
 
     /* ****** Configure the Module                            ****** */
-    moduleName = rf.check("name", Value("plantIdentification")).asString().c_str();
+    moduleName = rf.check("name", Value("stableGrasp")).asString().c_str();
+	string whichHand = rf.check("whichHand", Value("right")).asString().c_str();
     moduleThreadPeriod = rf.check("moduleThreadPeriod", 1000).asInt();
+    bool specifyHand = rf.check("specifyHand",Value(0)).asInt() != 0;
+    string portPrefix;
+    if (specifyHand){
+        portPrefix = "/" + moduleName + "/" + whichHand + "_hand";
+    } else {
+        portPrefix = "/" + moduleName;
+    }
+
 
     /* ******* Open ports                                       ******* */
-    portPlantIdentificationRPC.open("/plantIdentification/cmd:i");
+    portPlantIdentificationRPC.open(portPrefix + "/cmd:i");
     attach(portPlantIdentificationRPC);
 
 

@@ -28,12 +28,21 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
 	storedJointsControlMode.resize(8,VOCAB_CM_POSITION);
 	storedHandJointsMaxPwmLimits.resize(8);
 	
+    string moduleName = rf.check("name", Value("stableGrasp")).asString().c_str();
 	string robotName = rf.check("robot", Value("icub"), "The robot name.").asString().c_str();
     whichHand = rf.check("whichHand", Value("right"), "The hand to be used for the grasping.").asString().c_str();
     whichICub = rf.check("whichICub", Value("purple"), "The iCub used for the task.").asString().c_str();
     whichTask = rf.check("whichTask", Value("grasp"), "The code of the task [grasp/objrec]").asString().c_str();
     numFingers = rf.check("numFingers", Value(2), "Number of fingers used").asInt();
     headEnabled = rf.check("headEnabled",Value(0)).asInt() != 0;
+    bool specifyHand = rf.check("specifyHand",Value(0)).asInt() != 0;
+    string portPrefix;
+    if (specifyHand){
+        portPrefix = "/" + moduleName + "/" + whichHand + "_hand";
+    } else {
+        portPrefix = "/" + moduleName;
+    }
+
     std::cout << whichHand << " " << whichICub << " " << whichTask << "\n";
 	 /* ******* Joint interfaces                     ******* */
     string arm = whichHand + "_arm";
@@ -41,7 +50,7 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
     options.put("robot", robotName.c_str()); 
     options.put("device", "remote_controlboard");
     options.put("part", arm.c_str());
-    options.put("local", ("/plantIdentification/" + arm).c_str());
+    options.put("local", (portPrefix).c_str());
     options.put("remote", ("/" + robotName + "/" + arm).c_str());
     
     // Open driver
@@ -114,7 +123,7 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
 		Property gazeCtrlOptions;
 		gazeCtrlOptions.put("device","gazecontrollerclient");
 		gazeCtrlOptions.put("remote","/iKinGazeCtrl");
-		gazeCtrlOptions.put("local","/plantIdentification/gaze");
+		gazeCtrlOptions.put("local",portPrefix + "/gaze");
  
 		if (!clientGazeCtrl.open(gazeCtrlOptions)) {
 			cout << dbgTag << "could not open gaze controller driver\n";
@@ -135,7 +144,7 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
 		Property cartCtrlOptions;
 		cartCtrlOptions.put("device","cartesiancontrollerclient");
 		cartCtrlOptions.put("remote","/" + robotName + "/cartesianController/" + arm);
-		cartCtrlOptions.put("local","/plantIdentification/cartContr/" + arm);
+		cartCtrlOptions.put("local",portPrefix + "/cartContr/" + arm);
     
 		clientArmCartCtrl.open(cartCtrlOptions);
 
@@ -306,7 +315,7 @@ bool ControllersUtil::setArmInTaskPosition() {
         // Hand
         if (whichICub == "black"){
             if (whichHand == "right"){
-        	iPos->positionMove(7 , 30);
+        	iPos->positionMove(7 , 17);
                 iPos->positionMove(8 , 43);
                 iPos->positionMove(9 , 3);
                 iPos->positionMove(10, 33);

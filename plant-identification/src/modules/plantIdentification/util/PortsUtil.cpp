@@ -19,7 +19,7 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
 	using yarp::os::Network;
     using std::cout;
 
-	string moduleName = "stableGrasp";
+	string moduleName = rf.check("name", Value("stableGrasp")).asString().c_str();
 	string whichHand = rf.check("whichHand", Value("right")).asString().c_str();
     bool specifyHand = rf.check("specifyHand",Value(0)).asInt() != 0;
     string portPrefix;
