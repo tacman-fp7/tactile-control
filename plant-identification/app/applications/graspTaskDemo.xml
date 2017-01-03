@@ -3,7 +3,7 @@
 
      <module>
          <name>plantIdentification</name>
-         <parameters>--from confPlantIdentification3Fingers.ini --whichHand left --whichICub purple --whichTask grasp --headEnabled 1</parameters>
+         <parameters>--from confPlantIdentificationGMMRegression.ini --whichHand left --whichICub black --whichTask grasp --headEnabled 1 --specifyHand 0</parameters>
          <node>icub14</node>
          <tag>handController</tag>
      </module>
@@ -39,7 +39,7 @@
 	 
 	 <module>
          <name>yarpscope</name>
-         <parameters>--context stableGrasp --xml graspingDemoPortScopeConf.xml</parameters>
+         <parameters>--context plantIdentification --xml graspingDemoPortScopeConf.xml</parameters>
          <node>icub10</node>
          <tag>demo_port_scope</tag>
 		 <dependencies>
@@ -61,13 +61,13 @@
 -->
 	<connection>
 		<from>/objectGrasping/graspTaskCmd:o</from>
-		<to>/plantIdentification/cmd:i</to>
+		<to>/stableGrasp/cmd:i</to>
 		<protocol>tcp</protocol>
 	</connection>
 	
 	<connection>
 		<from>/NIDAQmxReader/data/real:o</from>
-		<to>/plantIdentification/force_sensor:i</to>
+		<to>/stableGrasp/force_sensor:i</to>
 		<protocol>tcp</protocol>
 	</connection>
 
@@ -75,19 +75,19 @@
 		
 	<connection>
 		<from> </from>
-		<to>/plantIdentification/real_force/thumb:i</to>
+		<to>/stableGrasp/real_force/thumb:i</to>
 		<protocol>tcp</protocol>
 	</connection>
 	
 	<connection>
 		<from> </from>
-		<to>/plantIdentification/real_force/index_finger:i</to>
+		<to>/stableGrasp/real_force/index_finger:i</to>
 		<protocol>tcp</protocol>
 	</connection>
 	
 	<connection>
 		<from> </from>
-		<to>/plantIdentification/real_force/middle_finger:i</to>
+		<to>/stableGrasp/real_force/middle_finger:i</to>
 		<protocol>tcp</protocol>
 	</connection>
 	

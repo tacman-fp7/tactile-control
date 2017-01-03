@@ -19,26 +19,40 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
 	using yarp::os::Network;
     using std::cout;
 
-	string moduleName = "plantIdentification";
+	string moduleName = "stableGrasp";
 	string whichHand = rf.check("whichHand", Value("right")).asString().c_str();
-    string moduleSkinRawPortName = "/" + moduleName + "/skin/" + whichHand + "_hand_raw:i";
-    string moduleSkinCompPortName = "/" + moduleName + "/skin/" + whichHand + "_hand_comp:i";
-    string moduleHandEncodersRawPortName = "/" + moduleName + "/encoders/" + whichHand + "_hand_raw:i";
-    string policyActionsPortName = "/" + moduleName + "/policyActions:i";
+    bool specifyHand = rf.check("specifyHand",Value(0)).asInt() != 0;
+    string portPrefix;
+    if (specifyHand){
+        portPrefix = "/" + moduleName + "/" + whichHand + "_hand";
+    } else {
+        portPrefix = "/" + moduleName;
+    }
+
+    // icub ports
     string icubSkinRawPortName = "/icub/skin/" + whichHand + "_hand";
     string icubSkinCompPortName = "/icub/skin/" + whichHand + "_hand_comp";
     string icubHandEncodersRawPortName = "/icub/" + whichHand + "_hand/analog:o";
-    string logDataPortName = "/" + moduleName + "/log:o";
-    string infoDataPortName = "/" + moduleName + "/info";
-    string controlDataPortName = "/" + moduleName + "/control";
-    string gmmDataPortName = "/" + moduleName + "/gmm:o";
-    string gmmRegressionDataPortName = "/" + moduleName + "/gmmRegression:o";
-    string objectRecognitionDataPortName = "/" + moduleName + "/object_recognition_log:o";
-    string gripStrengthDataPortName = "/" + moduleName + "/grip_strength:o";
-    string forceSensorPortName = "/" + moduleName + "/force_sensor:i";
-	string thumbRealForcePortName = "/" + moduleName + "/real_force/thumb:i";
-	string indexFingerRealForcePortName = "/" + moduleName + "/real_force/index_finger:i";
-	string middleFingerRealForcePortName = "/" + moduleName + "/real_force/middle_finger:i";
+
+    // input ports
+    string moduleSkinRawPortName = portPrefix + "/tactile_raw:i";
+    string moduleSkinCompPortName = portPrefix + "/tactile_comp:i";
+    string moduleHandEncodersRawPortName = portPrefix + "/encoders_raw:i";
+    string policyActionsPortName = portPrefix + "/policy_actions:i";
+    string forceSensorPortName = portPrefix + "/force_sensor:i";
+	string thumbRealForcePortName = portPrefix + "/real_force/thumb:i";
+	string indexFingerRealForcePortName = portPrefix + "/real_force/index_finger:i";
+	string middleFingerRealForcePortName = portPrefix + "/real_force/middle_finger:i";
+
+    // output ports
+    string logDataPortName = portPrefix + "/log:o";
+    string infoDataPortName = portPrefix + "/info";
+    string controlDataPortName = portPrefix + "/control";
+    string gmmDataPortName = portPrefix + "/gmm:o";
+    string gmmRegressionDataPortName = portPrefix + "/gmmRegression:o";
+    string objectRecognitionDataPortName = portPrefix + "/object_recognition_log:o";
+    string gripStrengthDataPortName = portPrefix + "/grip_strength:o";
+
 
 //	string middleFingerRealForcePortName = "/" + moduleName + "/real_force/thumb:i";
 //	string indexFingerRealForcePortName = "/" + moduleName + "/real_force/index_finger:i";

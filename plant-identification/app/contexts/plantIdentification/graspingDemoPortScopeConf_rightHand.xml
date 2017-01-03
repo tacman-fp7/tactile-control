@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<portscope rows="1" columns="3" carrier="mcast">
+<portscope rows="1" columns="2" carrier="mcast">
     <plot gridx="0"
           gridy="0"
           hspan="1"
@@ -9,13 +9,13 @@
           minval="-20"
           maxval="20"
           bgcolor="#EEFFEE">
-        <graph remote="/stableGrasp/control"
+        <graph remote="/stableGrasp/right_hand/control"
                index="8"
                color="Red"
                title="Target Hand Position"
                type="lines"
                size="1" />
-        <graph remote="/stableGrasp/control"
+        <graph remote="/stableGrasp/right_hand/control"
                index="10"
                color="Blue"
                title="Actual Hand Position"
@@ -31,38 +31,16 @@
           minval="-5"
           maxval="130"
           bgcolor="#FFEEEE">
-        <graph remote="/stableGrasp/control"
+        <graph remote="/stableGrasp/right_hand/control"
                index="4"
                color="Red"
                title="Target Grip Strength"
                type="lines"
                size="1" />
-        <graph remote="/stableGrasp/control"
+        <graph remote="/stableGrasp/right_hand/control"
                index="5"
                color="Blue"
                title="Actual Grip Strength"
-               type="lines"
-               size="1" />
-    </plot>
-	<plot gridx="2"
-          gridy="0"
-          hspan="1"
-          vspan="1"
-          title="Fingers Force"
-          size="201"
-          minval="-5"
-          maxval="130"
-          bgcolor="#FFEEEE">
-        <graph remote="/stableGrasp/control"
-               index="22"
-               color="Green"
-               title="Thumb Force"
-               type="lines"
-               size="1" />
-        <graph remote="/stableGrasp/control"
-               index="26"
-               color="Blue"
-               title="Middle Finger Force"
                type="lines"
                size="1" />
     </plot>

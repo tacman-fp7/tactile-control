@@ -9,13 +9,13 @@
           minval="0"
           maxval="100"
           bgcolor="#EEFFEE">
-        <graph remote="/plantIdentification/log:o"
+        <graph remote="/stableGrasp/log:o"
                index="4"
                color="Red"
                title="Target Force"
                type="lines"
                size="1" />
-        <graph remote="/plantIdentification/log:o"
+        <graph remote="/stableGrasp/log:o"
                index="17"
                color="Blue"
                title="Actual Force"
