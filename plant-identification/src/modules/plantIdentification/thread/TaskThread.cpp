@@ -265,7 +265,7 @@ void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData
         taskData->commonData.tempParameters[7] = paramValue.asDouble();
     case ALIAS_OBJECT_POSITION:
         if (paramValue.isString()){
-            if (paramValue.asString() == "standard"){
+            if (paramValue.asString() == "stable"){
                 taskData->commonData.tempParameters[56] = 1;
             } else if (paramValue.asString() == "inclined"){
                 taskData->commonData.tempParameters[56] = 3;
