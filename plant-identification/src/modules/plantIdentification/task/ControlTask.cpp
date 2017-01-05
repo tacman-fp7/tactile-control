@@ -178,8 +178,8 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
 	Vector kdSvOptionVect(1,svKd);
 	Vector ttSvOptionVect(1,calculateTt(svKp,svKi,svKd));
 	Matrix pvSatLimMatrix(1,2);
-    pvSatLimMatrix[0][0] = -1333.0;
-    pvSatLimMatrix[0][1] = 1333.0;
+    pvSatLimMatrix[0][0] = -2666;
+    pvSatLimMatrix[0][1] = 2666;
 	Bottle svPidOptions;
 	addOption(svPidOptions,"Wp",Value(controlData->pidWp));
 	addOption(svPidOptions,"Wi",Value(controlData->pidWi));

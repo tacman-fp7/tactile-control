@@ -229,8 +229,8 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
 	controlData.pidWd = rf.check("pidWd",Value(1.0)).asDouble();
 	controlData.pidN = rf.check("pidN",Value(10)).asInt();
 	controlData.pidWindUpCoeff = rf.check("pidWindUpCoeff",Value(0.5)).asDouble();
-	controlData.pidMinSatLim = rf.check("pidMinSatLim",Value(-1333.0)).asDouble();
-	controlData.pidMaxSatLim = rf.check("pidMaxSatLim",Value(1333.0)).asDouble();
+	controlData.pidMinSatLim = rf.check("pidMinSatLim",Value(-2666.0)).asDouble();
+	controlData.pidMaxSatLim = rf.check("pidMaxSatLim",Value(2666.0)).asDouble();
 	controlData.controlMode = static_cast<ControlTaskOpMode>(rf.check("controlMode",Value(2)).asInt());
 	controlData.pidResetEnabled = rf.check("pidResetEnabled",Value(0)).asInt() != 0;
 	controlData.lifespan = rf.check("controlTaskLifespan",Value(10)).asInt();
