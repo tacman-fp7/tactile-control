@@ -260,7 +260,21 @@ void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData
 		taskData->approachData.lifespan = paramValue.asInt();
 		break;
 
-
+    // alias (they are note shown through the 'view' command
+    case ALIAS_GRIP_STRENGTH:
+        taskData->commonData.tempParameters[7] = paramValue.asDouble();
+    case ALIAS_OBJECT_POSITION:
+        if (paramValue.isString()){
+            if (paramValue.asString() == "standard"){
+                taskData->commonData.tempParameters[56] = 1;
+            } else if (paramValue.asString() == "inclined"){
+                taskData->commonData.tempParameters[56] = 3;
+            } else {
+                setSuccessful = false;
+            }
+        } else {
+            setSuccessful = false;
+        }
 	}
 
 	if (setSuccessful){
