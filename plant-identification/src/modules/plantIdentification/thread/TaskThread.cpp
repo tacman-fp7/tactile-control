@@ -263,6 +263,7 @@ void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData
     // alias (they are note shown through the 'view' command
     case ALIAS_GRIP_STRENGTH:
         taskData->commonData.tempParameters[7] = paramValue.asDouble();
+        break;
     case ALIAS_OBJECT_POSITION:
         if (paramValue.isString()){
             if (paramValue.asString() == "stable"){
@@ -275,6 +276,8 @@ void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData
         } else {
             setSuccessful = false;
         }
+        break;
+
 	}
 
 	if (setSuccessful){

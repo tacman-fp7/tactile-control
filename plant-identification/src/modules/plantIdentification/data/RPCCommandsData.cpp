@@ -64,7 +64,7 @@ RPCCommandsData::RPCCommandsData(){
 	add("appr_pwm_lim",APPR_JOINTS_PWM_LIMITS,"APPROACH TASK JOINTS PWM LIMITS");
 	add("appr_pwm_lim_enabl",APPR_JOINTS_PWM_LIMITS_ENABLED,"APPROACH TASK JOINTS PWM LIMITS ENABLED [0: false; 1: true]");
 	add("appr_ls",APPR_LIFESPAN,"APPROACH TASK LIFESPAN");
-    add("grip_stength",ALIAS_GRIP_STRENGTH,"GRIP STRENGTH");
+    add("grip_strength",ALIAS_GRIP_STRENGTH,"GRIP STRENGTH");
     add("object_position",ALIAS_OBJECT_POSITION,"OBJECT POSITION");
 
 	// TASK <?>

@@ -5,7 +5,7 @@
 # 
 
 
-set(MODULENAME plantIdentification)
+set(MODULENAME stableGrasp)
 
 # Search for source code.
 set(INC_HEADERS
@@ -75,7 +75,7 @@ add_executable(${MODULENAME} ${INC_SOURCES} ${INC_HEADERS})
 target_link_libraries(${MODULENAME} ${YARP_LIBRARIES} ctrlLib skinDynLib iKin)
 
 if(WIN32)
-    install(TARGETS ${PROJECT_NAME} DESTINATION bin/${CMAKE_BUILD_TYPE})
+    install(TARGETS ${MODULENAME} DESTINATION bin/${CMAKE_BUILD_TYPE})
 else(WIN32)
-    install(TARGETS ${PROJECT_NAME} DESTINATION bin)
+    install(TARGETS ${MODULENAME} DESTINATION bin)
 endif(WIN32)
