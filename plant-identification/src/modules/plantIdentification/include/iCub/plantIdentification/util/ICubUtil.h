@@ -13,6 +13,7 @@
 
 
 #include <vector>
+#include <fstream>
 
 namespace iCub {
     namespace plantIdentification {
@@ -36,7 +37,7 @@ namespace iCub {
                 
                 static void makeObjectRecognitionBottle(yarp::os::Bottle &objRecBottle,std::string taskId,int objectId,iCub::plantIdentification::ObjectRecognitionTask objRecTask,int extraCode1,int extraCode2,int skipPreviousRepetition,std::string experimentDescription,std::string previousExperimentDescription,iCub::plantIdentification::TaskCommonData *commonData);
 
-
+                static void printBottleIntoFile(std::ofstream &file,yarp::os::Bottle &bottle);
         private:
 
                 static void processTactileData(iCub::plantIdentification::TaskCommonData *commonData,bool realForceMappingEnabled);

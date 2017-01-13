@@ -83,6 +83,7 @@ namespace iCub {
                 std::ofstream objRecDataFile;
                 bool objRecFileExists;
                 bool snapshotSaved;
+                bool squeezingStarted;
 
 
             public:

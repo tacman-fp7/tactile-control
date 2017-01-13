@@ -228,6 +228,7 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
     handClosurePerformed = false;
     objRecFileExists = false;
     snapshotSaved = false;
+    squeezingStarted = false;
 
 
     if (resetErrOnContact){
@@ -251,6 +252,9 @@ void ControlTask::init(){
     if (commonData->tpInt(56) >= 1 && commonData->tpInt(18) == 0){
         setGMMJointsControlMode(VOCAB_CM_POSITION_DIRECT);
     }
+
+    // for object recognition
+    commonData->tempParameters[49] = Value(0);
 
     cout << "\n\n" << dbgTag << "TASK STARTED - Target: ";
     for(size_t i = 0; i < pressureTargetValue.size(); i++){
@@ -1251,20 +1255,25 @@ void ControlTask::manageObjectRecognitionTask(Bottle &objectRecognitionBottle){
         // do nothing
 
     } else if (time < increaseGSTime){
-    
+
         if (!objRecFileExists){
-            //objRecDataFile.open(fileNameSqueezing);
+            objRecDataFile.open(fileNameSqueezing);
             objRecFileExists = true;
         }
-        // start logging the squeezing task (create a file with a proper name, related to the specific object, task and iteration)
+        ICubUtil::printBottleIntoFile(objRecDataFile,objectRecognitionBottle);
 
     } else if (time < stopSqueezingLogTime){
 
-        commonData->tempParameters[7] = gripStrengthForSqueezing;
+        if (!squeezingStarted){
+            commonData->tempParameters[7] = gripStrengthForSqueezing;
 
-        // set some variable so that from the log it's possible to split the two phases
+            // keep track that squeezing started
+            commonData->tempParameters[49] = Value(1);
 
-        // keep logging file
+            squeezingStarted = true;
+        }
+
+        ICubUtil::printBottleIntoFile(objRecDataFile,objectRecognitionBottle);
 
     } else if (time < logSnapshotTime && !handClosurePerformed){
 
@@ -1283,9 +1292,9 @@ void ControlTask::manageObjectRecognitionTask(Bottle &objectRecognitionBottle){
     } else {
 
         if (!snapshotSaved){
-            //objRecDataFile.open(fileNameHandClosure);
+            objRecDataFile.open(fileNameHandClosure);
             
-            // log snapshot
+            ICubUtil::printBottleIntoFile(objRecDataFile,objectRecognitionBottle);
             
             objRecDataFile.close();
             snapshotSaved = true;

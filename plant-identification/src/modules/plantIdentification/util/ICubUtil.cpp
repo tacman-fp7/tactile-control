@@ -674,3 +674,17 @@ void ICubUtil::putSelectedElementsIntoMatrix(const yarp::sig::Matrix &dataIn,con
 
  
  }
+
+void ICubUtil::printBottleIntoFile(std::ofstream &file,yarp::os::Bottle &bottle){
+
+    for(int i = 0; i < bottle.size(); i++){
+
+        file << bottle.get(i).toString();
+        if (i < bottle.size() - 1){
+            file << " ";
+        }
+    }
+
+    file << "\n";
+
+}

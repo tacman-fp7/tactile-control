@@ -104,7 +104,7 @@ namespace iCub {
             *	46: object recognition: ID object used (for whatever task)
             *   47: object recognition: ID kind of task (for example squeezing)
             *	48: object recognition: ID iteration used
-            *	49: object recognition: extra info (abouth the object or the task)
+            *	49: object recognition: extra info (abouth the object or the task) // in the case of squeezing, 0 refers to the phase before the grip strength is incremented, 1 refers to phase after it is incremented
             *	50: skip previous repetition [0/1]. Like property 17, it is reset to zero at the end of the control task
             *	51: policy learning enabled. no/yes [0/1]
             *	52: thumb sensitivity scale
