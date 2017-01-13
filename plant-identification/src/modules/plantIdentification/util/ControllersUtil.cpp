@@ -17,19 +17,19 @@ using yarp::os::Property;
 
 ControllersUtil::ControllersUtil(){
 
-	dbgTag = "ControllersUtil: ";
+    dbgTag = "ControllersUtil: ";
 }
 
 bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
-	using std::vector;
-	using yarp::os::Value;
+    using std::vector;
+    using yarp::os::Value;
 
-	//TODO use constants
-	storedJointsControlMode.resize(8,VOCAB_CM_POSITION);
-	storedHandJointsMaxPwmLimits.resize(8);
-	
+    //TODO use constants
+    storedJointsControlMode.resize(8,VOCAB_CM_POSITION);
+    storedHandJointsMaxPwmLimits.resize(8);
+    
     string moduleName = rf.check("name", Value("stableGrasp")).asString().c_str();
-	string robotName = rf.check("robot", Value("icub"), "The robot name.").asString().c_str();
+    string robotName = rf.check("robot", Value("icub"), "The robot name.").asString().c_str();
     whichHand = rf.check("whichHand", Value("right"), "The hand to be used for the grasping.").asString().c_str();
     whichICub = rf.check("whichICub", Value("purple"), "The iCub used for the task.").asString().c_str();
     whichTask = rf.check("whichTask", Value("grasp"), "The code of the task [grasp/objrec]").asString().c_str();
@@ -44,7 +44,7 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
     }
 
     std::cout << whichHand << " " << whichICub << " " << whichTask << "\n";
-	 /* ******* Joint interfaces                     ******* */
+     /* ******* Joint interfaces                     ******* */
     string arm = whichHand + "_arm";
     Property options;
     options.put("robot", robotName.c_str()); 
@@ -56,59 +56,59 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
     // Open driver
     if (!clientArm.open(options)) {
         cout << dbgTag << "could not open arm driver\n";
-		return false;
+        return false;
     }
     // Open interfaces
     clientArm.view(iEncs);
     if (!iEncs) {
-		cout << dbgTag << "could not open encoders interface\n";
+        cout << dbgTag << "could not open encoders interface\n";
         return false;
     }
-	clientArm.view(iOLC);
+    clientArm.view(iOLC);
     if (!iOLC) {
-		cout << dbgTag << "could not open open-loop interface\n";
+        cout << dbgTag << "could not open open-loop interface\n";
         return false;
     }
-	clientArm.view(iCtrl);
+    clientArm.view(iCtrl);
     if (!iCtrl) {
-		cout << dbgTag << "could not open control mode interface\n";
+        cout << dbgTag << "could not open control mode interface\n";
         return false;
     }
-	clientArm.view(iPos);
+    clientArm.view(iPos);
     if (!iPos) {
-		cout << dbgTag << "could not open position interface\n";
+        cout << dbgTag << "could not open position interface\n";
         return false;
     }
-	clientArm.view(iPosCtrl);
+    clientArm.view(iPosCtrl);
     if (!iPosCtrl) {
-		cout << dbgTag << "could not open position control interface\n";
+        cout << dbgTag << "could not open position control interface\n";
         return false;
     }
-	clientArm.view(iVel);
+    clientArm.view(iVel);
     if (!iVel) {
-		cout << dbgTag << "could not open velocity interface\n";
+        cout << dbgTag << "could not open velocity interface\n";
         return false;
     }
-	clientArm.view(iPosDir);
+    clientArm.view(iPosDir);
     if (!iPosDir) {
-		cout << dbgTag << "could not open position direct interface\n";
+        cout << dbgTag << "could not open position direct interface\n";
         return false;
     }
-	clientArm.view(iPid);
+    clientArm.view(iPid);
     if (!iPid) {
-		cout << dbgTag << "could not open pid interface\n";
+        cout << dbgTag << "could not open pid interface\n";
         return false;
     }
-	clientArm.view(iLim);
+    clientArm.view(iLim);
     if (!iLim) {
-		cout << dbgTag << "could not open joint limits interface\n";
+        cout << dbgTag << "could not open joint limits interface\n";
         return false;
     }
 
-	iPos->getAxes(&armJointsNum);
-	iPosCtrl->getAxes(&armJointsNum);
-	
-	// Set reference speeds
+    iPos->getAxes(&armJointsNum);
+    iPosCtrl->getAxes(&armJointsNum);
+    
+    // Set reference speeds
     vector<double> refSpeeds(armJointsNum, 0);
     iPos->getRefSpeeds(&refSpeeds[0]);
     for (int i = 11; i < 15; ++i) {
@@ -116,73 +116,73 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
     }
     iPos->setRefSpeeds(&refSpeeds[0]);
 
-	jointLimits.push_back(iLim);
+    jointLimits.push_back(iLim);
 
-	if (headEnabled){
+    if (headEnabled){
 
-		Property gazeCtrlOptions;
-		gazeCtrlOptions.put("device","gazecontrollerclient");
-		gazeCtrlOptions.put("remote","/iKinGazeCtrl");
-		gazeCtrlOptions.put("local",portPrefix + "/gaze");
+        Property gazeCtrlOptions;
+        gazeCtrlOptions.put("device","gazecontrollerclient");
+        gazeCtrlOptions.put("remote","/iKinGazeCtrl");
+        gazeCtrlOptions.put("local",portPrefix + "/gaze");
  
-		if (!clientGazeCtrl.open(gazeCtrlOptions)) {
-			cout << dbgTag << "could not open gaze controller driver\n";
-			return false;
-		}
-	
-		clientGazeCtrl.view(iGaze);
-		if (!iGaze) {
-			cout << dbgTag << "could not open gaze controller interface\n";
-			return false;
-		}
-
-		// store fixation point
-		iGaze->getFixationPoint(storedFixationPoint);
-
-
-	   
-		Property cartCtrlOptions;
-		cartCtrlOptions.put("device","cartesiancontrollerclient");
-		cartCtrlOptions.put("remote","/" + robotName + "/cartesianController/" + arm);
-		cartCtrlOptions.put("local",portPrefix + "/cartContr/" + arm);
+        if (!clientGazeCtrl.open(gazeCtrlOptions)) {
+            cout << dbgTag << "could not open gaze controller driver\n";
+            return false;
+        }
     
-		clientArmCartCtrl.open(cartCtrlOptions);
+        clientGazeCtrl.view(iGaze);
+        if (!iGaze) {
+            cout << dbgTag << "could not open gaze controller interface\n";
+            return false;
+        }
 
-		if (clientArmCartCtrl.isValid()) {
-		   clientArmCartCtrl.view(iCart);
-		}
-		if (!iCart) {
-			cout << dbgTag << "could not open cartesian controller interface\n";
-		}
+        // store fixation point
+        iGaze->getFixationPoint(storedFixationPoint);
 
-	}
-	return true;
+
+       
+        Property cartCtrlOptions;
+        cartCtrlOptions.put("device","cartesiancontrollerclient");
+        cartCtrlOptions.put("remote","/" + robotName + "/cartesianController/" + arm);
+        cartCtrlOptions.put("local",portPrefix + "/cartContr/" + arm);
+    
+        clientArmCartCtrl.open(cartCtrlOptions);
+
+        if (clientArmCartCtrl.isValid()) {
+           clientArmCartCtrl.view(iCart);
+        }
+        if (!iCart) {
+            cout << dbgTag << "could not open cartesian controller interface\n";
+        }
+
+    }
+    return true;
 }
 
 bool ControllersUtil::sendPwm(int joint,double pwm){
 
-	if (!iOLC->setRefOutput(joint,pwm)){
-		cout << dbgTag << "could not send pwm\n";
-		return false;
-	}
-	return true;
+    if (!iOLC->setRefOutput(joint,pwm)){
+        cout << dbgTag << "could not send pwm\n";
+        return false;
+    }
+    return true;
 }
 
 bool ControllersUtil::sendVelocity(int joint,double velocity){
 
-	if (!iVel->velocityMove(joint,velocity)){
-		cout << dbgTag << "could not send velocity\n";
-		return false;
-	}
-	return true;
+    if (!iVel->velocityMove(joint,velocity)){
+        cout << dbgTag << "could not send velocity\n";
+        return false;
+    }
+    return true;
 }
 
 bool ControllersUtil::saveCurrentArmPosition(){
-	using yarp::os::Time;
+    using yarp::os::Time;
 
     armStoredPosition.resize(armJointsNum);
     
-	bool encodersDataAcquired = false;
+    bool encodersDataAcquired = false;
     while(!encodersDataAcquired) {
 
         encodersDataAcquired = iEncs->getEncoders(armStoredPosition.data());
@@ -191,7 +191,7 @@ bool ControllersUtil::saveCurrentArmPosition(){
         cout << "DEBUG: " << dbgTag << "Encoder data is not available yet. \n";
 //#endif
 
-		Time::delay(0.1);
+        Time::delay(0.1);
     }
 
 #ifndef NODEBUG
@@ -203,93 +203,93 @@ bool ControllersUtil::saveCurrentArmPosition(){
     cout << "\n";
 #endif
 
-	return true;
+    return true;
 }
 
 
 bool ControllersUtil::getArmEncodersAngles(std::vector<double> &armEncodersAngles,bool wait){
-	using yarp::os::Time;
-	
-	yarp::sig::Vector armEncodersAnglesVector;
+    using yarp::os::Time;
+    
+    yarp::sig::Vector armEncodersAnglesVector;
     armEncodersAnglesVector.resize(armJointsNum);
 
-	bool encodersDataAcquired = false;
-	
-	encodersDataAcquired = iEncs->getEncoders(armEncodersAnglesVector.data());
-
-	while(wait && !encodersDataAcquired) {
-
-		cout << "DEBUG: " << dbgTag << "Encoder data is not available yet. \n";
-		Time::delay(0.1);
-
-		encodersDataAcquired = iEncs->getEncoders(armEncodersAnglesVector.data());
+    bool encodersDataAcquired = false;
     
-	}
+    encodersDataAcquired = iEncs->getEncoders(armEncodersAnglesVector.data());
 
-	if (encodersDataAcquired){
-		for(size_t i = 0; i < armEncodersAngles.size(); i++){
-			armEncodersAngles[i] = armEncodersAnglesVector[i];
-		}
+    while(wait && !encodersDataAcquired) {
 
-		return true;
-	}
+        cout << "DEBUG: " << dbgTag << "Encoder data is not available yet. \n";
+        Time::delay(0.1);
 
-	return false;
+        encodersDataAcquired = iEncs->getEncoders(armEncodersAnglesVector.data());
+    
+    }
+
+    if (encodersDataAcquired){
+        for(size_t i = 0; i < armEncodersAngles.size(); i++){
+            armEncodersAngles[i] = armEncodersAnglesVector[i];
+        }
+
+        return true;
+    }
+
+    return false;
 }
 
 bool ControllersUtil::getArmEncodersAnglesReferences(std::vector<double> &armEncodersAnglesReferences,bool wait){
-	using yarp::os::Time;
-	
-	yarp::sig::Vector armEncodersAnglesReferencesVector;
+    using yarp::os::Time;
+    
+    yarp::sig::Vector armEncodersAnglesReferencesVector;
     armEncodersAnglesReferencesVector.resize(armJointsNum);
 
-	bool encodersDataAcquired = false;
-	
-	encodersDataAcquired = iPosCtrl->getTargetPositions(armEncodersAnglesReferencesVector.data());
-
-	while(wait && !encodersDataAcquired) {
-
-		cout << "DEBUG: " << dbgTag << "Encoder data is not available yet. \n";
-		Time::delay(0.1);
-
-		encodersDataAcquired = iEncs->getEncoders(armEncodersAnglesReferencesVector.data());
+    bool encodersDataAcquired = false;
     
-	}
+    encodersDataAcquired = iPosCtrl->getTargetPositions(armEncodersAnglesReferencesVector.data());
 
-	if (encodersDataAcquired){
-		for(size_t i = 0; i < armEncodersAnglesReferences.size(); i++){
-			armEncodersAnglesReferences[i] = armEncodersAnglesReferencesVector[i];
-		}
+    while(wait && !encodersDataAcquired) {
 
-		return true;
-	}
+        cout << "DEBUG: " << dbgTag << "Encoder data is not available yet. \n";
+        Time::delay(0.1);
 
-	return false;
+        encodersDataAcquired = iEncs->getEncoders(armEncodersAnglesReferencesVector.data());
+    
+    }
+
+    if (encodersDataAcquired){
+        for(size_t i = 0; i < armEncodersAnglesReferences.size(); i++){
+            armEncodersAnglesReferences[i] = armEncodersAnglesReferencesVector[i];
+        }
+
+        return true;
+    }
+
+    return false;
 }
 
 
 
 bool ControllersUtil::saveCurrentControlMode(){
 
-	// save control mode of joints 8 9 10 11 12 13 14 15
-	for(size_t i = 0; i < 8; i++){
-		if (!iCtrl->getControlMode(8 + i,&storedJointsControlMode[i])){
-			cout << dbgTag << "could not get current control mode\n";
-			return false;
-		}
-	}
-	return true;
+    // save control mode of joints 8 9 10 11 12 13 14 15
+    for(size_t i = 0; i < 8; i++){
+        if (!iCtrl->getControlMode(8 + i,&storedJointsControlMode[i])){
+            cout << dbgTag << "could not get current control mode\n";
+            return false;
+        }
+    }
+    return true;
 }
 
 bool ControllersUtil::setTaskControlModes(std::vector<int> &jointsList,int controlMode){
 
-	for(size_t i = 0; i < jointsList.size(); i++){
-		if (!setControlMode(jointsList[i],controlMode,true)){
-			cout << dbgTag << "could not set all control modes\n";
-			return false;
-		}
-	}
-	return true;
+    for(size_t i = 0; i < jointsList.size(); i++){
+        if (!setControlMode(jointsList[i],controlMode,true)){
+            cout << dbgTag << "could not set all control modes\n";
+            return false;
+        }
+    }
+    return true;
 }
 
 
@@ -298,7 +298,7 @@ bool ControllersUtil::setArmInTaskPosition() {
 
     cout << dbgTag << "Reaching arm task position ... \t";
     
-	iVel->stop();
+    iVel->stop();
 
     if (whichTask == "grasp"){
 
@@ -315,7 +315,7 @@ bool ControllersUtil::setArmInTaskPosition() {
         // Hand
         if (whichICub == "black"){
             if (whichHand == "right"){
-        	iPos->positionMove(7 , 17);
+            iPos->positionMove(7 , 17);
                 iPos->positionMove(8 , 43);
                 iPos->positionMove(9 , 3);
                 iPos->positionMove(10, 33);
@@ -325,19 +325,19 @@ bool ControllersUtil::setArmInTaskPosition() {
                 iPos->positionMove(14, 35);
                 iPos->positionMove(15, 1);
             } else {
-        	iPos->positionMove(7 , 30);
-                iPos->positionMove(8 , 43);
+            iPos->positionMove(7 , 30);
+                iPos->positionMove(8 , 55);
                 iPos->positionMove(9 , 3);
-                iPos->positionMove(10, 33);
+                iPos->positionMove(10, 50);
                 iPos->positionMove(11, 2);
                 iPos->positionMove(12, numFingers == 2? 0 : 35);
                 iPos->positionMove(13, 3);
-                iPos->positionMove(14, 35);
+                iPos->positionMove(14, 50);
                 iPos->positionMove(15, 1);
             }
         } else if (whichICub == "purple") {
             if (whichHand == "right"){
-        	iPos->positionMove(7 , 30);
+            iPos->positionMove(7 , 30);
                 iPos->positionMove(8 , 50);    
                 iPos->positionMove(9 , 3);
                 iPos->positionMove(10, 15);
@@ -347,7 +347,7 @@ bool ControllersUtil::setArmInTaskPosition() {
                 iPos->positionMove(14, 30);
                 iPos->positionMove(15, 1);
             } else {
-        	iPos->positionMove(7 , 30);
+            iPos->positionMove(7 , 30);
                 iPos->positionMove(8 , 72);
                 iPos->positionMove(9 , 3);
                 iPos->positionMove(10, 15);
@@ -359,7 +359,7 @@ bool ControllersUtil::setArmInTaskPosition() {
             }
         } else {
             if (whichHand == "right"){
-        	iPos->positionMove(7 , 5);
+            iPos->positionMove(7 , 5);
                 iPos->positionMove(8 , 24);    
                 iPos->positionMove(9 , 2);
                 iPos->positionMove(10, 10);
@@ -369,7 +369,7 @@ bool ControllersUtil::setArmInTaskPosition() {
                 iPos->positionMove(14, 15);
                 iPos->positionMove(15, 2);
             } else {
-        	iPos->positionMove(7 , 1);
+            iPos->positionMove(7 , 1);
                 iPos->positionMove(8 , 45);
                 iPos->positionMove(9 , 2);
                 iPos->positionMove(10, 15);
@@ -398,7 +398,7 @@ bool ControllersUtil::setArmInTaskPosition() {
         // Hand
         if (whichICub == "black"){
             if (whichHand == "right"){
-        	iPos->positionMove(7 , 30);
+            iPos->positionMove(7 , 30);
                 iPos->positionMove(8 , 82);    
                 iPos->positionMove(9 , 3);
                 iPos->positionMove(10, 0);
@@ -408,7 +408,7 @@ bool ControllersUtil::setArmInTaskPosition() {
                 iPos->positionMove(14, 30);
                 iPos->positionMove(15, 1);
             } else {
-        	iPos->positionMove(7 , 30);
+            iPos->positionMove(7 , 30);
                 iPos->positionMove(8 , 82);
                 iPos->positionMove(9 , 3);
                 iPos->positionMove(10, 0);
@@ -420,7 +420,7 @@ bool ControllersUtil::setArmInTaskPosition() {
             }
         } else if (whichICub == "purple"){
             if (whichHand == "right"){
-        	iPos->positionMove(7 , 30);
+            iPos->positionMove(7 , 30);
                 iPos->positionMove(8 , 82);    
                 iPos->positionMove(9 , 3);
                 iPos->positionMove(10, 0);
@@ -430,7 +430,7 @@ bool ControllersUtil::setArmInTaskPosition() {
                 iPos->positionMove(14, 30);
                 iPos->positionMove(15, 1);
             } else {
-        	iPos->positionMove(7 , 30);
+            iPos->positionMove(7 , 30);
                 iPos->positionMove(8 , 82);
                 iPos->positionMove(9 , 3);
                 iPos->positionMove(10, 0);
@@ -442,7 +442,7 @@ bool ControllersUtil::setArmInTaskPosition() {
             }
         } else {
             if (whichHand == "right"){
-        	iPos->positionMove(7 , 5);
+            iPos->positionMove(7 , 5);
                 iPos->positionMove(8 , 24);    
                 iPos->positionMove(9 , 2);
                 iPos->positionMove(10, 10);
@@ -452,7 +452,7 @@ bool ControllersUtil::setArmInTaskPosition() {
                 iPos->positionMove(14, 15);
                 iPos->positionMove(15, 2);
             } else {
-        	iPos->positionMove(7 , 1);
+            iPos->positionMove(7 , 1);
                 iPos->positionMove(8 , 45);
                 iPos->positionMove(9 , 2);
                 iPos->positionMove(10, 15);
@@ -462,22 +462,22 @@ bool ControllersUtil::setArmInTaskPosition() {
                 iPos->positionMove(14, 25);
                 iPos->positionMove(15, 2);
             }
-	}
+    }
 
 
     }
 
     // Check motion done
     waitMoveDone(10, 1);
-	cout << "Done. \n";
+    cout << "Done. \n";
 
-	return true;
+    return true;
 }
 /* *********************************************************************************************************************** */
 
 bool ControllersUtil::restorePreviousArmPosition(){
-	
-	// Stop interfaces
+    
+    // Stop interfaces
     if (iVel) {
         iVel->stop();
     }
@@ -487,46 +487,46 @@ bool ControllersUtil::restorePreviousArmPosition(){
         iPos->positionMove(armStoredPosition.data());
     }
 
-	return true;
+    return true;
 }
 
 bool ControllersUtil::restorePreviousControlMode(){
 
-	// restore control modes from joints 8 9 10 11 12 13 14 15
-	for(size_t i = 0; i < 8; i++){
-		if (!setControlMode(8 + i,storedJointsControlMode[i],true)){
-			cout << dbgTag << "could not set all control modes\n";
-			return false;
-		}
-	}
+    // restore control modes from joints 8 9 10 11 12 13 14 15
+    for(size_t i = 0; i < 8; i++){
+        if (!setControlMode(8 + i,storedJointsControlMode[i],true)){
+            cout << dbgTag << "could not set all control modes\n";
+            return false;
+        }
+    }
 
-	return true;
+    return true;
 }
 
 bool ControllersUtil::setControlMode(int joint,int controlMode,bool checkCurrent){
 
-	if (checkCurrent){
-		int currentControlMode = -1;
-		if (iCtrl->getControlMode(joint,&currentControlMode)){
+    if (checkCurrent){
+        int currentControlMode = -1;
+        if (iCtrl->getControlMode(joint,&currentControlMode)){
 
-			if (currentControlMode != controlMode){
-				if  (iCtrl->setControlMode(joint,controlMode)){
-					cout << dbgTag << "CONTROL MODE SET TO " << controlMode << " ON JOINT " << joint << "   PREV: " << currentControlMode << "  OPEN: " << VOCAB_CM_OPENLOOP << "\n";
-					return true;
-				} else {
+            if (currentControlMode != controlMode){
+                if  (iCtrl->setControlMode(joint,controlMode)){
+                    cout << dbgTag << "CONTROL MODE SET TO " << controlMode << " ON JOINT " << joint << "   PREV: " << currentControlMode << "  OPEN: " << VOCAB_CM_OPENLOOP << "\n";
+                    return true;
+                } else {
                     cout << dbgTag << "failed to SET control mode on joint " << joint << "\n";                   
                     return false;
                 }	
-			} else {
+            } else {
                 cout << dbgTag << "open loop control mode already set (" << currentControlMode << ")\n";
                 return true;
             }
-		} else {
+        } else {
             cout << dbgTag << "failed to GET control mode from joint " << joint << " (controlMode appears to be " << currentControlMode << ")\n";           
             return false;
         }
-	} else return iCtrl->setControlMode(joint,controlMode);
-	
+    } else return iCtrl->setControlMode(joint,controlMode);
+    
     return true;
 }
 
@@ -549,15 +549,15 @@ bool ControllersUtil::waitMoveDone(const double &i_timeout, const double &i_dela
 
 
 bool ControllersUtil::getEncoderAngle(int joint,double *encoderData){
-	
-	bool ok;
+    
+    bool ok;
 
-	ok = iEncs->getEncoder(joint,encoderData);
-	
-	if (!ok){
-		cout << dbgTag << "could not get encoder value\n";
-	}
-	return ok;
+    ok = iEncs->getEncoder(joint,encoderData);
+    
+    if (!ok){
+        cout << dbgTag << "could not get encoder value\n";
+    }
+    return ok;
 }
 
 //TODO restore getRealPwmValue
@@ -586,21 +586,21 @@ bool ControllersUtil::release(){
 
     // Close drivers
     if (!clientArm.close()){
-		cout << dbgTag << "could not close arm driver\n";	
-		return false;
-	}
+        cout << dbgTag << "could not close arm driver\n";	
+        return false;
+    }
     if (!clientGazeCtrl.close()){
-		cout << dbgTag << "could not close gaze controller driver\n";	
-		return false;
-	}
-	return true;
+        cout << dbgTag << "could not close gaze controller driver\n";	
+        return false;
+    }
+    return true;
 }
 
 /* *********************************************************************************************************************** */
 /* ******* Open hand                                                        ********************************************** */
 bool ControllersUtil::openHand() {
     
-	cout << dbgTag << "Opening hand ... \t";
+    cout << dbgTag << "Opening hand ... \t";
     
     iVel->stop();
 
@@ -620,13 +620,13 @@ bool ControllersUtil::openHand() {
                 iPos->positionMove(14, 35);
                 iPos->positionMove(15, 1);
             } else {
-                iPos->positionMove(8 , 43);
+                iPos->positionMove(8 , 55);
                 iPos->positionMove(9 , 3);
-                iPos->positionMove(10, 33);
+                iPos->positionMove(10, 50);
                 iPos->positionMove(11, 2);
                 iPos->positionMove(12, numFingers == 2? 0 : 35);
                 iPos->positionMove(13, 3);
-                iPos->positionMove(14, 35);
+                iPos->positionMove(14, 50);
                 iPos->positionMove(15, 1);
             }
         } else if (whichICub == "purple"){
@@ -669,7 +669,7 @@ bool ControllersUtil::openHand() {
                 iPos->positionMove(14, 25);
                 iPos->positionMove(15, 2);
             }
-	}
+    }
 
 
     } else {
@@ -735,7 +735,7 @@ bool ControllersUtil::openHand() {
                 iPos->positionMove(14, 25);
                 iPos->positionMove(15, 2);
             }
-	}
+    }
 
 
     }
@@ -745,58 +745,58 @@ bool ControllersUtil::openHand() {
     waitMoveDone(10, 1);
     cout << "Done. \n";
 
-	return true;
+    return true;
 }
 /* *********************************************************************************************************************** */
 
 bool ControllersUtil::setJointMaxPwmLimit(int joint,double maxPwm){
 
-	yarp::dev::Pid pid;
+    yarp::dev::Pid pid;
 
-	if (iPid->getPid(joint,&pid)){
-		pid.max_output = maxPwm;
-		iPid->setPid(joint,pid);
-		return true;
-	}
-	return false;
+    if (iPid->getPid(joint,&pid)){
+        pid.max_output = maxPwm;
+        iPid->setPid(joint,pid);
+        return true;
+    }
+    return false;
 }
 
 bool ControllersUtil::setJointsMaxPwmLimit(std::vector<int> &jointsList,std::vector<double> &maxPwmList){
 
-	bool ok = true;
+    bool ok = true;
 
-	for(size_t i = 0; i < jointsList.size(); i++){
-		ok = ok && setJointMaxPwmLimit(jointsList[i],maxPwmList[i]);
-	}
+    for(size_t i = 0; i < jointsList.size(); i++){
+        ok = ok && setJointMaxPwmLimit(jointsList[i],maxPwmList[i]);
+    }
 
-	return ok;
+    return ok;
 }
 
 bool ControllersUtil::saveHandJointsMaxPwmLimits(){
 
-	//TODO use constants
-	for(size_t i = 0; i < 8; i++){
-		yarp::dev::Pid pid;
-		if (iPid->getPid(8 + i,&pid)){
-			storedHandJointsMaxPwmLimits[i] = pid.max_output;
-		}
-	}
+    //TODO use constants
+    for(size_t i = 0; i < 8; i++){
+        yarp::dev::Pid pid;
+        if (iPid->getPid(8 + i,&pid)){
+            storedHandJointsMaxPwmLimits[i] = pid.max_output;
+        }
+    }
 
-	return true;
+    return true;
 }
 
 bool ControllersUtil::restoreHandJointsMaxPwmLimits(){
 
-	//TODO use constants
-	for(size_t i = 0; i < 8; i++){
-		yarp::dev::Pid pid;
-		if (iPid->getPid(8 + i,&pid)){
-			pid.max_output = storedHandJointsMaxPwmLimits[i];
-			iPid->setPid(8 + i,pid);
-		}
-	}
+    //TODO use constants
+    for(size_t i = 0; i < 8; i++){
+        yarp::dev::Pid pid;
+        if (iPid->getPid(8 + i,&pid)){
+            pid.max_output = storedHandJointsMaxPwmLimits[i];
+            iPid->setPid(8 + i,pid);
+        }
+    }
 
-	return true;
+    return true;
 }
 
 void ControllersUtil::testShowEndEffectors(){
@@ -1042,74 +1042,74 @@ void ControllersUtil::testShowEndEffectors(){
 
 bool ControllersUtil::resetPIDIntegralGain(double joint){
 
-	yarp::dev::Pid pid;
-	//std::cout << "resetting\n";
-	if (iPid->getPid(joint,&pid)){
-		storedPIDIntegralGain = pid.ki;
-		//std::cout << "old ki " << pid.ki << "\n";
-		pid.setKi(0);
-		//std::cout << "new ki " << pid.ki << "\n";
-		iPid->setPid(joint,pid);
-		return true;
-	}
-	return false;
+    yarp::dev::Pid pid;
+    //std::cout << "resetting\n";
+    if (iPid->getPid(joint,&pid)){
+        storedPIDIntegralGain = pid.ki;
+        //std::cout << "old ki " << pid.ki << "\n";
+        pid.setKi(0);
+        //std::cout << "new ki " << pid.ki << "\n";
+        iPid->setPid(joint,pid);
+        return true;
+    }
+    return false;
 }
 
 bool ControllersUtil::restorePIDIntegralGain(double joint){
 
-	yarp::dev::Pid pid;
-	//std::cout << "restoring\n";
-	if (iPid->getPid(joint,&pid)){
-		//std::cout << "old ki " << pid.ki << "\n";
-		pid.setKi(storedPIDIntegralGain);
-		//std::cout << "stored: " << storedPIDIntegralGain << "  new ki " << pid.ki << "\n";
-		iPid->setPid(joint,pid);
-		return true;
-	}
-	return false;
+    yarp::dev::Pid pid;
+    //std::cout << "restoring\n";
+    if (iPid->getPid(joint,&pid)){
+        //std::cout << "old ki " << pid.ki << "\n";
+        pid.setKi(storedPIDIntegralGain);
+        //std::cout << "stored: " << storedPIDIntegralGain << "  new ki " << pid.ki << "\n";
+        iPid->setPid(joint,pid);
+        return true;
+    }
+    return false;
 }
 
 bool ControllersUtil::lookAtTheHand(){
 
-	if (headEnabled){
+    if (headEnabled){
 
-		yarp::sig::Vector handPosition,handOrientation;
-		handPosition.resize(3);
-		handOrientation.resize(4);
+        yarp::sig::Vector handPosition,handOrientation;
+        handPosition.resize(3);
+        handOrientation.resize(4);
 
-		iCart->getPose(handPosition,handOrientation);
+        iCart->getPose(handPosition,handOrientation);
 
-		iGaze->lookAtFixationPoint(handPosition);
-		//iGaze->waitMotionDone();
+        iGaze->lookAtFixationPoint(handPosition);
+        //iGaze->waitMotionDone();
 
-	}
-	return true;
+    }
+    return true;
 }
 
 bool ControllersUtil::restoreFixationPoint(){
 
-	if (headEnabled) {
-		iGaze->lookAtFixationPoint(storedFixationPoint);
-	}
+    if (headEnabled) {
+        iGaze->lookAtFixationPoint(storedFixationPoint);
+    }
 
-	return true;
+    return true;
 }
 
 bool ControllersUtil::setJointAngle(int joint,double angle){
 
-	iPos->positionMove(joint,angle);
+    iPos->positionMove(joint,angle);
 
-	return true;
+    return true;
 }
 
 bool ControllersUtil::setJointAnglePositionDirect(int joint,double angle){
 
-	iPosDir->setPosition(joint,angle);
+    iPosDir->setPosition(joint,angle);
 
-	return true;
+    return true;
 }
 
 std::deque<yarp::dev::IControlLimits*> ControllersUtil::getArmJointLimits(){
 
-	return jointLimits;
+    return jointLimits;
 }
