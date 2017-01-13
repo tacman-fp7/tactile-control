@@ -142,7 +142,7 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
             //commonData.tempParameters[53] = 1.0/45;
             //commonData.tempParameters[54] = 1.0/20;
 
-            commonData.tempParameters[75] = -30;
+            commonData.tempParameters[75] = -50;
 
             commonData.tempParameters[78] = 0.0;
             commonData.tempParameters[79] = 0.0;

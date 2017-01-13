@@ -1253,7 +1253,7 @@ void ControlTask::manageObjectRecognitionTask(Bottle &objectRecognitionBottle){
     } else if (time < increaseGSTime){
     
         if (!objRecFileExists){
-            objRecDataFile.open(fileNameSqueezing);
+            //objRecDataFile.open(fileNameSqueezing);
             objRecFileExists = true;
         }
         // start logging the squeezing task (create a file with a proper name, related to the specific object, task and iteration)
@@ -1283,7 +1283,7 @@ void ControlTask::manageObjectRecognitionTask(Bottle &objectRecognitionBottle){
     } else {
 
         if (!snapshotSaved){
-            objRecDataFile.open(fileNameHandClosure);
+            //objRecDataFile.open(fileNameHandClosure);
             
             // log snapshot
             
