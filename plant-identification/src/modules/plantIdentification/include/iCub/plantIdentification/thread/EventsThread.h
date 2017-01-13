@@ -16,61 +16,61 @@
 namespace iCub {
     namespace plantIdentification {
         
-		class EventsThread : public yarp::os::RateThread {
+        class EventsThread : public yarp::os::RateThread {
            
 
-			private:
+            private:
 
-				/* ****** Thread attributes                             ****** */
+                /* ****** Thread attributes                             ****** */
                 int period;
 
-				unsigned long counter;
+                unsigned long counter;
 
-				iCub::plantIdentification::TaskCommonData *commonData;
+                iCub::plantIdentification::TaskCommonData *commonData;
 
-				/* ******* Events data                      ******* */
-				// event 'Finger Pushed' (FP)
-				int fpWindowSize;
-				int fpWindowIndex;
-				double fpFinalCheckThreshold;
-				std::vector<int> fpTimeFromLastEventReset;
-				int fpMinTimeBetweenActivations;
-				std::vector<std::vector<double> > fpPressureMemory;
-				std::vector<bool> fpEventTriggered;
+                /* ******* Events data                      ******* */
+                // event 'Finger Pushed' (FP)
+                int fpWindowSize;
+                int fpWindowIndex;
+                double fpFinalCheckThreshold;
+                std::vector<int> fpTimeFromLastEventReset;
+                int fpMinTimeBetweenActivations;
+                std::vector<std::vector<double> > fpPressureMemory;
+                std::vector<bool> fpEventTriggered;
 
-				iCub::plantIdentification::WaveAction waveAction;
+                iCub::plantIdentification::WaveAction waveAction;
 
-				/* ******* Controllers utility                          ******* */
+                /* ******* Controllers utility                          ******* */
                 iCub::plantIdentification::ControllersUtil *controllersUtil;
 
-				/* ****** Ports utility                                 ****** */
-				iCub::plantIdentification::PortsUtil *portsUtil;
+                /* ****** Ports utility                                 ****** */
+                iCub::plantIdentification::PortsUtil *portsUtil;
 
-				// TODO these variables represent the state of the external data update process and should be grouped in a separate class
-				bool xyzCoordEnabled;
-				int forceSensorBiasCounter;
-				std::vector<double> forceSensorBiasPartial;
+                // TODO these variables represent the state of the external data update process and should be grouped in a separate class
+                bool xyzCoordEnabled;
+                int forceSensorBiasCounter;
+                std::vector<double> forceSensorBiasPartial;
 
                 /* ****** Debug attributes                              ****** */
                 std::string dbgTag;
 
-			
-			public:
+            
+            public:
 
-				EventsThread(yarp::os::ResourceFinder &rf,const int period,iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData);
-				virtual ~EventsThread();
+                EventsThread(yarp::os::ResourceFinder &rf,const int period,iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData);
+                virtual ~EventsThread();
 
                 virtual bool threadInit();
                 virtual void run();
                 virtual void threadRelease();
 
-				bool eventTriggered(iCub::plantIdentification::EventToTrigger eventToTrigger,int index);
+                bool eventTriggered(iCub::plantIdentification::EventToTrigger eventToTrigger,int index);
 
                 void setWaveAction(double actionDuration,double joint,double period,double amplitude,iCub::plantIdentification::Wave waveType);
-			
-			private:
+            
+            private:
 
-				void checkEvents();
+                void checkEvents();
 
                 void logData();
 
@@ -78,7 +78,7 @@ namespace iCub {
 
                 void executeWaveAction();
 
-				bool eventFPTriggered(int whichFinger);
+                bool eventFPTriggered(int whichFinger);
 
         };
     } //namespace plantIdentification

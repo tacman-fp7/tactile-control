@@ -20,84 +20,84 @@ using iCub::plantIdentification::PortsUtil;
 
 
 EventsThread::EventsThread(yarp::os::ResourceFinder &rf,int period,ControllersUtil *controllersUtil,PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData)
-	: RateThread(period){
+    : RateThread(period){
 
-	this->period = period;
-	this->controllersUtil = controllersUtil;
-	this->portsUtil = portsUtil;
-	this->commonData = commonData;
+    this->period = period;
+    this->controllersUtil = controllersUtil;
+    this->portsUtil = portsUtil;
+    this->commonData = commonData;
 
-	xyzCoordEnabled = rf.check("xyzCoordEnabled",Value(0)).asInt() != 0;
+    xyzCoordEnabled = rf.check("xyzCoordEnabled",Value(0)).asInt() != 0;
 
-	counter = 0;
+    counter = 0;
 
-	dbgTag = "EventsThread: ";
+    dbgTag = "EventsThread: ";
 }
 
 bool EventsThread::threadInit(){
 
-	// settings
-	fpWindowSize = commonData->getNumOfThreadCallsFromTime(EVENTS_THREAD,commonData->tpDbl(41));
-	fpFinalCheckThreshold = commonData->tpDbl(42);
-	fpMinTimeBetweenActivations = commonData->getNumOfThreadCallsFromTime(EVENTS_THREAD,commonData->tpDbl(43));
+    // settings
+    fpWindowSize = commonData->getNumOfThreadCallsFromTime(EVENTS_THREAD,commonData->tpDbl(41));
+    fpFinalCheckThreshold = commonData->tpDbl(42);
+    fpMinTimeBetweenActivations = commonData->getNumOfThreadCallsFromTime(EVENTS_THREAD,commonData->tpDbl(43));
 
-	int nFingers = commonData->overallFingerPressureMedian.size();
-	fpWindowIndex = 0;
-	fpTimeFromLastEventReset.resize(nFingers,-1);
-	fpEventTriggered.resize(nFingers,false);
-	fpPressureMemory.resize(nFingers);
-	for(size_t i = 0; i < nFingers; i++){
-		fpPressureMemory[i].resize(fpWindowSize,0);
-	}
+    int nFingers = commonData->overallFingerPressureMedian.size();
+    fpWindowIndex = 0;
+    fpTimeFromLastEventReset.resize(nFingers,-1);
+    fpEventTriggered.resize(nFingers,false);
+    fpPressureMemory.resize(nFingers);
+    for(size_t i = 0; i < nFingers; i++){
+        fpPressureMemory[i].resize(fpWindowSize,0);
+    }
 
-	forceSensorBiasCounter = -1;
-	forceSensorBiasPartial.resize(6,0.0);
+    forceSensorBiasCounter = -1;
+    forceSensorBiasPartial.resize(6,0.0);
 
-	return true;
+    return true;
 }
 
 void EventsThread::run(){
 
 
-	// update module data
-	ICubUtil::updateExternalData(controllersUtil,portsUtil,commonData,xyzCoordEnabled,forceSensorBiasCounter,forceSensorBiasPartial);
+    // update module data
+    ICubUtil::updateExternalData(controllersUtil,portsUtil,commonData,xyzCoordEnabled,forceSensorBiasCounter,forceSensorBiasPartial);
 
-	// check events
-	checkEvents();
+    // check events
+    checkEvents();
 
-	executeWaveAction();
+    executeWaveAction();
 
     logData();
 
-	if (counter%10 == 0){
-	// log various data
+    if (counter%10 == 0){
+    // log various data
         printData();
-	}
+    }
 
 
-	counter++;
+    counter++;
 }
 
 
 void EventsThread::checkEvents(){
-	// EVENT: FINGER PUSHED
-	double tempPressureDifference;
-	int fpNextWindowIndex = (fpWindowIndex + 1)%fpWindowSize;
+    // EVENT: FINGER PUSHED
+    double tempPressureDifference;
+    int fpNextWindowIndex = (fpWindowIndex + 1)%fpWindowSize;
 
-	for(size_t i = 0; i < fpPressureMemory.size(); i++){
-			
-		fpPressureMemory[i][fpWindowIndex] = commonData->overallFingerPressureMedian[i];
-		tempPressureDifference = fpPressureMemory[i][fpWindowIndex] - fpPressureMemory[i][fpNextWindowIndex];
+    for(size_t i = 0; i < fpPressureMemory.size(); i++){
+            
+        fpPressureMemory[i][fpWindowIndex] = commonData->overallFingerPressureMedian[i];
+        tempPressureDifference = fpPressureMemory[i][fpWindowIndex] - fpPressureMemory[i][fpNextWindowIndex];
         //if (i ==3) std::cout << tempPressureDifference << " / " << fpFinalCheckThreshold << "\n";
-		if (fpEventTriggered[i] == false && (fpTimeFromLastEventReset[i] > fpMinTimeBetweenActivations || fpTimeFromLastEventReset[i] == -1) && tempPressureDifference > fpFinalCheckThreshold){
-			fpEventTriggered[i] = true;
-			//std::cout << "\n\n\n<<< EVENT TRIGGERED: FINGER " << i << " PUSHED >>>\n\n\n";
-		} 
+        if (fpEventTriggered[i] == false && (fpTimeFromLastEventReset[i] > fpMinTimeBetweenActivations || fpTimeFromLastEventReset[i] == -1) && tempPressureDifference > fpFinalCheckThreshold){
+            fpEventTriggered[i] = true;
+            //std::cout << "\n\n\n<<< EVENT TRIGGERED: FINGER " << i << " PUSHED >>>\n\n\n";
+        } 
 
-		fpTimeFromLastEventReset[i]++;
-	}
+        fpTimeFromLastEventReset[i]++;
+    }
 
-	fpWindowIndex = fpNextWindowIndex;
+    fpWindowIndex = fpNextWindowIndex;
 
 }
 
@@ -143,29 +143,29 @@ bool EventsThread::eventFPTriggered(int whichFinger){
 
     bool fpEnabled = commonData->tpInt(44) != 0;
 
-	if (fpEventTriggered[whichFinger] == true){
-		fpEventTriggered[whichFinger] = false;
-		fpTimeFromLastEventReset[whichFinger] = 0;
-		if (fpEnabled){ // if finger pushed event is not enabled, it is triggered anyway, but it cannot be used by any function
-			return true;
-		}
-	}
-	return false;
+    if (fpEventTriggered[whichFinger] == true){
+        fpEventTriggered[whichFinger] = false;
+        fpTimeFromLastEventReset[whichFinger] = 0;
+        if (fpEnabled){ // if finger pushed event is not enabled, it is triggered anyway, but it cannot be used by any function
+            return true;
+        }
+    }
+    return false;
 
 }
 
 bool EventsThread::eventTriggered(EventToTrigger eventToTrigger,int index = 0){
 
-	switch(eventToTrigger){
+    switch(eventToTrigger){
 
-	case FINGERTIP_PUSHED:
+    case FINGERTIP_PUSHED:
 
-		return eventFPTriggered(index);
-		break;
+        return eventFPTriggered(index);
+        break;
 
-	}
+    }
 
-	return false;
+    return false;
 }
 
 void EventsThread::setWaveAction(double actionDuration,double joint,double period,double amplitude,iCub::plantIdentification::Wave waveType){
@@ -175,9 +175,9 @@ void EventsThread::setWaveAction(double actionDuration,double joint,double perio
 
 void EventsThread::executeWaveAction(){
 
-	if (waveAction.isEnabled()){
-		waveAction.executeNextStep();
-	}
+    if (waveAction.isEnabled()){
+        waveAction.executeNextStep();
+    }
 }
 
 EventsThread::~EventsThread() {}

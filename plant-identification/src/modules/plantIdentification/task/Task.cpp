@@ -16,71 +16,71 @@ using iCub::plantIdentification::TaskCommonData;
 using iCub::plantIdentification::ICubUtil;
 
 Task::Task(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,int taskLifespan,std::vector<int> &jointsList,std::vector<int> &fingersList){
-	
-	this->controllersUtil = controllersUtil;
-	this->portsUtil = portsUtil;
-	this->commonData = commonData;
-	this->jointsList.resize(jointsList.size());
-	for(size_t i = 0; i < jointsList.size(); i++){
-		this->jointsList[i] = jointsList[i];
-	}
-	this->fingersList.resize(fingersList.size());
-	for(size_t i = 0; i < fingersList.size(); i++){
-		this->fingersList[i] = fingersList[i];
-	}
-	inputCommandValue.resize(jointsList.size(),0.0);
+    
+    this->controllersUtil = controllersUtil;
+    this->portsUtil = portsUtil;
+    this->commonData = commonData;
+    this->jointsList.resize(jointsList.size());
+    for(size_t i = 0; i < jointsList.size(); i++){
+        this->jointsList[i] = jointsList[i];
+    }
+    this->fingersList.resize(fingersList.size());
+    for(size_t i = 0; i < fingersList.size(); i++){
+        this->fingersList[i] = fingersList[i];
+    }
+    inputCommandValue.resize(jointsList.size(),0.0);
 
-	isFirstCall = true;
-	callsNumber = 0;
-	maxCallsNumber = secondsToCallsNumber(static_cast<double>(taskLifespan));
+    isFirstCall = true;
+    callsNumber = 0;
+    maxCallsNumber = secondsToCallsNumber(static_cast<double>(taskLifespan));
     isClean = false;
-	optionalLogString = "";
+    optionalLogString = "";
 }
 
 void Task::createTaskId(){
 
-	time_t now = time(0);
-	tm *ltm = localtime(&now);
-	char myDate[15];
-	strftime(myDate,15,"%m%d%H%M%S",ltm);
-	
-	taskId = std::string(myDate);
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+    char myDate[15];
+    strftime(myDate,15,"%m%d%H%M%S",ltm);
+    
+    taskId = std::string(myDate);
 }
 
 
 bool Task::manage(bool keepActive){
-	
-	if (isFirstCall){
-		createTaskId();
-		init();
-		isFirstCall = false;
-	}
+    
+    if (isFirstCall){
+        createTaskId();
+        init();
+        isFirstCall = false;
+    }
 
-	loadICubData();
+    loadICubData();
 
-	calculateControlInput();
+    calculateControlInput();
 
-	sendCommands();
+    sendCommands();
 
     LogData logData(fingersList.size());
-	buildLogData(logData);
+    buildLogData(logData);
 
-	portsUtil->sendLogData(logData);
-	portsUtil->sendInfoData(commonData);
+    portsUtil->sendLogData(logData);
+    portsUtil->sendInfoData(commonData);
 
-	if (callsNumber%commonData->screenLogStride == 0){
-		printScreenLog();
-	}
+    if (callsNumber%commonData->screenLogStride == 0){
+        printScreenLog();
+    }
 
-	saveProgress();
+    saveProgress();
 
-	if (taskIsOver() && !keepActive){
-		release();
+    if (taskIsOver() && !keepActive){
+        release();
         isClean = true;
-		return false;
-	}
+        return false;
+    }
 
-	return true;
+    return true;
 }
 
 void Task::clean(){
@@ -94,25 +94,25 @@ void Task::clean(){
 
 void Task::sendCommands(){
 
-	for(size_t i = 0; i < inputCommandValue.size(); i++){
-		controllersUtil->sendPwm(jointsList[i],commonData->pwmSign*inputCommandValue[i]);
+    for(size_t i = 0; i < inputCommandValue.size(); i++){
+        controllersUtil->sendPwm(jointsList[i],commonData->pwmSign*inputCommandValue[i]);
     }
 }
 
 bool Task::loadICubData(){
 
-	// TODO - TO REMOVE, SECTION MOVED TO ICubUtil
+    // TODO - TO REMOVE, SECTION MOVED TO ICubUtil
 
-	//using yarp::sig::Vector;
+    //using yarp::sig::Vector;
 
-	//if (!portsUtil->readFingerSkinCompData(commonData->fingerTaxelsData)){
-	//	return false;
-	//}
+    //if (!portsUtil->readFingerSkinCompData(commonData->fingerTaxelsData)){
+    //	return false;
+    //}
 
-	//controllersUtil->getArmEncodersAngles(commonData->armEncodersAngles);
+    //controllersUtil->getArmEncodersAngles(commonData->armEncodersAngles);
 
-	//processTactileData();
-	//
+    //processTactileData();
+    //
  //   // index finger
  //   controllersUtil->getEncoderAngle(11,&commonData->proximalJointAngle[0]);
  //   controllersUtil->getEncoderAngle(12,&commonData->distalJointAngle[0]);
@@ -132,48 +132,48 @@ bool Task::loadICubData(){
  //   controllersUtil->getEncoderAngle(10,&commonData->distalJointAngle[4]);
 
 
-	return true;
+    return true;
 }
 
 void Task::processTactileData(){
 
-	// TODO - TO REMOVE, SECTION MOVED TO ICubUtil
+    // TODO - TO REMOVE, SECTION MOVED TO ICubUtil
 
-	//double partialOverallFingerPressure;
+    //double partialOverallFingerPressure;
 
-	//for(size_t i = 0; i < commonData->fingerTaxelsData.size(); i++){
-	//	
-	//	commonData->overallFingerPressureBySimpleSum[i] = ICubUtil::getForce(commonData->fingerTaxelsData[i],SIMPLE_SUM);
-	//	commonData->overallFingerPressureByWeightedSum[i] = ICubUtil::getForce(commonData->fingerTaxelsData[i],WEIGHTED_SUM);
-	//	
-	//	/*partialOverallFingerPressure = 0.0;
-	//	for(size_t j = 0; j < commonData->fingerTaxelsData[i].size(); j++){
-	//		partialOverallFingerPressure += commonData->fingerTaxelsData[i][j];
-	//	}*/
-	//	
-	//	commonData->overallFingerPressure[i] = commonData->overallFingerPressureByWeightedSum[i];
+    //for(size_t i = 0; i < commonData->fingerTaxelsData.size(); i++){
+    //	
+    //	commonData->overallFingerPressureBySimpleSum[i] = ICubUtil::getForce(commonData->fingerTaxelsData[i],SIMPLE_SUM);
+    //	commonData->overallFingerPressureByWeightedSum[i] = ICubUtil::getForce(commonData->fingerTaxelsData[i],WEIGHTED_SUM);
+    //	
+    //	/*partialOverallFingerPressure = 0.0;
+    //	for(size_t j = 0; j < commonData->fingerTaxelsData[i].size(); j++){
+    //		partialOverallFingerPressure += commonData->fingerTaxelsData[i][j];
+    //	}*/
+    //	
+    //	commonData->overallFingerPressure[i] = commonData->overallFingerPressureByWeightedSum[i];
 
-	//	commonData->previousOverallFingerPressures[i][commonData->previousPressuresIndex[i]] = commonData->overallFingerPressure[i];
-	//	commonData->previousPressuresIndex[i] = (commonData->previousPressuresIndex[i] + 1)%commonData->previousOverallFingerPressures[i].size();
+    //	commonData->previousOverallFingerPressures[i][commonData->previousPressuresIndex[i]] = commonData->overallFingerPressure[i];
+    //	commonData->previousPressuresIndex[i] = (commonData->previousPressuresIndex[i] + 1)%commonData->previousOverallFingerPressures[i].size();
 
-	//	std::vector<double> previousOverallFingerPressuresCopy(commonData->previousOverallFingerPressures[i]);
+    //	std::vector<double> previousOverallFingerPressuresCopy(commonData->previousOverallFingerPressures[i]);
 
-	//	gsl_sort(&previousOverallFingerPressuresCopy[0],1,previousOverallFingerPressuresCopy.size());
-	//	commonData->overallFingerPressureMedian[i] = gsl_stats_median_from_sorted_data(&previousOverallFingerPressuresCopy[0],1,previousOverallFingerPressuresCopy.size());
+    //	gsl_sort(&previousOverallFingerPressuresCopy[0],1,previousOverallFingerPressuresCopy.size());
+    //	commonData->overallFingerPressureMedian[i] = gsl_stats_median_from_sorted_data(&previousOverallFingerPressuresCopy[0],1,previousOverallFingerPressuresCopy.size());
 
-	//}
+    //}
 
 }
 
 void Task::buildLogData(LogData &logData){
 
-	addCommonLogData(logData);
+    addCommonLogData(logData);
 }
 
 void Task::addCommonLogData(LogData &logData){
 
-	logData.taskId = taskId;
-	//TODO only the first element is logged!
+    logData.taskId = taskId;
+    //TODO only the first element is logged!
     for (size_t i = 0; i < fingersList.size(); i++){
         for (size_t j = 0; j < commonData->fingerTaxelsData[fingersList[i]].size(); j++){
             logData.fingerTaxelValues[i][j] = commonData->fingerTaxelsData[fingersList[i]][j];
@@ -193,35 +193,42 @@ void Task::addCommonLogData(LogData &logData){
 }
 
 void Task::printScreenLog(){
-	using std::cout;
-	
-	cout << dbgTag << "Sum: ";
-	
-	for(size_t i = 0; i < fingersList.size(); i++){
-		cout << commonData->overallFingerPressure[fingersList[i]] << "(" << fingersList[i] << ") ";
-	}
-	cout << "\t   Pwm: ";
+    using std::cout;
+    
+    cout << dbgTag << "Sum: ";
+    
+    for(size_t i = 0; i < fingersList.size(); i++){
+        cout << commonData->overallFingerPressure[fingersList[i]] << "(" << fingersList[i] << ") ";
+    }
+    cout << "\t   Pwm: ";
 
-	for(size_t i = 0; i < jointsList.size(); i++){
-		cout << inputCommandValue[i] << "(" << jointsList[i] << ") ";
-	}
-	
-	cout << optionalLogString << "\n";
+    for(size_t i = 0; i < jointsList.size(); i++){
+        cout << inputCommandValue[i] << "(" << jointsList[i] << ") ";
+    }
+    
+    cout << optionalLogString << "\n";
 
-	optionalLogString.clear();
+    optionalLogString.clear();
 }
 
 void Task::saveProgress(){
 
-	callsNumber++;
+    callsNumber++;
 }
 
 bool Task::taskIsOver(){
 
-	return callsNumber >= maxCallsNumber;
+    return callsNumber >= maxCallsNumber;
 }
 
 int Task::secondsToCallsNumber(double seconds){
 
-	return static_cast<int>(seconds*1000/commonData->taskThreadPeriod);
+    return static_cast<int>(seconds*1000/commonData->taskThreadPeriod);
 }
+
+double Task::timeElapsed(){
+
+    return callsNumber*commonData->taskThreadPeriod/1000.0;
+
+}
+

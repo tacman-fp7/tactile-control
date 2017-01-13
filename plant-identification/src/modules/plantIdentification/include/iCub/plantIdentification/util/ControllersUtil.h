@@ -22,107 +22,107 @@ namespace iCub {
 
             public:
 
-				int armJointsNum;
+                int armJointsNum;
 
             private:
-				
+                
                 yarp::dev::PolyDriver clientArm;
-				yarp::dev::PolyDriver clientGazeCtrl;
-				yarp::dev::PolyDriver clientArmCartCtrl;
+                yarp::dev::PolyDriver clientGazeCtrl;
+                yarp::dev::PolyDriver clientArmCartCtrl;
                 yarp::dev::IEncoders *iEncs;
-				yarp::dev::IOpenLoopControl *iOLC;
-				yarp::dev::IControlMode2 *iCtrl;
-				yarp::dev::IPositionControl *iPos;
-				yarp::dev::IVelocityControl *iVel;
-				yarp::dev::IPositionDirect *iPosDir;
-				yarp::dev::IPositionControl2 *iPosCtrl;
-				yarp::dev::IPidControl *iPid;
-				yarp::dev::IGazeControl *iGaze;
+                yarp::dev::IOpenLoopControl *iOLC;
+                yarp::dev::IControlMode2 *iCtrl;
+                yarp::dev::IPositionControl *iPos;
+                yarp::dev::IVelocityControl *iVel;
+                yarp::dev::IPositionDirect *iPosDir;
+                yarp::dev::IPositionControl2 *iPosCtrl;
+                yarp::dev::IPidControl *iPid;
+                yarp::dev::IGazeControl *iGaze;
                 yarp::dev::ICartesianControl *iCart;
-				yarp::dev::IControlLimits *iLim;
-				std::deque<yarp::dev::IControlLimits*> jointLimits;
+                yarp::dev::IControlLimits *iLim;
+                std::deque<yarp::dev::IControlLimits*> jointLimits;
 
-				yarp::sig::Vector armStoredPosition;
-				yarp::sig::Vector storedFixationPoint;
-				std::vector<int> storedJointsControlMode;
-				std::vector<int> handJointsToMove;
-				std::vector<double> storedHandJointsMaxPwmLimits;
-				
-				//TODO TEMPORARY WORKAROUND
-				double storedPIDIntegralGain;
+                yarp::sig::Vector armStoredPosition;
+                yarp::sig::Vector storedFixationPoint;
+                std::vector<int> storedJointsControlMode;
+                std::vector<int> handJointsToMove;
+                std::vector<double> storedHandJointsMaxPwmLimits;
+                
+                //TODO TEMPORARY WORKAROUND
+                double storedPIDIntegralGain;
 
                 std::string whichHand;
                 std::string whichICub;
                 std::string whichTask;
                 int numFingers;
-				bool headEnabled;
+                bool headEnabled;
 
-				/* ****** Debug attributes                              ****** */
+                /* ****** Debug attributes                              ****** */
                 std::string dbgTag;
 
             public:
 
-				ControllersUtil();
+                ControllersUtil();
 
-				bool init(yarp::os::ResourceFinder &rf);
+                bool init(yarp::os::ResourceFinder &rf);
 
-				bool sendPwm(int joint,double pwm);
+                bool sendPwm(int joint,double pwm);
 
-				bool sendVelocity(int joint,double velocity);
+                bool sendVelocity(int joint,double velocity);
 
-				bool saveCurrentArmPosition();
+                bool saveCurrentArmPosition();
 
-				bool getArmEncodersAngles(std::vector<double> &armEncodersAngles,bool wait = false);
+                bool getArmEncodersAngles(std::vector<double> &armEncodersAngles,bool wait = false);
 
-				bool getArmEncodersAnglesReferences(std::vector<double> &armEncodersAnglesReferences,bool wait = false);
+                bool getArmEncodersAnglesReferences(std::vector<double> &armEncodersAnglesReferences,bool wait = false);
 
-				bool saveCurrentControlMode();
+                bool saveCurrentControlMode();
 
-				bool setTaskControlModes(std::vector<int> &jointsList,int controlMode);
+                bool setTaskControlModes(std::vector<int> &jointsList,int controlMode);
 
-				bool setArmInTaskPosition();
+                bool setArmInTaskPosition();
 
-				bool restorePreviousArmPosition();
+                bool restorePreviousArmPosition();
 
-				bool restorePreviousControlMode();
+                bool restorePreviousControlMode();
 
-				bool openHand();
+                bool openHand();
 
-				bool getEncoderAngle(int joint,double *encoderData);
+                bool getEncoderAngle(int joint,double *encoderData);
 
 //				bool getRealPwmValue(iCub::plantIdentification::FingerJoint fingerJoint,double *pwmValue);
 
-				bool release();
+                bool release();
 
-				bool setJointMaxPwmLimit(int joint,double maxPwm);
+                bool setJointMaxPwmLimit(int joint,double maxPwm);
 
-				bool setJointsMaxPwmLimit(std::vector<int> &jointsList,std::vector<double> &maxPwmList);
+                bool setJointsMaxPwmLimit(std::vector<int> &jointsList,std::vector<double> &maxPwmList);
 
-				bool saveHandJointsMaxPwmLimits();
+                bool saveHandJointsMaxPwmLimits();
 
-				bool restoreHandJointsMaxPwmLimits();
+                bool restoreHandJointsMaxPwmLimits();
 
                 void testShowEndEffectors();    
 
-				bool setControlMode(int joint,int controlMode,bool checkCurrent);
+                bool setControlMode(int joint,int controlMode,bool checkCurrent);
 
-				bool resetPIDIntegralGain(double joint);
-				bool restorePIDIntegralGain(double joint);
+                bool resetPIDIntegralGain(double joint);
+                bool restorePIDIntegralGain(double joint);
 
-				bool lookAtTheHand();
+                bool lookAtTheHand();
 
-				bool restoreFixationPoint();
+                bool restoreFixationPoint();
 
-				bool setJointAngle(int joint,double angle);
+                bool setJointAngle(int joint,double angle);
 
-				bool setJointAnglePositionDirect(int joint,double angle);
+                bool setJointAnglePositionDirect(int joint,double angle);
 
-				std::deque<yarp::dev::IControlLimits*> getArmJointLimits();
+                std::deque<yarp::dev::IControlLimits*> getArmJointLimits();
 
 
-			private:
+            private:
 
-				bool waitMoveDone(const double &i_timeout, const double &i_delay);
+                bool waitMoveDone(const double &i_timeout, const double &i_delay);
 
 };
     } //namespace plantIdentification

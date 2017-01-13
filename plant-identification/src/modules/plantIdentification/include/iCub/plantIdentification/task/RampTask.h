@@ -14,32 +14,32 @@ namespace iCub {
 
             private:
 
-				iCub::plantIdentification::RampTaskData *rampData;
-				std::vector<iCub::plantIdentification::RampTaskState> internalState;
-				std::vector<double> pressureTargetValue;
-				int callsNumberAfterStabilization;
-				int maxCallsNumberAfterStabilization;
+                iCub::plantIdentification::RampTaskData *rampData;
+                std::vector<iCub::plantIdentification::RampTaskState> internalState;
+                std::vector<double> pressureTargetValue;
+                int callsNumberAfterStabilization;
+                int maxCallsNumberAfterStabilization;
 
             public:
 
                 RampTask(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,iCub::plantIdentification::RampTaskData *rampData,std::vector<double> &targetList);
 
-				virtual void init();
+                virtual void init();
 
-				std::string getPressureTargetValueDescription();
+                std::string getPressureTargetValueDescription();
 
-				virtual void buildLogData(iCub::plantIdentification::LogData &logData);
+                virtual void buildLogData(iCub::plantIdentification::LogData &logData);
 
-				virtual void calculateControlInput();
+                virtual void calculateControlInput();
 
-				virtual void saveProgress();
+                virtual void saveProgress();
 
-				virtual bool taskIsOver();
+                virtual bool taskIsOver();
 
-			private:
+            private:
 
-				bool areAllJointsSteady();
-				
+                bool areAllJointsSteady();
+                
         };
     } //namespace plantIdentification
 } //namespace iCub

@@ -13,66 +13,66 @@ using iCub::plantIdentification::RampTaskData;
 
 RampTask::RampTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,RampTaskData *rampData,std::vector<double> &targetList):Task(controllersUtil,portsUtil,commonData,rampData->lifespan,rampData->jointsList,rampData->fingersList) {
 
-	this->rampData = rampData;
-	pressureTargetValue.resize(fingersList.size());
-	for(size_t i = 0; i < pressureTargetValue.size(); i++){
-		pressureTargetValue[i] = (i >= targetList.size() ? targetList[targetList.size()-1] : targetList[i]);
-	}
+    this->rampData = rampData;
+    pressureTargetValue.resize(fingersList.size());
+    for(size_t i = 0; i < pressureTargetValue.size(); i++){
+        pressureTargetValue[i] = (i >= targetList.size() ? targetList[targetList.size()-1] : targetList[i]);
+    }
 
-	internalState.resize(fingersList.size(),DECREASING);
+    internalState.resize(fingersList.size(),DECREASING);
 
-	callsNumberAfterStabilization = 0;
-	maxCallsNumberAfterStabilization = rampData->lifespanAfterStabilization*1000/commonData->taskThreadPeriod;
+    callsNumberAfterStabilization = 0;
+    maxCallsNumberAfterStabilization = rampData->lifespanAfterStabilization*1000/commonData->taskThreadPeriod;
 
-	taskName = RAMP;
-	dbgTag = "RampTask: ";
+    taskName = RAMP;
+    dbgTag = "RampTask: ";
 }
 
 void RampTask::init(){
-	using std::cout;
+    using std::cout;
 
-	controllersUtil->setTaskControlModes(jointsList,VOCAB_CM_OPENLOOP);
+    controllersUtil->setTaskControlModes(jointsList,VOCAB_CM_OPENLOOP);
 
-	cout << "\n\n" << dbgTag << "TASK STARTED - Target: ";
-	for(size_t i = 0; i < pressureTargetValue.size(); i++){
-		cout << pressureTargetValue[i] << " ";
-	}
-	cout << "\n\n";
+    cout << "\n\n" << dbgTag << "TASK STARTED - Target: ";
+    for(size_t i = 0; i < pressureTargetValue.size(); i++){
+        cout << pressureTargetValue[i] << " ";
+    }
+    cout << "\n\n";
 }
 
 void RampTask::calculateControlInput(){
 
-	double inputCommandValue;
-	
-	for(size_t i = 0; i < jointsList.size(); i++){
+    double inputCommandValue;
+    
+    for(size_t i = 0; i < jointsList.size(); i++){
 
-		switch (internalState[i]){
-	
-		case DECREASING:
+        switch (internalState[i]){
+    
+        case DECREASING:
 
-			inputCommandValue = rampData->intercept + rampData->slope*callsNumber*commonData->taskThreadPeriod;
+            inputCommandValue = rampData->intercept + rampData->slope*callsNumber*commonData->taskThreadPeriod;
 
-			if (commonData->overallFingerPressureMedian[i] < pressureTargetValue[i]){
-				internalState[i] = STEADY;
-			}
-			break;
+            if (commonData->overallFingerPressureMedian[i] < pressureTargetValue[i]){
+                internalState[i] = STEADY;
+            }
+            break;
 
-		case STEADY:
+        case STEADY:
 
-			inputCommandValue = 0.0;
-			break;
-		}
+            inputCommandValue = 0.0;
+            break;
+        }
 
-		this->inputCommandValue[i] = inputCommandValue;
-	}
+        this->inputCommandValue[i] = inputCommandValue;
+    }
 }
 
 void RampTask::buildLogData(LogData &logData){
 
-	addCommonLogData(logData);
+    addCommonLogData(logData);
 
-	logData.taskType = RAMP;
-	logData.taskOperationMode = 0;
+    logData.taskType = RAMP;
+    logData.taskOperationMode = 0;
     for(size_t i = 0; i < fingersList.size(); i++){
         logData.targetValue[i] = pressureTargetValue[0];
     }
@@ -81,35 +81,35 @@ void RampTask::buildLogData(LogData &logData){
 
 void RampTask::saveProgress(){
 
-	callsNumber++;
+    callsNumber++;
 
-	if (areAllJointsSteady()) callsNumberAfterStabilization++;
+    if (areAllJointsSteady()) callsNumberAfterStabilization++;
 }
 
 bool RampTask::taskIsOver(){
 
-	return callsNumber >= maxCallsNumber || callsNumberAfterStabilization >= maxCallsNumberAfterStabilization;
+    return callsNumber >= maxCallsNumber || callsNumberAfterStabilization >= maxCallsNumberAfterStabilization;
 }
 
 bool RampTask::areAllJointsSteady(){
 
-	bool allSteady = true;
-	
-	for(size_t i = 0; i < fingersList.size() && allSteady; i++){
-		allSteady = allSteady && (internalState[i] == STEADY);
-	}
+    bool allSteady = true;
+    
+    for(size_t i = 0; i < fingersList.size() && allSteady; i++){
+        allSteady = allSteady && (internalState[i] == STEADY);
+    }
 
-	return allSteady;
+    return allSteady;
 }
 
 
 std::string RampTask::getPressureTargetValueDescription(){
 
-	std::stringstream description("");
+    std::stringstream description("");
 
-	for(size_t i = 0; i < pressureTargetValue.size(); i++){
-		description << pressureTargetValue[i] << " ";
-	}
-	
-	return description.str();
+    for(size_t i = 0; i < pressureTargetValue.size(); i++){
+        description << pressureTargetValue[i] << " ";
+    }
+    
+    return description.str();
 }

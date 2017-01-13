@@ -17,51 +17,51 @@ namespace iCub {
 
             private:
 
-				iCub::plantIdentification::ApproachTaskData *approachData;
-				
-				int controlMode; // 0:velocity  1:openloop
-				int stopCondition; // 0:none  1:tactile  2:position  3:both tactile and position
-				bool stopFingers;
+                iCub::plantIdentification::ApproachTaskData *approachData;
+                
+                int controlMode; // 0:velocity  1:openloop
+                int stopCondition; // 0:none  1:tactile  2:position  3:both tactile and position
+                bool stopFingers;
                 bool manageFingers;
-				std::vector<bool> fingerIsInContact;
-				std::vector<bool> fingerSetInPosition;
-				int callsNumberForAvarage;
-				int callsNumberForMovementTimeout;
-				double thresholdScaleFactor;
+                std::vector<bool> fingerIsInContact;
+                std::vector<bool> fingerSetInPosition;
+                int callsNumberForAvarage;
+                int callsNumberForMovementTimeout;
+                double thresholdScaleFactor;
 
-				// stop condition by tactile feedback data
-				std::vector<bool> thresholdExceeded;
-				std::vector<double> tactileAvarage;
-				std::vector<double> tactileMaximum;
-				std::vector<double> tactileThreshold;
+                // stop condition by tactile feedback data
+                std::vector<bool> thresholdExceeded;
+                std::vector<double> tactileAvarage;
+                std::vector<double> tactileMaximum;
+                std::vector<double> tactileThreshold;
 
-				// stop condition by position data
-				std::vector<int> fingerState; // 0: before moving; 1:while moving; 2:after moving
-				std::vector<std::vector<double> > fingerPositions;
-				int windowSize;
-				double finalCheckThreshold;
-				int positionIndex;
+                // stop condition by position data
+                std::vector<int> fingerState; // 0: before moving; 1:while moving; 2:after moving
+                std::vector<std::vector<double> > fingerPositions;
+                int windowSize;
+                double finalCheckThreshold;
+                int positionIndex;
 
-				void moveFinger(int finger);
-				void stopFinger(int finger);
+                void moveFinger(int finger);
+                void stopFinger(int finger);
 
             public:
 
                 ApproachTask(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,iCub::plantIdentification::ApproachTaskData *approachData);
 
-				virtual void init();
+                virtual void init();
 
-				virtual void buildLogData(LogData &logData);
+                virtual void buildLogData(LogData &logData);
 
-				virtual void calculateControlInput();
+                virtual void calculateControlInput();
 
-				virtual void sendCommands();
+                virtual void sendCommands();
 
-				virtual void release();
+                virtual void release();
 
-				virtual bool taskIsOver();
+                virtual bool taskIsOver();
 
-				bool eachFingerIsInContact();
+                bool eachFingerIsInContact();
 
         };
     } //namespace plantIdentification

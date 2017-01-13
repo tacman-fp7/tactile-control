@@ -16,31 +16,31 @@ namespace iCub {
 
             private:
 
-				iCub::plantIdentification::RPCCommandsData *rpcData;
+                iCub::plantIdentification::RPCCommandsData *rpcData;
 
-				/* ****** Debug attributes                              ****** */
+                /* ****** Debug attributes                              ****** */
                 std::string dbgTag;
 
             public:
 
-				iCub::plantIdentification::RPCMainCmdName mainCmd;
-				iCub::plantIdentification::RPCSetCmdArgName setCmdArg;
-				iCub::plantIdentification::RPCTaskCmdArgName taskCmdArg;
-				iCub::plantIdentification::RPCViewCmdArgName viewCmdArg;
-				iCub::plantIdentification::TaskName task;
+                iCub::plantIdentification::RPCMainCmdName mainCmd;
+                iCub::plantIdentification::RPCSetCmdArgName setCmdArg;
+                iCub::plantIdentification::RPCTaskCmdArgName taskCmdArg;
+                iCub::plantIdentification::RPCViewCmdArgName viewCmdArg;
+                iCub::plantIdentification::TaskName task;
 
-				yarp::os::Value argValue;
+                yarp::os::Value argValue;
 
 
-				RPCCommandsUtil();
+                RPCCommandsUtil();
 
-				void init(iCub::plantIdentification::RPCCommandsData *rpcData);
+                void init(iCub::plantIdentification::RPCCommandsData *rpcData);
 
-				void processCommand(const yarp::os::Bottle &rpcCmdBottle);
+                void processCommand(const yarp::os::Bottle &rpcCmdBottle);
 
-			private:
+            private:
 
-				void processTaskCommand(const yarp::os::Bottle &rpcCmdBottle);
+                void processTaskCommand(const yarp::os::Bottle &rpcCmdBottle);
 
 };
     } //namespace plantIdentification

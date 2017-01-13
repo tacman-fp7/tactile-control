@@ -8,9 +8,9 @@ using yarp::os::Bottle;
 LogData::LogData(int fingersNum) {
 
 
-	taskId = "";
-	taskType = 0;
-	taskOperationMode = 0;
+    taskId = "";
+    taskType = 0;
+    taskOperationMode = 0;
     this->fingersNum = fingersNum;
     targetValue.resize(fingersNum,0);
     fingerTaxelValues.resize(fingersNum);
@@ -34,17 +34,17 @@ LogData::LogData(int fingersNum) {
     error.resize(fingersNum,0);
     errorIntegral.resize(fingersNum,0);
 
-	dbgTag = "LogData: ";
+    dbgTag = "LogData: ";
 
 }
 
 void LogData::toBottle(Bottle &bottle){
 
-	// #? : parameter number in the log file acquired using datadumper 
-	bottle.clear();
-	bottle.addString(taskId); // #3
-	bottle.addInt(taskType); // #4
-	bottle.addInt(taskOperationMode); // #5
+    // #? : parameter number in the log file acquired using datadumper 
+    bottle.clear();
+    bottle.addString(taskId); // #3
+    bottle.addInt(taskType); // #4
+    bottle.addInt(taskOperationMode); // #5
     bottle.addInt(fingersNum);
     for(size_t i = 0; i < fingersNum; i++){
         bottle.addDouble(targetValue[i]); // #6

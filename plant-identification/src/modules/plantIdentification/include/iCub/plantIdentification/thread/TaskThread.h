@@ -28,27 +28,27 @@ namespace iCub {
 
                 /* ****** Thread attributes                             ****** */
                 int period;
-				bool runEnabled;
+                bool runEnabled;
                 yarp::os::ResourceFinder rf;
 
-				/* ****** Tasks management								****** */
-				std::vector<Task*> taskList;
-				int currentTaskIndex;
+                /* ****** Tasks management								****** */
+                std::vector<Task*> taskList;
+                int currentTaskIndex;
 
-				/* ******* Controllers utility                          ******* */
+                /* ******* Controllers utility                          ******* */
                 iCub::plantIdentification::ControllersUtil *controllersUtil;
 
-				/* ****** Ports utility                                 ****** */
-				iCub::plantIdentification::PortsUtil *portsUtil;
+                /* ****** Ports utility                                 ****** */
+                iCub::plantIdentification::PortsUtil *portsUtil;
 
                 /* ****** Debug attributes                              ****** */
                 std::string dbgTag;
 
 
-			public:
+            public:
 
-				/* ****** Task data										****** */
-				iCub::plantIdentification::TaskData *taskData;
+                /* ****** Task data										****** */
+                iCub::plantIdentification::TaskData *taskData;
 
                 TaskThread(const int period, const yarp::os::ResourceFinder &aRf,iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskData *taskData);
                 virtual ~TaskThread();
@@ -57,15 +57,15 @@ namespace iCub {
                 virtual void run();
                 virtual void threadRelease();
 
-				bool initializeGrasping();
-				bool afterRun(bool openHand);
+                bool initializeGrasping();
+                bool afterRun(bool openHand);
 
-				bool setArmInTaskPosition();
+                bool setArmInTaskPosition();
 
-				void set(iCub::plantIdentification::RPCSetCmdArgName paramName,yarp::os::Value paramValue,iCub::plantIdentification::RPCCommandsData &rpcCmdData);
-				void task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,yarp::os::Value paramValue,iCub::plantIdentification::RPCCommandsData &rpcCmdData);
-				void view(iCub::plantIdentification::RPCViewCmdArgName paramName,iCub::plantIdentification::RPCCommandsData &rpcCmdData);
-				void help(iCub::plantIdentification::RPCCommandsData &rpcCmdData);
+                void set(iCub::plantIdentification::RPCSetCmdArgName paramName,yarp::os::Value paramValue,iCub::plantIdentification::RPCCommandsData &rpcCmdData);
+                void task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,yarp::os::Value paramValue,iCub::plantIdentification::RPCCommandsData &rpcCmdData);
+                void view(iCub::plantIdentification::RPCViewCmdArgName paramName,iCub::plantIdentification::RPCCommandsData &rpcCmdData);
+                void help(iCub::plantIdentification::RPCCommandsData &rpcCmdData);
 
                 void testShowEndEffectors();
         };

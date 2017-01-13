@@ -15,30 +15,30 @@ namespace iCub {
         class Task {
 
             private:
-				
-				bool isFirstCall;
+                
+                bool isFirstCall;
 
-			protected:
+            protected:
 
-				iCub::plantIdentification::TaskName taskName;
-				iCub::plantIdentification::ControllersUtil *controllersUtil;
-				iCub::plantIdentification::PortsUtil *portsUtil;
+                iCub::plantIdentification::TaskName taskName;
+                iCub::plantIdentification::ControllersUtil *controllersUtil;
+                iCub::plantIdentification::PortsUtil *portsUtil;
 
-				iCub::plantIdentification::TaskCommonData *commonData;
+                iCub::plantIdentification::TaskCommonData *commonData;
 
-				std::vector<int> jointsList;
-				std::vector<int> fingersList;
+                std::vector<int> jointsList;
+                std::vector<int> fingersList;
 
 
 
-				int callsNumber;
-				int maxCallsNumber;
+                int callsNumber;
+                int maxCallsNumber;
                 bool isClean;
-				std::vector<double> inputCommandValue;
+                std::vector<double> inputCommandValue;
 
-				std::string taskId;
+                std::string taskId;
 
-				std::string optionalLogString;
+                std::string optionalLogString;
 
                 /* ******* Debug attributes.                ******* */
                 std::string dbgTag;
@@ -46,43 +46,45 @@ namespace iCub {
 
             public:
                 
-				Task(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,int maxCallsNumber,std::vector<int> &jointsList,std::vector<int> &fingersList);
+                Task(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,int maxCallsNumber,std::vector<int> &jointsList,std::vector<int> &fingersList);
             
-				iCub::plantIdentification::TaskName getTaskName(){ return taskName; }
+                iCub::plantIdentification::TaskName getTaskName(){ return taskName; }
 
-				bool manage(bool keepActive);
+                bool manage(bool keepActive);
 
                 void clean();
 
-			protected:
+            protected:
 
-				void addCommonLogData(iCub::plantIdentification::LogData &logData);
+                void addCommonLogData(iCub::plantIdentification::LogData &logData);
 
-				void processTactileData();
+                void processTactileData();
 
-				int secondsToCallsNumber(double seconds);
+                int secondsToCallsNumber(double seconds);
 
-			private:
-			
-				void createTaskId();
+                double timeElapsed();
 
-				virtual void init(){};
+            private:
+            
+                void createTaskId();
 
-				virtual bool loadICubData();
+                virtual void init(){};
 
-				virtual void calculateControlInput() = 0;
+                virtual bool loadICubData();
 
-				virtual void sendCommands();
+                virtual void calculateControlInput() = 0;
 
-				virtual void buildLogData(iCub::plantIdentification::LogData &logData);
+                virtual void sendCommands();
 
-				virtual void printScreenLog();
+                virtual void buildLogData(iCub::plantIdentification::LogData &logData);
 
-				virtual void saveProgress();
+                virtual void printScreenLog();
 
-				virtual bool taskIsOver();
+                virtual void saveProgress();
 
-				virtual void release(){};
+                virtual bool taskIsOver();
+
+                virtual void release(){};
 
         };
     } //namespace plantIdentification

@@ -19,44 +19,46 @@ namespace iCub {
 
         class ICubUtil {
     
-		public:
+        public:
 
-				static double getForce(std::vector<double>& tactileData,iCub::plantIdentification::ForceCalculationMode forceCalculationMode);
+                static double getForce(std::vector<double>& tactileData,iCub::plantIdentification::ForceCalculationMode forceCalculationMode);
 
-				static void getNNOptionsForErrorPrediction2Fingers(yarp::os::Bottle& bottle);
-				static void getNNOptionsForErrorPrediction3Fingers(yarp::os::Bottle& bottle);
-				static void rotateFingersData(std::vector<double>& fingersAngles,std::vector<double>& rotatedFingersAngles);
+                static void getNNOptionsForErrorPrediction2Fingers(yarp::os::Bottle& bottle);
+                static void getNNOptionsForErrorPrediction3Fingers(yarp::os::Bottle& bottle);
+                static void rotateFingersData(std::vector<double>& fingersAngles,std::vector<double>& rotatedFingersAngles);
 
-				static bool updateExternalData(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,bool xyzCoordEnabled,int &forceSensorBiasCounter,std::vector<double> &forceSensorBiasPartial);
+                static bool updateExternalData(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,bool xyzCoordEnabled,int &forceSensorBiasCounter,std::vector<double> &forceSensorBiasPartial);
 
-				static void putDataIntoVector(const double *dataIn,int size,yarp::sig::Vector &dataOut);
-				static void putDataIntoMatrix(const double *dataIn,int rows,int columns,yarp::sig::Matrix &dataOut);
-				static void putSelectedElementsIntoVector(const yarp::sig::Vector &dataIn,const std::vector<int> &selectedIndexes,yarp::sig::Vector &dataOut);
-				static void putSelectedElementsIntoMatrix(const yarp::sig::Matrix &dataIn,const std::vector<int> &selectedRowIndexes,const std::vector<int> &selectedColumnIndexes,yarp::sig::Matrix &dataOut);
-				
+                static void putDataIntoVector(const double *dataIn,int size,yarp::sig::Vector &dataOut);
+                static void putDataIntoMatrix(const double *dataIn,int rows,int columns,yarp::sig::Matrix &dataOut);
+                static void putSelectedElementsIntoVector(const yarp::sig::Vector &dataIn,const std::vector<int> &selectedIndexes,yarp::sig::Vector &dataOut);
+                static void putSelectedElementsIntoMatrix(const yarp::sig::Matrix &dataIn,const std::vector<int> &selectedRowIndexes,const std::vector<int> &selectedColumnIndexes,yarp::sig::Matrix &dataOut);
+                
+                static void makeObjectRecognitionBottle(yarp::os::Bottle &objRecBottle,std::string taskId,int objectId,iCub::plantIdentification::ObjectRecognitionTask objRecTask,int extraCode1,int extraCode2,int skipPreviousRepetition,std::string experimentDescription,std::string previousExperimentDescription,iCub::plantIdentification::TaskCommonData *commonData);
 
-		private:
 
-				static void processTactileData(iCub::plantIdentification::TaskCommonData *commonData,bool realForceMappingEnabled);
+        private:
 
-				static void processForceSensorData(iCub::plantIdentification::TaskCommonData *commonData,int &forceSensorBiasCounter,std::vector<double> &forceSensorBiasPartial);
+                static void processTactileData(iCub::plantIdentification::TaskCommonData *commonData,bool realForceMappingEnabled);
 
-				static double getForceBySimpleSum(std::vector<double>& tactileData);
+                static void processForceSensorData(iCub::plantIdentification::TaskCommonData *commonData,int &forceSensorBiasCounter,std::vector<double> &forceSensorBiasPartial);
 
-				static double getForceByWeightedSum(std::vector<double>& tactileData);
-				static void getUnitVector(int index,std::vector<double>& unitVector);
+                static double getForceBySimpleSum(std::vector<double>& tactileData);
 
-				static double getForceByLearntMapping(std::vector<double>& tactileData);
+                static double getForceByWeightedSum(std::vector<double>& tactileData);
+                static void getUnitVector(int index,std::vector<double>& unitVector);
 
-				static void addOption(yarp::os::Bottle &bottle,const char *paramName,yarp::os::Value paramValue);
+                static double getForceByLearntMapping(std::vector<double>& tactileData);
 
-				static void addOption(yarp::os::Bottle &bottle,const char *paramName,yarp::os::Value paramValue1,yarp::os::Value paramValue2);
+                static void addOption(yarp::os::Bottle &bottle,const char *paramName,yarp::os::Value paramValue);
 
-				static void addOption(yarp::os::Bottle &bottle,const char *paramName,yarp::os::Value paramValue1,yarp::os::Value paramValue2,yarp::os::Value paramValue3);
+                static void addOption(yarp::os::Bottle &bottle,const char *paramName,yarp::os::Value paramValue1,yarp::os::Value paramValue2);
 
-				static void addOption(yarp::os::Bottle &bottle,const char *paramName,double paramValueList[],int numElem);
+                static void addOption(yarp::os::Bottle &bottle,const char *paramName,yarp::os::Value paramValue1,yarp::os::Value paramValue2,yarp::os::Value paramValue3);
 
-				static void addOption(yarp::os::Bottle &bottle,const char *paramName,yarp::os::Value paramValueList[],int numElem);
+                static void addOption(yarp::os::Bottle &bottle,const char *paramName,double paramValueList[],int numElem);
+
+                static void addOption(yarp::os::Bottle &bottle,const char *paramName,yarp::os::Value paramValueList[],int numElem);
 
 };
     } //namespace plantIdentification

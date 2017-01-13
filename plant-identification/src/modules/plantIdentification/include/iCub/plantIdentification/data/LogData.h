@@ -18,10 +18,10 @@ namespace iCub {
 
             public:
 
-				/* ******* Module attributes.               ******* */
-				std::string taskId;
-				int taskType;
-				int taskOperationMode;
+                /* ******* Module attributes.               ******* */
+                std::string taskId;
+                int taskType;
+                int taskOperationMode;
                 int fingersNum;
                 std::vector<double> targetValue;
                 std::vector<std::vector<double> > fingerTaxelValues;
@@ -42,7 +42,7 @@ namespace iCub {
 
                 LogData(int fingersNum);
                 
-				void toBottle(yarp::os::Bottle &bottle);
+                void toBottle(yarp::os::Bottle &bottle);
         };
     } //namespace plantIdentification
 } //namespace iCub

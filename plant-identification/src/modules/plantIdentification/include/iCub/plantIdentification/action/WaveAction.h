@@ -19,31 +19,31 @@ namespace iCub {
                 /* ******* Debug attributes.                ******* */
                 std::string dbgTag;
 
-				/* ******* Module attributes.               ******* */
-				double actionDuration;
-				int counter;
-				bool waveMeanInitialized;
-				bool enabled;
-				double joint;
-				double waveMean;
-				double wavePeriod;
-				double waveAmplitude;
+                /* ******* Module attributes.               ******* */
+                double actionDuration;
+                int counter;
+                bool waveMeanInitialized;
+                bool enabled;
+                double joint;
+                double waveMean;
+                double wavePeriod;
+                double waveAmplitude;
                 double threadPeriod; // milliseconds
-				iCub::plantIdentification::Wave waveType;
+                iCub::plantIdentification::Wave waveType;
                 
                 iCub::plantIdentification::ControllersUtil *controllersUtil;
 
-				void release();
+                void release();
 
             public:
 
-				WaveAction();
-					
-				void init(iCub::plantIdentification::ControllersUtil *controllersUtil,double actionDuration,double joint,double period,double amplitude,iCub::plantIdentification::Wave waveType,int threadPeriod);
+                WaveAction();
+                    
+                void init(iCub::plantIdentification::ControllersUtil *controllersUtil,double actionDuration,double joint,double period,double amplitude,iCub::plantIdentification::Wave waveType,int threadPeriod);
                 
-				bool isEnabled();
+                bool isEnabled();
 
-				void executeNextStep();
+                void executeNextStep();
 
         };
     } //namespace plantIdentification

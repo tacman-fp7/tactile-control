@@ -13,23 +13,23 @@ namespace iCub {
 
             private:
                 
-				iCub::plantIdentification::StepTaskData *stepData;
-				std::vector<double> constantPwm;
+                iCub::plantIdentification::StepTaskData *stepData;
+                std::vector<double> constantPwm;
 
-				//TODO TO BE REMOVED
-				double pinkyAngleReference;
+                //TODO TO BE REMOVED
+                double pinkyAngleReference;
 
             public:
 
                 StepTask(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,iCub::plantIdentification::StepTaskData *stepData,std::vector<double> &targetList);
 
-				virtual void init();
+                virtual void init();
 
-				std::string getConstantPwmDescription();
+                std::string getConstantPwmDescription();
 
-				virtual void buildLogData(iCub::plantIdentification::LogData &logData);
+                virtual void buildLogData(iCub::plantIdentification::LogData &logData);
 
-				virtual void calculateControlInput();
+                virtual void calculateControlInput();
         };
     } //namespace plantIdentification
 } //namespace iCub

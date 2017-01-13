@@ -20,62 +20,62 @@ namespace iCub {
 
         class PlantIdentificationModule : public yarp::os::RFModule {
 
-			private:
+            private:
 
-				/* ****** Module attributes                             ****** */
-				int moduleThreadPeriod;
-				std::string moduleName;
-				std::string robotName;
-				bool closing;
+                /* ****** Module attributes                             ****** */
+                int moduleThreadPeriod;
+                std::string moduleName;
+                std::string robotName;
+                bool closing;
                 bool tasksRunning;
 
-				/* ****** RPC Ports                                     ****** */
-				yarp::os::RpcServer portPlantIdentificationRPC;
+                /* ****** RPC Ports                                     ****** */
+                yarp::os::RpcServer portPlantIdentificationRPC;
 
-				iCub::plantIdentification::RPCCommandsUtil rpcCmdUtil;
-				iCub::plantIdentification::RPCCommandsData rpcCmdData;
+                iCub::plantIdentification::RPCCommandsUtil rpcCmdUtil;
+                iCub::plantIdentification::RPCCommandsData rpcCmdData;
 
-				/* ******* Controllers utility                          ******* */
+                /* ******* Controllers utility                          ******* */
                 iCub::plantIdentification::ControllersUtil *controllersUtil;
 
-				/* ****** Ports utility                                 ****** */
-				iCub::plantIdentification::PortsUtil *portsUtil;
+                /* ****** Ports utility                                 ****** */
+                iCub::plantIdentification::PortsUtil *portsUtil;
 
-				/* ****** Events utility                                 ****** */
-				iCub::plantIdentification::EventsThread *eventsThread;
+                /* ****** Events utility                                 ****** */
+                iCub::plantIdentification::EventsThread *eventsThread;
 
-				/* ****** Task data										****** */
-				iCub::plantIdentification::TaskData *taskData;
+                /* ****** Task data										****** */
+                iCub::plantIdentification::TaskData *taskData;
 
-				/* ****** Threads			                            ****** */
-				iCub::plantIdentification::TaskThread *taskThread;
+                /* ****** Threads			                            ****** */
+                iCub::plantIdentification::TaskThread *taskThread;
          
-				/* ****** Debug attributes                              ****** */
-				std::string dbgTag;
+                /* ****** Debug attributes                              ****** */
+                std::string dbgTag;
            
-			public:
-			   
-				PlantIdentificationModule();
-				virtual ~PlantIdentificationModule();
-				virtual double getPeriod();
-				virtual bool configure(yarp::os::ResourceFinder &rf);
-				virtual bool updateModule();
-				virtual bool interruptModule();
-				virtual bool respond(const yarp::os::Bottle& command, yarp::os::Bottle& reply);
-				virtual bool close();
+            public:
+               
+                PlantIdentificationModule();
+                virtual ~PlantIdentificationModule();
+                virtual double getPeriod();
+                virtual bool configure(yarp::os::ResourceFinder &rf);
+                virtual bool updateModule();
+                virtual bool interruptModule();
+                virtual bool respond(const yarp::os::Bottle& command, yarp::os::Bottle& reply);
+                virtual bool close();
 
-				/* ****** RPC Methods                                  ****** */
-				bool start();
-				bool stop();
-				bool open();
-				bool arm();
-				bool grasp();
-				bool wave();
-				bool quit();
-				void set(iCub::plantIdentification::RPCSetCmdArgName paramName,yarp::os::Value paramValue);
-				void task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,yarp::os::Value paramValue);
-				void view(iCub::plantIdentification::RPCViewCmdArgName paramName);
-				void help();
+                /* ****** RPC Methods                                  ****** */
+                bool start();
+                bool stop();
+                bool open();
+                bool arm();
+                bool grasp();
+                bool wave();
+                bool quit();
+                void set(iCub::plantIdentification::RPCSetCmdArgName paramName,yarp::os::Value paramValue);
+                void task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,yarp::os::Value paramValue);
+                void view(iCub::plantIdentification::RPCViewCmdArgName paramName);
+                void help();
         };
     }
 }
