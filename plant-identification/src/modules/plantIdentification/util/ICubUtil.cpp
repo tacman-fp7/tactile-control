@@ -620,7 +620,7 @@ void ICubUtil::putSelectedElementsIntoMatrix(const yarp::sig::Matrix &dataIn,con
 }
 
 
- void ICubUtil::makeObjectRecognitionBottle(Bottle &objRecBottle,string taskId,int objectId,iCub::plantIdentification::ObjectRecognitionTask objRecTask,int extraCode1,int extraCode2,int skipPreviousRepetition,string experimentDescription,string previousExperimentDescription,iCub::plantIdentification::TaskCommonData *commonData){
+ void ICubUtil::makeObjectRecognitionBottle(Bottle &objRecBottle,string taskId,int objectId,iCub::plantIdentification::ObjectRecognitionTask objRecTask,int extraCode1,int extraCode2,int skipPreviousRepetition,string experimentDescription,string previousExperimentDescription,double handAperture,double actualHandPosition,double targetHandPosition,double actualGripStrength,double targetGripStrength,iCub::plantIdentification::TaskCommonData *commonData){
 
      objRecBottle.clear();
 
@@ -637,7 +637,22 @@ void ICubUtil::putSelectedElementsIntoMatrix(const yarp::sig::Matrix &dataIn,con
 //    objRecognBottle.addString(taskId);
 //    objRecognBottle.addInt(skipPreviousRepetition);
 
-    // logging raw tactile data (24) (7-30) | (24) (5-28)
+//    double handAperture,double actualHandPosition,double targetHandPosition,double actualGripStrength,double targetGripStrength,
+
+    // hand aperture | 5
+    objRecBottle.addDouble(handAperture);
+
+    // actual hand position | 6
+    objRecBottle.addDouble(actualHandPosition);
+    // target hand position | 7
+    objRecBottle.addDouble(targetHandPosition);
+
+    // actual grip strength | 8
+    objRecBottle.addDouble(actualGripStrength);
+    // target grip strength | 9
+    objRecBottle.addDouble(targetGripStrength);
+
+    // logging raw tactile data (24) (7-30) | (24) (10-33)
 //    objRecognBottle.addString("midRawTact");
     for(size_t j = 0; j < commonData->fingerTaxelsRawData[1].size(); j++){
         objRecBottle.addDouble(commonData->fingerTaxelsRawData[1][j]);
@@ -646,7 +661,7 @@ void ICubUtil::putSelectedElementsIntoMatrix(const yarp::sig::Matrix &dataIn,con
     for(size_t j = 0; j < commonData->fingerTaxelsRawData[4].size(); j++){
         objRecBottle.addDouble(commonData->fingerTaxelsRawData[4][j]);
     }
-    // logging compensated tactile data (24) (31-54) | (24) (29-52)
+    // logging compensated tactile data (24) (31-54) | (24) (34-57)
 //    objRecognBottle.addString("midCompTact");
     for(size_t j = 0; j < commonData->fingerTaxelsData[1].size(); j++){
         objRecBottle.addDouble(commonData->fingerTaxelsData[1][j]);
@@ -655,19 +670,19 @@ void ICubUtil::putSelectedElementsIntoMatrix(const yarp::sig::Matrix &dataIn,con
     for(size_t j = 0; j < commonData->fingerTaxelsData[4].size(); j++){
         objRecBottle.addDouble(commonData->fingerTaxelsData[4][j]);
     }
-    // logging processed tactile data (2) (55-56) | (2) (53-54)
+    // logging processed tactile data (2) (55-56) | (2) (57-59)
 //    objRecognBottle.addString("overallTactVal");
     objRecBottle.addDouble(commonData->overallFingerPressureByWeightedSum[1]);
     objRecBottle.addDouble(commonData->overallFingerPressureByWeightedSum[4]);
 
 
-    // logging raw encoders (16) (57-72) | (16) (55-70)
+    // logging raw encoders (16) (57-72) | (16) (60-75)
 //    objRecognBottle.addString("handRawAng");
     for(size_t i = 0; i < commonData->fingerEncodersRawData.size(); i++){
         objRecBottle.addInt(commonData->fingerEncodersRawData[i]);
     }
 //    objRecognBottle.addString("armAng");
-    // logging encoders (16) (73-88)
+    // logging encoders (16) (73-88) | (16) (76-91)
     for(size_t i = 0; i < commonData->armEncodersAngles.size(); i++){
         objRecBottle.addDouble(commonData->armEncodersAngles[i]);
     }

@@ -1005,7 +1005,7 @@ void ControlTask::calculateControlInput(){
         portsUtil->sendGMMData(gripStrength,indMidPressureBalance,commonData);
         commonData->tempParameters[55] = Value(0);
     }
-
+    
     // log object recognition data
     if (objectRecognitionEnabled){
         portsUtil->sendObjectRecognitionData(taskId,commonData->tpInt(46),static_cast<iCub::plantIdentification::ObjectRecognitionTask>(commonData->tpInt(47)),commonData->tpInt(48),commonData->tpInt(49),commonData->tpInt(50),commonData->tpStr(16),commonData->tpStr(17),commonData);
@@ -1013,7 +1013,7 @@ void ControlTask::calculateControlInput(){
 
     if (objectRecognitionEnabled){
         Bottle objectRecognitionBottle;
-        ICubUtil::makeObjectRecognitionBottle(objectRecognitionBottle,taskId,commonData->tpInt(46),static_cast<iCub::plantIdentification::ObjectRecognitionTask>(commonData->tpInt(47)),commonData->tpInt(48),commonData->tpInt(49),commonData->tpInt(50),commonData->tpStr(16),commonData->tpStr(17),commonData);
+        ICubUtil::makeObjectRecognitionBottle(objectRecognitionBottle,taskId,commonData->tpInt(46),static_cast<iCub::plantIdentification::ObjectRecognitionTask>(commonData->tpInt(47)),commonData->tpInt(48),commonData->tpInt(49),commonData->tpInt(50),commonData->tpStr(16),commonData->tpStr(17),handAperture,handPosition,estimatedFinalPose,actualGripStrength,gripStrength,commonData);
         manageObjectRecognitionTask(objectRecognitionBottle);
     }
 
