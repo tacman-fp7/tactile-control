@@ -147,6 +147,10 @@ namespace iCub {
             *	89: object recognition: pwm to request at the index finger
             *	90: object recognition: pwm to request at the ring/pinky fingers
             *   91: object recognition: if set > 0, set handClosurePerformed to true and returns to 0 (it's an integer)
+            *   92: object recognition: not used yet
+            *   93: object recognition: not used yet
+            *   94: object recognition: not used yet
+            *   95: object recognition: not used yet
             *
             *   Note: double values have to contain a dot, while strings have to start with '#'
             *
