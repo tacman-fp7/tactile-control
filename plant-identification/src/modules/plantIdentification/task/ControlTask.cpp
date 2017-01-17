@@ -1331,10 +1331,7 @@ void ControlTask::manageObjectRecognitionTask(Bottle &objectRecognitionBottle){
                 std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
             }
         }
-
-
     }
-
 }
 
 
