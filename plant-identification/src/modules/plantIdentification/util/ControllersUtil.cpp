@@ -399,23 +399,23 @@ bool ControllersUtil::setArmInTaskPosition() {
         if (whichICub == "black"){
             if (whichHand == "right"){
             iPos->positionMove(7 , 30);
-                iPos->positionMove(8 , 82);    
+                iPos->positionMove(8 , 45);    
                 iPos->positionMove(9 , 3);
-                iPos->positionMove(10, 0);
+                iPos->positionMove(10, 60);
                 iPos->positionMove(11, 2);
                 iPos->positionMove(12, numFingers == 2? 0 : 30);
                 iPos->positionMove(13, 3);
-                iPos->positionMove(14, 30);
+                iPos->positionMove(14, 60);
                 iPos->positionMove(15, 1);
             } else {
             iPos->positionMove(7 , 30);
-                iPos->positionMove(8 , 82);
+                iPos->positionMove(8 , 45);
                 iPos->positionMove(9 , 3);
-                iPos->positionMove(10, 0);
+                iPos->positionMove(10, 60);
                 iPos->positionMove(11, 2);
                 iPos->positionMove(12, numFingers == 2? 0 : 30);
                 iPos->positionMove(13, 3);
-                iPos->positionMove(14, 30);
+                iPos->positionMove(14, 60);
                 iPos->positionMove(15, 1);
             }
         } else if (whichICub == "purple"){
@@ -677,22 +677,22 @@ bool ControllersUtil::openHand() {
         // Hand
         if (whichICub == "black"){
             if (whichHand == "right"){
-                iPos->positionMove(8 , 82);    
+                iPos->positionMove(8 , 45);    
                 iPos->positionMove(9 , 3);
-                iPos->positionMove(10, 0);
+                iPos->positionMove(10, 60);
                 iPos->positionMove(11, 2);
                 iPos->positionMove(12, numFingers == 2? 0 : 30);
                 iPos->positionMove(13, 3);
-                iPos->positionMove(14, 30);
+                iPos->positionMove(14, 60);
                 iPos->positionMove(15, 1);
             } else {
-                iPos->positionMove(8 , 82);
+                iPos->positionMove(8 , 45);
                 iPos->positionMove(9 , 3);
-                iPos->positionMove(10, 0);
+                iPos->positionMove(10, 60);
                 iPos->positionMove(11, 2);
                 iPos->positionMove(12, numFingers == 2? 0 : 30);
                 iPos->positionMove(13, 3);
-                iPos->positionMove(14, 30);
+                iPos->positionMove(14, 60);
                 iPos->positionMove(15, 1);
             }
         } else if (whichICub == "purple"){
