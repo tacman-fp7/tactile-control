@@ -77,13 +77,15 @@ namespace iCub {
                 double initialHandPosition;
 
                 // related to object recognition
-                bool closingHand;
+                bool closingProximals;
+                bool closingDistals;
                 bool objectRecognitionEnabled;
                 bool handClosurePerformed;
                 std::ofstream objRecDataFile;
                 bool objRecFileExists;
                 bool snapshotSaved;
                 bool squeezingStarted;
+                double storedGripStrength;
 
 
             public:

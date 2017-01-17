@@ -223,12 +223,14 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
     /*** END OF CODE RELATED TO SUPERVISOR MODE ***/
 
     // object recognition settings
-    closingHand = false;
+    closingProximals = false;
+    closingDistals = false;
     objectRecognitionEnabled = commonData->tpInt(45) != 0;
     handClosurePerformed = false;
     objRecFileExists = false;
     snapshotSaved = false;
     squeezingStarted = false;
+    storedGripStrength = commonData->tpDbl(7);
 
 
     if (resetErrOnContact){
@@ -1233,10 +1235,13 @@ void ControlTask::manageObjectRecognitionTask(Bottle &objectRecognitionBottle){
     double startSqueezingLogTime = commonData->tpDbl(84);
     double increaseGSTime = startSqueezingLogTime + commonData->tpDbl(85);
     double stopSqueezingLogTime = increaseGSTime + commonData->tpDbl(86);
-    double logSnapshotTime = stopSqueezingLogTime + commonData->tpDbl(87);
+    double bendDistalTime = stopSqueezingLogTime + commonData->tpDbl(87);
+    double logSnapshotTime = bendDistalTime + commonData->tpDbl(92);
     double gripStrengthForSqueezing = commonData->tpDbl(88); 
-    double pwmIndexFinger = commonData->tpDbl(89);
+    double pwmIndexFingerProximal = commonData->tpDbl(89);
     double pwmRingFinger = commonData->tpDbl(90);
+    double pwmIndexFingerDistal = commonData->tpDbl(93);
+    bool disableObjRecLogging = commonData->tpInt(94) != 0;
     int objectIDInt = commonData->tpInt(46);
     int iterationIDInt = commonData->tpInt(48);
     string objectID = static_cast<std::ostringstream*>( &(std::ostringstream() << objectIDInt))->str();
@@ -1256,12 +1261,14 @@ void ControlTask::manageObjectRecognitionTask(Bottle &objectRecognitionBottle){
 
     } else if (time < increaseGSTime){
 
-        if (!objRecFileExists){
-            objRecDataFile.open(fileNameSqueezing.c_str());
-            objRecFileExists = true;
-            std::cout << "OBJECT RECOGNITION: loggin started!!!\n";
+        if (!disableObjRecLogging){
+            if (!objRecFileExists){
+                objRecDataFile.open(fileNameSqueezing.c_str());
+                objRecFileExists = true;
+                std::cout << "OBJECT RECOGNITION: loggin started!!!\n";
+            }
+            ICubUtil::printBottleIntoFile(objRecDataFile,objectRecognitionBottle);
         }
-        ICubUtil::printBottleIntoFile(objRecDataFile,objectRecognitionBottle);
 
     } else if (time < stopSqueezingLogTime){
 
@@ -1275,33 +1282,54 @@ void ControlTask::manageObjectRecognitionTask(Bottle &objectRecognitionBottle){
             std::cout << "OBJECT RECOGNITION: squeezing started!!!\n";
         }
 
-        ICubUtil::printBottleIntoFile(objRecDataFile,objectRecognitionBottle);
+        if (!disableObjRecLogging){
+            ICubUtil::printBottleIntoFile(objRecDataFile,objectRecognitionBottle);
+        }
 
-    } else if (time < logSnapshotTime && !handClosurePerformed){
+    } else if (time < bendDistalTime){
 
         if (objRecFileExists){
             objRecDataFile.close();
             objRecFileExists = false;
-            std::cout << "OBJECT RECOGNITION: loggin stopped and hand closure started!!!\n";
+            std::cout << "OBJECT RECOGNITION: loggin stopped!!!\n";
         }
 
-        if (!closingHand){
+        if (!closingProximals){
             controllersUtil->setControlMode(11,VOCAB_CM_OPENLOOP,false);
             controllersUtil->setControlMode(15,VOCAB_CM_OPENLOOP,false);
-            controllersUtil->sendPwm(11,pwmIndexFinger);
-            controllersUtil->sendPwm(15,pwmRingFinger);
+            closingProximals = true;
+            std::cout << "OBJECT RECOGNITION: proximal closure started!!!\n";
         }
+
+        controllersUtil->sendPwm(11,pwmIndexFingerProximal);
+        controllersUtil->sendPwm(15,pwmRingFinger);
+
+    } else if (time < logSnapshotTime && !handClosurePerformed){
+
+
+
+        if (!closingDistals){
+            controllersUtil->setControlMode(12,VOCAB_CM_OPENLOOP,false);
+            closingDistals = true;
+            std::cout << "OBJECT RECOGNITION: distal closure started!!!\n";
+        }
+
+        controllersUtil->sendPwm(11,pwmIndexFingerProximal);
+        controllersUtil->sendPwm(12,pwmIndexFingerDistal);
+        controllersUtil->sendPwm(15,pwmRingFinger);
 
     } else {
 
-        if (!snapshotSaved){
-            objRecDataFile.open(fileNameHandClosure.c_str());
+        if (!disableObjRecLogging){
+            if (!snapshotSaved){
+                objRecDataFile.open(fileNameHandClosure.c_str());
             
-            ICubUtil::printBottleIntoFile(objRecDataFile,objectRecognitionBottle);
+                ICubUtil::printBottleIntoFile(objRecDataFile,objectRecognitionBottle);
             
-            objRecDataFile.close();
-            snapshotSaved = true;
-            std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
+                objRecDataFile.close();
+                snapshotSaved = true;
+                std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
+            }
         }
 
 
@@ -1335,7 +1363,9 @@ void ControlTask::release(){
 
     if (objectRecognitionEnabled){
         controllersUtil->setControlMode(11,VOCAB_CM_POSITION,true);
+        controllersUtil->setControlMode(12,VOCAB_CM_POSITION,true);
         controllersUtil->setControlMode(15,VOCAB_CM_POSITION,true);
+        commonData->tempParameters[7] = storedGripStrength;
     }
 
 }

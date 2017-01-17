@@ -142,14 +142,14 @@ namespace iCub {
             *	84: object recognition: time for grasp stabilization
             *	85: object recognition: time from grasp stabilization to grip strength increment (to log something before squeezing)
             *	86: object recognition: squeezing time
-            *	87: object recognition: hand closure time
+            *	87: object recognition: proximals closure time
             *	88: object recognition: grip strength used for squeezing
-            *	89: object recognition: pwm to request at the index finger
+            *	89: object recognition: pwm to request at the index finger proximal joint
             *	90: object recognition: pwm to request at the ring/pinky fingers
             *   91: object recognition: if set > 0, set handClosurePerformed to true and returns to 0 (it's an integer)
-            *   92: object recognition: not used yet
-            *   93: object recognition: not used yet
-            *   94: object recognition: not used yet
+            *   92: object recognition: distal closure time
+            *   93: object recognition: pwm to request at the index finger distal joint
+            *   94: object recognition: disable object recognition logging
             *   95: object recognition: not used yet
             *
             *   Note: double values have to contain a dot, while strings have to start with '#'
