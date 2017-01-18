@@ -374,6 +374,9 @@ void ControlTask::calculateControlInput(){
                     rotatedAnglesVector[1] = rotatedAngles[1];
                     Vector estimatedBestPositionNNVector = neuralNetwork.predict(rotatedAnglesVector);
                     estimatedFinalPose = estimatedBestPositionNNVector[0];
+
+                    handAperture = 180 - (middleEnc + indexEnc)/2 - thumbEnc;
+
                 } else if (bestPoseEstimatorMethod == 1){
                 // using the gaussian mixture model
 
@@ -1015,6 +1018,7 @@ void ControlTask::calculateControlInput(){
 
     if (objectRecognitionEnabled){
         Bottle objectRecognitionBottle;
+        std::cout << handAperture << "\n";
         ICubUtil::makeObjectRecognitionBottle(objectRecognitionBottle,taskId,commonData->tpInt(46),static_cast<iCub::plantIdentification::ObjectRecognitionTask>(commonData->tpInt(47)),commonData->tpInt(48),commonData->tpInt(49),commonData->tpInt(50),commonData->tpStr(16),commonData->tpStr(17),handAperture,handPosition,estimatedFinalPose,actualGripStrength,gripStrength,commonData);
         manageObjectRecognitionTask(objectRecognitionBottle);
     }

@@ -409,14 +409,14 @@ bool ControllersUtil::setArmInTaskPosition() {
                 iPos->positionMove(15, 1);
             } else {
             iPos->positionMove(7 , 30);
-                iPos->positionMove(8 , 45);
+                iPos->positionMove(8 , 30);
                 iPos->positionMove(9 , 3);
                 iPos->positionMove(10, 60);
                 iPos->positionMove(11, 2);
                 iPos->positionMove(12, numFingers == 2? 0 : 30);
                 iPos->positionMove(13, 3);
                 iPos->positionMove(14, 60);
-                iPos->positionMove(15, 1);
+                iPos->positionMove(15, 45);
             }
         } else if (whichICub == "purple"){
             if (whichHand == "right"){
@@ -686,14 +686,14 @@ bool ControllersUtil::openHand() {
                 iPos->positionMove(14, 60);
                 iPos->positionMove(15, 1);
             } else {
-                iPos->positionMove(8 , 45);
+                iPos->positionMove(8 , 30);
                 iPos->positionMove(9 , 3);
                 iPos->positionMove(10, 60);
                 iPos->positionMove(11, 2);
                 iPos->positionMove(12, numFingers == 2? 0 : 30);
                 iPos->positionMove(13, 3);
                 iPos->positionMove(14, 60);
-                iPos->positionMove(15, 1);
+                iPos->positionMove(15, 45);
             }
         } else if (whichICub == "purple"){
             if (whichHand == "right"){
