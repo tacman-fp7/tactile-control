@@ -160,11 +160,15 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
         if (whichHand == "right"){
             // default values
         } else {
+            // approach
+            commonData.tempParameters[34] = 1.5;
+            commonData.tempParameters[37] = 1.3;
+
             commonData.tempParameters[52] = 0.5;
-                    commonData.tempParameters[53] = 1.0;
+            commonData.tempParameters[53] = 1.0;
             commonData.tempParameters[54] = 1.0;
         }
-    } else {
+    } else { // darmstadt
         if (whichHand == "right"){
             // default values
         } else {

@@ -315,7 +315,7 @@ bool ControllersUtil::setArmInTaskPosition() {
         // Hand
         if (whichICub == "black"){
             if (whichHand == "right"){
-            iPos->positionMove(7 , 17);
+                iPos->positionMove(7 , 17);
                 iPos->positionMove(8 , 43);
                 iPos->positionMove(9 , 3);
                 iPos->positionMove(10, 33);
@@ -325,7 +325,7 @@ bool ControllersUtil::setArmInTaskPosition() {
                 iPos->positionMove(14, 35);
                 iPos->positionMove(15, 1);
             } else {
-            iPos->positionMove(7 , 30);
+                iPos->positionMove(7 , 30);
                 iPos->positionMove(8 , 23);
                 iPos->positionMove(9 , 3);
                 iPos->positionMove(10, 40);
@@ -337,7 +337,7 @@ bool ControllersUtil::setArmInTaskPosition() {
             }
         } else if (whichICub == "purple") {
             if (whichHand == "right"){
-            iPos->positionMove(7 , 30);
+                iPos->positionMove(7 , 30);
                 iPos->positionMove(8 , 50);    
                 iPos->positionMove(9 , 3);
                 iPos->positionMove(10, 15);
@@ -347,7 +347,7 @@ bool ControllersUtil::setArmInTaskPosition() {
                 iPos->positionMove(14, 30);
                 iPos->positionMove(15, 1);
             } else {
-            iPos->positionMove(7 , 30);
+                iPos->positionMove(7 , 30);
                 iPos->positionMove(8 , 72);
                 iPos->positionMove(9 , 3);
                 iPos->positionMove(10, 15);
@@ -359,7 +359,7 @@ bool ControllersUtil::setArmInTaskPosition() {
             }
         } else {
             if (whichHand == "right"){
-            iPos->positionMove(7 , 5);
+                iPos->positionMove(7 , 5);
                 iPos->positionMove(8 , 24);    
                 iPos->positionMove(9 , 2);
                 iPos->positionMove(10, 10);
@@ -369,7 +369,7 @@ bool ControllersUtil::setArmInTaskPosition() {
                 iPos->positionMove(14, 15);
                 iPos->positionMove(15, 2);
             } else {
-            iPos->positionMove(7 , 1);
+                iPos->positionMove(7 , 1);
                 iPos->positionMove(8 , 45);
                 iPos->positionMove(9 , 2);
                 iPos->positionMove(10, 15);
@@ -398,7 +398,7 @@ bool ControllersUtil::setArmInTaskPosition() {
         // Hand
         if (whichICub == "black"){
             if (whichHand == "right"){
-            iPos->positionMove(7 , 30);
+                iPos->positionMove(7 , 30);
                 iPos->positionMove(8 , 45);    
                 iPos->positionMove(9 , 3);
                 iPos->positionMove(10, 60);
@@ -408,7 +408,7 @@ bool ControllersUtil::setArmInTaskPosition() {
                 iPos->positionMove(14, 60);
                 iPos->positionMove(15, 1);
             } else {
-            iPos->positionMove(7 , 30);
+                iPos->positionMove(7 , 30);
                 iPos->positionMove(8 , 30);
                 iPos->positionMove(9 , 3);
                 iPos->positionMove(10, 60);
@@ -420,7 +420,7 @@ bool ControllersUtil::setArmInTaskPosition() {
             }
         } else if (whichICub == "purple"){
             if (whichHand == "right"){
-            iPos->positionMove(7 , 30);
+                iPos->positionMove(7 , 30);
                 iPos->positionMove(8 , 82);    
                 iPos->positionMove(9 , 3);
                 iPos->positionMove(10, 0);
@@ -430,19 +430,19 @@ bool ControllersUtil::setArmInTaskPosition() {
                 iPos->positionMove(14, 30);
                 iPos->positionMove(15, 1);
             } else {
-            iPos->positionMove(7 , 30);
-                iPos->positionMove(8 , 82);
+                iPos->positionMove(7 , 30);
+                iPos->positionMove(8 , 67);
                 iPos->positionMove(9 , 3);
-                iPos->positionMove(10, 0);
+                iPos->positionMove(10, 35);
                 iPos->positionMove(11, 2);
                 iPos->positionMove(12, numFingers == 2? 0 : 30);
                 iPos->positionMove(13, 3);
-                iPos->positionMove(14, 30);
+                iPos->positionMove(14, 37);
                 iPos->positionMove(15, 1);
             }
         } else {
             if (whichHand == "right"){
-            iPos->positionMove(7 , 5);
+                iPos->positionMove(7 , 5);
                 iPos->positionMove(8 , 24);    
                 iPos->positionMove(9 , 2);
                 iPos->positionMove(10, 10);
@@ -452,7 +452,7 @@ bool ControllersUtil::setArmInTaskPosition() {
                 iPos->positionMove(14, 15);
                 iPos->positionMove(15, 2);
             } else {
-            iPos->positionMove(7 , 1);
+                iPos->positionMove(7 , 1);
                 iPos->positionMove(8 , 45);
                 iPos->positionMove(9 , 2);
                 iPos->positionMove(10, 15);
@@ -706,13 +706,14 @@ bool ControllersUtil::openHand() {
                 iPos->positionMove(14, 30);
                 iPos->positionMove(15, 1);
             } else {
-                iPos->positionMove(8 , 82);
+                iPos->positionMove(7 , 30);
+                iPos->positionMove(8 , 67);
                 iPos->positionMove(9 , 3);
-                iPos->positionMove(10, 0);
+                iPos->positionMove(10, 35);
                 iPos->positionMove(11, 2);
                 iPos->positionMove(12, numFingers == 2? 0 : 30);
                 iPos->positionMove(13, 3);
-                iPos->positionMove(14, 30);
+                iPos->positionMove(14, 37);
                 iPos->positionMove(15, 1);
             }
         } else {
