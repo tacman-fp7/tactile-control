@@ -80,8 +80,8 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
     commonData.taskThreadPeriod = rf.check("taskThreadPeriod", 20).asInt();
     commonData.eventsThreadPeriod = rf.check("eventsThreadPeriod", 15).asInt();
 
-    std::string whichHand = rf.check("whichHand", Value("right"), "The hand to be used for the grasping.").asString().c_str();
-    std::string whichICub = rf.check("whichICub", Value("purple"), "The iCub used for the task.").asString().c_str();
+    std::string whichHand = rf.check("whichHand", Value("left"), "The hand to be used for the grasping.").asString().c_str();
+    std::string whichICub = rf.check("whichICub", Value("black"), "The iCub used for the task.").asString().c_str();
     std::string whichTask = rf.check("whichTask", Value("grasp"), "The code of the task [grasp/objrec]").asString().c_str();
 
     // load data from resource file
@@ -190,6 +190,12 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
     commonData.procForceSensorData.resize(5,0.0);      
 
     commonData.realForceData.resize(5,0.0);
+
+    Bottle* armJoints = rf.find("armJoints_" + whichTask).asList();
+    commonData.armJointsHome.resize(armJoints->size());
+    for(int i = 0; i < armJoints->size(); i++){
+        commonData.armJointsHome[i] = armJoints->get(i).asDouble();
+    }
 
     Bottle* stepTaskJoints = rf.find("stepTaskJoints").asList();
     stepData.jointsList.resize(stepTaskJoints->size(),0);
@@ -307,6 +313,58 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
     approachData.jointsPwmLimitsEnabled = rf.check("approach.jointsPwmLimitsEnabled",Value(0)).asInt() != 0;
     approachData.lifespan = rf.check("approach.lifespan",Value(5)).asInt();
 
+    /** ICUB RESOURCE FINEDER **/
+
+    yarp::os::ResourceFinder iCubRF;
+    iCubRF.setDefaultContext("plantIdentification");
+    std::string iCubRFFileName = "iCub_" + whichICub;
+    iCubRF.setDefaultConfigFile(iCubRFFileName.c_str());
+    char **fakeArgV;
+    iCubRF.configure(0,fakeArgV,false);
+
+    Bottle* sensitivity = iCubRF.find("sensitivity_" + whichHand).asList();
+    commonData.tempParameters[52] = sensitivity->get(0).asDouble();
+    commonData.tempParameters[53] = sensitivity->get(1).asDouble();
+    commonData.tempParameters[54] = sensitivity->get(2).asDouble();
+
+    commonData.tempParameters[75] = iCubRF.find("thumbAbductionOffset_" + whichHand).asDouble();
+
+    Bottle* pidGains = iCubRF.find("pidGains_" + whichHand).asList();
+    commonData.tempParameters[1] = pidGains->get(0).asDouble();
+    commonData.tempParameters[2] = pidGains->get(1).asDouble();
+    commonData.tempParameters[3] = pidGains->get(2).asDouble();
+
+    Bottle &iCubTaskRF = iCubRF.findGroup(whichTask);
+
+    Bottle* approach = iCubTaskRF.find("approach_" + whichHand).asList();
+    commonData.tempParameters[32] = approach->get(0).asInt();
+    commonData.tempParameters[33] = approach->get(1).asInt();
+    commonData.tempParameters[34] = approach->get(2).asDouble();
+    commonData.tempParameters[35] = approach->get(3).asDouble();
+    commonData.tempParameters[36] = approach->get(4).asInt();
+    commonData.tempParameters[37] = approach->get(5).asDouble();
+    commonData.tempParameters[38] = approach->get(6).asDouble();
+    commonData.tempParameters[39] = approach->get(7).asInt();
+
+    Bottle* hysteresis = iCubTaskRF.find("hysteresis_" + whichHand).asList();
+    commonData.tempParameters[77] = hysteresis->get(0).asInt();
+    commonData.tempParameters[78] = hysteresis->get(1).asDouble();
+    commonData.tempParameters[79] = hysteresis->get(2).asDouble();
+    commonData.tempParameters[80] = hysteresis->get(3).asDouble();
+    commonData.tempParameters[81] = hysteresis->get(4).asDouble();
+    commonData.tempParameters[82] = hysteresis->get(5).asInt();
+
+    commonData.tempParameters[7] = iCubTaskRF.find("gripStrength" + whichHand).asDouble();
+
+    Bottle* handJoints = iCubTaskRF.find("handJoints_" + whichHand).asList();
+    commonData.handJointsHome.resize(handJoints->size());
+    for(int i = 0; i < handJoints->size(); i++){
+        commonData.handJointsHome[i] = handJoints->get(i).asDouble();
+    }
+
+    /****/
+
+    controllersUtil->buildWholeArmJointsHome(commonData.armJointsHome,commonData.handJointsHome);
 }
 
 int TaskData::getFingerFromJoint(int joint){

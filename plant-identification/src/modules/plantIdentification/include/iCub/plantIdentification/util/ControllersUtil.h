@@ -57,6 +57,8 @@ namespace iCub {
                 int numFingers;
                 bool headEnabled;
 
+                std::vector<double> wholeArmJointsHome;
+
                 /* ****** Debug attributes                              ****** */
                 std::string dbgTag;
 
@@ -65,6 +67,8 @@ namespace iCub {
                 ControllersUtil();
 
                 bool init(yarp::os::ResourceFinder &rf);
+
+                bool buildWholeArmJointsHome(const std::vector<double> armJointsHome,const std::vector<double> handJointsHome);
 
                 bool sendPwm(int joint,double pwm);
 

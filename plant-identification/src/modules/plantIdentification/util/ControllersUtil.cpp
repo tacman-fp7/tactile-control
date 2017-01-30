@@ -159,6 +159,21 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
     return true;
 }
 
+bool ControllersUtil::buildWholeArmJointsHome(const std::vector<double> armJointsHome,const std::vector<double> handJointsHome){
+
+    wholeArmJointsHome.resize(16);
+
+    for(int i = 0; i < armJointsHome.size(); i++){
+        wholeArmJointsHome[i] = armJointsHome[i];
+    }
+    for(int i = 0; i < handJointsHome.size(); i++){
+        wholeArmJointsHome[7 + i] = handJointsHome[i];
+    }
+
+    return true;
+}
+
+
 bool ControllersUtil::sendPwm(int joint,double pwm){
 
     if (!iOLC->setRefOutput(joint,pwm)){
@@ -300,6 +315,13 @@ bool ControllersUtil::setArmInTaskPosition() {
     
     iVel->stop();
 
+    for(int i = 0; i < wholeArmJointsHome.size(); i++){
+
+        iPos->positionMove(i,wholeArmJointsHome[i]);
+
+    }
+
+    /*
     if (whichTask == "grasp"){
 
         // Arm
@@ -393,7 +415,6 @@ bool ControllersUtil::setArmInTaskPosition() {
         iPos->positionMove(4 , -20);// 0
         iPos->positionMove(5 , 2);// 1
         iPos->positionMove(6 , -20);// 1
-        iPos->positionMove(7 , 12);
         
         // Hand
         if (whichICub == "black"){
@@ -466,6 +487,8 @@ bool ControllersUtil::setArmInTaskPosition() {
 
 
     }
+
+    */
 
     // Check motion done
     waitMoveDone(10, 1);
@@ -606,6 +629,15 @@ bool ControllersUtil::openHand() {
 
     cout << dbgTag << whichICub << " " << whichHand << "\n";
 
+    
+    for(int i = 8; i < wholeArmJointsHome.size(); i++){
+
+        iPos->positionMove(i,wholeArmJointsHome[i]);
+
+    }
+
+    /*
+
     if (whichTask == "grasp"){
 
         // Hand
@@ -741,6 +773,7 @@ bool ControllersUtil::openHand() {
 
     }
 
+    */
 
     // Check motion done
     waitMoveDone(10, 1);

@@ -78,7 +78,7 @@ bool PlantIdentificationModule::configure(ResourceFinder &rf) {
 
     // initialize task data
     taskData = new TaskData(rf,controllersUtil);
- 
+
 
     /* ******* Threads                                          ******* */
     taskThread = new TaskThread(taskData->commonData.taskThreadPeriod,rf,controllersUtil,portsUtil,taskData);
@@ -236,11 +236,15 @@ bool PlantIdentificationModule::stop() {
 /* ******* RPC Stop task execution and open the hand                        ********************************************** */
 bool PlantIdentificationModule::open() {
     
-    tasksRunning = false;
+    if (tasksRunning == true){
+        tasksRunning = false;
 
-    taskThread->suspend();
+        taskThread->suspend();
 
-    taskThread->afterRun(true);
+        taskThread->afterRun(true);
+    } else {
+        controllersUtil->openHand();
+    }
 
     return true;
 }
