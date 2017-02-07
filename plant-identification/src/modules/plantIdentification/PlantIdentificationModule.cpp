@@ -343,5 +343,6 @@ void PlantIdentificationModule::view(iCub::plantIdentification::RPCViewCmdArgNam
 }
 
 void PlantIdentificationModule::help(){
+	controllersUtil->setArmHomeAsCurrent();
     taskThread->help(rpcCmdData);
 }

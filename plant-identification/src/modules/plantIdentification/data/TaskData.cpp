@@ -129,7 +129,7 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
     for(int i = 0; i < tempParameters->size(); i++){
         commonData.tempParameters[i] = tempParameters->get(i);
     }
-
+/*
     // temp parameters updated according to the hand and/or the robot
     if (whichICub == "black"){
         if (whichHand == "right"){
@@ -177,7 +177,7 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
             commonData.tempParameters[54] = 0.6;
         }
     }
-
+*/
     commonData.iCubThumb = new iCub::iKin::iCubFinger(whichHand + "_thumb");
     commonData.iCubIndexFinger = new iCub::iKin::iCubFinger(whichHand + "_index");
     commonData.iCubMiddleFinger = new iCub::iKin::iCubFinger(whichHand + "_middle");
@@ -317,7 +317,7 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
 
     yarp::os::ResourceFinder iCubRF;
     iCubRF.setDefaultContext("plantIdentification");
-    std::string iCubRFFileName = "iCub_" + whichICub;
+    std::string iCubRFFileName = "iCub_" + whichICub + ".ini";
     iCubRF.setDefaultConfigFile(iCubRFFileName.c_str());
     char **fakeArgV;
     iCubRF.configure(0,fakeArgV,false);
@@ -354,7 +354,7 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
     commonData.tempParameters[81] = hysteresis->get(4).asDouble();
     commonData.tempParameters[82] = hysteresis->get(5).asInt();
 
-    commonData.tempParameters[7] = iCubTaskRF.find("gripStrength" + whichHand).asDouble();
+    commonData.tempParameters[7] = iCubTaskRF.find("gripStrength_" + whichHand).asDouble();
 
     Bottle* handJoints = iCubTaskRF.find("handJoints_" + whichHand).asList();
     commonData.handJointsHome.resize(handJoints->size());

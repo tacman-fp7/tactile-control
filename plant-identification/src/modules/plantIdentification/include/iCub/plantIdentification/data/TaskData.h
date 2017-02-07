@@ -153,6 +153,7 @@ namespace iCub {
             *   93: object recognition: pwm to request at the index finger distal joint
             *   94: object recognition: disable object recognition logging
             *   95: object recognition: not used yet
+            *	96: neural network offeset
             *
             *   Note: double values have to contain a dot, while strings have to start with '#'
             *

@@ -88,6 +88,8 @@ namespace iCub {
 
                 bool restorePreviousArmPosition();
 
+                bool setArmHomeAsCurrent();
+
                 bool restorePreviousControlMode();
 
                 bool openHand();

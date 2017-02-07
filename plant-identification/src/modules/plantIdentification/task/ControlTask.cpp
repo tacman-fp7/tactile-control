@@ -373,7 +373,7 @@ void ControlTask::calculateControlInput(){
                     rotatedAnglesVector[0] = rotatedAngles[0];
                     rotatedAnglesVector[1] = rotatedAngles[1];
                     Vector estimatedBestPositionNNVector = neuralNetwork.predict(rotatedAnglesVector);
-                    estimatedFinalPose = estimatedBestPositionNNVector[0];
+                    estimatedFinalPose = estimatedBestPositionNNVector[0] + commonData->tpDbl(96);
 
                     handAperture = 180 - (middleEnc + indexEnc)/2 - thumbEnc;
 
@@ -441,7 +441,7 @@ void ControlTask::calculateControlInput(){
                     rotatedAnglesVector[1] = rotatedAngles[1];
                     rotatedAnglesVector[2] = rotatedAngles[2];
                     Vector estimatedBestPositionNNVector = neuralNetwork.predict(rotatedAnglesVector);
-                    estimatedFinalPose = estimatedBestPositionNNVector[0];
+                    estimatedFinalPose = estimatedBestPositionNNVector[0] + commonData->tpDbl(96);
 
                 } else if (bestPoseEstimatorMethod == 1){
 

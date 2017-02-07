@@ -317,7 +317,13 @@ bool ControllersUtil::setArmInTaskPosition() {
 
     for(int i = 0; i < wholeArmJointsHome.size(); i++){
 
-        iPos->positionMove(i,wholeArmJointsHome[i]);
+	double jointAngle;
+	if (i == 12 && numFingers == 2){
+		jointAngle = 4.0;
+	} else {
+		jointAngle = wholeArmJointsHome[i];
+	}
+        iPos->positionMove(i,jointAngle);
 
     }
 
@@ -513,6 +519,36 @@ bool ControllersUtil::restorePreviousArmPosition(){
     return true;
 }
 
+
+bool ControllersUtil::setArmHomeAsCurrent(){
+    using yarp::os::Time;
+
+    bool encodersDataAcquired = false;
+    while(!encodersDataAcquired) {
+
+        encodersDataAcquired = iEncs->getEncoders(wholeArmJointsHome.data());
+
+//#ifndef NODEBUG
+        cout << "DEBUG: " << dbgTag << "Encoder data is not available yet. \n";
+//#endif
+
+        Time::delay(0.1);
+    }
+
+#ifndef NODEBUG
+    cout << "\n";
+    cout << "DEBUG: " << dbgTag << "New arm home positions are: ";
+    for (size_t i = 0; i < wholeArmJointsHome.size(); ++i) {
+        cout << wholeArmJointsHome[i] << " ";
+    }
+    cout << "\n";
+#endif
+
+    return true;
+}
+
+
+
 bool ControllersUtil::restorePreviousControlMode(){
 
     // restore control modes from joints 8 9 10 11 12 13 14 15
@@ -632,7 +668,14 @@ bool ControllersUtil::openHand() {
     
     for(int i = 8; i < wholeArmJointsHome.size(); i++){
 
-        iPos->positionMove(i,wholeArmJointsHome[i]);
+
+	double jointAngle;
+	if (i == 12 && numFingers == 2){
+		jointAngle = 4.0;
+	} else {
+		jointAngle = wholeArmJointsHome[i];
+	}
+        iPos->positionMove(i,jointAngle);
 
     }
 
