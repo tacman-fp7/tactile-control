@@ -2,6 +2,7 @@
 
 #include "iCub/plantIdentification/PlantIdentificationEnums.h"
 #include "iCub/plantIdentification/util/ICubUtil.h"
+#include "iCub/plantIdentification/util/MLUtil.h"
 
 #include <yarp/sig/Vector.h>
 #include <yarp/sig/Matrix.h>
@@ -231,7 +232,14 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
     snapshotSaved = false;
     squeezingStarted = false;
     storedGripStrength = commonData->tpDbl(7);
-
+    testClassifierEnabled = commonData->tpInt(95) > 0;
+    predictionEvaluationMethod = commonData->tpInt(95);
+    features.resize(45,0);
+    featuresIndex = 0;
+    tactileDataTemp.resize(30);
+    for(int i = 0; i < tactileDataTemp.size(); i++){
+        tactileDataTemp[i].resize(24,0);
+    }
 
     if (resetErrOnContact){
         taskName = APPROACH_AND_CONTROL;
@@ -1269,6 +1277,17 @@ void ControlTask::manageObjectRecognitionTask(Bottle &objectRecognitionBottle){
                 objRecDataFile.open(fileNameSqueezing.c_str());
                 objRecFileExists = true;
                 std::cout << "OBJECT RECOGNITION: loggin started!!!\n";
+
+                // copy initial raw encoders of the thumb and the middle fingers into features
+                if (testClassifierEnabled){
+                    for(int i = 0; i < 3; i++){ // thumb
+                        features[featuresIndex + i] = commonData->fingerEncodersRawData[i];
+                    }
+                    for(int i = 0; i < 3; i++){ // middle fingers
+                        features[featuresIndex + i] = commonData->fingerEncodersRawData[6 + i];
+                    }
+                    featuresIndex += 3;
+                }
             }
             ICubUtil::printBottleIntoFile(objRecDataFile,objectRecognitionBottle);
         }
@@ -1289,12 +1308,38 @@ void ControlTask::manageObjectRecognitionTask(Bottle &objectRecognitionBottle){
             ICubUtil::printBottleIntoFile(objRecDataFile,objectRecognitionBottle);
         }
 
+        if (testClassifierEnabled){
+            // copy current tactile data in the temporary matrix used to avarage the last 30 tactile values
+            for(int i = 0; i < commonData->fingerTaxelsRawData[4].size(); i++){ // thumb
+                tactileDataTemp[callsNumber%30][i] = commonData->fingerTaxelsRawData[4][i]; 
+            }
+            for(int i = 0; i < commonData->fingerTaxelsRawData[1].size(); i++){ // middle finger
+                tactileDataTemp[callsNumber%30][i + 12] = commonData->fingerTaxelsRawData[1][i]; 
+            }
+        }
+
     } else if (time < bendDistalTime){
 
         if (objRecFileExists){
             objRecDataFile.close();
             objRecFileExists = false;
             std::cout << "OBJECT RECOGNITION: loggin stopped!!!\n";
+
+            // calculate tactile avarage over the last 30 tactile values
+            if (testClassifierEnabled){
+                std::vector<double> tactileAvarage(24,0);
+                for(int i = 0; i < tactileAvarage.size(); i++){
+                    for(int j = 0; j < tactileDataTemp.size(); j++){
+                        tactileAvarage[i] += tactileDataTemp[j][i];
+                    }
+                    tactileAvarage[i] /= tactileDataTemp.size();
+                }
+                // put the tactile avarage into the features vector
+                for(int i = 0; i < tactileAvarage.size(); i++){
+                    features[featuresIndex + i] = tactileAvarage[i];
+                }
+                featuresIndex += tactileAvarage.size();
+            }
         }
 
         if (!closingProximals){
@@ -1342,6 +1387,17 @@ void ControlTask::manageObjectRecognitionTask(Bottle &objectRecognitionBottle){
                 std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
                 std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
                 std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
+
+                // copy all final raw encoders
+                if (testClassifierEnabled){
+                    for(int i = 0; i < commonData->fingerEncodersRawData.size() - 1; i++){ // 15 components (the 16th is always 0)
+                        features[featuresIndex + i] = commonData->fingerEncodersRawData[i];
+                    }
+                    featuresIndex += commonData->fingerEncodersRawData.size() - 1;
+
+                    // test features!!!
+                    commonData->mlUtil.testClassifierOneShot(features,predictionEvaluationMethod);
+                }
             }
         }
     }

@@ -37,6 +37,10 @@ namespace iCub {
                 std::map<iCub::plantIdentification::RPCViewCmdArgName,std::string> viewCmdArgDescMap;
                 std::map<std::string,iCub::plantIdentification::RPCViewCmdArgName> viewCmdArgRevMap;
 
+                std::map<iCub::plantIdentification::RPCMlCmdArgName,std::string> mlCmdArgMap;
+                std::map<iCub::plantIdentification::RPCMlCmdArgName,std::string> mlCmdArgDescMap;
+                std::map<std::string,iCub::plantIdentification::RPCMlCmdArgName> mlCmdArgRevMap;
+
                 std::map<iCub::plantIdentification::TaskName,std::string> taskMap;
                 std::map<iCub::plantIdentification::TaskName,std::string> taskDescMap;
                 std::map<std::string,iCub::plantIdentification::TaskName> taskRevMap;
@@ -63,6 +67,8 @@ namespace iCub {
                 void add(std::string mapKey,iCub::plantIdentification::RPCTaskCmdArgName mapValue,std::string description);
 
                 void add(std::string mapKey,iCub::plantIdentification::RPCViewCmdArgName mapValue,std::string description);
+
+                void add(std::string mapKey,iCub::plantIdentification::RPCMlCmdArgName mapValue,std::string description);
 
                 void add(std::string mapKey,iCub::plantIdentification::TaskName mapValue,std::string description);
 

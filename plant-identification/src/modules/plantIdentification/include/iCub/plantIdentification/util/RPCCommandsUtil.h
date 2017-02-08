@@ -27,6 +27,7 @@ namespace iCub {
                 iCub::plantIdentification::RPCSetCmdArgName setCmdArg;
                 iCub::plantIdentification::RPCTaskCmdArgName taskCmdArg;
                 iCub::plantIdentification::RPCViewCmdArgName viewCmdArg;
+                iCub::plantIdentification::RPCMlCmdArgName mlCmdArg;
                 iCub::plantIdentification::TaskName task;
 
                 yarp::os::Value argValue;

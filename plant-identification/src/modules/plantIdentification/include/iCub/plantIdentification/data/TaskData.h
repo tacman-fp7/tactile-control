@@ -4,6 +4,7 @@
 #include "iCub/plantIdentification/PlantIdentificationEnums.h"
 #include "iCub/plantIdentification/util/ControllersUtil.h"
 #include "iCub/plantIdentification/data/GMMData.h"
+#include "iCub/plantIdentification/util/MLUtil.h"
 
 #include <iCub/iKin/iKinFwd.h>
 #include <yarp/os/BufferedPort.h>
@@ -54,6 +55,8 @@ namespace iCub {
             std::vector<double> realForceData;
 
             double currentThAbdJointAngleSetpoint;
+
+            iCub::plantIdentification::MLUtil mlUtil;
 
             
             /*  TEMP PARAMETERS USED DURING CONTROL TASKS (EXCEPT THE 15th, USED DURING STEP TASKS)
@@ -152,7 +155,7 @@ namespace iCub {
             *   92: object recognition: distal closure time
             *   93: object recognition: pwm to request at the index finger distal joint
             *   94: object recognition: disable object recognition logging
-            *   95: object recognition: not used yet
+            *   95: object recognition: test mode status. 0: off 1: on (one shot) 2: on (refinement using avarage) 3: on (refinement using maxmax)
             *	96: neural network offeset
             *
             *   Note: double values have to contain a dot, while strings have to start with '#'

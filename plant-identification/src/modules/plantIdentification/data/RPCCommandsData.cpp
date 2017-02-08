@@ -10,13 +10,14 @@ using iCub::plantIdentification::RPCMainCmdName;
 using iCub::plantIdentification::RPCSetCmdArgName;
 using iCub::plantIdentification::RPCTaskCmdArgName;
 using iCub::plantIdentification::RPCViewCmdArgName;
+using iCub::plantIdentification::RPCMlCmdArgName;
 using iCub::plantIdentification::TaskName;
 
 using std::string;
 using std::pair;
 
 
-// TO COMMENT OUT IF NEURAL NETWORKS HAVE TO BE TESTED
+// TO UNCOMMENT IF NEURAL NETWORKS HAVE TO BE TESTED
 //#include <yarp/os/Property.h>
 //#include "iCub/plantIdentification/util/ICubUtil.h"
 //#include <yarp/os/Bottle.h>
@@ -36,6 +37,7 @@ RPCCommandsData::RPCCommandsData(){
     add("open",OPEN,"STOP TASKS AND OPEN HAND");
     add("arm",ARM,"set ARM IN TASK POSITION");
     add("grasp",GRASP,"EXECUTE GRASP TASK");
+    add("ml",ML,"MANAGE GURLS (usage: 'ml [train | test | save | load]");
     add("wave",WAVE,"EXECUTE WAVE ACTION");
     add("quit",QUIT,"QUIT MODULE");
 
@@ -83,6 +85,13 @@ RPCCommandsData::RPCCommandsData(){
     add("set",SETTINGS,"SETTINGS");
     add("tasks",TASKS,"TASKS");
 
+    // ML <?>
+    add("train",TRAIN,"TRAINING");
+    add("test",TEST,"TESTING");
+    add("save_model",SAVE_MODEL,"SAVE MODEL");
+    add("load_model",LOAD_MODEL,"LOAD MODEL");
+    add("load_data",LOAD_DATA,"LOAD TRAINING AND TEST SETS");
+
     dbgTag = "RPCCommandsData: ";
     
 }
@@ -109,6 +118,12 @@ void RPCCommandsData::add(string rpcLabel,RPCViewCmdArgName enumLabel,string des
     viewCmdArgMap.insert(pair<RPCViewCmdArgName,string>(enumLabel,rpcLabel));
     viewCmdArgDescMap.insert(pair<RPCViewCmdArgName,string>(enumLabel,description));
     viewCmdArgRevMap.insert(pair<string,RPCViewCmdArgName>(rpcLabel,enumLabel));
+}
+
+void RPCCommandsData::add(string rpcLabel,RPCMlCmdArgName enumLabel,string description){
+    mlCmdArgMap.insert(pair<RPCMlCmdArgName,string>(enumLabel,rpcLabel));
+    mlCmdArgDescMap.insert(pair<RPCMlCmdArgName,string>(enumLabel,description));
+    mlCmdArgRevMap.insert(pair<string,RPCMlCmdArgName>(rpcLabel,enumLabel));
 }
 
 void RPCCommandsData::add(string rpcLabel,TaskName enumLabel,string description){
@@ -154,7 +169,7 @@ void RPCCommandsData::setValues(yarp::os::Value &value,std::vector<double> &valu
 
 
 
-    //TO COMMENT OUT IF NEURAL NETWORKS HAVE TO BE TESTED
+    //TO UNCOMMENT IF NEURAL NETWORKS HAVE TO BE TESTED
     // create the neural network and configure it
  //   iCub::ctrl::ff2LayNN_tansig_purelin neuralNetwork;
     //yarp::os::Property nnConfProperty;

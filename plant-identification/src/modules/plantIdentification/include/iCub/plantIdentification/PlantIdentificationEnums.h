@@ -16,6 +16,7 @@ namespace iCub {
             ARM,
             GRASP,
             WAVE,
+            ML,
             QUIT
         };
 
@@ -75,6 +76,16 @@ namespace iCub {
 
             SETTINGS,
             TASKS
+        };
+
+        enum RPCMlCmdArgName {
+
+            TRAIN,
+            TEST,
+            SAVE_MODEL,
+            LOAD_MODEL,
+            LOAD_DATA,
+            NONE
         };
 
         enum FingerJoint {

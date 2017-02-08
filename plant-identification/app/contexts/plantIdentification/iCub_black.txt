@@ -1,0 +1,47 @@
+#					 #52 #53 #54
+sensitivity_left =  [1.0 0.6 0.6]
+sensitivity_right = [1.0 0.6 1.0]
+
+#							 #75
+thumbAbductionOffset_left =  -30.0
+thumbAbductionOffset_right = -50.0
+
+#				  #1   #2  #3
+pidGains_left =  [60.0 1.0 1.6]
+pidGains_right = [60.0 1.0 1.6]
+
+[grasp]
+
+#					J7 J8 J9 J10 J11 J12 J13 J14 J15
+handJoints_left =  [30 23 3  40  2   40  3   40  1]
+handJoints_right = [17 43 3  33  2   35  3   35  1]
+
+#				  #32 #33 #34 #35 #36 #37 #38 #39
+approach_left =  [0   3   2.0 2.0 25  1.5 0.7 1]
+approach_right = [0   3   2.0 2.0 25  1.5 0.7 1]
+
+#					#77 #78 #79 #80 #81 #82
+hysteresis_left =  [0   0.0 0.0 0.0 0.0 0]
+hysteresis_right = [0   0.0 0.0 0.0 0.0 0]
+
+#					 #7
+gripStrength_left =  50.0
+gripStrength_right = 50.0
+
+[objrec]
+
+#					J7 J8 J9 J10 J11 J12 J13 J14 J15
+handJoints_left =  [30 47 3  44  2   30  3   60  45]
+handJoints_right = [30 45 3  60  2   30  3   60  1]
+
+#				  #32 #33 #34 #35 #36 #37 #38 #39
+approach_left =  [0   3   2.0 2.0 25  1.5 0.7 1]
+approach_right = [0   3   2.0 2.0 25  1.5 0.7 1]
+
+#					#77 #78 #79 #80 #81 #82
+hysteresis_left =  [0   0.0 0.0 0.0 0.0 0]
+hysteresis_right = [0   0.0 0.0 0.0 0.0 0]
+
+#					 #7
+gripStrength_left =  50.0
+gripStrength_right = 50.0

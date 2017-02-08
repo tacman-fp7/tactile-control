@@ -50,6 +50,9 @@ void RPCCommandsUtil::processCommand(const Bottle &rpcCmdBottle){
         break;
     case WAVE: // do nothing
         break;
+    case ML:
+        mlCmdArg = rpcData->mlCmdArgRevMap[rpcCmdBottle.get(1).asString()];
+        break;
     case QUIT: // do nothing
         break;
 

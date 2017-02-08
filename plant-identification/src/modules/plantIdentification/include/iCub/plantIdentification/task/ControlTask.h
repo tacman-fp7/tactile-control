@@ -86,6 +86,11 @@ namespace iCub {
                 bool snapshotSaved;
                 bool squeezingStarted;
                 double storedGripStrength;
+                bool testClassifierEnabled;
+                int predictionEvaluationMethod;
+                std::vector<double> features;
+                int featuresIndex;
+                std::vector<std::vector<double> > tactileDataTemp;
 
 
             public:

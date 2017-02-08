@@ -181,6 +181,9 @@ bool PlantIdentificationModule::respond(const yarp::os::Bottle& command, yarp::o
     case GRASP:
         grasp();
         break;
+    case ML:
+        ml(rpcCmdUtil.mlCmdArg);
+        break;
     case WAVE:
         wave();
         break;
@@ -314,6 +317,37 @@ bool PlantIdentificationModule::wave() {
     double actionDuration = taskData->commonData.tpDbl(64);
 
     eventsThread->setWaveAction(actionDuration,armJoint,wavePeriod,waveAmplitude,waveType);
+
+    return true;
+}
+/* *********************************************************************************************************************** */
+
+/* ******* RPC Manage machine learning related commands                                       ********************************************** */
+bool PlantIdentificationModule::ml(iCub::plantIdentification::RPCMlCmdArgName paramName) {
+
+    switch(paramName){
+
+    case TRAIN:
+        // train the classifier
+        taskData->commonData.mlUtil.trainClassifier();
+        break;
+    case TEST:
+        // test the classifier
+        taskData->commonData.mlUtil.testClassifier();
+        break;
+    case SAVE_MODEL:
+        // save the learned model to file
+        taskData->commonData.mlUtil.saveModelToFile();
+        break;
+    case LOAD_MODEL:
+        // load model from file
+        taskData->commonData.mlUtil.loadModelFromFile();
+        break;
+    case LOAD_DATA:
+        // load data from files
+        taskData->commonData.mlUtil.loadTrainingAndTestSetsFromFile();
+        break;
+    }
 
     return true;
 }
