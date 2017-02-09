@@ -323,7 +323,7 @@ bool PlantIdentificationModule::wave() {
 /* *********************************************************************************************************************** */
 
 /* ******* RPC Manage machine learning related commands                                       ********************************************** */
-bool PlantIdentificationModule::ml(iCub::plantIdentification::RPCMlCmdArgName paramName) {
+bool PlantIdentificationModule::ml(iCub::plantIdentification::RPCMlCmdArgName paramName,Value paramValue) {
 
     switch(paramName){
 

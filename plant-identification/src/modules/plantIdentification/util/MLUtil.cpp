@@ -1,7 +1,6 @@
 #include "iCub/plantIdentification/util/MLUtil.h"
 
 #include <iomanip>
-#include <string>
 
 using iCub::plantIdentification::MLUtil;
 
@@ -17,13 +16,13 @@ bool MLUtil::init(yarp::os::ResourceFinder &rf){
     std::vector<double> cioa;
     outputsOverTime.resize(0);
 
-    std::string pathPrefix = "/home/icub/tmp_massimo/tactile-control/plant-identification/build/bin/";
+    std::string pathPrefix = "/home/icub/tmp_massimo/tactile-control/data/objectRecognition/";
 
-    modelFileName = "model.dat";
-    trainingSetXFileName = pathPrefix + "trainingSetX.dat";
-    trainingSetYFileName = pathPrefix + "trainingSetY.dat";
-    testSetXFileName = pathPrefix + "testSetX.dat";
-    testSetYFileName = pathPrefix + "testSetY.dat";
+    modelFileName = "model";
+    trainingSetXFileName = pathPrefix + "trainingSetX";
+    trainingSetYFileName = pathPrefix + "trainingSetY";
+    testSetXFileName = pathPrefix + "testSetX";
+    testSetYFileName = pathPrefix + "testSetY";
 
     return true;
 }
@@ -131,11 +130,11 @@ bool MLUtil::testClassifierOneShot(std::vector<double> &features,int predictionE
 
 }
 
-bool MLUtil::saveModelToFile(){
+bool MLUtil::saveModelToFile(std::string fileSuffix){
 
     std::cout << "saving model...";
 
-    wrapper->saveModel(modelFileName);
+    wrapper->saveModel(modelFileName + fileSuffix + ".dat");
 
     std::cout << " ...done" << std::endl;
 
@@ -143,28 +142,28 @@ bool MLUtil::saveModelToFile(){
 }
 
 
-bool MLUtil::loadModelFromFile(){
+bool MLUtil::loadModelFromFile(std::string fileSuffix){
 
     std::cout << "loading model...";
 
-    wrapper->loadOpt(modelFileName);
+    wrapper->loadOpt(modelFileName + fileSuffix + ".dat");
 
     std::cout << " ...done" << std::endl;
 
     return true;
 }
 
-bool MLUtil::loadTrainingAndTestSetsFromFile(){
+bool MLUtil::loadTrainingAndTestSetsFromFile(std::string fileSuffix){
 
     std::cout << "loading training and test data...";
 
-    xTr.readCSV(trainingSetXFileName);
+    xTr.readCSV(trainingSetXFileName + fileSuffix + ".dat");
 
-    yTr.readCSV(trainingSetYFileName);
+    yTr.readCSV(trainingSetYFileName + fileSuffix + ".dat");
 
-    xTe.readCSV(testSetXFileName);
+    xTe.readCSV(testSetXFileName + fileSuffix + ".dat");
 
-    yTe.readCSV(testSetYFileName);
+    yTe.readCSV(testSetYFileName + fileSuffix + ".dat");
 
     std::cout << " ...done" << std::endl;
 

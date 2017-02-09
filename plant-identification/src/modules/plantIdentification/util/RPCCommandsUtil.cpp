@@ -52,6 +52,9 @@ void RPCCommandsUtil::processCommand(const Bottle &rpcCmdBottle){
         break;
     case ML:
         mlCmdArg = rpcData->mlCmdArgRevMap[rpcCmdBottle.get(1).asString()];
+        if (rpcCmdBottle.size() > 2){
+            argValue = rpcCmdBottle.get(2);
+        }
         break;
     case QUIT: // do nothing
         break;

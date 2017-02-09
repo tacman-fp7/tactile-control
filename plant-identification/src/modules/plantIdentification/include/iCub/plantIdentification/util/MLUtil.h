@@ -44,11 +44,11 @@ namespace iCub {
 
                 bool testClassifierOneShot(std::vector<double> &features,int predictionEvaluationMethod);
 
-                bool saveModelToFile();
+                bool saveModelToFile(std::string fileSuffix);
 
-                bool loadModelFromFile();
+                bool loadModelFromFile(std::string fileSuffix);
 
-                bool loadTrainingAndTestSetsFromFile();
+                bool loadTrainingAndTestSetsFromFile(std::string fileSuffix);
 
                 bool release();
 
