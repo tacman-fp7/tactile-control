@@ -345,6 +345,7 @@ bool PlantIdentificationModule::ml(iCub::plantIdentification::RPCMlCmdArgName pa
         break;
     case LOAD_DATA:
         // load data from files
+	std::cout << "calling training method" << std::endl;
         taskData->commonData.mlUtil.loadTrainingAndTestSetsFromFile();
         break;
     }

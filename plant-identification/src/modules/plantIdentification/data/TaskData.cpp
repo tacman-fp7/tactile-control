@@ -365,6 +365,8 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
     /****/
 
     controllersUtil->buildWholeArmJointsHome(commonData.armJointsHome,commonData.handJointsHome);
+
+    commonData.mlUtil.init(rf);
 }
 
 int TaskData::getFingerFromJoint(int joint){

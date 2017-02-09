@@ -84,8 +84,7 @@ namespace iCub {
             TEST,
             SAVE_MODEL,
             LOAD_MODEL,
-            LOAD_DATA,
-            NONE
+            LOAD_DATA
         };
 
         enum FingerJoint {

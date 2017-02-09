@@ -1,6 +1,7 @@
 #include "iCub/plantIdentification/util/MLUtil.h"
 
 #include <iomanip>
+#include <string>
 
 using iCub::plantIdentification::MLUtil;
 
@@ -16,11 +17,13 @@ bool MLUtil::init(yarp::os::ResourceFinder &rf){
     std::vector<double> cioa;
     outputsOverTime.resize(0);
 
+    std::string pathPrefix = "/home/icub/tmp_massimo/tactile-control/plant-identification/build/bin/";
+
     modelFileName = "model.dat";
-    trainingSetXFileName = "trainingSetX.dat";
-    trainingSetYFileName = "trainingSetY.dat";
-    testSetXFileName = "testSetX.dat";
-    testSetYFileName = "testSetY.dat";
+    trainingSetXFileName = pathPrefix + "trainingSetX.dat";
+    trainingSetYFileName = pathPrefix + "trainingSetY.dat";
+    testSetXFileName = pathPrefix + "testSetX.dat";
+    testSetYFileName = pathPrefix + "testSetY.dat";
 
     return true;
 }
@@ -130,7 +133,11 @@ bool MLUtil::testClassifierOneShot(std::vector<double> &features,int predictionE
 
 bool MLUtil::saveModelToFile(){
 
+    std::cout << "saving model...";
+
     wrapper->saveModel(modelFileName);
+
+    std::cout << " ...done" << std::endl;
 
     return true;
 }
@@ -138,17 +145,28 @@ bool MLUtil::saveModelToFile(){
 
 bool MLUtil::loadModelFromFile(){
 
+    std::cout << "loading model...";
+
     wrapper->loadOpt(modelFileName);
+
+    std::cout << " ...done" << std::endl;
 
     return true;
 }
 
 bool MLUtil::loadTrainingAndTestSetsFromFile(){
 
+    std::cout << "loading training and test data...";
+
     xTr.readCSV(trainingSetXFileName);
+
     yTr.readCSV(trainingSetYFileName);
+
     xTe.readCSV(testSetXFileName);
+
     yTe.readCSV(testSetYFileName);
+
+    std::cout << " ...done" << std::endl;
 
     return true;
 }
@@ -190,7 +208,7 @@ bool MLUtil::checkAccuracy(const std::vector<int> &predictions,const std::vector
     std::vector<int> numGuessedByClass(numObjects,0);
     std::vector<int> numSamplesByClass(numObjects,0);
     std::vector<double> accuracyByClass(numObjects,0);
-    std::vector<std::vector<int>> confusionMatrix(numObjects);
+    std::vector<std::vector<int> > confusionMatrix(numObjects);
     for(int i = 0; i < confusionMatrix.size(); i++){
         confusionMatrix[i].resize(numObjects,0);
     }
@@ -210,10 +228,28 @@ bool MLUtil::checkAccuracy(const std::vector<int> &predictions,const std::vector
     }
 
     cout << "Confusion matrix: " << endl;
+    cout << "    ";
     for(int i = 0; i < confusionMatrix.size(); i++){
-        for(int j = 0; j < confusionMatrix[i].size(); j++){
+        cout << (i + 1)%10 << " ";
+    }
+    cout << endl;
+    cout << "    ";
+    for(int i = 0; i < confusionMatrix.size(); i++){
+        cout << "--";
+    }
+    cout << endl;
+    
 
-            cout << confusionMatrix[i][j] << "\t";
+    for(int i = 0; i < confusionMatrix.size(); i++){
+        cout << (i + 1)%10 << " | ";
+        for(int j = 0; j < confusionMatrix[i].size(); j++){
+	
+		if (confusionMatrix[i][j] > 0){
+			cout << confusionMatrix[i][j];
+		} else {
+			cout << ".";
+		}
+		cout << " ";
         }
         cout << endl;
     }
@@ -221,11 +257,13 @@ bool MLUtil::checkAccuracy(const std::vector<int> &predictions,const std::vector
 
     cout << "Accuracy by class: ";
     for(int i = 0; i < accuracyByClass.size(); i++){
-        cout << i + 1 << ": " << std::setprecision(2) << accuracyByClass[i]*100 << "%  - ";
+//        cout << i + 1 << ": " << std::setprecision(2) << accuracyByClass[i]*100 << "%  - ";
+        cout << i + 1 << ": " << accuracyByClass[i]*100 << "%  - ";
     }
     cout << endl;
     
-    cout << "Total accuracy: " << std::setprecision(2) << accuracy << "%" << endl;
+//    cout << "Total accuracy: " << std::setprecision(2) << accuracy*100 << "%" << endl;
+    cout << "Total accuracy: " << accuracy*100 << "%" << endl;
 
 }
 

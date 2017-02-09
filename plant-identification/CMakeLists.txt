@@ -29,6 +29,7 @@ endif(CMAKE_BUILD_TYPE MATCHES Debug)
 # Find packages
 find_package(YARP)
 find_package(ICUB)
+find_package(Gurls REQUIRED)
 list(APPEND CMAKE_MODULE_PATH ${YARP_MODULE_PATH})
 list(APPEND CMAKE_MODULE_PATH ${ICUB_MODULE_PATH})
 include(YarpInstallationHelpers)
@@ -42,10 +43,10 @@ icubcontrib_set_default_prefix()
 
 add_definitions(${YARP_DEFINES}) # add yarp definitions - this contains also -D_REENTRANT
 
-
 # Include directories
 include_directories(${YARP_INCLUDE_DIRS})
 include_directories(${ICUB_INCLUDE_DIRS})
+include_directories(${Gurls_INCLUDE_DIRS})
 
 
 # Add project directories

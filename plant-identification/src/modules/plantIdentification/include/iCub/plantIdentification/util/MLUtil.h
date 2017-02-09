@@ -1,7 +1,7 @@
 #ifndef __ICUB_PLANTIDENTIFICATION_MLUTIL_H__
 #define __ICUB_PLANTIDENTIFICATION_MLUTIL_H__
 
-#include <gurls++\kernelrlswrapper.hpp>
+#include <gurls++/kernelrlswrapper.h>
 
 #include <yarp/os/ResourceFinder.h>
 
