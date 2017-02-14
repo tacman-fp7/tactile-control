@@ -620,7 +620,7 @@ void ICubUtil::putSelectedElementsIntoMatrix(const yarp::sig::Matrix &dataIn,con
 }
 
 
- void ICubUtil::makeObjectRecognitionBottle(Bottle &objRecBottle,string taskId,int objectId,iCub::plantIdentification::ObjectRecognitionTask objRecTask,int extraCode1,int extraCode2,int skipPreviousRepetition,string experimentDescription,string previousExperimentDescription,double handAperture,double actualHandPosition,double targetHandPosition,double actualGripStrength,double targetGripStrength,iCub::plantIdentification::TaskCommonData *commonData){
+ void ICubUtil::makeObjectRecognitionBottle(Bottle &objRecBottle,string taskId,int objectId,iCub::plantIdentification::ObjectRecognitionTask objRecTask,int extraCode1,int extraCode2,int skipPreviousRepetition,string experimentDescription,string previousExperimentDescription,double handAperture,double actualHandPosition,double targetHandPosition,double actualGripStrength,double targetGripStrength,std::vector<double> &pwm,iCub::plantIdentification::TaskCommonData *commonData){
 
      objRecBottle.clear();
 
@@ -687,7 +687,12 @@ void ICubUtil::putSelectedElementsIntoMatrix(const yarp::sig::Matrix &dataIn,con
         objRecBottle.addDouble(commonData->armEncodersAngles[i]);
     }
 
- 
+    // logging pwm values (2) (89-90) | (2) (92-93)
+    for(size_t i = 0; i < pwm.size(); i++){
+        objRecBottle.addDouble(pwm[i]);
+    }
+
+
  }
 
 void ICubUtil::printBottleIntoFile(std::ofstream &file,yarp::os::Bottle &bottle){

@@ -35,7 +35,7 @@ namespace iCub {
                 static void putSelectedElementsIntoVector(const yarp::sig::Vector &dataIn,const std::vector<int> &selectedIndexes,yarp::sig::Vector &dataOut);
                 static void putSelectedElementsIntoMatrix(const yarp::sig::Matrix &dataIn,const std::vector<int> &selectedRowIndexes,const std::vector<int> &selectedColumnIndexes,yarp::sig::Matrix &dataOut);
                 
-                static void makeObjectRecognitionBottle(yarp::os::Bottle &objRecBottle,std::string taskId,int objectId,iCub::plantIdentification::ObjectRecognitionTask objRecTask,int extraCode1,int extraCode2,int skipPreviousRepetition,std::string experimentDescription,std::string previousExperimentDescription,double handAperture,double actualHandPosition,double targetHandPosition,double actualGripStrength,double targetGripStrength,iCub::plantIdentification::TaskCommonData *commonData); 
+                static void makeObjectRecognitionBottle(yarp::os::Bottle &objRecBottle,std::string taskId,int objectId,iCub::plantIdentification::ObjectRecognitionTask objRecTask,int extraCode1,int extraCode2,int skipPreviousRepetition,std::string experimentDescription,std::string previousExperimentDescription,double handAperture,double actualHandPosition,double targetHandPosition,double actualGripStrength,double targetGripStrength,std::vector<double> &pwm,iCub::plantIdentification::TaskCommonData *commonData); 
 
                 static void printBottleIntoFile(std::ofstream &file,yarp::os::Bottle &bottle);
         private:

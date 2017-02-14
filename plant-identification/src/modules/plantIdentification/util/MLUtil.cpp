@@ -57,8 +57,22 @@ bool MLUtil::testClassifierOneShot(std::vector<double> &features,int predictionE
     gurls::gMat2D<double> input(1,features.size());
 
     for(int i = 0; i < features.size(); i++){
-        input[0][i] = features[i];
+        input(0,i) = features[i];
+
+std::cout << "( " << input[0][i] << "/" << input(0,i) << "/" << features[i] << ")" << " ";
     }
+
+std::cout << std::endl;
+
+
+	for(int i = 0; i < input.rows(); i++){
+		for(int j = 0; j < input.cols(); j++){
+			std::cout << input(i,j) << " ";
+		}
+		std::cout << std::endl;
+	}
+
+
 
     gurls::gMat2D<double> *output = wrapper->eval(input);
 
@@ -69,7 +83,7 @@ bool MLUtil::testClassifierOneShot(std::vector<double> &features,int predictionE
 
         std::vector<double> currentOutput(numObjects);
         for(int i = 0; i < currentOutput.size(); i++){
-            currentOutput[i] = (*output)[0][i];
+            currentOutput[i] = (*output)(0,i);
         }
         outputsOverTime.push_back(currentOutput);
 
@@ -79,9 +93,9 @@ bool MLUtil::testClassifierOneShot(std::vector<double> &features,int predictionE
            
             for(int i = 0; i < outputMean.cols(); i++){
                 for(int j = 0; j < outputsOverTime.size(); j++){
-                    outputMean[i] += outputsOverTime[j][i];
+                    outputMean(0,i) += outputsOverTime[j][i];
                 }
-                outputMean[i] /= outputsOverTime.size();
+                outputMean(0,i) /= outputsOverTime.size();
             }
 
             std::vector<int> predictions;
@@ -108,12 +122,28 @@ bool MLUtil::testClassifierOneShot(std::vector<double> &features,int predictionE
         outputsOverTime.resize(1);
         outputsOverTime[0].resize(output->cols());
         for(int i = 0; i < outputsOverTime[0].size(); i++){
-            outputsOverTime[0][i] = (*output)[0][i];
+            outputsOverTime[0][i] = (*output)(0,i);
         }
 
         std::vector<int> predictions;
         getStandardPredictionsFrom1vsAll(*output,predictions);
         prediction = predictions[0];
+
+
+
+
+	for(int i = 0; i < output->rows(); i++){
+		for(int j = 0; j < output->cols(); j++){
+			std::cout << (*output)(i,j) << " ";
+		}
+		std::cout << std::endl;
+	}
+
+
+
+
+
+
     }
 
     std::cout << "PREDICTION: <<<<<<<<<<<<<<       " << prediction + 1 << "       >>>>>>>>>>>>>>" << std::endl;
@@ -176,8 +206,8 @@ int MLUtil::getArgMin(const gurls::gMat2D<double> &mat,int rowNum){
     double currMax = -1000.0;
     
     for(int i = 0; i < mat.cols(); i++){
-        if (mat[rowNum][i] > currMax){
-            currMax = mat[rowNum][i];
+        if (mat(rowNum,i) > currMax){
+            currMax = mat(rowNum,i);
             currIndex = i;
         }
     }

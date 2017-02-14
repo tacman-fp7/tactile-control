@@ -182,7 +182,7 @@ bool PlantIdentificationModule::respond(const yarp::os::Bottle& command, yarp::o
         grasp();
         break;
     case ML:
-        ml(rpcCmdUtil.mlCmdArg);
+        ml(rpcCmdUtil.mlCmdArg,rpcCmdUtil.argValue);
         break;
     case WAVE:
         wave();
@@ -337,16 +337,16 @@ bool PlantIdentificationModule::ml(iCub::plantIdentification::RPCMlCmdArgName pa
         break;
     case SAVE_MODEL:
         // save the learned model to file
-        taskData->commonData.mlUtil.saveModelToFile();
+        taskData->commonData.mlUtil.saveModelToFile(paramValue.asString());
         break;
     case LOAD_MODEL:
         // load model from file
-        taskData->commonData.mlUtil.loadModelFromFile();
+        taskData->commonData.mlUtil.loadModelFromFile(paramValue.asString());
         break;
     case LOAD_DATA:
         // load data from files
-	std::cout << "calling training method" << std::endl;
-        taskData->commonData.mlUtil.loadTrainingAndTestSetsFromFile();
+
+        taskData->commonData.mlUtil.loadTrainingAndTestSetsFromFile(paramValue.asString());
         break;
     }
 

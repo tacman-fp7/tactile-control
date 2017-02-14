@@ -1021,12 +1021,12 @@ void ControlTask::calculateControlInput(){
     
     // log object recognition data
     if (objectRecognitionEnabled){
-        portsUtil->sendObjectRecognitionData(taskId,commonData->tpInt(46),static_cast<iCub::plantIdentification::ObjectRecognitionTask>(commonData->tpInt(47)),commonData->tpInt(48),commonData->tpInt(49),commonData->tpInt(50),commonData->tpStr(16),commonData->tpStr(17),commonData);
+        portsUtil->sendObjectRecognitionData(taskId,commonData->tpInt(46),static_cast<iCub::plantIdentification::ObjectRecognitionTask>(commonData->tpInt(47)),commonData->tpInt(48),commonData->tpInt(49),commonData->tpInt(50),commonData->tpStr(16),commonData->tpStr(17),inputCommandValue,commonData);
     }
 
     if (objectRecognitionEnabled){
         Bottle objectRecognitionBottle;
-        ICubUtil::makeObjectRecognitionBottle(objectRecognitionBottle,taskId,commonData->tpInt(46),static_cast<iCub::plantIdentification::ObjectRecognitionTask>(commonData->tpInt(47)),commonData->tpInt(48),commonData->tpInt(49),commonData->tpInt(50),commonData->tpStr(16),commonData->tpStr(17),handAperture,handPosition,estimatedFinalPose,actualGripStrength,gripStrength,commonData);
+        ICubUtil::makeObjectRecognitionBottle(objectRecognitionBottle,taskId,commonData->tpInt(46),static_cast<iCub::plantIdentification::ObjectRecognitionTask>(commonData->tpInt(47)),commonData->tpInt(48),commonData->tpInt(49),commonData->tpInt(50),commonData->tpStr(16),commonData->tpStr(17),handAperture,handPosition,estimatedFinalPose,actualGripStrength,gripStrength,inputCommandValue,commonData);
         manageObjectRecognitionTask(objectRecognitionBottle);
     }
 
@@ -1280,12 +1280,19 @@ void ControlTask::manageObjectRecognitionTask(Bottle &objectRecognitionBottle){
 
                 // copy initial raw encoders of the thumb and the middle fingers into features
                 if (testClassifierEnabled){
+std::cout << "thumb enc: ";
                     for(int i = 0; i < 3; i++){ // thumb
                         features[featuresIndex + i] = commonData->fingerEncodersRawData[i];
+std::cout << commonData->fingerEncodersRawData[i] << " ";
                     }
+std::cout << std::endl;
+                    featuresIndex += 3;
+std::cout << "middle enc: ";
                     for(int i = 0; i < 3; i++){ // middle fingers
                         features[featuresIndex + i] = commonData->fingerEncodersRawData[6 + i];
+std::cout << commonData->fingerEncodersRawData[6 + i] << " ";
                     }
+std::cout << std::endl;
                     featuresIndex += 3;
                 }
             }
@@ -1311,10 +1318,10 @@ void ControlTask::manageObjectRecognitionTask(Bottle &objectRecognitionBottle){
         if (testClassifierEnabled){
             // copy current tactile data in the temporary matrix used to avarage the last 30 tactile values
             for(int i = 0; i < commonData->fingerTaxelsRawData[4].size(); i++){ // thumb
-                tactileDataTemp[callsNumber%30][i] = commonData->fingerTaxelsRawData[4][i]; 
+                tactileDataTemp[callsNumber%30][i] = commonData->fingerTaxelsRawData[4][i];
             }
             for(int i = 0; i < commonData->fingerTaxelsRawData[1].size(); i++){ // middle finger
-                tactileDataTemp[callsNumber%30][i + 12] = commonData->fingerTaxelsRawData[1][i]; 
+                tactileDataTemp[callsNumber%30][i + 12] = commonData->fingerTaxelsRawData[1][i];
             }
         }
 
@@ -1335,9 +1342,12 @@ void ControlTask::manageObjectRecognitionTask(Bottle &objectRecognitionBottle){
                     tactileAvarage[i] /= tactileDataTemp.size();
                 }
                 // put the tactile avarage into the features vector
+std::cout << "tact all: ";
                 for(int i = 0; i < tactileAvarage.size(); i++){
                     features[featuresIndex + i] = tactileAvarage[i];
+std::cout << tactileAvarage[i] << " "; 
                 }
+std::cout << std::endl;
                 featuresIndex += tactileAvarage.size();
             }
         }
@@ -1390,9 +1400,12 @@ void ControlTask::manageObjectRecognitionTask(Bottle &objectRecognitionBottle){
 
                 // copy all final raw encoders
                 if (testClassifierEnabled){
+std::cout << "enc all: ";
                     for(int i = 0; i < commonData->fingerEncodersRawData.size() - 1; i++){ // 15 components (the 16th is always 0)
                         features[featuresIndex + i] = commonData->fingerEncodersRawData[i];
+std::cout << commonData->fingerEncodersRawData[i] << " ";
                     }
+std::cout << std::endl;
                     featuresIndex += commonData->fingerEncodersRawData.size() - 1;
 
                     // test features!!!

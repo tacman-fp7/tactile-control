@@ -405,14 +405,14 @@ bool PortsUtil::sendGMMRegressionData(double handAperture,double indMidPosDiff,d
 }
 
 
-bool PortsUtil::sendObjectRecognitionData(string taskId,int objectId,iCub::plantIdentification::ObjectRecognitionTask objRecTask,int extraCode1,int extraCode2,int skipPreviousRepetition,string experimentDescription,string previousExperimentDescription,iCub::plantIdentification::TaskCommonData *commonData){
+bool PortsUtil::sendObjectRecognitionData(string taskId,int objectId,iCub::plantIdentification::ObjectRecognitionTask objRecTask,int extraCode1,int extraCode2,int skipPreviousRepetition,string experimentDescription,string previousExperimentDescription,std::vector<double> &pwm,iCub::plantIdentification::TaskCommonData *commonData){
 
     using yarp::os::Bottle;
 
     Bottle& objRecognBottle = portObjRecognDataOut.prepare();
 
     // TODO insert handAperture,handPosition,estimatedFinalPose,actualGripStrength,gripStrength instead of 0
-    ICubUtil::makeObjectRecognitionBottle(objRecognBottle,taskId,objectId,objRecTask,extraCode1,extraCode2,skipPreviousRepetition,experimentDescription,previousExperimentDescription,0,0,0,0,0,commonData);
+    ICubUtil::makeObjectRecognitionBottle(objRecognBottle,taskId,objectId,objRecTask,extraCode1,extraCode2,skipPreviousRepetition,experimentDescription,previousExperimentDescription,0,0,0,0,0,pwm,commonData);
 
 
 
