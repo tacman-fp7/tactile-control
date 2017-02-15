@@ -192,6 +192,9 @@ bool PlantIdentificationModule::respond(const yarp::os::Bottle& command, yarp::o
 
         break;
     }
+    
+    reply.addString("ok");    
+
     return true;
 }
 
