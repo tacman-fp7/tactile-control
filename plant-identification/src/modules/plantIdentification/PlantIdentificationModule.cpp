@@ -332,47 +332,47 @@ bool PlantIdentificationModule::ml(iCub::plantIdentification::RPCMlCmdArgName pa
 
     case TRAIN:
         // train the classifier
-        taskData->commonData.mlUtil.trainClassifier();
+        mlUtil.trainClassifier();
         break;
     case TEST:
         // test the classifier
-        taskData->commonData.mlUtil.testClassifier();
+        mlUtil.testClassifier();
         break;
     case SAVE_MODEL:
         // save the learned model to file
-        taskData->commonData.mlUtil.saveModelToFile(paramValue.asString());
+        mlUtil.saveModelToFile(paramValue.asString());
         break;
     case LOAD_MODEL:
         // load model from file
-        taskData->commonData.mlUtil.loadModelFromFile(paramValue.asString());
+        mlUtil.loadModelFromFile(paramValue.asString());
         break;
     case LOAD_TRAINING_SET:
         // load training set from files
-        taskData->commonData.mlUtil.loadTrainingSetFromFile(paramValue.asString());
+        mlUtil.loadTrainingSetFromFile(paramValue.asString());
         break;
     case LOAD_TEST_SET:
         // load test set from files
-        taskData->commonData.mlUtil.loadTestSetFromFile(paramValue.asString());
+        mlUtil.loadTestSetFromFile(paramValue.asString());
         break;
     case SAVE_TRAINING_SET:
         // save training set from files
-        taskData->commonData.mlUtil.saveTrainingSetToFile(paramValue.asString());
+        mlUtil.saveTrainingSetToFile(paramValue.asString());
         break;
     case LEARN_NEW_OBJECT:
         // start the mode "learning a new object"
-        taskData->commonData.mlUtil.initNewObjectLearning(false);
+        mlUtil.initNewObjectLearning(false);
         break;
     case REFINE_NEW_OBJECT:
         // learn more features for the previous learned object
-        taskData->commonData.mlUtil.initNewObjectLearning(true);
+        mlUtil.initNewObjectLearning(true);
         break;    
     case DISCARD_LAST_FEATURES:
         // discard last collected features
-        taskData->commonData.mlUtil.discardLastCollectedFeatures();
+        mlUtil.discardLastCollectedFeatures();
         break;
     case PROCESS_COLLECTED_DATA:
         // process the collected data
-        taskData->commonData.mlUtil.processCollectedData();
+        mlUtil.processCollectedData();
         break;
     }
 

@@ -5,6 +5,7 @@
 #include "iCub/plantIdentification/data/TaskData.h"
 #include "iCub/plantIdentification/util/ControllersUtil.h"
 #include "iCub/plantIdentification/util/PortsUtil.h"
+#include "iCub/plantIdentification/util/MLUtil.h"
 
 #include <iCub/ctrl/neuralNetworks.h>
 #include <iCub/ctrl/pids.h>
@@ -31,6 +32,8 @@ namespace iCub {
                 std::vector<double> pressureTargetValue;
 
                 iCub::plantIdentification::PortsUtil *portsUtil;
+
+                iCub::plantIdentification::MLUtil *mlUtil;
 
                 /* variables used for error integral reset mode */
                 bool resetErrOnContact;
@@ -95,7 +98,7 @@ namespace iCub {
 
             public:
 
-                ControlTask(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::TaskCommonData *commonData,iCub::plantIdentification::ControlTaskData *controlData,std::vector<double> &targetList,bool resetErrOnContact = false);
+                ControlTask(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::MLUtil *mlUtil,iCub::plantIdentification::TaskCommonData *commonData,iCub::plantIdentification::ControlTaskData *controlData,std::vector<double> &targetList,bool resetErrOnContact = false);
 
                 std::string getPressureTargetValueDescription();
 

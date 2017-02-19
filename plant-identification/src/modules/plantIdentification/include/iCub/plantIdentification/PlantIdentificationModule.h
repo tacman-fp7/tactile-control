@@ -7,6 +7,7 @@
 #include "iCub/plantIdentification/data/RPCCommandsData.h"
 #include "iCub/plantIdentification/util/ControllersUtil.h"
 #include "iCub/plantIdentification/util/PortsUtil.h"
+#include "iCub/plantIdentification/util/MLUtil.h"
 
 #include <string>
 
@@ -50,6 +51,9 @@ namespace iCub {
                 /* ****** Threads			                            ****** */
                 iCub::plantIdentification::TaskThread *taskThread;
          
+                /* ****** Machine Learning utility                      ******* */
+                iCub::plantIdentification::MLUtil mlUtil;
+
                 /* ****** Debug attributes                              ****** */
                 std::string dbgTag;
            

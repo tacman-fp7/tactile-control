@@ -2,7 +2,6 @@
 
 #include "iCub/plantIdentification/PlantIdentificationEnums.h"
 #include "iCub/plantIdentification/util/ICubUtil.h"
-#include "iCub/plantIdentification/util/MLUtil.h"
 
 #include <yarp/sig/Vector.h>
 #include <yarp/sig/Matrix.h>
@@ -27,7 +26,7 @@ using yarp::os::Value;
 
 using std::string;
 
-ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCommonData *commonData,ControlTaskData *controlData,std::vector<double> &targetList,bool resetErrOnContact):Task(controllersUtil,portsUtil,commonData,controlData->lifespan,controlData->jointsList,controlData->fingersList) {
+ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,iCub::plantIdentification::MLUtil *mlUtil,TaskCommonData *commonData,ControlTaskData *controlData,std::vector<double> &targetList,bool resetErrOnContact):Task(controllersUtil,portsUtil,commonData,controlData->lifespan,controlData->jointsList,controlData->fingersList) {
     using yarp::sig::Vector;
     using yarp::sig::Matrix;
     this->controlData = controlData;
@@ -37,6 +36,8 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,T
     gmmCtrlModeIsSet = false;
 
     this->portsUtil = portsUtil;
+
+    this->mlUtil = mlUtil;
 
     this->resetErrOnContact = resetErrOnContact;
     fingerIsInContact.resize(commonData->objDetectPressureThresholds.size(),false);
@@ -1409,11 +1410,11 @@ std::cout << std::endl;
                     featuresIndex += commonData->fingerEncodersRawData.size() - 1;
 
                     // if the "new object learning" mode is enabled, instead of testing the collected features, they have to be stored in order to retrain the model
-                    if (commonData->mlUtil.isNewObjectLearningModeEnabled()){
-                        commonData->mlUtil.addCollectedFeatures(features);
+                    if (mlUtil->isNewObjectLearningModeEnabled()){
+                        mlUtil->addCollectedFeatures(features);
                     } else {
                         // test features!!!
-                        commonData->mlUtil.testClassifierOneShot(features,predictionEvaluationMethod);
+                        mlUtil->testClassifierOneShot(features,predictionEvaluationMethod);
                     }
                 }
             }
