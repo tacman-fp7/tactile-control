@@ -196,7 +196,6 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
     for(int i = 0; i < armJoints->size(); i++){
         commonData.armJointsHome[i] = armJoints->get(i).asDouble();
     }
-    commonData.portsUtil = portsUtil;
 
     Bottle* stepTaskJoints = rf.find("stepTaskJoints").asList();
     stepData.jointsList.resize(stepTaskJoints->size(),0);

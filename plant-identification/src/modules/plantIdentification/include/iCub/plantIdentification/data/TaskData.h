@@ -5,7 +5,6 @@
 #include "iCub/plantIdentification/util/ControllersUtil.h"
 #include "iCub/plantIdentification/data/GMMData.h"
 #include "iCub/plantIdentification/util/MLUtil.h"
-#include "iCub/plantIdentification/util/PortsUtil.h"
 
 #include <iCub/iKin/iKinFwd.h>
 #include <yarp/os/BufferedPort.h>
@@ -58,7 +57,6 @@ namespace iCub {
             double currentThAbdJointAngleSetpoint;
 
             iCub::plantIdentification::MLUtil mlUtil;
-            iCub::plantIdentification::PortsUtil *portsUtil;
 
             
             /*  TEMP PARAMETERS USED DURING CONTROL TASKS (EXCEPT THE 15th, USED DURING STEP TASKS)
@@ -250,7 +248,7 @@ namespace iCub {
                 RampTaskData rampData;
                 ApproachTaskData approachData;
                 
-                TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil);
+                TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::ControllersUtil *controllersUtil);
 
                 std::string getValueDescription(iCub::plantIdentification::RPCSetCmdArgName cmdName);
         

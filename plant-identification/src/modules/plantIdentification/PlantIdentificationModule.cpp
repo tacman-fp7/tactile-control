@@ -77,7 +77,7 @@ bool PlantIdentificationModule::configure(ResourceFinder &rf) {
     }
 
     // initialize task data
-    taskData = new TaskData(rf,controllersUtil,portsUtil);
+    taskData = new TaskData(rf,controllersUtil);
 
 
     /* ******* Threads                                          ******* */
