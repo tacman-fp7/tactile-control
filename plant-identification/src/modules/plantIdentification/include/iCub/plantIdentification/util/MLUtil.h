@@ -12,13 +12,14 @@
 
 namespace iCub {
     namespace plantIdentification {
-        
+
         class MLUtil {
-            
+
             private:
 
                 gurls::KernelRLSWrapper<double> *wrapper;
                 std::string modelFileName;
+                std::string objectNamesFileName;
                 std::string trainingSetXFileName;
                 std::string trainingSetYFileName;
                 std::string testSetXFileName;
@@ -63,15 +64,18 @@ namespace iCub {
 
                 bool loadTestSetFromFile(std::string fileSuffix);
 
+                bool loadObjectNamesFromFile(std::string fileSuffix);
+
+                bool saveObjectNamesToFile(std::string fileSuffix);
+
                 bool saveTrainingSetToFile(std::string fileSuffix);
 
                 // methods related to the "new object learning" mode
-                bool initNewObjectLearning(bool isRefinement);
+                bool initNewObjectLearning(std::string newObjectName,bool isRefinement);
                 bool addCollectedFeatures(std::vector<double> &features);
                 bool discardLastCollectedFeatures();
                 bool processCollectedData();
                 bool isNewObjectLearningModeEnabled();
-
 
                 bool release();
 

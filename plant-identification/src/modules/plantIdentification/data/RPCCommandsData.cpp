@@ -37,7 +37,7 @@ RPCCommandsData::RPCCommandsData(){
     add("open",OPEN,"STOP TASKS AND OPEN HAND");
     add("arm",ARM,"set ARM IN TASK POSITION");
     add("grasp",GRASP,"EXECUTE GRASP TASK");
-    add("ml",ML,"MANAGE GURLS (usage: 'ml [train | test | load_data | load_model | save_model | learn_new_object | refine_new_object | discard_last_features | process_collected_data]");
+    add("ml",ML,"MANAGE GURLS (usage: 'ml [train | test | load_model | load_train | load_test | load_names | load_train_and_names | save_model | save_train | save_test | save_names | save_train_and_names | learn_new_object | refine_new_object | discard_last_features | process_collected_data]");
     add("wave",WAVE,"EXECUTE WAVE ACTION");
     add("quit",QUIT,"QUIT MODULE");
 
@@ -88,15 +88,20 @@ RPCCommandsData::RPCCommandsData(){
     // ML <?>
     add("train",TRAIN,"TRAINING");
     add("test",TEST,"TESTING");
-    add("save_model",SAVE_MODEL,"SAVE MODEL");
     add("load_model",LOAD_MODEL,"LOAD MODEL");
     add("load_train",LOAD_TRAINING_SET,"LOAD TRAINING SET");
     add("load_test",LOAD_TEST_SET,"LOAD TEST SET");
+    add("load_names",LOAD_OBJECT_NAMES,"LOAD OBJECT NAMES");
+    add("load_train_and_names",LOAD_TRAINING_SET_AND_OBJECT_NAMES,"LOAD TRAINING SET AND OBJECT NAMES");
+    add("save_model",SAVE_MODEL,"SAVE MODEL");
     add("save_train",SAVE_TRAINING_SET,"SAVE TRAINING SET");
+    add("save_names",SAVE_OBJECT_NAMES,"SAVE OBJECT NAMES");
+    add("save_train_and_names",SAVE_TRAINING_SET_AND_OBJECT_NAMES,"SAVE TRAINING SET AND OBJECT NAMES");
     add("learn_new_object",LEARN_NEW_OBJECT,"LEARN A NEW OBJECT");
     add("refine_new_object",REFINE_NEW_OBJECT,"LEARN MORE FEATURES FOR THE PREVIOUS LEARNED OBJECT");
     add("discard_last_features",DISCARD_LAST_FEATURES,"DISCARD LAST FEATURES");
     add("process_collected_data",PROCESS_COLLECTED_DATA,"PROCESS LEARNED DATA");
+
 
     dbgTag = "RPCCommandsData: ";
     

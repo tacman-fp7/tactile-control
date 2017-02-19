@@ -1379,45 +1379,49 @@ std::cout << std::endl;
 
     } else {
 
-        if (!disableObjRecLogging){
-            if (!snapshotSaved){
+
+        if (!snapshotSaved){
+            if (!disableObjRecLogging){
                 objRecDataFile.open(fileNameHandClosure.c_str());
             
                 ICubUtil::printBottleIntoFile(objRecDataFile,objectRecognitionBottle);
             
                 objRecDataFile.close();
-                snapshotSaved = true;
-                std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
-                std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
-                std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
-                std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
-                std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
-                std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
-                std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
-                std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
-                std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
-                std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
-                std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
+            }
+            snapshotSaved = true;
 
-                // copy all final raw encoders
-                if (testClassifierEnabled){
+            std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
+            std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
+            std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
+            std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
+            std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
+            std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
+            std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
+            std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
+            std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
+            std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
+            std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
+
+            // copy all final raw encoders
+            if (testClassifierEnabled){
 std::cout << "enc all: ";
-                    for(int i = 0; i < commonData->fingerEncodersRawData.size() - 1; i++){ // 15 components (the 16th is always 0)
-                        features[featuresIndex + i] = commonData->fingerEncodersRawData[i];
+                for(int i = 0; i < commonData->fingerEncodersRawData.size() - 1; i++){ // 15 components (the 16th is always 0)
+                    features[featuresIndex + i] = commonData->fingerEncodersRawData[i];
 std::cout << commonData->fingerEncodersRawData[i] << " ";
-                    }
+                }
 std::cout << std::endl;
-                    featuresIndex += commonData->fingerEncodersRawData.size() - 1;
+                featuresIndex += commonData->fingerEncodersRawData.size() - 1;
 
-                    // if the "new object learning" mode is enabled, instead of testing the collected features, they have to be stored in order to retrain the model
-                    if (mlUtil->isNewObjectLearningModeEnabled()){
-                        mlUtil->addCollectedFeatures(features);
-                    } else {
-                        // test features!!!
-                        mlUtil->testClassifierOneShot(features,predictionEvaluationMethod);
-                    }
+                // if the "new object learning" mode is enabled, instead of testing the collected features, they have to be stored in order to retrain the model
+                if (mlUtil->isNewObjectLearningModeEnabled()){
+                    mlUtil->addCollectedFeatures(features);
+                } else {
+                    // test features!!!
+                    mlUtil->testClassifierOneShot(features,predictionEvaluationMethod);
                 }
             }
+
+            commonData->requestOpen = true;
         }
     }
 }

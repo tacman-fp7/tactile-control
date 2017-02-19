@@ -95,7 +95,6 @@ namespace iCub {
                 int featuresIndex;
                 std::vector<std::vector<double> > tactileDataTemp;
 
-
             public:
 
                 ControlTask(iCub::plantIdentification::ControllersUtil *controllersUtil,iCub::plantIdentification::PortsUtil *portsUtil,iCub::plantIdentification::MLUtil *mlUtil,iCub::plantIdentification::TaskCommonData *commonData,iCub::plantIdentification::ControlTaskData *controlData,std::vector<double> &targetList,bool resetErrOnContact = false);
@@ -123,7 +122,7 @@ namespace iCub {
                 void changeSVGain(std::string gainName,double newGainValue);
 
                 void replaceBottle(yarp::os::Bottle &oldBottle,yarp::os::Bottle &newBottle,double scaleFactor);
-                
+
                 void replaceBottle(yarp::os::Bottle &oldBottle,yarp::os::Bottle &newBottle,std::string gainName,double newGainValue);
 
                 double calculateTt(double kp,double ki,double kd);

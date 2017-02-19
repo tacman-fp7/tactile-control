@@ -1,6 +1,8 @@
 #include "iCub/plantIdentification/util/MLUtil.h"
 
 #include <iomanip>
+#include <fstream>
+#include <iostream>
 
 using iCub::plantIdentification::MLUtil;
 
@@ -27,13 +29,14 @@ bool MLUtil::init(yarp::os::ResourceFinder &rf,iCub::plantIdentification::PortsU
 
     std::string pathPrefix = "/home/icub/tmp_massimo/tactile-control/data/objectRecognition/";
 
-    modelFileName = "model_";
+    modelFileName = pathPrefix + "model_";
+    objectNamesFileName = pathPrefix + "objectNames_";
     trainingSetXFileName = pathPrefix + "trainingSetX_";
     trainingSetYFileName = pathPrefix + "trainingSetY_";
     testSetXFileName = pathPrefix + "testSetX_";
     testSetYFileName = pathPrefix + "testSetY_";
-    
-    // build objects map
+
+    // build default objects map
     objectsMap.clear();
     objectsMap.insert(std::pair<int,std::string>(1,"sugar box"));
     objectsMap.insert(std::pair<int,std::string>(2,"tomato can"));
@@ -61,7 +64,7 @@ bool MLUtil::trainClassifier(){
 bool MLUtil::testClassifier(){
 
     gurls::gMat2D<double> *output = wrapper->eval(xTe);
-    
+
     std::vector<int> predictions, groundTruth;
 
     getStandardPredictionsFrom1vsAll(*output,predictions);
@@ -184,7 +187,6 @@ bool MLUtil::saveModelToFile(std::string fileSuffix){
     return true;
 }
 
-
 bool MLUtil::loadModelFromFile(std::string fileSuffix){
 
     std::cout << "loading model...";
@@ -220,6 +222,45 @@ bool MLUtil::loadTestSetFromFile(std::string fileSuffix){
     std::cout << " ...done" << std::endl;
 
     return true;
+}
+
+bool MLUtil::loadObjectNamesFromFile(std::string fileSuffix){
+
+    std::cout << "loading object names list...";
+
+    std::string objectName;
+    std::ifstream objectNamesFile(objectNamesFileName + fileSuffix + ".dat");
+    objectsMap.clear();
+    int i = 1;
+    while (std::getline(objectNamesFile,objectName).good()){
+        objectsMap.insert(std::pair<int,std::string>(i,objectName));
+        i++;
+    }
+    objectNamesFile.close();
+
+    std::cout << " ...done" << std::endl;
+
+    return true;
+}
+
+bool MLUtil::saveObjectNamesToFile(std::string fileSuffix){
+
+    std::cout << "saving object names list...";
+
+    std::ofstream objectNamesFile(objectNamesFileName + fileSuffix + ".dat");
+
+    for(int i = 1; i <= objectsMap.size(); i++){
+
+        objectNamesFile << objectsMap[i] << std::endl;
+
+    }
+
+    objectNamesFile.close();
+
+    std::cout << " ...done" << std::endl;
+
+    return true;
+
 }
 
 bool MLUtil::saveTrainingSetToFile(std::string fileSuffix){
@@ -336,13 +377,16 @@ bool MLUtil::sendDetectedObjectToPort(int objectNum){
     portsUtil->sendObjectLabelToSpeaker(objectsMap[objectNum]);
 }
 
-bool MLUtil::initNewObjectLearning(bool isRefinement){
+bool MLUtil::initNewObjectLearning(std::string newObjectName,bool isRefinement){
 
     learningNewObjectMode = true;
 
     if (!isRefinement){
         collectedFeatures.clear();
     }
+
+    int newKey = objectsMap.rbegin()->first + 1;
+    objectsMap.insert(std::pair<int,std::string>(newKey,newObjectName));
 }
 
 bool MLUtil::addCollectedFeatures(std::vector<double> &features){

@@ -129,6 +129,11 @@ bool PlantIdentificationModule::updateModule() {
         }
     }
 
+    if (taskData->commonData.requestOpen == true){
+        taskData->commonData.requestOpen = false;
+        open();
+    }
+
     return !closing; 
 }
 /* *********************************************************************************************************************** */
@@ -332,6 +337,10 @@ bool PlantIdentificationModule::ml(iCub::plantIdentification::RPCMlCmdArgName pa
 
     switch(paramName){
 
+
+//            add("load_names",LOAD_OBJECT_NAMES,"LOAD OBJECT NAMES");
+//    add("load_train_and_names",LOAD_TRAINING_SET_AND_OBJECT_NAMES,"LOAD TRAINING SET AND OBJECT NAMES");
+
     case TRAIN:
         // train the classifier
         mlUtil.trainClassifier();
@@ -356,17 +365,35 @@ bool PlantIdentificationModule::ml(iCub::plantIdentification::RPCMlCmdArgName pa
         // load test set from files
         mlUtil.loadTestSetFromFile(paramValue.asString());
         break;
+    case LOAD_OBJECT_NAMES:
+        // load object names list
+        mlUtil.loadObjectNamesFromFile(paramValue.asString());
+        break;
+    case LOAD_TRAINING_SET_AND_OBJECT_NAMES:
+        // load training set and object names list
+        mlUtil.loadTrainingSetFromFile(paramValue.asString());
+        mlUtil.loadObjectNamesFromFile(paramValue.asString());
+        break;
     case SAVE_TRAINING_SET:
         // save training set from files
         mlUtil.saveTrainingSetToFile(paramValue.asString());
         break;
+    case SAVE_OBJECT_NAMES:
+        // save object names list
+        mlUtil.loadObjectNamesFromFile(paramValue.asString());
+        break;
+    case SAVE_TRAINING_SET_AND_OBJECT_NAMES:
+        // save training set and object names list
+        mlUtil.saveTrainingSetToFile(paramValue.asString());
+        mlUtil.saveObjectNamesToFile(paramValue.asString());
+        break;
     case LEARN_NEW_OBJECT:
         // start the mode "learning a new object"
-        mlUtil.initNewObjectLearning(false);
+        mlUtil.initNewObjectLearning(paramValue.asString(),false);
         break;
     case REFINE_NEW_OBJECT:
         // learn more features for the previous learned object
-        mlUtil.initNewObjectLearning(true);
+        mlUtil.initNewObjectLearning(paramValue.asString(),true);
         break;    
     case DISCARD_LAST_FEATURES:
         // discard last collected features

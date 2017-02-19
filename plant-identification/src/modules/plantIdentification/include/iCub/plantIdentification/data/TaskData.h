@@ -55,6 +55,8 @@ namespace iCub {
 
             double currentThAbdJointAngleSetpoint;
 
+            bool requestOpen;
+
             
             /*  TEMP PARAMETERS USED DURING CONTROL TASKS (EXCEPT THE 15th, USED DURING STEP TASKS)
             *   0: supervisor mode off/on [0/1]
