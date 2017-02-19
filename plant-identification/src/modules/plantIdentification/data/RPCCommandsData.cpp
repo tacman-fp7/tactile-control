@@ -37,7 +37,7 @@ RPCCommandsData::RPCCommandsData(){
     add("open",OPEN,"STOP TASKS AND OPEN HAND");
     add("arm",ARM,"set ARM IN TASK POSITION");
     add("grasp",GRASP,"EXECUTE GRASP TASK");
-    add("ml",ML,"MANAGE GURLS (usage: 'ml [train | test | save | load]");
+    add("ml",ML,"MANAGE GURLS (usage: 'ml [train | test | load_data | load_model | save_model | learn_new_object | refine_new_object | discard_last_features | process_collected_data]");
     add("wave",WAVE,"EXECUTE WAVE ACTION");
     add("quit",QUIT,"QUIT MODULE");
 
@@ -90,7 +90,13 @@ RPCCommandsData::RPCCommandsData(){
     add("test",TEST,"TESTING");
     add("save_model",SAVE_MODEL,"SAVE MODEL");
     add("load_model",LOAD_MODEL,"LOAD MODEL");
-    add("load_data",LOAD_DATA,"LOAD TRAINING AND TEST SETS");
+    add("load_train",LOAD_TRAINING_SET,"LOAD TRAINING SET");
+    add("load_test",LOAD_TEST_SET,"LOAD TEST SET");
+    add("save_train",SAVE_TRAINING_SET,"SAVE TRAINING SET");
+    add("learn_new_object",LEARN_NEW_OBJECT,"LEARN A NEW OBJECT");
+    add("refine_new_object",REFINE_NEW_OBJECT,"LEARN MORE FEATURES FOR THE PREVIOUS LEARNED OBJECT");
+    add("discard_last_features",DISCARD_LAST_FEATURES,"DISCARD LAST FEATURES");
+    add("process_collected_data",PROCESS_COLLECTED_DATA,"PROCESS LEARNED DATA");
 
     dbgTag = "RPCCommandsData: ";
     

@@ -1,11 +1,14 @@
 #ifndef __ICUB_PLANTIDENTIFICATION_MLUTIL_H__
 #define __ICUB_PLANTIDENTIFICATION_MLUTIL_H__
 
+#include "iCub/plantIdentification/util/PortsUtil.h"
+
 #include <gurls++/kernelrlswrapper.h>
 
 #include <yarp/os/ResourceFinder.h>
 
 #include <string>
+#include <map>
 
 namespace iCub {
     namespace plantIdentification {
@@ -22,6 +25,12 @@ namespace iCub {
                 std::string testSetYFileName;
                 gurls::gMat2D<double> xTr,yTr,xTe,yTe;
                 std::vector<std::vector<double> > outputsOverTime;
+                std::map<int,std::string> objectsMap;
+                iCub::plantIdentification::PortsUtil *portsUtil;
+
+                // new object learning
+                bool learningNewObjectMode;
+                std::vector<std::vector<double> > collectedFeatures;
 
                 /* ******* Debug attributes.                ******* */
                 std::string dbgTag;
@@ -32,11 +41,13 @@ namespace iCub {
 
                 bool checkAccuracy(const std::vector<int> &predictions,const std::vector<int> &groundTruth,int numObjects);
 
+                bool sendDetectedObjectToPort(int objectCode);
+
             public:
 
                 MLUtil();
 
-                bool init(yarp::os::ResourceFinder &rf);
+                bool init(yarp::os::ResourceFinder &rf,iCub::plantIdentification::PortsUtil *portsUtil);
 
                 bool trainClassifier();
 
@@ -48,7 +59,19 @@ namespace iCub {
 
                 bool loadModelFromFile(std::string fileSuffix);
 
-                bool loadTrainingAndTestSetsFromFile(std::string fileSuffix);
+                bool loadTrainingSetFromFile(std::string fileSuffix);
+
+                bool loadTestSetFromFile(std::string fileSuffix);
+
+                bool saveTrainingSetToFile(std::string fileSuffix);
+
+                // methods related to the "new object learning" mode
+                bool initNewObjectLearning(bool isRefinement);
+                bool addCollectedFeatures(std::vector<double> &features);
+                bool discardLastCollectedFeatures();
+                bool processCollectedData();
+                bool isNewObjectLearningModeEnabled();
+
 
                 bool release();
 

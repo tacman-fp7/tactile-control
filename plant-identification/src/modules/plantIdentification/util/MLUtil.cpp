@@ -7,26 +7,47 @@ using iCub::plantIdentification::MLUtil;
 
 MLUtil::MLUtil(){
 
+    learningNewObjectMode = false;
+
+    xTr.resize(0,0);
+    yTr.resize(0,0);
+    xTe.resize(0,0);
+    yTe.resize(0,0);
+
     dbgTag = "MLUtil: ";
 }
 
-bool MLUtil::init(yarp::os::ResourceFinder &rf){
+bool MLUtil::init(yarp::os::ResourceFinder &rf,iCub::plantIdentification::PortsUtil *portsUtil){
+
+    this->portsUtil = portsUtil;
 
     wrapper = new gurls::KernelRLSWrapper<double>("myWrapper");
-    std::vector<double> cioa;
+
     outputsOverTime.resize(0);
 
     std::string pathPrefix = "/home/icub/tmp_massimo/tactile-control/data/objectRecognition/";
 
-    modelFileName = "model";
-    trainingSetXFileName = pathPrefix + "trainingSetX";
-    trainingSetYFileName = pathPrefix + "trainingSetY";
-    testSetXFileName = pathPrefix + "testSetX";
-    testSetYFileName = pathPrefix + "testSetY";
+    modelFileName = "model_";
+    trainingSetXFileName = pathPrefix + "trainingSetX_";
+    trainingSetYFileName = pathPrefix + "trainingSetY_";
+    testSetXFileName = pathPrefix + "testSetX_";
+    testSetYFileName = pathPrefix + "testSetY_";
+    
+    // build objects map
+    objectsMap.clear();
+    objectsMap.insert(std::pair<int,std::string>(1,"sugar box"));
+    objectsMap.insert(std::pair<int,std::string>(2,"tomato can"));
+    objectsMap.insert(std::pair<int,std::string>(3,"brown block"));
+    objectsMap.insert(std::pair<int,std::string>(4,"cat"));
+    objectsMap.insert(std::pair<int,std::string>(5,"blue sponge"));
+    objectsMap.insert(std::pair<int,std::string>(6,"blue ball"));
+    objectsMap.insert(std::pair<int,std::string>(7,"yellow sponge"));
+    objectsMap.insert(std::pair<int,std::string>(8,"small cube"));
+    objectsMap.insert(std::pair<int,std::string>(9,"tennis ball"));
+    objectsMap.insert(std::pair<int,std::string>(10,"soccer ball"));
 
     return true;
 }
-
 
 bool MLUtil::trainClassifier(){
 
@@ -58,21 +79,17 @@ bool MLUtil::testClassifierOneShot(std::vector<double> &features,int predictionE
 
     for(int i = 0; i < features.size(); i++){
         input(0,i) = features[i];
-
-std::cout << "( " << input[0][i] << "/" << input(0,i) << "/" << features[i] << ")" << " ";
+        std::cout << "( " << input[0][i] << "/" << input(0,i) << "/" << features[i] << ")" << " ";
     }
 
-std::cout << std::endl;
+    std::cout << std::endl;
 
-
-	for(int i = 0; i < input.rows(); i++){
-		for(int j = 0; j < input.cols(); j++){
-			std::cout << input(i,j) << " ";
-		}
-		std::cout << std::endl;
-	}
-
-
+    for(int i = 0; i < input.rows(); i++){
+        for(int j = 0; j < input.cols(); j++){
+            std::cout << input(i,j) << " ";
+        }
+        std::cout << std::endl;
+    }
 
     gurls::gMat2D<double> *output = wrapper->eval(input);
 
@@ -87,7 +104,7 @@ std::cout << std::endl;
         }
         outputsOverTime.push_back(currentOutput);
 
-        if (predictionEvaluationMethod){ // using avarage method
+        if (predictionEvaluationMethod == 2){ // using avarage method
 
             gurls::gMat2D<double> outputMean = gurls::gMat2D<double>::zeros(1,numObjects);
            
@@ -130,22 +147,16 @@ std::cout << std::endl;
         prediction = predictions[0];
 
 
-
-
-	for(int i = 0; i < output->rows(); i++){
-		for(int j = 0; j < output->cols(); j++){
-			std::cout << (*output)(i,j) << " ";
-		}
-		std::cout << std::endl;
-	}
-
-
-
-
-
+        for(int i = 0; i < output->rows(); i++){
+            for(int j = 0; j < output->cols(); j++){
+                std::cout << (*output)(i,j) << " ";
+            }
+            std::cout << std::endl;
+        }
 
     }
 
+
     std::cout << "PREDICTION: <<<<<<<<<<<<<<       " << prediction + 1 << "       >>>>>>>>>>>>>>" << std::endl;
     std::cout << "PREDICTION: <<<<<<<<<<<<<<       " << prediction + 1 << "       >>>>>>>>>>>>>>" << std::endl;
     std::cout << "PREDICTION: <<<<<<<<<<<<<<       " << prediction + 1 << "       >>>>>>>>>>>>>>" << std::endl;
@@ -157,6 +168,8 @@ std::cout << std::endl;
     std::cout << "PREDICTION: <<<<<<<<<<<<<<       " << prediction + 1 << "       >>>>>>>>>>>>>>" << std::endl;
     std::cout << "PREDICTION: <<<<<<<<<<<<<<       " << prediction + 1 << "       >>>>>>>>>>>>>>" << std::endl;
     std::cout << "PREDICTION: <<<<<<<<<<<<<<       " << prediction + 1 << "       >>>>>>>>>>>>>>" << std::endl;
+
+    sendDetectedObjectToPort(prediction + 1);
 
 }
 
@@ -183,17 +196,39 @@ bool MLUtil::loadModelFromFile(std::string fileSuffix){
     return true;
 }
 
-bool MLUtil::loadTrainingAndTestSetsFromFile(std::string fileSuffix){
+bool MLUtil::loadTrainingSetFromFile(std::string fileSuffix){
 
-    std::cout << "loading training and test data...";
+    std::cout << "loading training data...";
 
     xTr.readCSV(trainingSetXFileName + fileSuffix + ".dat");
 
     yTr.readCSV(trainingSetYFileName + fileSuffix + ".dat");
 
+    std::cout << " ...done" << std::endl;
+
+    return true;
+}
+
+bool MLUtil::loadTestSetFromFile(std::string fileSuffix){
+
+    std::cout << "loading test data...";
+
     xTe.readCSV(testSetXFileName + fileSuffix + ".dat");
 
     yTe.readCSV(testSetYFileName + fileSuffix + ".dat");
+
+    std::cout << " ...done" << std::endl;
+
+    return true;
+}
+
+bool MLUtil::saveTrainingSetToFile(std::string fileSuffix){
+
+    std::cout << "saving training data...";
+
+    xTr.saveCSV(trainingSetXFileName + fileSuffix + ".dat");
+
+    yTr.saveCSV(trainingSetYFileName + fileSuffix + ".dat");
 
     std::cout << " ...done" << std::endl;
 
@@ -294,6 +329,81 @@ bool MLUtil::checkAccuracy(const std::vector<int> &predictions,const std::vector
 //    cout << "Total accuracy: " << std::setprecision(2) << accuracy*100 << "%" << endl;
     cout << "Total accuracy: " << accuracy*100 << "%" << endl;
 
+}
+
+bool MLUtil::sendDetectedObjectToPort(int objectNum){
+
+    portsUtil->sendObjectLabelToSpeaker(objectsMap[objectNum]);
+}
+
+bool MLUtil::initNewObjectLearning(bool isRefinement){
+
+    learningNewObjectMode = true;
+
+    if (!isRefinement){
+        collectedFeatures.clear();
+    }
+}
+
+bool MLUtil::addCollectedFeatures(std::vector<double> &features){
+
+    collectedFeatures.push_back(features);
+}
+
+bool MLUtil::discardLastCollectedFeatures(){
+
+    if (collectedFeatures.size() > 0){
+        collectedFeatures.pop_back();
+    }
+}
+
+bool MLUtil::processCollectedData(){
+
+    if (collectedFeatures.size() > 0){
+
+        // add the new features to xTr and yTr 
+
+        int numPrevObjects = yTr.cols();
+        int numPrevSamples = xTr.rows();
+
+        xTr.resize(xTr.rows() + collectedFeatures.size(),collectedFeatures[0].size());
+        yTr.resize(yTr.rows() + collectedFeatures.size(),yTr.cols() + 1);
+
+        for(int i = 0; i < collectedFeatures.size(); i++){
+            // update xTr
+            for(int j = 0; j < collectedFeatures[i].size(); j++){
+                xTr(numPrevSamples + i,j) = collectedFeatures[i][j];
+            }
+            // update yTr
+            for(int j = 0; j < numPrevObjects + 1; j++){
+                // in the added rows, the columns related to the old objects are set to -1, the one related to the new object is set to 1 (as requested from the learner)
+                if (j < numPrevObjects){
+                    yTr(numPrevSamples + i,j) = -1;
+                } else {
+                    yTr(numPrevSamples + i,j) = +1;
+                }
+            }
+        }
+        
+        // set the last column to -1 (except for the added rows)
+        for(int i = 0; i < numPrevSamples; i++){
+            yTr(i,yTr.cols() - 1) = -1;
+        }
+
+        // re-train the model
+
+        trainClassifier();
+
+    }
+
+    // disable the "learning new object" mode
+
+    learningNewObjectMode = false;
+}
+
+bool MLUtil::isNewObjectLearningModeEnabled(){
+
+    return learningNewObjectMode;
 }
 
 bool MLUtil::release(){

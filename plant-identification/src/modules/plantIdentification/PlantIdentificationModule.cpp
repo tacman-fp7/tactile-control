@@ -77,7 +77,7 @@ bool PlantIdentificationModule::configure(ResourceFinder &rf) {
     }
 
     // initialize task data
-    taskData = new TaskData(rf,controllersUtil);
+    taskData = new TaskData(rf,controllersUtil,portsUtil);
 
 
     /* ******* Threads                                          ******* */
@@ -346,10 +346,33 @@ bool PlantIdentificationModule::ml(iCub::plantIdentification::RPCMlCmdArgName pa
         // load model from file
         taskData->commonData.mlUtil.loadModelFromFile(paramValue.asString());
         break;
-    case LOAD_DATA:
-        // load data from files
-
-        taskData->commonData.mlUtil.loadTrainingAndTestSetsFromFile(paramValue.asString());
+    case LOAD_TRAINING_SET:
+        // load training set from files
+        taskData->commonData.mlUtil.loadTrainingSetFromFile(paramValue.asString());
+        break;
+    case LOAD_TEST_SET:
+        // load test set from files
+        taskData->commonData.mlUtil.loadTestSetFromFile(paramValue.asString());
+        break;
+    case SAVE_TRAINING_SET:
+        // save training set from files
+        taskData->commonData.mlUtil.saveTrainingSetToFile(paramValue.asString());
+        break;
+    case LEARN_NEW_OBJECT:
+        // start the mode "learning a new object"
+        taskData->commonData.mlUtil.initNewObjectLearning(false);
+        break;
+    case REFINE_NEW_OBJECT:
+        // learn more features for the previous learned object
+        taskData->commonData.mlUtil.initNewObjectLearning(true);
+        break;    
+    case DISCARD_LAST_FEATURES:
+        // discard last collected features
+        taskData->commonData.mlUtil.discardLastCollectedFeatures();
+        break;
+    case PROCESS_COLLECTED_DATA:
+        // process the collected data
+        taskData->commonData.mlUtil.processCollectedData();
         break;
     }
 

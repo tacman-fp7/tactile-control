@@ -37,6 +37,7 @@ namespace iCub {
                 yarp::os::BufferedPort<yarp::os::Bottle> portGMMRegressionDataOut;
                 yarp::os::BufferedPort<yarp::os::Bottle> portObjRecognDataOut;
                 yarp::os::BufferedPort<yarp::os::Bottle> portGripStrengthDataOut;
+                yarp::os::BufferedPort<yarp::os::Bottle> portSpeakerOut;
 
                 /* ******* Debug attributes.                ******* */
                 std::string dbgTag;
@@ -54,6 +55,8 @@ namespace iCub {
                 bool sendControlData(std::string taskId,std::string experimentDescription,std::string previousExperimentDescription,double targetGripStrength,double actualGripStrength,double u,double error,double svCurrentPosition,double actualCurrentTargetPose,double finalTargetPose,double estimatedFinalPose,double svKp,double svKi,double svKd,double thumbEnc,double indexEnc,double middleEnc,double enc8,std::vector<double> &pressureTarget,std::vector<double> &actualPressure,std::vector<double> &pwm,std::vector<int> &fingersList);
 
                 bool sendObjectRecognitionData(std::string taskId,int objectId,iCub::plantIdentification::ObjectRecognitionTask objRecTask,int extraCode1,int extraCode2,int skipPreviousRepetition,std::string experimentDescription,std::string previousExperimentDescription,std::vector<double> &pwm,iCub::plantIdentification::TaskCommonData *commonData);
+
+                bool sendObjectLabelToSpeaker(std::string objectLabel);
 
                 bool sendGMMData(double gripStrength, double indexMiddleFingerPressureBalance, iCub::plantIdentification::TaskCommonData *commonData);
 

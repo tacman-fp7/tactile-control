@@ -1408,8 +1408,13 @@ std::cout << commonData->fingerEncodersRawData[i] << " ";
 std::cout << std::endl;
                     featuresIndex += commonData->fingerEncodersRawData.size() - 1;
 
-                    // test features!!!
-                    commonData->mlUtil.testClassifierOneShot(features,predictionEvaluationMethod);
+                    // if the "new object learning" mode is enabled, instead of testing the collected features, they have to be stored in order to retrain the model
+                    if (commonData->mlUtil.isNewObjectLearningModeEnabled()){
+                        commonData->mlUtil.addCollectedFeatures(features);
+                    } else {
+                        // test features!!!
+                        commonData->mlUtil.testClassifierOneShot(features,predictionEvaluationMethod);
+                    }
                 }
             }
         }

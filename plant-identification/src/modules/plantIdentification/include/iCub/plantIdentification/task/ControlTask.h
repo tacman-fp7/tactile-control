@@ -87,7 +87,7 @@ namespace iCub {
                 bool squeezingStarted;
                 double storedGripStrength;
                 bool testClassifierEnabled;
-                int predictionEvaluationMethod;
+                int predictionEvaluationMethod; // test mode status. 0: off 1: on (one shot) 2: on (refinement using avarage) 3: on (refinement using maxmax)
                 std::vector<double> features;
                 int featuresIndex;
                 std::vector<std::vector<double> > tactileDataTemp;

@@ -54,6 +54,7 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
     string gmmRegressionDataPortName = portPrefix + "/gmmRegression:o";
     string objectRecognitionDataPortName = portPrefix + "/object_recognition_log:o";
     string gripStrengthDataPortName = portPrefix + "/grip_strength:o";
+    string speakerPortName = portPrefix + "/speaker:o";
 
 
 //	string middleFingerRealForcePortName = "/" + moduleName + "/real_force/thumb:i";
@@ -106,6 +107,10 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
         cout << dbgTag << "could not open " << gripStrengthDataPortName << " port \n";
         return false;
     }
+    if (!portSpeakerOut.open(speakerPortName)){
+        cout << dbgTag << "could not open " << speakerPortName << " port \n";
+        return false;
+    }
     if (!portForceSensorIn.open(forceSensorPortName)){
         cout << dbgTag << "could not open " << forceSensorPortName << " port \n";
         return false;
@@ -122,6 +127,7 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
         cout << dbgTag << "could not open " << middleFingerRealForcePortName << " port \n";
         return false;
     }
+
 
 
 
@@ -417,6 +423,19 @@ bool PortsUtil::sendObjectRecognitionData(string taskId,int objectId,iCub::plant
 
 
     portObjRecognDataOut.write();
+
+    return true;
+}
+
+bool PortsUtil::sendObjectLabelToSpeaker(string objectLabel){
+
+    using yarp::os::Bottle;
+
+    Bottle& speakerBottle = portSpeakerOut.prepare();
+
+    speakerBottle.addString(objectLabel);
+
+    portSpeakerOut.write();
 
     return true;
 }

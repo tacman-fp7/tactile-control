@@ -84,7 +84,13 @@ namespace iCub {
             TEST,
             SAVE_MODEL,
             LOAD_MODEL,
-            LOAD_DATA
+            LOAD_TRAINING_SET,
+            LOAD_TEST_SET,
+            SAVE_TRAINING_SET,
+            LEARN_NEW_OBJECT,
+            REFINE_NEW_OBJECT,
+            DISCARD_LAST_FEATURES,
+            PROCESS_COLLECTED_DATA
         };
 
         enum FingerJoint {
