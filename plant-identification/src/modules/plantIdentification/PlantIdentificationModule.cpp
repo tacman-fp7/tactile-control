@@ -61,8 +61,7 @@ bool PlantIdentificationModule::configure(ResourceFinder &rf) {
     portPlantIdentificationRPC.open(portPrefix + "/cmd:i");
     attach(portPlantIdentificationRPC);
 
-
-        // initialize controllers
+    // initialize controllers
     controllersUtil = new ControllersUtil();
     if (!controllersUtil->init(rf)) {
         cout << dbgTag << "failed to initialize controllers utility\n";
@@ -76,12 +75,15 @@ bool PlantIdentificationModule::configure(ResourceFinder &rf) {
         return false;
     }
 
+    // initialize machine learning utililty
+    mlUtil.init(rf,portsUtil);
+
     // initialize task data
     taskData = new TaskData(rf,controllersUtil);
 
 
     /* ******* Threads                                          ******* */
-    taskThread = new TaskThread(taskData->commonData.taskThreadPeriod,rf,controllersUtil,portsUtil,taskData);
+    taskThread = new TaskThread(taskData->commonData.taskThreadPeriod,rf,controllersUtil,portsUtil,&mlUtil,taskData);
     if (!taskThread->start()) {
         cout << dbgTag << "Could not start the task thread. \n";
         return false;

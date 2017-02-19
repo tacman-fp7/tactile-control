@@ -33,6 +33,7 @@ using iCub::plantIdentification::RPCViewCmdArgName;
 using iCub::plantIdentification::RPCCommandsData;
 using iCub::plantIdentification::ControllersUtil;
 using iCub::plantIdentification::PortsUtil;
+using iCub::plantIdentification::MLUtil;
 using iCub::plantIdentification::TaskData;
 
 
@@ -42,12 +43,13 @@ using yarp::os::Value;
 
 /* *********************************************************************************************************************** */
 /* ******* Constructor                                                      ********************************************** */   
-TaskThread::TaskThread(const int period, const yarp::os::ResourceFinder &aRf,ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskData *taskData) 
+TaskThread::TaskThread(const int period, const yarp::os::ResourceFinder &aRf,ControllersUtil *controllersUtil,PortsUtil *portsUtil,MLUtil *mlUtil,TaskData *taskData) 
     : RateThread(period) {
         this->period = period;
         rf = aRf;
         this->controllersUtil = controllersUtil;
         this->portsUtil = portsUtil;
+        this->mlUtil = mlUtil;
         this->taskData = taskData;
         
         dbgTag = "TaskThread: ";
@@ -304,11 +306,11 @@ void TaskThread::task(RPCTaskCmdArgName paramName,TaskName taskName,Value paramV
             break;
 
         case CONTROL:
-            taskList.push_back(new ControlTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->controlData,targetList));
+            taskList.push_back(new ControlTask(controllersUtil,portsUtil,mlUtil,&taskData->commonData,&taskData->controlData,targetList));
             break;
 
         case APPROACH_AND_CONTROL:
-            taskList.push_back(new ControlTask(controllersUtil,portsUtil,&taskData->commonData,&taskData->controlData,targetList,true));
+            taskList.push_back(new ControlTask(controllersUtil,portsUtil,mlUtil,&taskData->commonData,&taskData->controlData,targetList,true));
             break;
 
         case APPROACH:
