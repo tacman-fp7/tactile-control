@@ -30,14 +30,14 @@ RPCCommandsData::RPCCommandsData(){
 
     add("help",HELP,"THIS HELP");
     add("set",SET,"SET PARAMETERS (usage: 'set <paramName> <paramValue>')");
-    add("task",TASK,"MANAGE TASKS (usage: 'task [pop | empty | add <taskType> <targetValue>]')");
-    add("view",VIEW,"VIEW PARAMETERS/TASKS (usage: 'view [set | tasks]')");
+    add("task",TASK,"MANAGE TASKS (usage: 'task [ pop | empty | add <taskType> <targetValue> ]')");
+    add("view",VIEW,"VIEW PARAMETERS/TASKS (usage: 'view [ set | tasks ]')");
     add("start",START,"START TASKS");
     add("stop",STOP,"STOP TASKS");
     add("open",OPEN,"STOP TASKS AND OPEN HAND");
     add("arm",ARM,"set ARM IN TASK POSITION");
     add("grasp",GRASP,"EXECUTE GRASP TASK");
-    add("ml",ML,"MANAGE GURLS (usage: 'ml [train | test | load_model | load_train | load_test | load_names | load_train_and_names | save_model | save_train | save_test | save_names | save_train_and_names | learn_new_object | refine_new_object | discard_last_features | process_collected_data]");
+    add("ml",ML,"MANAGE GURLS (usage: 'ml [ view | train | test | load_model | load_train | load_test | load_names | load_train_and_names | save_model | save_train | save_test | save_names | save_train_and_names | learn_new_object | refine_new_object | discard_last | process | reset ]");
     add("wave",WAVE,"EXECUTE WAVE ACTION");
     add("quit",QUIT,"QUIT MODULE");
 
@@ -86,6 +86,7 @@ RPCCommandsData::RPCCommandsData(){
     add("tasks",TASKS,"TASKS");
 
     // ML <?>
+    add("view",VIEW_DATA,"VIEW DATA");
     add("train",TRAIN,"TRAINING");
     add("test",TEST,"TESTING");
     add("load_model",LOAD_MODEL,"LOAD MODEL");
@@ -99,8 +100,9 @@ RPCCommandsData::RPCCommandsData(){
     add("save_train_and_names",SAVE_TRAINING_SET_AND_OBJECT_NAMES,"SAVE TRAINING SET AND OBJECT NAMES");
     add("learn_new_object",LEARN_NEW_OBJECT,"LEARN A NEW OBJECT");
     add("refine_new_object",REFINE_NEW_OBJECT,"LEARN MORE FEATURES FOR THE PREVIOUS LEARNED OBJECT");
-    add("discard_last_features",DISCARD_LAST_FEATURES,"DISCARD LAST FEATURES");
-    add("process_collected_data",PROCESS_COLLECTED_DATA,"PROCESS LEARNED DATA");
+    add("discard_last",DISCARD_LAST_FEATURES,"DISCARD LAST FEATURES");
+    add("process",PROCESS_COLLECTED_DATA,"PROCESS LEARNED DATA");
+    add("reset",RESET,"RESET DATA");
 
 
     dbgTag = "RPCCommandsData: ";

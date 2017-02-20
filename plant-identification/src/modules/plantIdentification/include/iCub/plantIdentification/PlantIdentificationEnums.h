@@ -80,6 +80,7 @@ namespace iCub {
 
         enum RPCMlCmdArgName {
 
+            VIEW_DATA,
             TRAIN,
             TEST,
             SAVE_MODEL,
@@ -94,7 +95,8 @@ namespace iCub {
             LEARN_NEW_OBJECT,
             REFINE_NEW_OBJECT,
             DISCARD_LAST_FEATURES,
-            PROCESS_COLLECTED_DATA
+            PROCESS_COLLECTED_DATA,
+            RESET
         };
 
         enum FingerJoint {

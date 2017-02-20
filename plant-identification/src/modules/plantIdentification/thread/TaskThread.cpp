@@ -433,6 +433,7 @@ void TaskThread::help(RPCCommandsData &rpcCmdData){
                 rpcCmdData.getFullDescription(STOP) << "\n" <<
                 rpcCmdData.getFullDescription(OPEN) << "\n" <<
                 rpcCmdData.getFullDescription(ARM) << "\n" <<
+                rpcCmdData.getFullDescription(ML) << "\n" <<
                 rpcCmdData.getFullDescription(QUIT);
     
 }			

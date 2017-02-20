@@ -416,6 +416,7 @@ bool PortsUtil::sendObjectRecognitionData(string taskId,int objectId,iCub::plant
     using yarp::os::Bottle;
 
     Bottle& objRecognBottle = portObjRecognDataOut.prepare();
+    objRecognBottle.clear();
 
     // TODO insert handAperture,handPosition,estimatedFinalPose,actualGripStrength,gripStrength instead of 0
     ICubUtil::makeObjectRecognitionBottle(objRecognBottle,taskId,objectId,objRecTask,extraCode1,extraCode2,skipPreviousRepetition,experimentDescription,previousExperimentDescription,0,0,0,0,0,pwm,commonData);
@@ -432,6 +433,7 @@ bool PortsUtil::sendObjectLabelToSpeaker(string objectLabel){
     using yarp::os::Bottle;
 
     Bottle& speakerBottle = portSpeakerOut.prepare();
+    speakerBottle.clear();
 
     speakerBottle.addString(objectLabel);
 

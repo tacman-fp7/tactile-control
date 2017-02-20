@@ -77,6 +77,10 @@ namespace iCub {
                 bool processCollectedData();
                 bool isNewObjectLearningModeEnabled();
 
+                void viewData();
+
+                bool reset();
+
                 bool release();
 
         };

@@ -38,7 +38,8 @@ bool MLUtil::init(yarp::os::ResourceFinder &rf,iCub::plantIdentification::PortsU
 
     // build default objects map
     objectsMap.clear();
-    objectsMap.insert(std::pair<int,std::string>(1,"sugar box"));
+
+/*    objectsMap.insert(std::pair<int,std::string>(1,"sugar box"));
     objectsMap.insert(std::pair<int,std::string>(2,"tomato can"));
     objectsMap.insert(std::pair<int,std::string>(3,"brown block"));
     objectsMap.insert(std::pair<int,std::string>(4,"cat"));
@@ -48,6 +49,7 @@ bool MLUtil::init(yarp::os::ResourceFinder &rf,iCub::plantIdentification::PortsU
     objectsMap.insert(std::pair<int,std::string>(8,"small cube"));
     objectsMap.insert(std::pair<int,std::string>(9,"tennis ball"));
     objectsMap.insert(std::pair<int,std::string>(10,"soccer ball"));
+*/
 
     return true;
 }
@@ -96,6 +98,12 @@ bool MLUtil::testClassifierOneShot(std::vector<double> &features,int predictionE
 
     gurls::gMat2D<double> *output = wrapper->eval(input);
 
+
+std::cout << "REAL OUTPUT >>> ";
+for(int i = 0; i < output->cols(); i++){
+    std::cout << (*output)(0,i) << " ";
+}
+
     int numObjects = output->cols();
     int prediction;
 
@@ -118,6 +126,12 @@ bool MLUtil::testClassifierOneShot(std::vector<double> &features,int predictionE
                 outputMean(0,i) /= outputsOverTime.size();
             }
 
+std::cout << "OUTPUT MEAN" << std::endl;
+for(int i = 0; i < outputMean.cols(); i++){
+    std::cout << outputMean(0,i) << " ";
+}
+std::cout << std::endl;
+
             std::vector<int> predictions;
             getStandardPredictionsFrom1vsAll(outputMean,predictions);
             prediction = predictions[0];
@@ -134,6 +148,8 @@ bool MLUtil::testClassifierOneShot(std::vector<double> &features,int predictionE
                     }
                 }
             }
+std::cout << "CURRENT MAX: " << currMax << std::endl;
+
             prediction = currIndex;
         }
 
@@ -229,7 +245,8 @@ bool MLUtil::loadObjectNamesFromFile(std::string fileSuffix){
     std::cout << "loading object names list...";
 
     std::string objectName;
-    std::ifstream objectNamesFile(objectNamesFileName + fileSuffix + ".dat");
+    std::string fileName = objectNamesFileName + fileSuffix + ".dat";
+    std::ifstream objectNamesFile(fileName.c_str());
     objectsMap.clear();
     int i = 1;
     while (std::getline(objectNamesFile,objectName).good()){
@@ -247,7 +264,8 @@ bool MLUtil::saveObjectNamesToFile(std::string fileSuffix){
 
     std::cout << "saving object names list...";
 
-    std::ofstream objectNamesFile(objectNamesFileName + fileSuffix + ".dat");
+    std::string fileName = objectNamesFileName + fileSuffix + ".dat";
+    std::ofstream objectNamesFile(fileName.c_str());
 
     for(int i = 1; i <= objectsMap.size(); i++){
 
@@ -383,10 +401,16 @@ bool MLUtil::initNewObjectLearning(std::string newObjectName,bool isRefinement){
 
     if (!isRefinement){
         collectedFeatures.clear();
+
+        int newKey;
+        if (!objectsMap.empty()){
+            newKey = objectsMap.rbegin()->first + 1;
+        } else {
+            newKey = 1;
+        }
+        objectsMap.insert(std::pair<int,std::string>(newKey,newObjectName));
     }
 
-    int newKey = objectsMap.rbegin()->first + 1;
-    objectsMap.insert(std::pair<int,std::string>(newKey,newObjectName));
 }
 
 bool MLUtil::addCollectedFeatures(std::vector<double> &features){
@@ -405,13 +429,42 @@ bool MLUtil::processCollectedData(){
 
     if (collectedFeatures.size() > 0){
 
-        // add the new features to xTr and yTr 
+        /// add the new features to xTr and yTr 
 
         int numPrevObjects = yTr.cols();
         int numPrevSamples = xTr.rows();
 
+        std::vector<std::vector<double> > tempStorage;
+        
+        // store xTr and yTr
+        tempStorage.resize(xTr.rows());
+        for(int i = 0; i < tempStorage.size(); i++){
+            tempStorage[i].resize(xTr.cols());
+            for(int j = 0; j < tempStorage[i].size(); j++){
+                tempStorage[i][j] = xTr(i,j);
+            }
+        }
         xTr.resize(xTr.rows() + collectedFeatures.size(),collectedFeatures[0].size());
+        for(int i = 0; i < tempStorage.size(); i++){
+            for(int j = 0; j < tempStorage[i].size(); j++){
+                xTr(i,j) = tempStorage[i][j];
+            }
+        }
+
+        tempStorage.resize(yTr.rows());
+        for(int i = 0; i < tempStorage.size(); i++){
+            tempStorage[i].resize(yTr.cols());
+            for(int j = 0; j < tempStorage[i].size(); j++){
+                tempStorage[i][j] = yTr(i,j);
+            }
+        }
         yTr.resize(yTr.rows() + collectedFeatures.size(),yTr.cols() + 1);
+        for(int i = 0; i < tempStorage.size(); i++){
+            for(int j = 0; j < tempStorage[i].size(); j++){
+                yTr(i,j) = tempStorage[i][j];
+            }
+        }
+
 
         for(int i = 0; i < collectedFeatures.size(); i++){
             // update xTr
@@ -434,7 +487,7 @@ bool MLUtil::processCollectedData(){
             yTr(i,yTr.cols() - 1) = -1;
         }
 
-        // re-train the model
+        /// re-train the model
 
         trainClassifier();
 
@@ -448,6 +501,70 @@ bool MLUtil::processCollectedData(){
 bool MLUtil::isNewObjectLearningModeEnabled(){
 
     return learningNewObjectMode;
+}
+
+void MLUtil::viewData(){
+
+    std::cout << std::endl << std::endl;
+
+    std::cout << "-- X training --" << std::endl;
+    for(int i = 0; i < xTr.rows(); i++){
+        for(int j = 0; j < xTr.cols(); j++){
+            std::cout << xTr(i,j) << "\t";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+
+
+    std::cout << "-- Y training --" << std::endl;
+    for(int i = 0; i < yTr.rows(); i++){
+        for(int j = 0; j < yTr.cols(); j++){
+            std::cout << yTr(i,j) << "\t";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+
+
+    std::cout << "-- Collected features --" << std::endl;
+    for(int i = 0; i < collectedFeatures.size(); i++){
+        for(int j = 0; j < collectedFeatures[i].size(); j++){
+            std::cout << collectedFeatures[i][j] << "\t";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+
+
+    std::cout << "-- object names map --" << std::endl;
+    for(std::map<int,std::string>::iterator it = objectsMap.begin(); it != objectsMap.end(); ++it){
+
+       std::cout << it->first << "\t" << objectsMap[it->first] << std::endl;
+    }
+
+    std::cout << "-- Output over time --" << std::endl;
+    for(int i = 0; i < outputsOverTime.size(); i++){
+        for(int j = 0; j < outputsOverTime[i].size(); j++){
+            std::cout << outputsOverTime[i][j] << "\t";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+
+
+
+    std::cout << std::endl << std::endl;
+
+}
+
+bool MLUtil::reset(){
+
+//    xTr.resize(0,0);
+//    yTr.resize(0,0);
+    objectsMap.clear();
+    collectedFeatures.clear();
+    learningNewObjectMode = false;
 }
 
 bool MLUtil::release(){

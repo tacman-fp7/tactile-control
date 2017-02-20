@@ -341,6 +341,10 @@ bool PlantIdentificationModule::ml(iCub::plantIdentification::RPCMlCmdArgName pa
 //            add("load_names",LOAD_OBJECT_NAMES,"LOAD OBJECT NAMES");
 //    add("load_train_and_names",LOAD_TRAINING_SET_AND_OBJECT_NAMES,"LOAD TRAINING SET AND OBJECT NAMES");
 
+    case VIEW_DATA:
+        // view data for debugging
+        mlUtil.viewData();
+        break;
     case TRAIN:
         // train the classifier
         mlUtil.trainClassifier();
@@ -402,6 +406,10 @@ bool PlantIdentificationModule::ml(iCub::plantIdentification::RPCMlCmdArgName pa
     case PROCESS_COLLECTED_DATA:
         // process the collected data
         mlUtil.processCollectedData();
+        break;
+    case RESET:
+        // reset the collected data
+        mlUtil.reset();
         break;
     }
 

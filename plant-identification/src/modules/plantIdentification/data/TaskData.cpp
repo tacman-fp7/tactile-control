@@ -51,6 +51,8 @@ int TaskCommonData::getNumOfThreadCallsFromTime(MyThread whichThread,double time
     return (int)(time*1000.0/threadPeriod);
 
 }
+
+
 double TaskCommonData::getTimeFromNumOfThreadCalls(MyThread whichThread,int numOfThreadCalls){
     
     int threadPeriod;
@@ -68,7 +70,6 @@ double TaskCommonData::getTimeFromNumOfThreadCalls(MyThread whichThread,int numO
     return numOfThreadCalls*threadPeriod/1000.0;
 
 }
-
 
 
 TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::ControllersUtil *controllersUtil) {
