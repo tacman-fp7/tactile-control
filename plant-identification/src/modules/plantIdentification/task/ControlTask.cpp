@@ -235,7 +235,7 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,i
     storedGripStrength = commonData->tpDbl(7);
     testClassifierEnabled = commonData->tpInt(95) > 0;
     predictionEvaluationMethod = commonData->tpInt(95);
-    features.resize(45,0);
+    features.resize(39,0);
     featuresIndex = 0;
     tactileDataTemp.resize(30);
     for(int i = 0; i < tactileDataTemp.size(); i++){
@@ -1280,7 +1280,7 @@ void ControlTask::manageObjectRecognitionTask(Bottle &objectRecognitionBottle){
                 std::cout << "OBJECT RECOGNITION: loggin started!!!\n";
 
                 // copy initial raw encoders of the thumb and the middle fingers into features
-                if (testClassifierEnabled){
+/*                if (testClassifierEnabled){
 std::cout << "thumb enc: ";
                     for(int i = 0; i < 3; i++){ // thumb
                         features[featuresIndex + i] = commonData->fingerEncodersRawData[i];
@@ -1296,6 +1296,7 @@ std::cout << commonData->fingerEncodersRawData[6 + i] << " ";
 std::cout << std::endl;
                     featuresIndex += 3;
                 }
+*/
             }
             ICubUtil::printBottleIntoFile(objRecDataFile,objectRecognitionBottle);
         }
