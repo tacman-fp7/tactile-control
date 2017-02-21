@@ -316,7 +316,7 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
     approachData.jointsPwmLimitsEnabled = rf.check("approach.jointsPwmLimitsEnabled",Value(0)).asInt() != 0;
     approachData.lifespan = rf.check("approach.lifespan",Value(5)).asInt();
 
-    /** ICUB RESOURCE FINEDER **/
+    /** ICUB RESOURCE FINDER **/
 
     yarp::os::ResourceFinder iCubRF;
     iCubRF.setDefaultContext("plantIdentification");
@@ -365,13 +365,12 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
         commonData.handJointsHome[i] = handJoints->get(i).asDouble();
     }
 
-    /** COMMON RESOURCE FINEDER **/
+    /** COMMON RESOURCE FINDER **/
 
     yarp::os::ResourceFinder commonRF;
     commonRF.setDefaultContext("plantIdentification");
     std::string commonRFFileName = "confCommon.ini";
     commonRF.setDefaultConfigFile(commonRFFileName.c_str());
-    char **fakeArgV;
     commonRF.configure(0,fakeArgV,false);
 
     Bottle* wholeArmJointsDown = commonRF.find("wholeArmJoints_down").asList();

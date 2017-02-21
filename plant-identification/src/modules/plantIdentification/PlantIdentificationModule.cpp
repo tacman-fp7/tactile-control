@@ -113,7 +113,7 @@ bool PlantIdentificationModule::updateModule() {
     // manage event triggers
     if (eventsThread->eventTriggered(FINGERTIP_PUSHED,3)){ // pinky
         if (tasksRunning){
-            open();
+            open(yarp::os::Value(""));
         } else {
             grasp();
         }
@@ -131,7 +131,7 @@ bool PlantIdentificationModule::updateModule() {
 
     if (taskData->commonData.requestOpen == true){
         taskData->commonData.requestOpen = false;
-        open();
+        open(yarp::os::Value(""));
     }
 
     return !closing; 

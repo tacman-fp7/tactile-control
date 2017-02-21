@@ -125,7 +125,7 @@ bool TaskThread::afterRun(bool openHand){
 
     if (!controllersUtil->restorePreviousControlMode()) return false;
     if (openHand) {
-        if (!controllersUtil->openHand()) return false;
+        if (!controllersUtil->openHand(false)) return false;
     }
     runEnabled = false;
     taskList[currentTaskIndex]->clean();

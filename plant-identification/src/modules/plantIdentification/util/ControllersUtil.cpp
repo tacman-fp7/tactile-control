@@ -175,7 +175,7 @@ bool ControllersUtil::buildWholeArmJointsHome(const std::vector<double> armJoint
 
 bool ControllersUtil::buildWholeArmJointsDown(const std::vector<double> wholeArmJointsDown){
 
-    wholeArmJointsHome.resize(16);
+    this->wholeArmJointsDown.resize(16);
 
     for(int i = 0; i < wholeArmJointsDown.size(); i++){
         this->wholeArmJointsDown[i] = wholeArmJointsDown[i];
