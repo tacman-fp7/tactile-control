@@ -44,7 +44,19 @@ void RPCCommandsUtil::processCommand(const Bottle &rpcCmdBottle){
         break;
     case STOP: // do nothing
         break;
-    case ARM: // do nothing
+    case OPEN:
+        if (rpcCmdBottle.size() > 1 ){
+            argValue = rpcCmdBottle.get(1);
+        } else {
+            argValue = yarp::os::Value("");
+        }
+        break;
+    case ARM:
+        if (rpcCmdBottle.size() > 1 ){
+            argValue = rpcCmdBottle.get(1);
+        } else {
+            argValue = yarp::os::Value("");
+        }
         break;
     case GRASP: // do nothing
         break;

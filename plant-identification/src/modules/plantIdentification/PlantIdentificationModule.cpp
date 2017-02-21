@@ -159,48 +159,53 @@ bool PlantIdentificationModule::respond(const yarp::os::Bottle& command, yarp::o
 
     rpcCmdUtil.processCommand(command);
 
+    bool ok;
+
     switch (rpcCmdUtil.mainCmd){
 
     case HELP:
-        help();
+        ok = help();
         break;
     case SET:
-        set(rpcCmdUtil.setCmdArg,rpcCmdUtil.argValue);
+        ok = set(rpcCmdUtil.setCmdArg,rpcCmdUtil.argValue);
         break;
     case TASK:
-        task(rpcCmdUtil.taskCmdArg,rpcCmdUtil.task,rpcCmdUtil.argValue);
+        ok = task(rpcCmdUtil.taskCmdArg,rpcCmdUtil.task,rpcCmdUtil.argValue);
         break;
     case VIEW:
         view(rpcCmdUtil.viewCmdArg);
         break;
     case START:
-        start();
+        ok = start();
         break;
     case STOP:
-        stop();
+        ok = stop();
         break;
     case OPEN:
-        open();
+        ok = open(rpcCmdUtil.argValue);
         break;
     case ARM:
-        arm();
+        ok = arm(rpcCmdUtil.argValue);
         break;
     case GRASP:
-        grasp();
+        ok = grasp();
         break;
     case ML:
-        ml(rpcCmdUtil.mlCmdArg,rpcCmdUtil.argValue);
+        ok = ml(rpcCmdUtil.mlCmdArg,rpcCmdUtil.argValue);
         break;
     case WAVE:
-        wave();
+        ok = wave();
         break;
     case QUIT:
-        quit();
-
+        ok = quit();
         break;
     }
     
-    reply.addString("ok");    
+    if (ok){
+        reply.addString("ack");
+    } else {
+        reply.addString("nack");
+    }
 
     return true;
 }
@@ -247,8 +252,15 @@ bool PlantIdentificationModule::stop() {
 
 /* *********************************************************************************************************************** */
 /* ******* RPC Stop task execution and open the hand                        ********************************************** */
-bool PlantIdentificationModule::open() {
-    
+bool PlantIdentificationModule::open(Value paramValue) {
+
+    bool fingersAreStraight;
+    if (paramValue.asString() == "wide"){
+        fingersAreStraight = true;
+    } else {
+        fingersAreStraight = false;
+    }
+
     if (tasksRunning == true){
         tasksRunning = false;
 
@@ -256,7 +268,7 @@ bool PlantIdentificationModule::open() {
 
         taskThread->afterRun(true);
     } else {
-        controllersUtil->openHand();
+        controllersUtil->openHand(fingersAreStraight);
     }
 
     return true;
@@ -280,9 +292,9 @@ bool PlantIdentificationModule::start() {
 
 /* *********************************************************************************************************************** */
 /* ******* RPC Set arm in task position                                     ********************************************** */
-bool PlantIdentificationModule::arm() {
+bool PlantIdentificationModule::arm(Value paramValue) {
 
-    return taskThread->setArmInTaskPosition();
+    return taskThread->setArmPosition(paramValue);
 }
 /* *********************************************************************************************************************** */
 
@@ -335,85 +347,83 @@ bool PlantIdentificationModule::wave() {
 /* ******* RPC Manage machine learning related commands                                       ********************************************** */
 bool PlantIdentificationModule::ml(iCub::plantIdentification::RPCMlCmdArgName paramName,Value paramValue) {
 
+    bool ok;
+
     switch(paramName){
-
-
-//            add("load_names",LOAD_OBJECT_NAMES,"LOAD OBJECT NAMES");
-//    add("load_train_and_names",LOAD_TRAINING_SET_AND_OBJECT_NAMES,"LOAD TRAINING SET AND OBJECT NAMES");
 
     case VIEW_DATA:
         // view data for debugging
-        mlUtil.viewData();
+        ok = mlUtil.viewData();
         break;
     case TRAIN:
         // train the classifier
-        mlUtil.trainClassifier();
+        ok = mlUtil.trainClassifier();
         break;
     case TEST:
         // test the classifier
-        mlUtil.testClassifier();
+        ok = mlUtil.testClassifier();
         break;
     case SAVE_MODEL:
         // save the learned model to file
-        mlUtil.saveModelToFile(paramValue.asString());
+        ok = mlUtil.saveModelToFile(paramValue.asString());
         break;
     case LOAD_MODEL:
         // load model from file
-        mlUtil.loadModelFromFile(paramValue.asString());
+        ok = mlUtil.loadModelFromFile(paramValue.asString());
         break;
     case LOAD_TRAINING_SET:
         // load training set from files
-        mlUtil.loadTrainingSetFromFile(paramValue.asString());
+        ok = mlUtil.loadTrainingSetFromFile(paramValue.asString());
         break;
     case LOAD_TEST_SET:
         // load test set from files
-        mlUtil.loadTestSetFromFile(paramValue.asString());
+        ok = mlUtil.loadTestSetFromFile(paramValue.asString());
         break;
     case LOAD_OBJECT_NAMES:
         // load object names list
-        mlUtil.loadObjectNamesFromFile(paramValue.asString());
+        ok = mlUtil.loadObjectNamesFromFile(paramValue.asString());
         break;
     case LOAD_TRAINING_SET_AND_OBJECT_NAMES:
         // load training set and object names list
-        mlUtil.loadTrainingSetFromFile(paramValue.asString());
-        mlUtil.loadObjectNamesFromFile(paramValue.asString());
+        ok = mlUtil.loadTrainingSetFromFile(paramValue.asString());
+        ok = mlUtil.loadObjectNamesFromFile(paramValue.asString());
         break;
     case SAVE_TRAINING_SET:
         // save training set from files
-        mlUtil.saveTrainingSetToFile(paramValue.asString());
+        ok = mlUtil.saveTrainingSetToFile(paramValue.asString());
         break;
     case SAVE_OBJECT_NAMES:
         // save object names list
-        mlUtil.loadObjectNamesFromFile(paramValue.asString());
+        ok = mlUtil.loadObjectNamesFromFile(paramValue.asString());
         break;
     case SAVE_TRAINING_SET_AND_OBJECT_NAMES:
         // save training set and object names list
-        mlUtil.saveTrainingSetToFile(paramValue.asString());
-        mlUtil.saveObjectNamesToFile(paramValue.asString());
+        ok = mlUtil.saveTrainingSetToFile(paramValue.asString());
+        ok = mlUtil.saveObjectNamesToFile(paramValue.asString());
         break;
     case LEARN_NEW_OBJECT:
         // start the mode "learning a new object"
-        mlUtil.initNewObjectLearning(paramValue.asString(),false);
+        ok = mlUtil.initNewObjectLearning(paramValue.asString(),false);
         break;
     case REFINE_NEW_OBJECT:
         // learn more features for the previous learned object
-        mlUtil.initNewObjectLearning(paramValue.asString(),true);
+        ok = mlUtil.initNewObjectLearning(paramValue.asString(),true);
         break;    
     case DISCARD_LAST_FEATURES:
         // discard last collected features
-        mlUtil.discardLastCollectedFeatures();
+        ok = mlUtil.discardLastCollectedFeatures();
         break;
     case PROCESS_COLLECTED_DATA:
         // process the collected data
-        mlUtil.processCollectedData();
+        ok = mlUtil.processCollectedData();
         break;
     case RESET:
         // reset the collected data
-        mlUtil.reset();
+        ok = mlUtil.reset();
         break;
     }
 
-    return true;
+    return ok;
 }
 /* *********************************************************************************************************************** */
 
@@ -421,26 +431,32 @@ bool PlantIdentificationModule::ml(iCub::plantIdentification::RPCMlCmdArgName pa
 /* *********************************************************************************************************************** */
 /* ******* RPC Quit module                                                  ********************************************** */
 bool PlantIdentificationModule::quit() {
-    return closing = true;
+
+    closing = true;
+    return true;
 }
 /* *********************************************************************************************************************** */
 
 
-void PlantIdentificationModule::set(iCub::plantIdentification::RPCSetCmdArgName paramName,Value paramValue){
+bool PlantIdentificationModule::set(iCub::plantIdentification::RPCSetCmdArgName paramName,Value paramValue){
     taskThread->set(paramName,paramValue,rpcCmdData);
     view(SETTINGS);
+    return true;
 }
 
-void PlantIdentificationModule::task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,Value paramValue){
+bool PlantIdentificationModule::task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,Value paramValue){
     taskThread->task(paramName,taskName,paramValue,rpcCmdData);
     view(TASKS);
+    return true;
 }
 
-void PlantIdentificationModule::view(iCub::plantIdentification::RPCViewCmdArgName paramName){
+bool PlantIdentificationModule::view(iCub::plantIdentification::RPCViewCmdArgName paramName){
     taskThread->view(paramName,rpcCmdData);
+    return true;
 }
 
-void PlantIdentificationModule::help(){
+bool PlantIdentificationModule::help(){
 	controllersUtil->setArmHomeAsCurrent();
     taskThread->help(rpcCmdData);
+    return true;
 }

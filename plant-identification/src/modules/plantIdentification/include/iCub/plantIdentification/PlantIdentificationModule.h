@@ -71,16 +71,16 @@ namespace iCub {
                 /* ****** RPC Methods                                  ****** */
                 bool start();
                 bool stop();
-                bool open();
-                bool arm();
+                bool open(yarp::os::Value paramValue);
+                bool arm(yarp::os::Value paramValue);
                 bool grasp();
                 bool wave();
                 bool ml(iCub::plantIdentification::RPCMlCmdArgName paramName,yarp::os::Value paramValue);
                 bool quit();
-                void set(iCub::plantIdentification::RPCSetCmdArgName paramName,yarp::os::Value paramValue);
-                void task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,yarp::os::Value paramValue);
-                void view(iCub::plantIdentification::RPCViewCmdArgName paramName);
-                void help();
+                bool set(iCub::plantIdentification::RPCSetCmdArgName paramName,yarp::os::Value paramValue);
+                bool task(iCub::plantIdentification::RPCTaskCmdArgName paramName,iCub::plantIdentification::TaskName taskName,yarp::os::Value paramValue);
+                bool view(iCub::plantIdentification::RPCViewCmdArgName paramName);
+                bool help();
         };
     }
 }

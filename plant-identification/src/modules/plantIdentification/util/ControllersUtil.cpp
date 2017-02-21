@@ -7,6 +7,8 @@
 #include <yarp/os/Time.h>
 #include <yarp/os/Value.h>
 
+#define STRAIGHT_DISTAL_ANGLE 4.0
+
 using iCub::plantIdentification::ControllersUtil;
 using iCub::plantIdentification::FingerJoint;
 
@@ -27,7 +29,7 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
     //TODO use constants
     storedJointsControlMode.resize(8,VOCAB_CM_POSITION);
     storedHandJointsMaxPwmLimits.resize(8);
-    
+
     string moduleName = rf.check("name", Value("stableGrasp")).asString().c_str();
     string robotName = rf.check("robot", Value("icub"), "The robot name.").asString().c_str();
     whichHand = rf.check("whichHand", Value("right"), "The hand to be used for the grasping.").asString().c_str();
@@ -139,8 +141,6 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
         // store fixation point
         iGaze->getFixationPoint(storedFixationPoint);
 
-
-       
         Property cartCtrlOptions;
         cartCtrlOptions.put("device","cartesiancontrollerclient");
         cartCtrlOptions.put("remote","/" + robotName + "/cartesianController/" + arm);
@@ -168,6 +168,17 @@ bool ControllersUtil::buildWholeArmJointsHome(const std::vector<double> armJoint
     }
     for(int i = 0; i < handJointsHome.size(); i++){
         wholeArmJointsHome[7 + i] = handJointsHome[i];
+    }
+
+    return true;
+}
+
+bool ControllersUtil::buildWholeArmJointsDown(const std::vector<double> wholeArmJointsDown){
+
+    wholeArmJointsHome.resize(16);
+
+    for(int i = 0; i < wholeArmJointsDown.size(); i++){
+        this->wholeArmJointsDown[i] = wholeArmJointsDown[i];
     }
 
     return true;
@@ -504,6 +515,27 @@ bool ControllersUtil::setArmInTaskPosition() {
 }
 /* *********************************************************************************************************************** */
 
+/* ******* Place arm in grasping position                                   ********************************************** */ 
+bool ControllersUtil::setArmDown() {
+
+    cout << dbgTag << "Reaching arm down position ... \t";
+    
+    iVel->stop();
+
+    for(int i = 0; i < wholeArmJointsDown.size(); i++){
+
+        iPos->positionMove(i,wholeArmJointsDown[i]);
+
+    }
+
+    // Check motion done
+    waitMoveDone(10, 1);
+    cout << "Done. \n";
+
+    return true;
+}
+/* *********************************************************************************************************************** */
+
 bool ControllersUtil::restorePreviousArmPosition(){
     
     // Stop interfaces
@@ -657,7 +689,7 @@ bool ControllersUtil::release(){
 
 /* *********************************************************************************************************************** */
 /* ******* Open hand                                                        ********************************************** */
-bool ControllersUtil::openHand() {
+bool ControllersUtil::openHand(bool fingersAreStraight) {
     
     cout << dbgTag << "Opening hand ... \t";
     
@@ -668,15 +700,18 @@ bool ControllersUtil::openHand() {
     
     for(int i = 8; i < wholeArmJointsHome.size(); i++){
 
+        double jointAngle;
 
-	double jointAngle;
-	if (i == 12 && numFingers == 2){
-		jointAngle = 4.0;
-	} else {
-		jointAngle = wholeArmJointsHome[i];
-	}
+        if (fingersAreStraight && (i ==  10 || i == 12 || i == 14)){
+            jointAngle = STRAIGHT_DISTAL_ANGLE;
+        } else if (i == 12 && numFingers == 2){
+            jointAngle = STRAIGHT_DISTAL_ANGLE;
+        } else {
+            jointAngle = wholeArmJointsHome[i];
+        }
         iPos->positionMove(i,jointAngle);
 
+        
     }
 
     /*

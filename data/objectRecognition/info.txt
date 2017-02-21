@@ -1,0 +1,3 @@
+SET:
+- S1: i dieci oggetti del review meeting
+- S2: S1 meno il decimo oggetto (la soccer ball), quindi sono 9 oggetti

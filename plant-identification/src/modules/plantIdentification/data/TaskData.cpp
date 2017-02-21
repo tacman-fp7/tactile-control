@@ -365,9 +365,27 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
         commonData.handJointsHome[i] = handJoints->get(i).asDouble();
     }
 
+    /** COMMON RESOURCE FINEDER **/
+
+    yarp::os::ResourceFinder commonRF;
+    commonRF.setDefaultContext("plantIdentification");
+    std::string commonRFFileName = "confCommon.ini";
+    commonRF.setDefaultConfigFile(commonRFFileName.c_str());
+    char **fakeArgV;
+    commonRF.configure(0,fakeArgV,false);
+
+    Bottle* wholeArmJointsDown = commonRF.find("wholeArmJoints_down").asList();
+    commonData.wholeArmJointsDown.resize(wholeArmJointsDown->size());
+    for(int i = 0; i < wholeArmJointsDown->size(); i++){
+        commonData.wholeArmJointsDown[i] = wholeArmJointsDown->get(i).asDouble();
+    }
+
     /****/
 
     controllersUtil->buildWholeArmJointsHome(commonData.armJointsHome,commonData.handJointsHome);
+
+    controllersUtil->buildWholeArmJointsDown(commonData.wholeArmJointsDown);
+
 
 }
 

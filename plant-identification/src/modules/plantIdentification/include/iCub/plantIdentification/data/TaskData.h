@@ -31,6 +31,7 @@ namespace iCub {
             std::vector<double> armEncodersAngles;
             std::vector<double> armEncodersAnglesReferences;
             std::vector<double> armJointsHome;
+            std::vector<double> wholeArmJointsDown;
             std::vector<double> handJointsHome;
 
             std::vector<double> fingerEncodersRawData;
@@ -57,7 +58,6 @@ namespace iCub {
 
             bool requestOpen;
 
-            
             /*  TEMP PARAMETERS USED DURING CONTROL TASKS (EXCEPT THE 15th, USED DURING STEP TASKS)
             *   0: supervisor mode off/on [0/1]
             *   1: supervisor Kp

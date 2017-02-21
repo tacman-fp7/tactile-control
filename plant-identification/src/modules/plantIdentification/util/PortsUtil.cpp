@@ -428,7 +428,7 @@ bool PortsUtil::sendObjectRecognitionData(string taskId,int objectId,iCub::plant
     return true;
 }
 
-bool PortsUtil::sendObjectLabelToSpeaker(string objectLabel){
+bool PortsUtil::sendStringToSpeaker(string objectLabel){
 
     using yarp::os::Bottle;
 

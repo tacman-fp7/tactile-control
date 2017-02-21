@@ -160,13 +160,19 @@ void TaskThread::threadRelease() {
 }
 /* *********************************************************************************************************************** */
 
-bool TaskThread::setArmInTaskPosition(){
+bool TaskThread::setArmPosition(Value paramValue){
 
-    if (!controllersUtil->setArmInTaskPosition()) {
-        cout << dbgTag << "failed to set arm in task position\n";
-        return false;
+    if (paramValue.asString() == "down"){
+        if (!controllersUtil->setArmDown()) {
+            cout << dbgTag << "failed to set arm down\n";
+            return false;
+        }
+    } else {
+        if (!controllersUtil->setArmInTaskPosition()) {
+            cout << dbgTag << "failed to set arm in task position\n";
+            return false;
+        }
     }
-
     return true;
 
 }

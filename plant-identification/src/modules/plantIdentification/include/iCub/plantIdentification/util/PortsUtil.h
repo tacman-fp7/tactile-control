@@ -56,7 +56,7 @@ namespace iCub {
 
                 bool sendObjectRecognitionData(std::string taskId,int objectId,iCub::plantIdentification::ObjectRecognitionTask objRecTask,int extraCode1,int extraCode2,int skipPreviousRepetition,std::string experimentDescription,std::string previousExperimentDescription,std::vector<double> &pwm,iCub::plantIdentification::TaskCommonData *commonData);
 
-                bool sendObjectLabelToSpeaker(std::string objectLabel);
+                bool sendStringToSpeaker(std::string objectLabel);
 
                 bool sendGMMData(double gripStrength, double indexMiddleFingerPressureBalance, iCub::plantIdentification::TaskCommonData *commonData);
 

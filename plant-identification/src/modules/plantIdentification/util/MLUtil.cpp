@@ -361,18 +361,17 @@ bool MLUtil::checkAccuracy(const std::vector<int> &predictions,const std::vector
         cout << "--";
     }
     cout << endl;
-    
 
     for(int i = 0; i < confusionMatrix.size(); i++){
         cout << (i + 1)%10 << " | ";
         for(int j = 0; j < confusionMatrix[i].size(); j++){
-	
-		if (confusionMatrix[i][j] > 0){
-			cout << confusionMatrix[i][j];
-		} else {
-			cout << ".";
-		}
-		cout << " ";
+
+            if (confusionMatrix[i][j] > 0){
+                cout << confusionMatrix[i][j];
+            } else {
+                cout << ".";
+            }
+            cout << " ";
         }
         cout << endl;
     }
@@ -392,7 +391,7 @@ bool MLUtil::checkAccuracy(const std::vector<int> &predictions,const std::vector
 
 bool MLUtil::sendDetectedObjectToPort(int objectNum){
 
-    portsUtil->sendObjectLabelToSpeaker(objectsMap[objectNum]);
+    portsUtil->sendStringToSpeaker("I think this is the " + objectsMap[objectNum]);
 }
 
 bool MLUtil::initNewObjectLearning(std::string newObjectName,bool isRefinement){
@@ -411,6 +410,7 @@ bool MLUtil::initNewObjectLearning(std::string newObjectName,bool isRefinement){
         objectsMap.insert(std::pair<int,std::string>(newKey,newObjectName));
     }
 
+    return true;
 }
 
 bool MLUtil::addCollectedFeatures(std::vector<double> &features){
@@ -423,6 +423,8 @@ bool MLUtil::discardLastCollectedFeatures(){
     if (collectedFeatures.size() > 0){
         collectedFeatures.pop_back();
     }
+
+    return true;
 }
 
 bool MLUtil::processCollectedData(){
@@ -491,11 +493,19 @@ bool MLUtil::processCollectedData(){
 
         trainClassifier();
 
+
+         // disable the "learning new object" mode
+
+        learningNewObjectMode = false;
+
+        return true;
+
+    } else {
+
+        return false;
+
     }
 
-    // disable the "learning new object" mode
-
-    learningNewObjectMode = false;
 }
 
 bool MLUtil::isNewObjectLearningModeEnabled(){
@@ -503,7 +513,7 @@ bool MLUtil::isNewObjectLearningModeEnabled(){
     return learningNewObjectMode;
 }
 
-void MLUtil::viewData(){
+bool MLUtil::viewData(){
 
     std::cout << std::endl << std::endl;
 
@@ -552,10 +562,9 @@ void MLUtil::viewData(){
     }
     std::cout << std::endl;
 
-
-
     std::cout << std::endl << std::endl;
 
+    return true;
 }
 
 bool MLUtil::reset(){
@@ -565,6 +574,8 @@ bool MLUtil::reset(){
     objectsMap.clear();
     collectedFeatures.clear();
     learningNewObjectMode = false;
+
+    return true;
 }
 
 bool MLUtil::release(){

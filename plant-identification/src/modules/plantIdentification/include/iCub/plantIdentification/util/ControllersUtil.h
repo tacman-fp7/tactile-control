@@ -25,7 +25,7 @@ namespace iCub {
                 int armJointsNum;
 
             private:
-                
+
                 yarp::dev::PolyDriver clientArm;
                 yarp::dev::PolyDriver clientGazeCtrl;
                 yarp::dev::PolyDriver clientArmCartCtrl;
@@ -47,7 +47,7 @@ namespace iCub {
                 std::vector<int> storedJointsControlMode;
                 std::vector<int> handJointsToMove;
                 std::vector<double> storedHandJointsMaxPwmLimits;
-                
+
                 //TODO TEMPORARY WORKAROUND
                 double storedPIDIntegralGain;
 
@@ -58,6 +58,7 @@ namespace iCub {
                 bool headEnabled;
 
                 std::vector<double> wholeArmJointsHome;
+                std::vector<double> wholeArmJointsDown;
 
                 /* ****** Debug attributes                              ****** */
                 std::string dbgTag;
@@ -69,6 +70,8 @@ namespace iCub {
                 bool init(yarp::os::ResourceFinder &rf);
 
                 bool buildWholeArmJointsHome(const std::vector<double> armJointsHome,const std::vector<double> handJointsHome);
+
+                bool buildWholeArmJointsDown(const std::vector<double> wholeArmJointsDown);
 
                 bool sendPwm(int joint,double pwm);
 
@@ -86,13 +89,15 @@ namespace iCub {
 
                 bool setArmInTaskPosition();
 
+                bool setArmDown();
+
                 bool restorePreviousArmPosition();
 
                 bool setArmHomeAsCurrent();
 
                 bool restorePreviousControlMode();
 
-                bool openHand();
+                bool openHand(bool fingersAreStraight);
 
                 bool getEncoderAngle(int joint,double *encoderData);
 
