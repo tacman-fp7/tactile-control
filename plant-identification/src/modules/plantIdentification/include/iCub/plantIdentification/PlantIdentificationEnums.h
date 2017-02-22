@@ -81,6 +81,7 @@ namespace iCub {
         enum RPCMlCmdArgName {
 
             VIEW_DATA,
+            MODE,
             TRAIN,
             TEST,
             SAVE_MODEL,
@@ -96,6 +97,7 @@ namespace iCub {
             REFINE_NEW_OBJECT,
             DISCARD_LAST_FEATURES,
             PROCESS_COLLECTED_DATA,
+            GET_READY,
             RESET
         };
 

@@ -1,3 +1,7 @@
 SET:
 - S1: i dieci oggetti del review meeting
 - S2: S1 meno il decimo oggetto (la soccer ball), quindi sono 9 oggetti
+
+- XX: dove X = [S|N}, i due valori sono associati il primo alla spugna blu e il secondo alla spugna gialla. Se X = S, il relativo oggetto viene dato in entrambi i modi durante il training, altrimenti viene dato sempre nello stesso modo
+
+- N[T]: ad esempio 25T, N indica il numero di training examples per oggetto, T indica se ci si deve fare un test set

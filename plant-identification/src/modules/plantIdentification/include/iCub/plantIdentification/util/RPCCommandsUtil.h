@@ -37,11 +37,11 @@ namespace iCub {
 
                 void init(iCub::plantIdentification::RPCCommandsData *rpcData);
 
-                void processCommand(const yarp::os::Bottle &rpcCmdBottle);
+                bool processCommand(const yarp::os::Bottle &rpcCmdBottle);
 
             private:
 
-                void processTaskCommand(const yarp::os::Bottle &rpcCmdBottle);
+                bool processTaskCommand(const yarp::os::Bottle &rpcCmdBottle);
 
 };
     } //namespace plantIdentification

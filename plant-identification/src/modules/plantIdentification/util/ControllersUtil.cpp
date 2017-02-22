@@ -37,6 +37,7 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
     whichTask = rf.check("whichTask", Value("grasp"), "The code of the task [grasp/objrec]").asString().c_str();
     numFingers = rf.check("numFingers", Value(2), "Number of fingers used").asInt();
     headEnabled = rf.check("headEnabled",Value(0)).asInt() != 0;
+    double refVelocity = rf.check("refVelocity",Value(50)).asDouble();
     bool specifyHand = rf.check("specifyHand",Value(0)).asInt() != 0;
     string portPrefix;
     if (specifyHand){
@@ -113,9 +114,10 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
     // Set reference speeds
     vector<double> refSpeeds(armJointsNum, 0);
     iPos->getRefSpeeds(&refSpeeds[0]);
-    for (int i = 11; i < 15; ++i) {
-        refSpeeds[i] = 50;
+    for (int i = 7; i < 16; ++i) {
+        refSpeeds[i] = refVelocity;
     }
+    std::cout << "ref velocity set to: " << refVelocity << std::endl;
     iPos->setRefSpeeds(&refSpeeds[0]);
 
     jointLimits.push_back(iLim);

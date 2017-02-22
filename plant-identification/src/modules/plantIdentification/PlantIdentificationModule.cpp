@@ -157,50 +157,51 @@ bool PlantIdentificationModule::interruptModule() {
 /* ******* Manage commands coming from RPC Port                             ********************************************** */   
 bool PlantIdentificationModule::respond(const yarp::os::Bottle& command, yarp::os::Bottle& reply){
 
-    rpcCmdUtil.processCommand(command);
+    bool ok = rpcCmdUtil.processCommand(command);
 
-    bool ok;
+    if (ok){
 
-    switch (rpcCmdUtil.mainCmd){
+        switch (rpcCmdUtil.mainCmd){
 
-    case HELP:
-        ok = help();
-        break;
-    case SET:
-        ok = set(rpcCmdUtil.setCmdArg,rpcCmdUtil.argValue);
-        break;
-    case TASK:
-        ok = task(rpcCmdUtil.taskCmdArg,rpcCmdUtil.task,rpcCmdUtil.argValue);
-        break;
-    case VIEW:
-        view(rpcCmdUtil.viewCmdArg);
-        break;
-    case START:
-        ok = start();
-        break;
-    case STOP:
-        ok = stop();
-        break;
-    case OPEN:
-        ok = open(rpcCmdUtil.argValue);
-        break;
-    case ARM:
-        ok = arm(rpcCmdUtil.argValue);
-        break;
-    case GRASP:
-        ok = grasp();
-        break;
-    case ML:
-        ok = ml(rpcCmdUtil.mlCmdArg,rpcCmdUtil.argValue);
-        break;
-    case WAVE:
-        ok = wave();
-        break;
-    case QUIT:
-        ok = quit();
-        break;
+        case HELP:
+            ok = help();
+            break;
+        case SET:
+            ok = set(rpcCmdUtil.setCmdArg,rpcCmdUtil.argValue);
+            break;
+        case TASK:
+            ok = task(rpcCmdUtil.taskCmdArg,rpcCmdUtil.task,rpcCmdUtil.argValue);
+            break;
+        case VIEW:
+            view(rpcCmdUtil.viewCmdArg);
+            break;
+        case START:
+            ok = start();
+            break;
+        case STOP:
+            ok = stop();
+            break;
+        case OPEN:
+            ok = open(rpcCmdUtil.argValue);
+            break;
+        case ARM:
+            ok = arm(rpcCmdUtil.argValue);
+            break;
+        case GRASP:
+            ok = grasp();
+            break;
+        case ML:
+            ok = ml(rpcCmdUtil.mlCmdArg,rpcCmdUtil.argValue);
+            break;
+        case WAVE:
+            ok = wave();
+            break;
+        case QUIT:
+            ok = quit();
+            break;
+        }
     }
-    
+
     if (ok){
         reply.addString("ack");
     } else {
@@ -240,13 +241,22 @@ bool PlantIdentificationModule::close() {
 /* ******* RPC Stop task execution without opening the hand                 ********************************************** */
 bool PlantIdentificationModule::stop() {
     
-    tasksRunning = false;
+    if (tasksRunning == true){
 
-    taskThread->suspend();
+        tasksRunning = false;
 
-    taskThread->afterRun(false);
+        taskThread->suspend();
 
-    return true;
+        taskThread->afterRun(false);
+
+        return true;
+
+    } else {
+
+        return false;
+
+    }
+
 }
 /* *********************************************************************************************************************** */
 
@@ -280,13 +290,21 @@ bool PlantIdentificationModule::open(Value paramValue) {
 /* ******* RPC Grasp object                                                 ********************************************** */
 bool PlantIdentificationModule::start() {
 
-    tasksRunning = true;
+    if (tasksRunning == true){
+         
+        return false;
 
-    if (!taskThread->initializeGrasping()) return false;
+    } else {
 
-    taskThread->resume();
+        tasksRunning = true;
 
-    return true;
+        if (!taskThread->initializeGrasping()) return false;
+
+        taskThread->resume();
+
+        return true;
+
+    }
 }
 /* *********************************************************************************************************************** */
 
@@ -305,25 +323,33 @@ bool PlantIdentificationModule::grasp() {
 
     using yarp::os::Time;
 
-    bool hysteresisThresholdsStorageEnabled = taskData->commonData.tpInt(82) != 0;
+    if (tasksRunning == true){
+         
+        return false;
 
-    if (hysteresisThresholdsStorageEnabled){
+    } else {
 
-        std::cout << "Setting hysteresis thresholds...\n"; 
-        double rate = 1.0 + taskData->commonData.tpDbl(81)/100.0;
-        Time::delay(1);
-        taskData->commonData.tempParameters[78] = rate * taskData->commonData.overallFingerPressureMedian[4]; // thumb
-        taskData->commonData.tempParameters[79] = rate * taskData->commonData.overallFingerPressureMedian[0]; // index finger
-        taskData->commonData.tempParameters[80] = rate * taskData->commonData.overallFingerPressureMedian[1]; // middle finger
-        std::cout << "Done.\n"; 
+        bool hysteresisThresholdsStorageEnabled = taskData->commonData.tpInt(82) != 0;
+
+        if (hysteresisThresholdsStorageEnabled){
+
+            std::cout << "Setting hysteresis thresholds...\n"; 
+            double rate = 1.0 + taskData->commonData.tpDbl(81)/100.0;
+            Time::delay(1);
+            taskData->commonData.tempParameters[78] = rate * taskData->commonData.overallFingerPressureMedian[4]; // thumb
+            taskData->commonData.tempParameters[79] = rate * taskData->commonData.overallFingerPressureMedian[0]; // index finger
+            taskData->commonData.tempParameters[80] = rate * taskData->commonData.overallFingerPressureMedian[1]; // middle finger
+            std::cout << "Done.\n"; 
+        }
+
+        task(EMPTY,NONE,Value(0));
+        task(ADD,APPROACH,Value(0));
+        task(ADD,CONTROL,Value(0));
+        start();
+
+        return true;
+
     }
-
-    task(EMPTY,NONE,Value(0));
-    task(ADD,APPROACH,Value(0));
-    task(ADD,CONTROL,Value(0));
-    start();
-
-    return true;
 }
 /* *********************************************************************************************************************** */
 
@@ -358,6 +384,20 @@ bool PlantIdentificationModule::ml(iCub::plantIdentification::RPCMlCmdArgName pa
     case TRAIN:
         // train the classifier
         ok = mlUtil.trainClassifier();
+        break;
+    case MODE:
+        // set classification mode
+        if (paramValue.asString() == "off"){
+            taskData->commonData.tempParameters[95] = 0;
+        } else if (paramValue.asString() == "std"){
+            taskData->commonData.tempParameters[95] = 1;
+        } else if (paramValue.asString() == "avg"){
+            taskData->commonData.tempParameters[95] = 2;
+        } else if (paramValue.asString() == "max"){
+            taskData->commonData.tempParameters[95] = 3;
+        } else { // default
+            taskData->commonData.tempParameters[95] = 1;
+        }
         break;
     case TEST:
         // test the classifier
@@ -416,6 +456,19 @@ bool PlantIdentificationModule::ml(iCub::plantIdentification::RPCMlCmdArgName pa
     case PROCESS_COLLECTED_DATA:
         // process the collected data
         ok = mlUtil.processCollectedData();
+        break;
+    case GET_READY:
+        // get ready
+        // load object names list
+        ok = mlUtil.loadObjectNamesFromFile(paramValue.asString());
+        if (ok){
+            // load training set from files
+            ok = mlUtil.loadTrainingSetFromFile(paramValue.asString());
+            if (ok){
+                // train the classifier
+                ok = mlUtil.trainClassifier();
+            }
+        }
         break;
     case RESET:
         // reset the collected data

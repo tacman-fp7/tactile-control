@@ -1,5 +1,7 @@
 #include "iCub/plantIdentification/util/RPCCommandsUtil.h"
 
+#include <stdexcept>
+
 using iCub::plantIdentification::RPCCommandsUtil;
 using iCub::plantIdentification::RPCCommandsData;
 using iCub::plantIdentification::RPCMainCmdName;
@@ -22,23 +24,43 @@ void RPCCommandsUtil::init(RPCCommandsData *rpcData){
     dbgTag = "RPCCommandsUtil: ";
 }
 
-void RPCCommandsUtil::processCommand(const Bottle &rpcCmdBottle){
+bool RPCCommandsUtil::processCommand(const Bottle &rpcCmdBottle){
 
-    mainCmd = rpcData->mainCmdRevMap[rpcCmdBottle.get(0).asString()];
-    
+    try {
+        mainCmd = rpcData->mainCmdRevMap.at(rpcCmdBottle.get(0).asString());
+    } catch(const std::out_of_range& oor){
+        return false;
+    }
+
+    bool ok = true;
+
     switch (mainCmd){
 
     case HELP: // do nothing
         break;
     case SET:
-        setCmdArg = rpcData->setCmdArgRevMap[rpcCmdBottle.get(1).asString()];
+        if (rpcCmdBottle.size() < 3){
+            return false;
+        }
+        try {
+            setCmdArg = rpcData->setCmdArgRevMap[rpcCmdBottle.get(1).asString()];
+        } catch(const std::out_of_range& oor){
+            return false;
+        }
         argValue = rpcCmdBottle.get(2);
         break;
     case TASK:
-        processTaskCommand(rpcCmdBottle);
+        return processTaskCommand(rpcCmdBottle);
         break;
     case VIEW:
-        viewCmdArg = rpcData->viewCmdArgRevMap[rpcCmdBottle.get(1).asString()];
+        if (rpcCmdBottle.size() < 2){
+            return false;
+        }
+        try {
+            viewCmdArg = rpcData->viewCmdArgRevMap[rpcCmdBottle.get(1).asString()];
+        } catch(const std::out_of_range& oor){
+            return false;
+        }
         break;
     case START: // do nothing
         break;
@@ -63,7 +85,14 @@ void RPCCommandsUtil::processCommand(const Bottle &rpcCmdBottle){
     case WAVE: // do nothing
         break;
     case ML:
-        mlCmdArg = rpcData->mlCmdArgRevMap[rpcCmdBottle.get(1).asString()];
+        if (rpcCmdBottle.size() < 2){
+            return false;
+        }
+        try {
+            mlCmdArg = rpcData->mlCmdArgRevMap[rpcCmdBottle.get(1).asString()];
+        } catch(const std::out_of_range& oor){
+            return false;
+        }
         if (rpcCmdBottle.size() > 2){
             argValue = rpcCmdBottle.get(2);
         }
@@ -73,15 +102,28 @@ void RPCCommandsUtil::processCommand(const Bottle &rpcCmdBottle){
 
     };
 
+    return true;
 }
 
-void RPCCommandsUtil::processTaskCommand(const Bottle &rpcCmdBottle){
+bool RPCCommandsUtil::processTaskCommand(const Bottle &rpcCmdBottle){
 
-    taskCmdArg = rpcData->taskCmdArgRevMap[rpcCmdBottle.get(1).asString()];
+    try {
+        taskCmdArg = rpcData->taskCmdArgRevMap[rpcCmdBottle.get(1).asString()];
+    } catch(const std::out_of_range& oor){
+        return false;
+    }
+        
     switch (taskCmdArg){
 
     case ADD:
-        task = rpcData->taskRevMap[rpcCmdBottle.get(2).asString()];
+        if (rpcCmdBottle.size() < 4){
+            return false;
+        }
+        try {
+            task = rpcData->taskRevMap[rpcCmdBottle.get(2).asString()];
+        } catch(const std::out_of_range& oor){
+            return false;
+        }
         argValue = rpcCmdBottle.get(3);
         break;
     case EMPTY: // do nothing
@@ -89,4 +131,6 @@ void RPCCommandsUtil::processTaskCommand(const Bottle &rpcCmdBottle){
     case POP: // do nothing
         break;
     }
+
+    return true;
 }

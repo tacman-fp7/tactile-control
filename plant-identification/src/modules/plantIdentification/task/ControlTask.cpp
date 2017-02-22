@@ -1343,13 +1343,27 @@ std::cout << std::endl;
                     }
                     tactileAvarage[i] /= tactileDataTemp.size();
                 }
-                // put the tactile avarage into the features vector
-std::cout << "tact all: ";
+
+                std::vector<double> tactileAvarageNormalized;
+                ICubUtil::normalizeVector(tactileAvarage,tactileAvarageNormalized);
+
+                std::cout << "tact all     : ";
                 for(int i = 0; i < tactileAvarage.size(); i++){
-                    features[featuresIndex + i] = tactileAvarage[i];
-std::cout << tactileAvarage[i] << " "; 
+                    std::cout << tactileAvarage[i] << " "; 
                 }
-std::cout << std::endl;
+                std::cout << std::endl;
+
+                std::cout << "tact all norm: ";
+                for(int i = 0; i < tactileAvarageNormalized.size(); i++){
+                    std::cout << tactileAvarageNormalized[i] << " "; 
+                }
+                std::cout << std::endl;
+
+                // put the tactile avarage into the features vector
+                for(int i = 0; i < tactileAvarage.size(); i++){
+                    features[featuresIndex + i] = tactileAvarageNormalized[i];
+                }
+                std::cout << std::endl;
                 featuresIndex += tactileAvarage.size();
             }
         }

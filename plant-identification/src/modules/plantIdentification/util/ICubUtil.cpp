@@ -708,3 +708,29 @@ void ICubUtil::printBottleIntoFile(std::ofstream &file,yarp::os::Bottle &bottle)
     file << "\n";
 
 }
+
+void ICubUtil::normalizeVector(const std::vector<double> &inputVector,std::vector<double> &outputVector){
+
+    double avarage = 0;
+
+    for(int i = 0; i < inputVector.size(); i++){
+        avarage += inputVector[i];
+    }
+    avarage /= inputVector.size();
+
+    std::vector<double> zeroAvarage(inputVector.size());
+    for(int i = 0; i < zeroAvarage.size(); i++){
+        zeroAvarage[i] = inputVector[i] - avarage;
+    }
+
+    double stdDev = 0;
+    for(int i = 0; i < zeroAvarage.size(); i++){
+        stdDev += zeroAvarage[i]*zeroAvarage[i];
+    }
+    stdDev /= zeroAvarage.size();
+
+    outputVector.resize(zeroAvarage.size());
+    for(int i = 0; i < outputVector.size(); i++){
+        outputVector[i] = zeroAvarage[i] / stdDev;
+    }
+}

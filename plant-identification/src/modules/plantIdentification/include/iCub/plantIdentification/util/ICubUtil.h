@@ -38,6 +38,9 @@ namespace iCub {
                 static void makeObjectRecognitionBottle(yarp::os::Bottle &objRecBottle,std::string taskId,int objectId,iCub::plantIdentification::ObjectRecognitionTask objRecTask,int extraCode1,int extraCode2,int skipPreviousRepetition,std::string experimentDescription,std::string previousExperimentDescription,double handAperture,double actualHandPosition,double targetHandPosition,double actualGripStrength,double targetGripStrength,std::vector<double> &pwm,iCub::plantIdentification::TaskCommonData *commonData); 
 
                 static void printBottleIntoFile(std::ofstream &file,yarp::os::Bottle &bottle);
+
+                static void normalizeVector(const std::vector<double> &inputVector,std::vector<double> &outputVector);
+
         private:
 
                 static void processTactileData(iCub::plantIdentification::TaskCommonData *commonData,bool realForceMappingEnabled);

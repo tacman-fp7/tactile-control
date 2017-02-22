@@ -87,6 +87,7 @@ RPCCommandsData::RPCCommandsData(){
 
     // ML <?>
     add("view",VIEW_DATA,"VIEW DATA");
+    add("mode",MODE,"SET CLASSIFICATION MODE");
     add("train",TRAIN,"TRAINING");
     add("test",TEST,"TESTING");
     add("load_model",LOAD_MODEL,"LOAD MODEL");
@@ -102,6 +103,7 @@ RPCCommandsData::RPCCommandsData(){
     add("refine_new_object",REFINE_NEW_OBJECT,"LEARN MORE FEATURES FOR THE PREVIOUS LEARNED OBJECT");
     add("discard_last",DISCARD_LAST_FEATURES,"DISCARD LAST FEATURES");
     add("process",PROCESS_COLLECTED_DATA,"PROCESS LEARNED DATA");
+    add("get_ready",GET_READY,"GET READY");
     add("reset",RESET,"RESET DATA");
 
 
