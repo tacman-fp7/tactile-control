@@ -727,7 +727,7 @@ void ICubUtil::normalizeVector(const std::vector<double> &inputVector,std::vecto
     for(int i = 0; i < zeroAvarage.size(); i++){
         stdDev += zeroAvarage[i]*zeroAvarage[i];
     }
-    stdDev /= zeroAvarage.size();
+    stdDev = sqrt(stdDev / zeroAvarage.size());
 
     outputVector.resize(zeroAvarage.size());
     for(int i = 0; i < outputVector.size(); i++){
