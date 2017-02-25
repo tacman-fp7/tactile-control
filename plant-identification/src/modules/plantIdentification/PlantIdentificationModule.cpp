@@ -111,7 +111,7 @@ bool PlantIdentificationModule::configure(ResourceFinder &rf) {
 bool PlantIdentificationModule::updateModule() { 
 
     // manage event triggers
-    if (eventsThread->eventTriggered(FINGERTIP_PUSHED,3)){ // pinky
+/*    if (eventsThread->eventTriggered(FINGERTIP_PUSHED,3)){ // pinky
         if (tasksRunning){
             open(yarp::os::Value(""));
         } else {
@@ -128,6 +128,7 @@ bool PlantIdentificationModule::updateModule() {
             taskData->commonData.tempParameters[29] = Value(1);
         }
     }
+*/
 
     if (taskData->commonData.requestOpen == true){
         taskData->commonData.requestOpen = false;
@@ -373,7 +374,23 @@ bool PlantIdentificationModule::wave() {
 /* ******* RPC Manage machine learning related commands                                       ********************************************** */
 bool PlantIdentificationModule::ml(iCub::plantIdentification::RPCMlCmdArgName paramName,Value paramValue) {
 
-    bool ok;
+    if (paramName == SAVE_MODEL || 
+        paramName == LOAD_MODEL || 
+        paramName == LOAD_TRAINING_SET || 
+        paramName == LOAD_TEST_SET || 
+        paramName == LOAD_OBJECT_NAMES || 
+        paramName == LOAD_TRAINING_SET_AND_OBJECT_NAMES || 
+        paramName == SAVE_TRAINING_SET || 
+        paramName == SAVE_OBJECT_NAMES || 
+        paramName == SAVE_TRAINING_SET_AND_OBJECT_NAMES || 
+        paramName == GET_READY){
+
+            if (paramValue.toString() == "default"){
+                paramValue = Value(taskData->commonData.objRecDataDefaultSuffix);
+            }
+    }
+
+    bool ok = true;
 
     switch(paramName){
 
@@ -459,7 +476,6 @@ bool PlantIdentificationModule::ml(iCub::plantIdentification::RPCMlCmdArgName pa
         break;
     case GET_READY:
         // get ready
-        // load object names list
         ok = mlUtil.loadObjectNamesFromFile(paramValue.asString());
         if (ok){
             // load training set from files

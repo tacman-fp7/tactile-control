@@ -364,6 +364,24 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
     for(int i = 0; i < handJoints->size(); i++){
         commonData.handJointsHome[i] = handJoints->get(i).asDouble();
     }
+    
+    if (whichTask == "objrec"){
+
+        Bottle* objectRecognitionParameters = iCubTaskRF.find("objRecPar_" + whichHand).asList();
+        commonData.tempParameters[84] = objectRecognitionParameters->get(0).asDouble();
+        commonData.tempParameters[85] = objectRecognitionParameters->get(1).asDouble();
+        commonData.tempParameters[86] = objectRecognitionParameters->get(2).asDouble();
+        commonData.tempParameters[87] = objectRecognitionParameters->get(3).asDouble();
+        commonData.tempParameters[88] = objectRecognitionParameters->get(4).asDouble();
+        commonData.tempParameters[89] = objectRecognitionParameters->get(5).asDouble();
+        commonData.tempParameters[90] = objectRecognitionParameters->get(6).asDouble();
+        commonData.tempParameters[91] = objectRecognitionParameters->get(7).asInt();
+        commonData.tempParameters[92] = objectRecognitionParameters->get(8).asDouble();
+        commonData.tempParameters[93] = objectRecognitionParameters->get(9).asDouble();
+        commonData.tempParameters[94] = objectRecognitionParameters->get(10).asInt();
+        commonData.tempParameters[95] = objectRecognitionParameters->get(11).asInt();
+
+    }
 
     /** COMMON RESOURCE FINDER **/
 
@@ -378,6 +396,17 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
     for(int i = 0; i < wholeArmJointsDown->size(); i++){
         commonData.wholeArmJointsDown[i] = wholeArmJointsDown->get(i).asDouble();
     }
+
+    if (whichTask == "objrec"){
+
+        commonData.objRecDataDefaultSuffix = commonRF.check("dataDefaultSuffix",Value("default")).asString().c_str();
+
+    } else {
+
+        commonData.objRecDataDefaultSuffix = "";
+
+    }
+
 
     /****/
 

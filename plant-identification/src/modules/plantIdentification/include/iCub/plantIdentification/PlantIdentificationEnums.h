@@ -52,7 +52,8 @@ namespace iCub {
             APPR_LIFESPAN,
 
             ALIAS_GRIP_STRENGTH,
-            ALIAS_OBJECT_POSITION
+            ALIAS_OBJECT_POSITION,
+            ALIAS_MINIMUM_FORCE
         };
     
         enum RPCTaskCmdArgName {

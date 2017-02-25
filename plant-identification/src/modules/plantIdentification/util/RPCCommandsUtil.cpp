@@ -95,6 +95,8 @@ bool RPCCommandsUtil::processCommand(const Bottle &rpcCmdBottle){
         }
         if (rpcCmdBottle.size() > 2){
             argValue = rpcCmdBottle.get(2);
+        } else {
+            argValue = yarp::os::Value("");
         }
         break;
     case QUIT: // do nothing

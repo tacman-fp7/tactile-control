@@ -31,7 +31,14 @@ namespace iCub {
 
                 // new object learning
                 bool learningNewObjectMode;
+                bool refineObjectMode;
                 std::vector<std::vector<double> > collectedFeatures;
+                std::string nameObjectToLearn;
+
+                bool trainingSetLoaded;
+                bool testSetLoaded;
+                bool objectMapLoaded;
+                bool classifierTrained;
 
                 /* ******* Debug attributes.                ******* */
                 std::string dbgTag;

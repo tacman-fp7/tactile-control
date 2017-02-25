@@ -58,6 +58,8 @@ namespace iCub {
 
             bool requestOpen;
 
+            std::string objRecDataDefaultSuffix;
+
             /*  TEMP PARAMETERS USED DURING CONTROL TASKS (EXCEPT THE 15th, USED DURING STEP TASKS)
             *   0: supervisor mode off/on [0/1]
             *   1: supervisor Kp
@@ -153,7 +155,7 @@ namespace iCub {
             *   91: object recognition: if set > 0, set handClosurePerformed to true and returns to 0 (it's an integer)
             *   92: object recognition: distal closure time
             *   93: object recognition: pwm to request at the index finger distal joint
-            *   94: object recognition: disable object recognition logging
+            *   94: object recognition: disable object recognition logging. no/yes [0/1]
             *   95: object recognition: test mode status. 0: off 1: on (one shot) 2: on (refinement using avarage) 3: on (refinement using maxmax)
             *	96: neural network offeset
             *

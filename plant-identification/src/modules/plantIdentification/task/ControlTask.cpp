@@ -1407,24 +1407,15 @@ std::cout << std::endl;
 
             std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
             std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
-            std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
-            std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
-            std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
-            std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
-            std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
-            std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
-            std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
-            std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
-            std::cout << "OBJECT RECOGNITION: hand closure stopped!!!\n";
 
             // copy all final raw encoders
             if (testClassifierEnabled){
-std::cout << "enc all: ";
+                //std::cout << "enc all: ";
                 for(int i = 0; i < commonData->fingerEncodersRawData.size() - 1; i++){ // 15 components (the 16th is always 0)
                     features[featuresIndex + i] = commonData->fingerEncodersRawData[i];
-std::cout << commonData->fingerEncodersRawData[i] << " ";
+                    //std::cout << commonData->fingerEncodersRawData[i] << " ";
                 }
-std::cout << std::endl;
+                //std::cout << std::endl;
                 featuresIndex += commonData->fingerEncodersRawData.size() - 1;
 
                 // if the "new object learning" mode is enabled, instead of testing the collected features, they have to be stored in order to retrain the model

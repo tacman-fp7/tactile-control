@@ -68,6 +68,7 @@ RPCCommandsData::RPCCommandsData(){
     add("appr_ls",APPR_LIFESPAN,"APPROACH TASK LIFESPAN");
     add("grip_strength",ALIAS_GRIP_STRENGTH,"GRIP STRENGTH");
     add("object_position",ALIAS_OBJECT_POSITION,"OBJECT POSITION");
+    add("min_force",ALIAS_MINIMUM_FORCE,"MINIMUM FORCE");
 
     // TASK <?>
     add("add",ADD,"add");
@@ -100,8 +101,8 @@ RPCCommandsData::RPCCommandsData(){
     add("save_names",SAVE_OBJECT_NAMES,"SAVE OBJECT NAMES");
     add("save_train_and_names",SAVE_TRAINING_SET_AND_OBJECT_NAMES,"SAVE TRAINING SET AND OBJECT NAMES");
     add("learn_new_object",LEARN_NEW_OBJECT,"LEARN A NEW OBJECT");
-    add("refine_new_object",REFINE_NEW_OBJECT,"LEARN MORE FEATURES FOR THE PREVIOUS LEARNED OBJECT");
-    add("discard_last",DISCARD_LAST_FEATURES,"DISCARD LAST FEATURES");
+    add("refine_object",REFINE_NEW_OBJECT,"LEARN MORE FEATURES FOR THE PREVIOUS LEARNED OBJECT");
+    add("discard",DISCARD_LAST_FEATURES,"DISCARD LAST FEATURES");
     add("process",PROCESS_COLLECTED_DATA,"PROCESS LEARNED DATA");
     add("get_ready",GET_READY,"GET READY");
     add("reset",RESET,"RESET DATA");

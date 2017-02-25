@@ -285,7 +285,18 @@ void TaskThread::set(RPCSetCmdArgName paramName,Value paramValue,RPCCommandsData
             setSuccessful = false;
         }
         break;
-
+    case ALIAS_MINIMUM_FORCE:
+        if (paramValue.asDouble() < 0.1){
+            taskData->commonData.tempParameters[77] = 0;
+            taskData->commonData.tempParameters[78] = 0.0;
+            taskData->commonData.tempParameters[79] = 0.0;
+            taskData->commonData.tempParameters[80] = 0.0;
+        } else {
+            taskData->commonData.tempParameters[77] = 1;
+            taskData->commonData.tempParameters[78] = paramValue.asDouble();
+            taskData->commonData.tempParameters[79] = paramValue.asDouble();
+            taskData->commonData.tempParameters[80] = paramValue.asDouble();
+        }
     }
 
     if (setSuccessful){
