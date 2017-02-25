@@ -15,7 +15,7 @@ speechRecog_port = yarp.Port()
 manager_port = yarp.Port()
 
 -- defining of objects
-objects = {"Soccer ball", "New object", "Tacman object", "Final review meeting object", "Bottle", "Box"}
+objects = {"Soccerball", "New object", "Tacman object", "Final review meeting object", "Bottle", "Box"}
 
 -- defining speech grammar for initial menu
 grammar_initial = "Let start | See you soon | Forget #Object | Forget all objects"

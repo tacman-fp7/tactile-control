@@ -71,6 +71,8 @@ bool MLUtil::trainClassifier(){
         wrapper->train(xTr,yTr);
         std::cout << "...finished!" << std::endl;
 
+        classifierTrained = true;
+
         return true;
 
     } else {
@@ -104,6 +106,9 @@ bool MLUtil::testClassifier(){
 }
 
 bool MLUtil::testClassifierOneShot(std::vector<double> &features,int predictionEvaluationMethod){
+
+
+
 
     if (trainingSetLoaded && classifierTrained){
 
@@ -571,8 +576,6 @@ bool MLUtil::processCollectedData(){
         /// re-train the model
 
         trainClassifier();
-
-        classifierTrained = true;
 
          // disable the "learning new object" mode
 
