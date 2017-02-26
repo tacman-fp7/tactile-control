@@ -143,7 +143,7 @@ interact_fsm = rfsm.state{
                 rfsm.send_events(fsm, "e_try")
             else
                 local learn = learn_object(manager_port, objectName)
-                speak(ispeak_port,"Ok, Let me have a look at the " .. objectName )
+                speak(ispeak_port,"Ok, give me the " .. objectName )
                 local b = grasp_object(manager_port)
                 local ret = b:get(0):asString()
                 print("Reply from grasp is", cmd)
@@ -154,7 +154,7 @@ interact_fsm = rfsm.state{
     SUB_REFINE = rfsm.state{
         entry=function()
 			local refine = refine_object(manager_port)
-            speak(ispeak_port,"Ok, I will have another look at the " .. objectName )
+            speak(ispeak_port,"Ok, give me again the " .. objectName )
 			local b = grasp_object(manager_port)
 			local ret = b:get(0):asString()
 			print("Reply from grasp is", cmd)

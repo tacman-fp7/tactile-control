@@ -555,23 +555,27 @@ bool MLUtil::processCollectedData(){
         }
         
         // set the last column to -1 (except for the added rows)
-        for(int i = 0; i < numPrevSamples; i++){
-            yTr(i,yTr.cols() - 1) = -1;
+        if (!refineObjectMode){
+            for(int i = 0; i < numPrevSamples; i++){
+                yTr(i,yTr.cols() - 1) = -1;
+            }
         }
 
         trainingSetLoaded = true;
 
         /// update the object names map
 
-        int newKey;
-        if (!objectsMap.empty()){
-            newKey = objectsMap.rbegin()->first + 1;
-        } else {
-            newKey = 1;
-        }
-        objectsMap.insert(std::pair<int,std::string>(newKey,nameObjectToLearn));
+        if (!refineObjectMode){
+		int newKey;
+		if (!objectsMap.empty()){
+		    newKey = objectsMap.rbegin()->first + 1;
+		} else {
+		    newKey = 1;
+		}
+		objectsMap.insert(std::pair<int,std::string>(newKey,nameObjectToLearn));
 
-        objectMapLoaded = true;
+		objectMapLoaded = true;
+        }
 
         /// re-train the model
 
