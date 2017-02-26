@@ -21,7 +21,7 @@ objects = {"Soccerball", "New object", "Tacman object", "Final review meeting ob
 grammar_initial = "Let start | See you soon | Forget #Object | Forget all objects"
 
 -- defining speech grammar for classifying
-grammar_classify = "Here you go | Try it again | Skip it | I will teach you a new object | Have another look at the #Object "
+grammar_classify = "Here you go | Try it again | Skip it | I will teach you a new object "
 
 -- defining speech grammar for teaching a new object
 grammar_object = "This is a #Object | Skip it"

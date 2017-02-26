@@ -55,16 +55,6 @@ function learn_object(port, obj)
     return reply
 end
 
-function refine_object(port)
-    local wb = yarp.Bottle()
-    local reply = yarp.Bottle()
-    wb:clear()
-    wb:addString("ml")
-    wb:addString("refine_object")
-    port:write(wb,reply)
-    return reply
-end
-
 function process_object(port)
     local wb = yarp.Bottle()
     local reply = yarp.Bottle()

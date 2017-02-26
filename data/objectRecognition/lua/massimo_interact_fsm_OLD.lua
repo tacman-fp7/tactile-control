@@ -10,7 +10,6 @@ event_table_classify = {
     Try       = "e_try",
     Skip      = "e_skip",
     Here      = "e_here",
-    Have      = "e_have",
 }
 
 event_table_train = {
@@ -151,16 +150,6 @@ interact_fsm = rfsm.state{
         end
     },
 
-    SUB_REFINE = rfsm.state{
-        entry=function()
-			local refine = refine_object(manager_port)
-            speak(ispeak_port,"Ok, I will have another look at the " .. objectName )
-			local b = grasp_object(manager_port)
-			local ret = b:get(0):asString()
-			print("Reply from grasp is", cmd)
-        end
-    },
-
     ----------------------------------
     -- train  states                --
     ----------------------------------
@@ -213,9 +202,6 @@ interact_fsm = rfsm.state{
     rfsm.transition { src='SUB_MENU_CLASSIFY', tgt='SUB_TEACH', events={ 'e_i_will' } },
     rfsm.transition { src='SUB_TEACH', tgt='SUB_MENU_CLASSIFY', events={ 'e_try' } },
     rfsm.transition { src='SUB_TEACH', tgt='SUB_MENU_TRAIN', events={ 'e_done' } },
-
-    rfsm.transition { src='SUB_MENU_CLASSIFY', tgt='SUB_REFINE', events={ 'e_have' } },
-    rfsm.transition { src='SUB_REFINE', tgt='SUB_MENU_TRAIN', events={ 'e_done' } },
 
     ----------------------------------------------------------------------------------------
 
