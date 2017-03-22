@@ -118,7 +118,7 @@ bool RPCCommandsUtil::processTaskCommand(const Bottle &rpcCmdBottle){
     switch (taskCmdArg){
 
     case ADD:
-        if (rpcCmdBottle.size() < 4){
+        if (rpcCmdBottle.size() < 3){
             return false;
         }
         try {
