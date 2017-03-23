@@ -1,6 +1,6 @@
 
-dofile(rf:findFile("massimo_interact_fsm.lua"))
-dofile(rf:findFile("massimo_funcs.lua"))
+dofile(rf:findFile("tactile_object_recognition_interact_fsm.lua"))
+dofile(rf:findFile("tactile_object_recognition_funcs.lua"))
 
 --require("iol_interact_fsm")
 --require("yarp")
@@ -11,9 +11,9 @@ return rfsm.state {
     ----------------------------------
     ST_INITPORTS = rfsm.state{
         entry=function()
-            ret = ispeak_port:open("/massimo/speak")
-            ret = ret and speechRecog_port:open("/massimo/speechRecog")
-            ret = ret and manager_port:open("/massimo/manager")
+            ret = ispeak_port:open("/tactile_object_recognition/speak")
+            ret = ret and speechRecog_port:open("/tactile_object_recognition/speechRecog")
+            ret = ret and manager_port:open("/tactile_object_recognition/manager")
             if ret == false then
                 rfsm.send_events(fsm, 'e_error')
             else

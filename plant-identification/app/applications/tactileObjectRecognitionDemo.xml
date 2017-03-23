@@ -1,40 +1,51 @@
 <application>
      <name>Tactile Object Recognition Demo</name>
-
+<!--     
      <module>
          <name>iSpeak</name>
          <parameters></parameters>
          <node>icub19</node>
          <tag>iSpeak</tag>
      </module>
+-->
+     <module>
+         <name>iSpeak</name>
+         <parameters>--package acapela-tts --package_options icub_eng</parameters>
+         <node>icub-win1</node>
+         <tag>iSpeak</tag>
+     </module>
 
+<!--     
      <module>
          <name>yarpdev</name>
          <parameters>--device speech --lingware-context speech --default-language en-US --pitch 100 --speed 100</parameters>
          <node>icub19</node>
          <tag>svox</tag>
      </module>
+-->
 
      <module>
          <name>stableGrasp</name>
          <parameters>--from confObjectRecognition.ini</parameters>
-         <node>icub19</node>
+         <node>icub21</node>
          <tag>stableGrasp</tag>
      </module>
 	 
      <module>
-         <name>massimo_main.lua</name>
+         <name>tactile_object_recognition_main.lua</name>
          <parameters></parameters>
-         <node>icub19</node>
+         <node>icub21</node>
          <tag>stateMachine</tag>
      </module>
 	 
 	  
+<!--     
 	<connection>
 		<from>/iSpeak/speech-dev/rpc</from>
 		<to>/icub/speech:rpc</to>
 		<protocol>tcp</protocol>
 	</connection>
+-->
 	
 	<connection>
 		<from>/stableGrasp/speaker:o</from>

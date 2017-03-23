@@ -33,9 +33,9 @@ grammar_train = "Do it again | Finished | Discard the last grasp"
 
 -- load state machine model and initalize it
 rf = yarp.ResourceFinder()
-rf:setDefaultContext("massimo/lua")
+rf:setDefaultContext("tactile-object-recognition/lua")
 rf:configure(arg)
-fsm_file = rf:findFile("massimo_root_fsm.lua")
+fsm_file = rf:findFile("tactile_object_recognition_root_fsm.lua")
 fsm_model = rfsm.load(fsm_file)
 fsm = rfsm.init(fsm_model)
 rfsm.run(fsm)
