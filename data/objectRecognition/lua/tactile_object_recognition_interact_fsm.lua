@@ -110,7 +110,7 @@ interact_fsm = rfsm.state{
 
     SUB_HERE = rfsm.state{
         entry=function()
-            speak(ispeak_port,"Ok") -- speak(ispeak_port,"Ok thank you")
+            speak(ispeak_port,"Ok thank you") -- speak(ispeak_port,"Ok")
             local b = grasp_object(manager_port)
             local ret = b:get(0):asString()
             print("Reply from grasp is", cmd)
@@ -119,7 +119,7 @@ interact_fsm = rfsm.state{
 
     SUB_TRY = rfsm.state{
         entry=function()
-            speak(ispeak_port,"Ok") -- speak(ispeak_port,"Ok, I will try it again")
+            speak(ispeak_port,"Ok, I will try it again") -- speak(ispeak_port,"Ok")
             local b = grasp_object(manager_port)
             local ret = b:get(0):asString()
             print("Reply from grasp is", cmd)
@@ -167,7 +167,7 @@ interact_fsm = rfsm.state{
 
     SUB_AGAIN = rfsm.state{
         entry=function()
-            speak(ispeak_port,"Ok") -- speak(ispeak_port,"Ok, Let me have another look at the " .. objectName )
+            speak(ispeak_port,"Ok, Let me have another look at the " .. objectName ) -- speak(ispeak_port,"Ok")
             local b = grasp_object(manager_port)
         end
     },
