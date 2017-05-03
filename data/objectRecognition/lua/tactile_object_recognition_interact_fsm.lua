@@ -167,7 +167,7 @@ interact_fsm = rfsm.state{
 
     SUB_AGAIN = rfsm.state{
         entry=function()
-            speak(ispeak_port,"Ok, Let me have another look at the " .. objectName ) -- speak(ispeak_port,"Ok")
+            speak(ispeak_port,"Ok, Give me again the " .. objectName ) -- speak(ispeak_port,"Ok, Let me have another look at the " .. objectName ) -- speak(ispeak_port,"Ok")
             local b = grasp_object(manager_port)
         end
     },

@@ -53,7 +53,11 @@
 		<protocol>tcp</protocol>
 	</connection>
 	
-
+    <connection>
+            <from>/iSpeak/emotions:o</from>
+            <to>/icub/face/emotions/in</to>
+            <protocol>tcp</protocol>
+    </connection>
 	
 
 	
