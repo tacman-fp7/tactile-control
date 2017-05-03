@@ -30,7 +30,7 @@ namespace iCub {
                 yarp::dev::PolyDriver clientGazeCtrl;
                 yarp::dev::PolyDriver clientArmCartCtrl;
                 yarp::dev::IEncoders *iEncs;
-                yarp::dev::IOpenLoopControl *iOLC;
+                yarp::dev::IPWMControl *iPwm;
                 yarp::dev::IControlMode2 *iCtrl;
                 yarp::dev::IPositionControl *iPos;
                 yarp::dev::IVelocityControl *iVel;

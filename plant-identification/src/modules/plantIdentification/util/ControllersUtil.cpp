@@ -67,8 +67,8 @@ bool ControllersUtil::init(yarp::os::ResourceFinder &rf){
         cout << dbgTag << "could not open encoders interface\n";
         return false;
     }
-    clientArm.view(iOLC);
-    if (!iOLC) {
+    clientArm.view(iPwm);
+    if (!iPwm) {
         cout << dbgTag << "could not open open-loop interface\n";
         return false;
     }
@@ -189,8 +189,9 @@ bool ControllersUtil::buildWholeArmJointsDown(const std::vector<double> wholeArm
 
 bool ControllersUtil::sendPwm(int joint,double pwm){
 
-    if (!iOLC->setRefOutput(joint,pwm)){
-        cout << dbgTag << "could not send pwm\n";
+    double dutyCycle = (pwm/1333)*100;
+    if (!iPwm->setRefDutyCycle(joint,dutyCycle)){
+        std::cout << dbgTag << "could not send pwm\n";
         return false;
     }
     return true;
