@@ -605,7 +605,7 @@ bool ControllersUtil::setControlMode(int joint,int controlMode,bool checkCurrent
 
             if (currentControlMode != controlMode){
                 if  (iCtrl->setControlMode(joint,controlMode)){
-                    cout << dbgTag << "CONTROL MODE SET TO " << controlMode << " ON JOINT " << joint << "   PREV: " << currentControlMode << "  OPEN: " << VOCAB_CM_OPENLOOP << "\n";
+                    cout << dbgTag << "CONTROL MODE SET TO " << controlMode << " ON JOINT " << joint << "   PREV: " << currentControlMode << "  OPEN: " << VOCAB_CM_PWM << "\n";
                     return true;
                 } else {
                     cout << dbgTag << "failed to SET control mode on joint " << joint << "\n";                   

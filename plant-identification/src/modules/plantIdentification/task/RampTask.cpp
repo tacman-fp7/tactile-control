@@ -31,7 +31,7 @@ RampTask::RampTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCom
 void RampTask::init(){
     using std::cout;
 
-    controllersUtil->setTaskControlModes(jointsList,VOCAB_CM_OPENLOOP);
+    controllersUtil->setTaskControlModes(jointsList,VOCAB_CM_PWM);
 
     cout << "\n\n" << dbgTag << "TASK STARTED - Target: ";
     for(size_t i = 0; i < pressureTargetValue.size(); i++){

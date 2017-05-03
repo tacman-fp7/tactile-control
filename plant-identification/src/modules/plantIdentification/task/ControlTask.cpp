@@ -255,7 +255,7 @@ ControlTask::ControlTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,i
 void ControlTask::init(){
     using std::cout;
 
-    controllersUtil->setTaskControlModes(jointsList,VOCAB_CM_OPENLOOP);
+    controllersUtil->setTaskControlModes(jointsList,VOCAB_CM_PWM);
 
     // TODO WORKAROUND TO REMOVE
     if (disablePIDIntegralGain) controllersUtil->resetPIDIntegralGain(8);
@@ -1369,8 +1369,8 @@ std::cout << std::endl;
         }
 
         if (!closingProximals){
-            controllersUtil->setControlMode(11,VOCAB_CM_OPENLOOP,false);
-            controllersUtil->setControlMode(15,VOCAB_CM_OPENLOOP,false);
+            controllersUtil->setControlMode(11,VOCAB_CM_PWM,false);
+            controllersUtil->setControlMode(15,VOCAB_CM_PWM,false);
             closingProximals = true;
             std::cout << "OBJECT RECOGNITION: proximal closure started!!!\n";
         }
@@ -1383,7 +1383,7 @@ std::cout << std::endl;
 
 
         if (!closingDistals){
-            controllersUtil->setControlMode(12,VOCAB_CM_OPENLOOP,false);
+            controllersUtil->setControlMode(12,VOCAB_CM_PWM,false);
             closingDistals = true;
             std::cout << "OBJECT RECOGNITION: distal closure started!!!\n";
         }

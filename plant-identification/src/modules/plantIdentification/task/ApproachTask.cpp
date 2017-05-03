@@ -93,7 +93,7 @@ void ApproachTask::calculateControlInput(){
                         controllersUtil->setJointsMaxPwmLimit(jointsList,approachData->jointsPwmLimitsList);
                     }
                 } else { // openloop control mode
-                    controllersUtil->setTaskControlModes(jointsList,VOCAB_CM_OPENLOOP);
+                    controllersUtil->setTaskControlModes(jointsList,VOCAB_CM_PWM);
                 }
                 
                 // evaluate contact threshold on each fingertip

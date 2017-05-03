@@ -26,7 +26,7 @@ StepTask::StepTask(ControllersUtil *controllersUtil,PortsUtil *portsUtil,TaskCom
 void StepTask::init(){
     using std::cout;
 
-    controllersUtil->setTaskControlModes(jointsList,VOCAB_CM_OPENLOOP);
+    controllersUtil->setTaskControlModes(jointsList,VOCAB_CM_PWM);
 
     cout << "\n\n" << dbgTag << "TASK STARTED - Target: ";
     for(size_t i = 0; i < constantPwm.size(); i++){
