@@ -524,7 +524,7 @@ void ICubUtil::addOption(Bottle &bottle,const char *paramName,Value paramValue){
 
     Bottle paramBottle;
 
-    paramBottle.add(paramName);
+    paramBottle.addString(paramName);
     paramBottle.add(paramValue);
 
     bottle.addList() = paramBottle;
@@ -557,7 +557,7 @@ void ICubUtil::addOption(Bottle &bottle,const char *paramName,double paramValueL
         valueBottle.add(Value(paramValueList[i]));
     }
 
-    paramBottle.add(paramName);
+    paramBottle.addString(paramName);
     paramBottle.addList() = valueBottle;
 
     bottle.addList() = paramBottle;
@@ -571,7 +571,7 @@ void ICubUtil::addOption(Bottle &bottle,const char *paramName,Value paramValueLi
         valueBottle.add(paramValueList[i]);
     }
 
-    paramBottle.add(paramName);
+    paramBottle.addString(paramName);
     paramBottle.addList() = valueBottle;
 
     bottle.addList() = paramBottle;

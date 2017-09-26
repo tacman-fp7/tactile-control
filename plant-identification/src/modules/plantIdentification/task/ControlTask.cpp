@@ -479,7 +479,9 @@ void ControlTask::calculateControlInput(){
 
                     estimatedFinalPose = output[0];
 
+
                     if (!wavePositionTrackingIsActive){
+
                         // TODO  manual corrections to be removed!
                         distalJoints[0] = targetThumbDistalJoint = output[1] + 6;// + 20; // thumb
 
@@ -624,7 +626,7 @@ void ControlTask::calculateControlInput(){
 
                     if (!wavePositionTrackingIsActive){
 
-                        abductionJoint = targetThumbAbductionJoint = output[1];
+                        abductionJoint = targetThumbAbductionJoint = output[1] + commonData->tpDbl(105);
 
                         // MIN JERK TRACKING
                         // if gmmJointsMinJerkTracking mode is activated, gmmJointsMinJerkTrackingModeEnabled is initialized, if gmmJointsMinJerkTracking mode is disabled, gmmJointsMinJerkTrackingModeEnabled is set to false so that next time initPosition will be initialized again
@@ -1087,7 +1089,7 @@ void ControlTask::addOption(Bottle &bottle,const char *paramName,Value paramValu
 
     valueBottle.add(paramValue);
 
-    paramBottle.add(paramName);
+    paramBottle.addString(paramName);
     paramBottle.addList() = valueBottle;
 
     bottle.addList() = paramBottle;
@@ -1100,7 +1102,7 @@ void ControlTask::addOption(Bottle &bottle,const char *paramName,Value paramValu
     valueBottle.add(paramValue1);
     valueBottle.add(paramValue2);
 
-    paramBottle.add(paramName);
+    paramBottle.addString(paramName);
     paramBottle.addList() = valueBottle;
 
     bottle.addList() = paramBottle;
