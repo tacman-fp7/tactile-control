@@ -36,8 +36,9 @@ RPCCommandsData::RPCCommandsData(){
     add("stop",STOP,"STOP TASKS");
     add("open",OPEN,"STOP TASKS AND OPEN HAND");
     add("arm",ARM,"set ARM IN TASK POSITION");
-    add("grasp",GRASP,"EXECUTE GRASP TASK");
-    add("ml",ML,"MANAGE GURLS (usage: 'ml [ view | train | test | load_model | load_train | load_test | load_names | load_train_and_names | save_model | save_train | save_test | save_names | save_train_and_names | learn_new_object | refine_new_object | discard_last | process | reset ]");
+    add("grasp", GRASP, "EXECUTE GRASP TASK");
+    add("classify", CLASSIFY, "CLASSIFY OBJECT");
+    add("ml", ML, "MANAGE GURLS (usage: 'ml [ view | train | test | load_model | load_train | load_test | load_names | load_train_and_names | save_model | save_train | save_test | save_names | save_train_and_names | learn_new_object | refine_new_object | discard_last | process | reset ]");
     add("wave",WAVE,"EXECUTE WAVE ACTION");
     add("quit",QUIT,"QUIT MODULE");
 

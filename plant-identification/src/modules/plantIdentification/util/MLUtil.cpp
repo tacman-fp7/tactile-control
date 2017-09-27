@@ -105,7 +105,7 @@ bool MLUtil::testClassifier(){
     }
 }
 
-bool MLUtil::testClassifierOneShot(std::vector<double> &features,int predictionEvaluationMethod){
+bool MLUtil::testClassifierOneShot(std::vector<double> &features, int predictionEvaluationMethod, std::vector<double> &outputScores){
 
 
 
@@ -135,6 +135,13 @@ bool MLUtil::testClassifierOneShot(std::vector<double> &features,int predictionE
         for(int i = 0; i < output->cols(); i++){
             std::cout << (*output)(0,i) << " ";
         }
+
+        // store output scores
+        outputScores.resize(output->cols());
+        for (int i = 0; i < output->cols(); i++){
+            outputScores[i] = (*output)(0, i);
+        }
+
 
         int numObjects = output->cols();
         int prediction;

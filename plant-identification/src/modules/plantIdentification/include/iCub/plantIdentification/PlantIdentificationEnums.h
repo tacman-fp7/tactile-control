@@ -15,6 +15,7 @@ namespace iCub {
             OPEN,
             ARM,
             GRASP,
+            CLASSIFY,
             WAVE,
             ML,
             QUIT

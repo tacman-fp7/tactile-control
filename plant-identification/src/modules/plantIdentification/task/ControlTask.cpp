@@ -1425,7 +1425,7 @@ std::cout << std::endl;
                     mlUtil->addCollectedFeatures(features);
                 } else {
                     // test features!!!
-                    mlUtil->testClassifierOneShot(features,predictionEvaluationMethod);
+                    mlUtil->testClassifierOneShot(features,predictionEvaluationMethod,commonData->tactAvgScores);
                 }
             }
 

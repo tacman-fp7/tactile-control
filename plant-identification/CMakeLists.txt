@@ -29,7 +29,7 @@ endif(CMAKE_BUILD_TYPE MATCHES Debug)
 # Find packages
 find_package(YARP)
 find_package(ICUB)
-find_package(Gurls REQUIRED)
+find_package(Gurls)
 list(APPEND CMAKE_MODULE_PATH ${YARP_MODULE_PATH})
 list(APPEND CMAKE_MODULE_PATH ${ICUB_MODULE_PATH})
 include(YarpInstallationHelpers)

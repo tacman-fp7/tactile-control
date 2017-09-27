@@ -17,7 +17,7 @@ namespace iCub {
     namespace plantIdentification {
 
         class TaskCommonData {
-        
+
         public:
             std::vector<std::vector<double> > fingerTaxelsData;
             std::vector<std::vector<double> > fingerTaxelsRawData;
@@ -59,6 +59,12 @@ namespace iCub {
             bool requestOpen;
 
             std::string objRecDataDefaultSuffix;
+
+            // data related to tactile/visual combined classification
+            std::vector<double> tactAvgScores;
+            std::vector<double> vcAvgScores;
+
+
 
             /*  TEMP PARAMETERS USED DURING CONTROL TASKS (EXCEPT THE 15th, USED DURING STEP TASKS)
             *   0: supervisor mode off/on [0/1]
@@ -157,7 +163,12 @@ namespace iCub {
             *   93: object recognition: pwm to request at the index finger distal joint
             *   94: object recognition: disable object recognition logging. no/yes [0/1]
             *   95: object recognition: test mode status. 0: off 1: on (one shot) 2: on (refinement using avarage) 3: on (refinement using maxmax)
-            *	96: neural network offeset
+            *   96: neural network offeset
+            *   97: combining classifiers: combining mode
+            *   98: combining classifiers: combSumScale
+            *   99: combining classifiers: combMaxMaxScale
+            *   100:
+            *   101:
             *
             *   Note: double values have to contain a dot, while strings have to start with '#'
             *

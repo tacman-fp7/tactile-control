@@ -45,7 +45,8 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
     string thumbRealForcePortName = portPrefix + "/real_force/thumb:i";
     string indexFingerRealForcePortName = portPrefix + "/real_force/index_finger:i";
     string middleFingerRealForcePortName = portPrefix + "/real_force/middle_finger:i";
-
+    string portAvgScoresPortName = portPrefix + "/avg_scores:i";
+    
     // output ports
     string logDataPortName = portPrefix + "/log:o";
     string infoDataPortName = portPrefix + "/info";
@@ -127,6 +128,11 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
         cout << dbgTag << "could not open " << middleFingerRealForcePortName << " port \n";
         return false;
     }
+    if (!portAvgScoresIn.open(portAvgScoresPortName)){
+        cout << dbgTag << "could not open " << portAvgScoresPortName << " port \n";
+        return false;
+    }
+    
 
 
 
@@ -558,6 +564,30 @@ bool PortsUtil::readRealForceData(std::vector<double> &realForceData){
     }
 
     return true;
+}
+
+bool PortsUtil::readVisualClassifierAvgScores(std::vector<double> &vcAvgScores){
+
+    using yarp::sig::Vector;
+
+    Vector *portData = portAvgScoresIn.read(false);
+
+    if (!portData){
+        return false;
+    }
+
+    int numClasses;
+
+    numClasses = (*portData)[0];
+    vcAvgScores.resize(numClasses);
+
+    for(int i = 0; i < numClasses; i++){
+        vcAvgScores[i] = (*portData)[i + 1];
+    }
+
+    return true;
+
+
 }
 
 

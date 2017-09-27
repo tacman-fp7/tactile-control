@@ -191,6 +191,9 @@ bool PlantIdentificationModule::respond(const yarp::os::Bottle& command, yarp::o
         case GRASP:
             ok = grasp();
             break;
+        case CLASSIFY:
+            ok = classify();
+            break;
         case ML:
             ok = ml(rpcCmdUtil.mlCmdArg,rpcCmdUtil.argValue);
             break;
@@ -353,6 +356,106 @@ bool PlantIdentificationModule::grasp() {
     }
 }
 /* *********************************************************************************************************************** */
+
+
+bool PlantIdentificationModule::classify() {
+
+    using yarp::os::Time;
+    int combiningMethod = 0;
+    double combSumScale = 1.0;
+    double combMaxmaxScale = 1.0;
+
+    // wait a few seconds while putting the object in front of the robot
+    Time::delay(3);
+
+    // read the visual recognition average scores
+    bool ok = portsUtil->readVisualClassifierAvgScores(taskData->commonData.vcAvgScores);
+    
+    if (!ok){
+        std::cout << "<<< could not read visual recognition average scores (returned false) >>>" << std::endl;
+        return false;
+    }
+
+    if (taskData->commonData.vcAvgScores.size() == 0){
+        std::cout << "<<< could not read visual recognition average scores (returned 0 classes) >>>" << std::endl;
+        return false;
+    }
+
+    // run the tactile classification (it will store the data in taskData->commonData.tactAvgScores)
+    grasp();
+
+    if (taskData->commonData.tactAvgScores.size() != taskData->commonData.vcAvgScores.size()){
+        std::cout << "<<< tact num: " << taskData->commonData.tactAvgScores.size() << " - vc num: " << taskData->commonData.vcAvgScores.size() << " >>>" << std::endl;
+        return false;
+    }
+
+    std::cout << "TACTILE CLASSIFIER SCORES" << std::endl;
+    for (int i = 0; i < taskData->commonData.tactAvgScores.size(); i++){
+        std::cout << "[ " << i + 1 << " : " << taskData->commonData.tactAvgScores[i] << " ] ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "VISUAL CLASSIFIER SCORES" << std::endl;
+    for (int i = 0; i < taskData->commonData.vcAvgScores.size(); i++){
+        std::cout << "[ " << i + 1 << " : " << taskData->commonData.vcAvgScores[i] << " ] ";
+    }
+    std::cout << std::endl;
+
+    /*** compare the scores ***/
+    int winningClass,sumWinningClass,maxmaxWinningClass;
+
+    // avg method
+    std::vector<double> scoresSum;
+    scoresSum.resize(taskData->commonData.tactAvgScores.size());
+    double currMax = -1000.0;
+    double currMax_ind = -1;
+    for (int i = 0; i < scoresSum.size(); i++){
+        scoresSum[i] = combSumScale*taskData->commonData.tactAvgScores[i] + taskData->commonData.vcAvgScores[i];
+        if (scoresSum[i] > currMax){
+            currMax = scoresSum[i];
+            currMax_ind = i;
+        }
+    }
+    std::cout << "SCORES SUM" << std::endl;
+    for (int i = 0; i < taskData->commonData.tactAvgScores.size(); i++){
+        std::cout << "[ " << i + 1 << " : " << taskData->commonData.tactAvgScores[i] << " ] ";
+    }
+    std::cout << std::endl;
+
+    sumWinningClass = currMax_ind;
+    
+    // maxmax method
+    double currMax = -1000.0;
+    int currMax_ind = -1;
+    for (int i = 0; i < taskData->commonData.tactAvgScores.size(); i++){
+        if (taskData->commonData.tactAvgScores[i] > currMax){
+            currMax = taskData->commonData.tactAvgScores[i];
+            currMax_ind = i;
+        }
+    }
+    currMax = combMaxmaxScale*currMax;
+    for (int i = 0; i < taskData->commonData.vcAvgScores.size(); i++){
+        if (taskData->commonData.vcAvgScores[i] > currMax){
+            currMax = taskData->commonData.vcAvgScores[i];
+            currMax_ind = i;
+        }
+    }
+    maxmaxWinningClass = currMax_ind;
+    
+    if (combiningMethod == 0){
+        winningClass = sumWinningClass;
+    }
+    else if (combiningMethod == 1){
+        winningClass = maxmaxWinningClass;
+    }
+
+    std::cout << "<<<<< WINNING CLASS: " << winningClass << "  sum/maxmax(" << sumWinningClass << "/" << maxmaxWinningClass << ") >>>>>" << std::endl;
+    std::cout << "<<<<< WINNING CLASS: " << winningClass << "  sum/maxmax(" << sumWinningClass << "/" << maxmaxWinningClass << ") >>>>>" << std::endl;
+    std::cout << "<<<<< WINNING CLASS: " << winningClass << "  sum/maxmax(" << sumWinningClass << "/" << maxmaxWinningClass << ") >>>>>" << std::endl;
+    std::cout << "<<<<< WINNING CLASS: " << winningClass << "  sum/maxmax(" << sumWinningClass << "/" << maxmaxWinningClass << ") >>>>>" << std::endl;
+
+    return true;
+}
 
 /* ******* RPC Execute the wave action                                       ********************************************** */
 bool PlantIdentificationModule::wave() {

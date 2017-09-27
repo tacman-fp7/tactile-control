@@ -61,7 +61,7 @@ namespace iCub {
 
                 bool testClassifier();
 
-                bool testClassifierOneShot(std::vector<double> &features,int predictionEvaluationMethod);
+                bool testClassifierOneShot(std::vector<double> &features, int predictionEvaluationMethod, std::vector<double> &outputScores);
 
                 bool saveModelToFile(std::string fileSuffix);
 

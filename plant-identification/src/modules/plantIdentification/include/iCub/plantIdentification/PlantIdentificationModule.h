@@ -74,6 +74,7 @@ namespace iCub {
                 bool open(yarp::os::Value paramValue);
                 bool arm(yarp::os::Value paramValue);
                 bool grasp();
+                bool classify();
                 bool wave();
                 bool ml(iCub::plantIdentification::RPCMlCmdArgName paramName,yarp::os::Value paramValue);
                 bool quit();
