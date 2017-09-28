@@ -131,8 +131,19 @@ bool PlantIdentificationModule::updateModule() {
 */
 
     if (taskData->commonData.requestOpen == true){
+
+        if (taskData->commonData.classificationState == 1){
+            taskData->commonData.classificationState = 2;
+        }
+
         taskData->commonData.requestOpen = false;
         open(yarp::os::Value(""));
+    }
+
+    if (taskData->commonData.classificationState == 2){
+
+        completeClassification();
+        taskData->commonData.classificationState = 0;
     }
 
     return !closing; 
@@ -361,18 +372,15 @@ bool PlantIdentificationModule::grasp() {
 bool PlantIdentificationModule::classify() {
 
     using yarp::os::Time;
-    int combiningMethod = 0;
-    double combSumScale = 1.0;
-    double combMaxmaxScale = 1.0;
 
     // wait a few seconds while putting the object in front of the robot
-    Time::delay(3);
+    Time::delay(4);
 
     // read the visual recognition average scores
     bool ok = portsUtil->readVisualClassifierAvgScores(taskData->commonData.vcAvgScores);
-    
+
     if (!ok){
-        std::cout << "<<< could not read visual recognition average scores (returned false) >>>" << std::endl;
+        std::cout << "<<< could not read visual recognition average scores (out of time) >>>" << std::endl;
         return false;
     }
 
@@ -381,8 +389,20 @@ bool PlantIdentificationModule::classify() {
         return false;
     }
 
+    taskData->commonData.classificationState = 1;
     // run the tactile classification (it will store the data in taskData->commonData.tactAvgScores)
     grasp();
+
+    return true;
+}
+
+
+
+bool PlantIdentificationModule::completeClassification() {
+
+    int combiningMethod = 0;
+    double combSumScale = 1.0;
+    double combMaxmaxScale = 1.0;
 
     if (taskData->commonData.tactAvgScores.size() != taskData->commonData.vcAvgScores.size()){
         std::cout << "<<< tact num: " << taskData->commonData.tactAvgScores.size() << " - vc num: " << taskData->commonData.vcAvgScores.size() << " >>>" << std::endl;
@@ -417,16 +437,16 @@ bool PlantIdentificationModule::classify() {
         }
     }
     std::cout << "SCORES SUM" << std::endl;
-    for (int i = 0; i < taskData->commonData.tactAvgScores.size(); i++){
-        std::cout << "[ " << i + 1 << " : " << taskData->commonData.tactAvgScores[i] << " ] ";
+    for (int i = 0; i < scoresSum.size(); i++){
+        std::cout << "[ " << i + 1 << " : " << scoresSum[i] << " ] ";
     }
     std::cout << std::endl;
 
     sumWinningClass = currMax_ind;
     
     // maxmax method
-    double currMax = -1000.0;
-    int currMax_ind = -1;
+    currMax = -1000.0;
+    currMax_ind = -1;
     for (int i = 0; i < taskData->commonData.tactAvgScores.size(); i++){
         if (taskData->commonData.tactAvgScores[i] > currMax){
             currMax = taskData->commonData.tactAvgScores[i];
@@ -456,6 +476,7 @@ bool PlantIdentificationModule::classify() {
 
     return true;
 }
+
 
 /* ******* RPC Execute the wave action                                       ********************************************** */
 bool PlantIdentificationModule::wave() {

@@ -570,7 +570,18 @@ bool PortsUtil::readVisualClassifierAvgScores(std::vector<double> &vcAvgScores){
 
     using yarp::sig::Vector;
 
-    Vector *portData = portAvgScoresIn.read(false);
+    yarp::os::Bottle *portData = portAvgScoresIn.read(false);
+
+    double stepTime = 0.1;
+    double maxTime = 3.0;
+    double tempTime = 0.0;
+
+    while (!portData && tempTime < maxTime){
+
+        yarp::os::Time::delay(stepTime);
+        tempTime += stepTime;
+        portData = portAvgScoresIn.read(false);
+    }
 
     if (!portData){
         return false;
@@ -578,11 +589,11 @@ bool PortsUtil::readVisualClassifierAvgScores(std::vector<double> &vcAvgScores){
 
     int numClasses;
 
-    numClasses = (*portData)[0];
+    numClasses = portData->get(0).asInt();//(*portData)[0];
     vcAvgScores.resize(numClasses);
 
     for(int i = 0; i < numClasses; i++){
-        vcAvgScores[i] = (*portData)[i + 1];
+        vcAvgScores[i] = portData->get(i+1).asDouble();//(*portData)[i + 1];
     }
 
     return true;
@@ -595,9 +606,11 @@ bool PortsUtil::release(){
 
     portLogDataOut.interrupt();
     portSkinCompIn.interrupt();
+    portAvgScoresIn.interrupt();
 
     portLogDataOut.close();
     portSkinCompIn.close();
+    portAvgScoresIn.close();
 
     return true;
 }

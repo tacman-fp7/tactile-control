@@ -198,7 +198,7 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
         commonData.armJointsHome[i] = armJoints->get(i).asDouble();
     }
     commonData.requestOpen = false;
-
+    commonData.classificationState = 0; 
 
     Bottle* stepTaskJoints = rf.find("stepTaskJoints").asList();
     stepData.jointsList.resize(stepTaskJoints->size(),0);

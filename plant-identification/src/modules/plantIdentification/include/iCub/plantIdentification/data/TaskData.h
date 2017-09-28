@@ -63,6 +63,7 @@ namespace iCub {
             // data related to tactile/visual combined classification
             std::vector<double> tactAvgScores;
             std::vector<double> vcAvgScores;
+            int classificationState; // 0: not started; 1: running (classify() run but tactile recognition not finished); 2: finished (tactile recognition finished);
 
 
 

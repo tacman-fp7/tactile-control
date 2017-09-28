@@ -29,7 +29,7 @@ namespace iCub {
                 yarp::os::BufferedPort<yarp::sig::Vector> portThumbRealForceIn;
                 yarp::os::BufferedPort<yarp::sig::Vector> portIndexFingerRealForceIn;
                 yarp::os::BufferedPort<yarp::sig::Vector> portMiddleFingerRealForceIn;
-                yarp::os::BufferedPort<yarp::sig::Vector> portAvgScoresIn;
+                yarp::os::BufferedPort<yarp::os::Bottle> portAvgScoresIn;
 
                 yarp::os::BufferedPort<yarp::os::Bottle> portLogDataOut;
                 yarp::os::BufferedPort<yarp::os::Bottle> portInfoDataOut;
