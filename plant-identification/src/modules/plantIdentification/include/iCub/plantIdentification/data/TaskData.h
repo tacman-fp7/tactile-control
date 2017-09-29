@@ -168,8 +168,8 @@ namespace iCub {
             *   97: combining classifiers: combining mode
             *   98: combining classifiers: combSumScale
             *   99: combining classifiers: combMaxMaxScale
-            *   100:
-            *   101:
+            *   100: combining classifiers: objectTested
+            *   101: combining classifiers: objectTestIteration
             *
             *   Note: double values have to contain a dot, while strings have to start with '#'
             *

@@ -2,6 +2,9 @@
 
 #include <yarp/os/Time.h>
 
+#include <sstream>
+#include <fstream>
+
 using iCub::plantIdentification::PlantIdentificationModule;
 
 using iCub::plantIdentification::EventsThread;
@@ -400,6 +403,8 @@ bool PlantIdentificationModule::classify() {
 
 bool PlantIdentificationModule::completeClassification() {
 
+    using std::string;
+
     int combiningMethod = 0;
     double combSumScale = 1.0;
     double combMaxmaxScale = 1.0;
@@ -473,6 +478,30 @@ bool PlantIdentificationModule::completeClassification() {
     std::cout << "<<<<< WINNING CLASS: " << winningClass << "  sum/maxmax(" << sumWinningClass << "/" << maxmaxWinningClass << ") >>>>>" << std::endl;
     std::cout << "<<<<< WINNING CLASS: " << winningClass << "  sum/maxmax(" << sumWinningClass << "/" << maxmaxWinningClass << ") >>>>>" << std::endl;
     std::cout << "<<<<< WINNING CLASS: " << winningClass << "  sum/maxmax(" << sumWinningClass << "/" << maxmaxWinningClass << ") >>>>>" << std::endl;
+
+    // store everything
+    int objectIDInt = taskData->commonData.tpInt(100);
+    int iterationIDInt = taskData->commonData.tpInt(101);
+    string objectID = static_cast<std::ostringstream*>(&(std::ostringstream() << objectIDInt))->str();
+    string iterationID = static_cast<std::ostringstream*>(&(std::ostringstream() << iterationIDInt))->str();
+
+    std::ofstream multiRecDataFileTouch;
+    string fileNameMultiRecTouch = "obj" + objectID + "_task01_iter" + iterationID + ".dat";
+    multiRecDataFileTouch.open(fileNameMultiRecTouch.c_str());
+    for (int i = 0; i < taskData->commonData.tactAvgScores.size(); i++){
+        multiRecDataFileTouch << taskData->commonData.tactAvgScores[i] << " ";
+    }
+    multiRecDataFileTouch << "\n";
+    multiRecDataFileTouch.close();
+
+    std::ofstream multiRecDataFileVision;
+    string fileNameMultiRecVision = "obj" + objectID + "_task02_iter" + iterationID + ".dat";
+    multiRecDataFileVision.open(fileNameMultiRecVision.c_str());
+    for (int i = 0; i < taskData->commonData.vcAvgScores.size(); i++){
+        multiRecDataFileVision << taskData->commonData.vcAvgScores[i] << " ";
+    }
+    multiRecDataFileVision << "\n";
+    multiRecDataFileVision.close();
 
     return true;
 }
