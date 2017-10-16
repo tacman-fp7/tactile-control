@@ -27,14 +27,14 @@
      <module>
          <name>stableGrasp</name>
          <parameters>--from confObjectRecognition.ini</parameters>
-         <node>icub21</node>
+         <node>icub23</node>
          <tag>stableGrasp</tag>
      </module>
 	 
      <module>
          <name>tactile_object_recognition_main.lua</name>
          <parameters></parameters>
-         <node>icub21</node>
+         <node>icub23</node>
          <tag>stateMachine</tag>
      </module>
 	 
