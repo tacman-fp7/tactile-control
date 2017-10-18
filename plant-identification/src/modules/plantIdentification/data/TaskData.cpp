@@ -112,7 +112,7 @@ TaskData::TaskData(yarp::os::ResourceFinder &rf,iCub::plantIdentification::Contr
     commonData.fingerEncodersRawData.resize(16,0.0);      
 
     controllersUtil->getArmEncodersAngles(commonData.armEncodersAngles,true);
-    controllersUtil->getArmEncodersAnglesReferences(commonData.armEncodersAnglesReferences,true);
+    //controllersUtil->getArmEncodersAnglesReferences(commonData.armEncodersAnglesReferences,true);
 
     Bottle* objDetectPressureThresholds = rf.find("objDetectPressureThresholds").asList();
     commonData.objDetectPressureThresholds.resize(objDetectPressureThresholds->size(),0);

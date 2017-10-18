@@ -146,10 +146,10 @@ bool PortsUtil::init(yarp::os::ResourceFinder &rf){
         cout << dbgTag << "could not connect ports: " << icubSkinCompPortName << " -> " <<  moduleSkinCompPortName << "\n";
         return false;
     }
-    if (!Network::connect(icubHandEncodersRawPortName,moduleHandEncodersRawPortName)){
-        cout << dbgTag << "could not connect ports: " << icubHandEncodersRawPortName << " -> " <<  moduleHandEncodersRawPortName << "\n";
-        return false;
-    }
+//    if (!Network::connect(icubHandEncodersRawPortName,moduleHandEncodersRawPortName)){
+//        cout << dbgTag << "could not connect ports: " << icubHandEncodersRawPortName << " -> " <<  moduleHandEncodersRawPortName << "\n";
+//        return false;
+//    }
 
 
     return true;

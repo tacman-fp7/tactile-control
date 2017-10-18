@@ -252,7 +252,7 @@ bool ICubUtil::updateExternalData(ControllersUtil *controllersUtil,PortsUtil *po
     }
 
     controllersUtil->getArmEncodersAngles(commonData->armEncodersAngles);
-    controllersUtil->getArmEncodersAnglesReferences(commonData->armEncodersAnglesReferences);
+//    controllersUtil->getArmEncodersAnglesReferences(commonData->armEncodersAnglesReferences);
 
     processTactileData(commonData,realForceMappingEnabled);
     
