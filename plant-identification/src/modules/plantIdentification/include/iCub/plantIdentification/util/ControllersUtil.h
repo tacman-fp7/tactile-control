@@ -33,7 +33,7 @@ namespace iCub {
                 yarp::dev::IPWMControl *iPwm;
                 yarp::dev::IControlMode2 *iCtrl;
                 yarp::dev::IPositionControl *iPos;
-                yarp::dev::IVelocityControl2 *iVel;
+                yarp::dev::IVelocityControl *iVel;
                 yarp::dev::IPositionDirect *iPosDir;
                 yarp::dev::IPositionControl2 *iPosCtrl;
                 yarp::dev::IPidControl *iPid;

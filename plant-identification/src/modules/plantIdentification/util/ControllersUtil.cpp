@@ -326,9 +326,8 @@ bool ControllersUtil::setTaskControlModes(std::vector<int> &jointsList,int contr
 bool ControllersUtil::setArmInTaskPosition() {
 
     cout << dbgTag << "Reaching arm task position ... \t";
-    std::cout << "#### 1 #####" << std::endl;
+
     iVel->stop();
-    std::cout << "#### 2 #####" << std::endl;
 
     for(int i = 0; i < wholeArmJointsHome.size(); i++){
 
@@ -634,10 +633,8 @@ bool ControllersUtil::waitMoveDone(const double &i_timeout, const double &i_dela
     double start = Time::now();
 
     while (!ok && (start - Time::now() <= i_timeout)) {
-    std::cout << "#### 3 #####" << std::endl;
 
         iPos->checkMotionDone(&ok);
-    std::cout << "#### 4 #####" << std::endl;
         Time::delay(i_delay);
     }
 

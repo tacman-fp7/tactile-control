@@ -302,11 +302,11 @@ bool PortsUtil::sendGMMData(double gripStrength, double indexMiddleFingerPressur
 
     // arm encoders (16) (68-83)
     for(size_t i = 0; i < commonData->armEncodersAngles.size(); i++){
-        if (i == 8 && thAbdRefEnabled){
-            objGMMBottle.addDouble(commonData->armEncodersAnglesReferences[i]);
-        } else {
+//        if (i == 8 && thAbdRefEnabled){
+//            objGMMBottle.addDouble(commonData->armEncodersAnglesReferences[i]);
+//        } else {
             objGMMBottle.addDouble(commonData->armEncodersAngles[i]);
-        }
+//        }
     }
 
     // raw taxels feedback (60) (84-143)
