@@ -140,12 +140,14 @@ bool PlantIdentificationModule::updateModule() {
         }
 
         taskData->commonData.requestOpen = false;
-        open(yarp::os::Value(""));
+        open(yarp::os::Value("wide"));
     }
 
     if (taskData->commonData.classificationState == 2){
 
-        completeClassification();
+        // TODO choose the proper function according to the task: completeClassification() is used with "classify", while getTactileClassifierOutput_step2() is used with "ml get_tactile_classifier_output"
+        //completeClassification();
+        getTactileClassifierOutput_step2();
         taskData->commonData.classificationState = 0;
     }
 
@@ -359,6 +361,10 @@ bool PlantIdentificationModule::grasp() {
             taskData->commonData.tempParameters[80] = rate * taskData->commonData.overallFingerPressureMedian[1]; // middle finger
             std::cout << "Done.\n"; 
         }
+
+        //TODO TO REMOVE
+        open(yarp::os::Value(""));
+        Time::delay(3);
 
         task(EMPTY,NONE,Value(0));
         task(ADD,APPROACH,Value(0));
@@ -649,12 +655,114 @@ bool PlantIdentificationModule::ml(iCub::plantIdentification::RPCMlCmdArgName pa
         // reset the collected data
         ok = mlUtil.reset();
         break;
+    case GET_TACTILE_CLASSIFIER_OUTPUT:
+        // get and store tactile classifier output
+        getTactileClassifierOutput_step1();
+        break;
+    case GET_VISUAL_CLASSIFIER_OUTPUT:
+        // get and store visual classifier output
+        getVisualClassifierOutput();
+        break;
     }
 
     return ok;
 }
 /* *********************************************************************************************************************** */
 
+bool  PlantIdentificationModule::getTactileClassifierOutput_step1(){
+
+    taskData->commonData.classificationState = 1;
+    // run the tactile classification (it will store the data in taskData->commonData.tactAvgScores)
+    grasp();
+
+    return true;
+}
+
+bool  PlantIdentificationModule::getTactileClassifierOutput_step2(){
+
+    using std::string;
+
+
+    std::cout << "TACTILE CLASSIFIER SCORES" << std::endl;
+    for (int i = 0; i < taskData->commonData.tactAvgScores.size(); i++){
+        std::cout << "[ " << i + 1 << " : " << taskData->commonData.tactAvgScores[i] << " ] ";
+    }
+    std::cout << std::endl;
+
+    // store everything
+    int objectIDInt = taskData->commonData.tpInt(100);
+    int iterationIDInt = taskData->commonData.tpInt(101);
+    string objectID = static_cast<std::ostringstream*>(&(std::ostringstream() << objectIDInt))->str();
+    string iterationID = static_cast<std::ostringstream*>(&(std::ostringstream() << iterationIDInt))->str();
+    if (objectIDInt < 10){
+        objectID = "0" + objectID;
+    }
+    if (iterationIDInt < 10){
+        iterationID = "0" + iterationID;
+    }
+
+    std::ofstream multiRecDataFileTouch;
+    string fileNameMultiRecTouch = "output/obj" + objectID + "_task01_iter" + iterationID + ".dat";
+    multiRecDataFileTouch.open(fileNameMultiRecTouch.c_str());
+    for (int i = 0; i < taskData->commonData.tactAvgScores.size(); i++){
+        multiRecDataFileTouch << taskData->commonData.tactAvgScores[i] << " ";
+    }
+    multiRecDataFileTouch << "\n";
+    multiRecDataFileTouch.close();
+
+    return true;
+}
+
+bool  PlantIdentificationModule::getVisualClassifierOutput(){
+
+    using yarp::os::Time;
+    using std::string;
+
+    // read the visual recognition average scores
+    bool ok = portsUtil->readVisualClassifierAvgScores(taskData->commonData.vcAvgScores);
+
+    if (!ok){
+        std::cout << "<<< could not read visual recognition average scores (out of time) >>>" << std::endl;
+        return false;
+    }
+
+    if (taskData->commonData.vcAvgScores.size() == 0){
+        std::cout << "<<< could not read visual recognition average scores (returned 0 classes) >>>" << std::endl;
+        return false;
+    }
+
+
+    std::cout << "VISUAL CLASSIFIER SCORES" << std::endl;
+    for (int i = 0; i < taskData->commonData.vcAvgScores.size(); i++){
+        std::cout << "[ " << i + 1 << " : " << taskData->commonData.vcAvgScores[i] << " ] ";
+    }
+    std::cout << std::endl;
+
+
+    // store everything
+    int objectIDInt = taskData->commonData.tpInt(100);
+    int iterationIDInt = taskData->commonData.tpInt(101);
+    string objectID = static_cast<std::ostringstream*>(&(std::ostringstream() << objectIDInt))->str();
+    string iterationID = static_cast<std::ostringstream*>(&(std::ostringstream() << iterationIDInt))->str();
+    if (objectIDInt < 10){
+        objectID = "0" + objectID;
+    }
+    if (iterationIDInt < 10){
+        iterationID = "0" + iterationID;
+    }
+
+    std::ofstream multiRecDataFileVision;
+    string fileNameMultiRecVision = "obj" + objectID + "_task02_iter" + iterationID + ".dat";
+    multiRecDataFileVision.open(fileNameMultiRecVision.c_str());
+    for (int i = 0; i < taskData->commonData.vcAvgScores.size(); i++){
+        multiRecDataFileVision << taskData->commonData.vcAvgScores[i] << " ";
+    }
+    multiRecDataFileVision << "\n";
+    multiRecDataFileVision.close();
+
+    return true;
+    return true;
+}
 
 /* *********************************************************************************************************************** */
 /* ******* RPC Quit module                                                  ********************************************** */

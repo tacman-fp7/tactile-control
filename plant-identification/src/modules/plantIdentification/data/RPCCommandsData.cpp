@@ -106,7 +106,9 @@ RPCCommandsData::RPCCommandsData(){
     add("discard",DISCARD_LAST_FEATURES,"DISCARD LAST FEATURES");
     add("process",PROCESS_COLLECTED_DATA,"PROCESS LEARNED DATA");
     add("get_ready",GET_READY,"GET READY");
-    add("reset",RESET,"RESET DATA");
+    add("reset", RESET, "RESET DATA");
+    add("get_tc_out", GET_TACTILE_CLASSIFIER_OUTPUT, "GET TACTILE CLASSIFIER OUTPUT");
+    add("get_vc_out", GET_VISUAL_CLASSIFIER_OUTPUT, "GET VISUAL CLASSIFIER OUTPUT");
 
 
     dbgTag = "RPCCommandsData: ";

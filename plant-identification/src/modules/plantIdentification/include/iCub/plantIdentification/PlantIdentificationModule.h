@@ -56,7 +56,12 @@ namespace iCub {
 
                 /* ****** Debug attributes                              ****** */
                 std::string dbgTag;
-           
+
+                bool getTactileClassifierOutput_step1();
+                bool getTactileClassifierOutput_step2();
+                bool getVisualClassifierOutput();
+                bool completeClassification();
+
             public:
                
                 PlantIdentificationModule();
@@ -75,7 +80,6 @@ namespace iCub {
                 bool arm(yarp::os::Value paramValue);
                 bool grasp();
                 bool classify();
-                bool completeClassification();
                 bool wave();
                 bool ml(iCub::plantIdentification::RPCMlCmdArgName paramName,yarp::os::Value paramValue);
                 bool quit();

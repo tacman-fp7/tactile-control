@@ -100,7 +100,9 @@ namespace iCub {
             DISCARD_LAST_FEATURES,
             PROCESS_COLLECTED_DATA,
             GET_READY,
-            RESET
+            RESET,
+            GET_TACTILE_CLASSIFIER_OUTPUT,
+            GET_VISUAL_CLASSIFIER_OUTPUT
         };
 
         enum FingerJoint {
