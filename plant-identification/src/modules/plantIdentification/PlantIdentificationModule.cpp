@@ -484,6 +484,12 @@ bool PlantIdentificationModule::completeClassification() {
     int iterationIDInt = taskData->commonData.tpInt(101);
     string objectID = static_cast<std::ostringstream*>(&(std::ostringstream() << objectIDInt))->str();
     string iterationID = static_cast<std::ostringstream*>(&(std::ostringstream() << iterationIDInt))->str();
+    if (objectIDInt < 10){
+        objectID = "0" + objectID;
+    }
+    if (iterationIDInt < 10){
+        iterationID = "0" + iterationID;
+    }
 
     std::ofstream multiRecDataFileTouch;
     string fileNameMultiRecTouch = "obj" + objectID + "_task01_iter" + iterationID + ".dat";
